@@ -1,3 +1,43 @@
 {
-  "extends": "astro/tsconfigs/base"
+  "extends": "astro/tsconfigs/strict",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "plugins": [
+      {
+        "name": "@astrojs/ts-plugin"
+      }
+    ],
+    "paths": {
+      "@components/*": [
+        "src/components/*"
+      ],
+      "@ts/*": [
+        "src/types/*"
+      ],
+      "@fonts/*": [
+        "src/fonts/*"
+      ],
+      "@partials/*": [
+        "src/partials/*"
+      ],
+      "@img/*": [
+        "src/img/*"
+      ],
+      "@pages/*": [
+        "src/pages/*"
+      ],
+      "@styles/*": [
+        "src/styles/*"
+      ],
+      "@utils/*": [
+        "utils/*"
+      ],
+      "@layouts/*": [
+        "src/layouts/*"
+      ],
+      "@data/*": [
+        "_data/*"
+      ],
+    }
+  }
 }

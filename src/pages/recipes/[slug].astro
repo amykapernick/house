@@ -1,0 +1,40 @@
+---
+import { getCollection } from "astro:content";
+
+import Layout from "@layouts/recipe.astro";
+
+import formatIngredients from "@utils/meals/parseIngredients";
+
+import type { RecipeContent, Ingredient } from "@ts/meals";
+import IngredientItem from "@components/meals/ingredient.astro";
+
+export async function getStaticPaths() {
+	const recipes = await getCollection("recipes");
+
+	return recipes.map((r) => ({
+		params: { slug: r.slug },
+		props: { recipe: r },
+	}));
+}
+
+const recipe: RecipeContent = Astro.props.recipe;
+const { Content } = await recipe.render();
+const ingredients: Ingredient[] = formatIngredients(recipe.data.ingredients);
+---
+
+<Layout>
+	<h1>{recipe.data.title}</h1>
+	{recipe.data.image && <img src={recipe.data.image} />}
+	<h2>Ingredients</h2>
+	<ul>
+		{
+			ingredients.map((i) => (
+				<li>
+					<IngredientItem {...i} />
+				</li>
+			))
+		}
+	</ul>
+	<h2>Method</h2>
+	<Content />
+</Layout>

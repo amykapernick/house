@@ -1,0 +1,14 @@
+---
+import type { RecipeContent } from "@ts/meals";
+
+import formatTime from "@utils/meals/formatTime";
+
+const recipe: RecipeContent = Astro.props.recipe;
+---
+
+<>
+	{recipe.data.image && <img src={recipe.data.image} />}
+	<h3><a href={`/recipes/${recipe.slug}`}>{recipe.data.title}</a></h3>
+	<span>{recipe.data.difficulty}</span>
+	<span>{formatTime(recipe.data.time)}</span>
+</>
