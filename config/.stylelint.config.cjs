@@ -1,15 +1,30 @@
 module.exports = {
 	plugins: [
 		'stylelint-order',
-		'stylelint-use-nesting'
+		'stylelint-use-nesting',
+		// 'stylelint-prettier',
 	],
 	extends: [
+		'stylelint-config-astro',
+		// 'stylelint-config-html/astro',
+		// "stylelint-prettier/recommended",
 		'stylelint-config-property-sort-order-smacss',
 		'stylelint-config-standard',
-		'stylelint-config-astro'
+		// "stylelint-config-html/html",
+		// 'stylelint-config-html/astro',
+		// 'stylelint-config-astro',
 	],
+	// overrides: [
+	// 	{
+	// 		files: ['*.astro', '**/*.astro'],
+	// 		customSyntax: 'postcss-html'
+	// 	}
+	// ],
 	rules: {
 		'at-rule-empty-line-before': 'always',
+		'at-rule-no-unknown': [true, {
+			ignoreAtRules: ['define-mixin']
+		}],
 		'block-no-empty': true,
 		'color-hex-length': 'long',
 		'color-named': 'never',
@@ -25,6 +40,15 @@ module.exports = {
 			}
 		],
 		'declaration-block-no-shorthand-property-overrides': true,
+		'declaration-block-no-redundant-longhand-properties': [
+			true,
+			{
+				ignoreShorthands: [
+					'grid-template',
+					'font'
+				]
+			}
+		],
 		'declaration-no-important': true,
 		'function-calc-no-unspaced-operator': true,
 		'function-url-no-scheme-relative': true,
@@ -37,6 +61,7 @@ module.exports = {
 		'no-invalid-position-at-import-rule': null,
 		'number-max-precision': 3,
 		'order/order': ['custom-properties', 'declarations'],
+		// "prettier/prettier": true,
 		'property-no-unknown': [
 			true,
 			{
@@ -60,6 +85,9 @@ module.exports = {
 		'selector-type-no-unknown': true,
 		'shorthand-property-no-redundant-values': true,
 		'string-no-newline': true,
-		'unit-no-unknown': true
+		'unit-no-unknown': true,
+		'value-keyword-case': ['lower', {
+			ignoreKeywords: 'currentColor'
+		}]
 	}
 }

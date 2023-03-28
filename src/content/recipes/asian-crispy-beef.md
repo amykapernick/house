@@ -5,7 +5,7 @@ difficulty: Easy
 categories:
   - Beef
   - Main
-image: /img/cms/46329135.jpg
+image: /img/meals/46329135.jpg
 ingredients:
   - 1 tablespoon unsalted peanuts
   - 2 cloves of garlic

@@ -1,19 +1,49 @@
 ---
-import { getCollection } from "astro:content";
+import { getCollection } from 'astro:content';
+import Layout from '@layouts/default.astro';
+import RecipeCard from '@components/meals/recipeCard.astro';
+import type { RecipeContent } from '@ts/meals';
 
-import Layout from "@layouts/default.astro";
-import RecipeCard from "@components/meals/recipeCard.astro";
-
-const recipes = await getCollection("recipes");
+const recipes = await getCollection('recipes');
 ---
+
+<style lang="postcss">
+	.cards {
+		display: flex; 
+		flex-wrap: wrap;
+		justify-content: space-between; 
+		margin: -10px;
+		padding: 0;
+
+		& li { 
+			flex: 1 1 200px;
+			margin: 10px;
+			padding: 0; 
+			list-style: none;
+		}  
+	}
+
+	@supports(grid-template-areas: '.') {
+		.cards {
+			display: grid;
+			grid-gap: 20px;
+			grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+			margin: 0;
+
+			& li {
+				margin: 0;
+			}
+		}
+	}
+</style>
 
 <Layout>
 	<h1>Home</h1>
-	<ul>
+	<ul class='cards'>
 		{
-			recipes.map((recipe) => (
+			recipes.map((recipe: RecipeContent) => (
 				<li>
-					<RecipeCard {recipe} />
+					<RecipeCard recipe={recipe} />
 				</li>
 			))
 		}

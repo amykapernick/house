@@ -1,0 +1,27 @@
+---
+import path from "path";
+import { readFileSync } from "fs";
+import type { HTMLAttributes } from "astro/types";
+
+type Props = HTMLAttributes<"svg"> & {
+  name: string;
+};
+
+const { name, ...args } = Astro.props;
+
+const imagePath: string = path.join(process.cwd(), "src/img", `${name}.svg`);
+
+const imageData = readFileSync(imagePath, {
+  encoding: "utf-8",
+});
+
+let props: string = "";
+
+Object.entries(args).forEach(([key, value]) => {
+  props += `${key}="${value}" `;
+});
+
+const image: string = imageData?.replace(/^<svg /, `<svg ${props}`);
+---
+
+<Fragment set:html={image} />

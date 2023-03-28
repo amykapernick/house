@@ -18,6 +18,7 @@ module.exports = {
 		}
 	],
 	rules: {
+		"prettier/prettier": true,
 		'linebreak-style': 0,
 		'no-tabs': 0,
 		camelcase: 0,
@@ -38,9 +39,24 @@ module.exports = {
 		],
 		'no-var': `error`,
 		'no-unused-vars': 1,
-		'one-var': [2, `consecutive`],
+		'one-var': null,
 		quotes: [`error`, `backtick`],
 		'no-param-reassign': 0,
-		'class-methods-use-this': 0
+		'class-methods-use-this': 0,
+		"import/order": [
+			"error",
+			{
+				"groups": [
+					"builtin",
+					"external",
+					"internal",
+					"parent",
+					"sibling",
+					"index",
+					"object",
+					"type"
+				]
+			}
+		]
 	}
 };

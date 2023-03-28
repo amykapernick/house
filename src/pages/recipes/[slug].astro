@@ -1,20 +1,18 @@
 ---
 import { getCollection } from "astro:content";
-
 import Layout from "@layouts/recipe.astro";
-
 import formatIngredients from "@utils/meals/parseIngredients";
-
 import type { RecipeContent, Ingredient } from "@ts/meals";
 import IngredientItem from "@components/meals/ingredient.astro";
+import { Picture } from '@astrojs/image/components';
 
 export async function getStaticPaths() {
-	const recipes = await getCollection("recipes");
+  const recipes = await getCollection("recipes");
 
-	return recipes.map((r) => ({
-		params: { slug: r.slug },
-		props: { recipe: r },
-	}));
+  return recipes.map((r) => ({
+    params: { slug: r.slug },
+    props: { recipe: r },
+  }));
 }
 
 const recipe: RecipeContent = Astro.props.recipe;
@@ -22,19 +20,34 @@ const { Content } = await recipe.render();
 const ingredients: Ingredient[] = formatIngredients(recipe.data.ingredients);
 ---
 
+<style>
+  .image {
+    width: 100%;
+    max-width: 200px;
+  }
+</style>
+
 <Layout>
-	<h1>{recipe.data.title}</h1>
-	{recipe.data.image && <img src={recipe.data.image} />}
-	<h2>Ingredients</h2>
-	<ul>
-		{
-			ingredients.map((i) => (
-				<li>
-					<IngredientItem {...i} />
-				</li>
-			))
-		}
-	</ul>
-	<h2>Method</h2>
-	<Content />
+  <h1>{recipe.data.title}</h1>
+  {recipe.data.image && <Picture
+				class='image'
+				src={recipe.data.image}
+				alt={`Photo of ${recipe.data.title}`}
+				widths={[200]}
+				aspectRatio={1}
+				sizes={''}
+				formats={['avif', 'webp', 'jpeg']}
+			/>}
+  <h2>Ingredients</h2>
+  <ul>
+    {
+      ingredients.map((i) => (
+        <li>
+          <IngredientItem {...i} />
+        </li>
+      ))
+    }
+  </ul>
+  <h2>Method</h2>
+  <Content />
 </Layout>

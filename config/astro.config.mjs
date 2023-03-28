@@ -1,4 +1,4 @@
-import { defineConfig } from 'astro/config'
+import { defineConfig } from 'astro/config';
 import image from '@astrojs/image';
 
 export default defineConfig({
@@ -7,8 +7,8 @@ export default defineConfig({
 	// root: new URL('../', import.meta.url)
 	vite: {
 		css: {
-			postcss: './config'
+			postcss: `./config`
 		}
 	},
 	integrations: [image()],
-})
+});

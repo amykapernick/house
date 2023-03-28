@@ -2,23 +2,23 @@
 import Header from "@partials/header.astro";
 import Footer from "@partials/footer.astro";
 import DevStyles from "@partials/devStyles.astro";
-
+ 
 import type { LayoutData } from "@ts/global";
 
 import Favicon from "@img/favicon.ico";
 
-import "@styles/main.css";
+import "@styles/main.postcss.css";
 
-const env = import.meta.env.MODE;
+const env = import.meta.env.MODE; 
 
 const siteData: LayoutData = {
-	title: "Home",
-	description: "Meal Planning, Tasks, Reminders, Calendars",
+  title: "Home",
+  description: "Meal Planning, Tasks, Reminders, Calendars",
 };
 
 const content = {
-	...siteData,
-	...Astro?.props?.content,
+  ...siteData,
+  ...Astro?.props?.content,
 };
 
 const { title, description } = content;
@@ -26,26 +26,26 @@ const { title, description } = content;
 
 <!DOCTYPE html>
 <html lang="en-AU">
-	<head>
-		<meta charset="utf-8" />
-		<meta http-equiv="x-ua-compatible" content="ie=edge" />
-		<meta
-			name="viewport"
-			content="width=device-width,initial-scale=1,shrink-to-fit=no"
-		/>
-		<link rel="shortcut icon" href={Favicon} />
-		<title>{title}</title>
-		<meta name="description" content={description} />
-	</head>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,shrink-to-fit=no"
+    />
+    <link rel="shortcut icon" href={Favicon} />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+  </head>
 
-	<body class={Astro.props.class}>
-		{env === "development" && <DevStyles />}
-		<Header />
+  <body class={Astro.props.class}>
+    {env === "development" && <DevStyles />}
+    <Header />
 
-		<main>
-			<slot />
-		</main>
+    <main>
+      <slot />
+    </main>
 
-		<Footer />
-	</body>
+    <Footer />
+  </body>
 </html>
