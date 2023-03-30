@@ -54,8 +54,15 @@ const days = [
 	const dayButtons = document.querySelectorAll('.list button')
 
 	buttons.forEach(button => {
-		button.addEventListener('click', ({target}) => {
-			const recipe = target.getAttribute('data-recipe')
+		button.addEventListener('click', (props: {currentTarget: any}) => {
+			const { currentTarget } = props
+
+			if(!currentTarget) return
+
+			const recipe = currentTarget.getAttribute('data-recipe')
+
+			if(!recipe) return
+
 			const dropdown = document.querySelector(`#save_${recipe}`)
 
 			if(!dropdown) return
@@ -74,7 +81,8 @@ const days = [
 			const day = button.getAttribute('data-day') || 0
 			const dropdown = document.querySelector(`#save_${recipe}`)
 			const currentWeek = '2023-03-25'
-			const savedRecipes = localStorage.getItem('recipes') ? JSON.parse(localStorage.getItem('recipes')) : {[currentWeek]: []}
+			const local = localStorage.getItem('recipes')
+			const savedRecipes = local ? JSON.parse(local) : {[currentWeek]: []}
 
 			savedRecipes[currentWeek][day] = recipe
 

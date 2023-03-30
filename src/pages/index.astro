@@ -2,8 +2,6 @@
 import { getCollection } from 'astro:content';
 import Layout from '@layouts/default.astro';
 import RecipeFeed from '@components/meals/recipeFeed.astro';
-import generateCategories from '@utils/meals/categories';
-import type { Recipe } from '@ts/meals';
 
 const allRecipes = await getCollection('recipes');
 const recipes = allRecipes.splice(0, 6)
