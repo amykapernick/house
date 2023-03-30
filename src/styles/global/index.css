@@ -1,11 +1,13 @@
+@import './fonts';
+
+@import './variables';
+
 @import './typo';
 
-*, *:before, *:after {
+*, *::before, *::after {
 	box-sizing: border-box;
 }
 
 body {
-	font-family: Arial, sans-serif;
-	font-size: 1.1em;
-	
+	background: var(--background);	
 } 

@@ -2,28 +2,16 @@ module.exports = {
 	plugins: [
 		'stylelint-order',
 		'stylelint-use-nesting',
-		// 'stylelint-prettier',
 	],
 	extends: [
 		'stylelint-config-astro',
-		// 'stylelint-config-html/astro',
-		// "stylelint-prettier/recommended",
 		'stylelint-config-property-sort-order-smacss',
 		'stylelint-config-standard',
-		// "stylelint-config-html/html",
-		// 'stylelint-config-html/astro',
-		// 'stylelint-config-astro',
 	],
-	// overrides: [
-	// 	{
-	// 		files: ['*.astro', '**/*.astro'],
-	// 		customSyntax: 'postcss-html'
-	// 	}
-	// ],
 	rules: {
 		'at-rule-empty-line-before': 'always',
 		'at-rule-no-unknown': [true, {
-			ignoreAtRules: ['define-mixin']
+			ignoreAtRules: ['define-mixin', 'mixin', 'import']
 		}],
 		'block-no-empty': true,
 		'color-hex-length': 'long',
@@ -86,8 +74,11 @@ module.exports = {
 		'shorthand-property-no-redundant-values': true,
 		'string-no-newline': true,
 		'unit-no-unknown': true,
-		'value-keyword-case': ['lower', {
-			ignoreKeywords: 'currentColor'
-		}]
+		'value-keyword-case': [
+			'lower', 
+			{
+				ignoreKeywords: 'currentColor'
+			}
+		]
 	}
 }

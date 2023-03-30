@@ -1,5 +1,6 @@
 import { defineConfig } from 'astro/config';
 import image from '@astrojs/image';
+import react from "@astrojs/react";
 
 export default defineConfig({
 	// your configuration options here...
@@ -10,5 +11,8 @@ export default defineConfig({
 			postcss: `./config`
 		}
 	},
-	integrations: [image()],
+	integrations: [
+		image(),
+		react()
+	],
 });

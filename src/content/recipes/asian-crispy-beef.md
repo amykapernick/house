@@ -7,6 +7,7 @@ categories:
   - Main
 image: /img/meals/46329135.jpg
 ingredients:
+  - 200 g fresh mixed salad veg, such as round lettuce, carrot, radishes, cress, spinach
   - 1 tablespoon unsalted peanuts
   - 2 cloves of garlic
   - 5cm piece of ginger

@@ -1,0 +1,105 @@
+---
+interface Props {
+	recipe: string
+}
+
+const recipe = Astro.props.recipe
+
+const days = [
+	{
+		name: 'Saturday',
+		number: 6
+	},
+	{
+		name: 'Sunday',
+		number: 0
+	},
+	{
+		name: 'Monday',
+		number: 1
+	},
+	{
+		name: 'Tuesday',
+		number: 2
+	},
+	{
+		name: 'Wednesday',
+		number: 3
+	},
+	{
+		name: 'Thursday',
+		number: 4
+	},
+	{
+		name: 'Friday',
+		number: 5
+	}
+]
+---
+
+<style>
+	.dropdown {
+		& .list {
+			display: none;
+		}
+
+		&[data-active="true"] .list {
+			display: block;
+		}
+	}
+</style>
+
+<script>
+	const buttons = document.querySelectorAll('.save_recipe')
+	const dayButtons = document.querySelectorAll('.list button')
+
+	buttons.forEach(button => {
+		button.addEventListener('click', ({target}) => {
+			const recipe = target.getAttribute('data-recipe')
+			const dropdown = document.querySelector(`#save_${recipe}`)
+
+			if(!dropdown) return
+
+			if(dropdown?.getAttribute('data-active') === 'true') {
+				dropdown.setAttribute('data-active', 'false')
+			} else {
+				dropdown.setAttribute('data-active', 'true')
+			}
+		})
+	})
+
+	dayButtons.forEach(button => {
+		button.addEventListener('click', () => {
+			const recipe: string = button.getAttribute('data-recipe')
+			const day: number = button.getAttribute('data-day')
+			const dropdown = document.querySelector(`#save_${recipe}`)
+			const currentWeek = '2023-03-25'
+			const savedRecipes = localStorage.getItem('recipes') ? JSON.parse(localStorage.getItem('recipes')) : {[currentWeek]: []}
+
+			savedRecipes[currentWeek][day] = recipe
+
+			localStorage.setItem('recipes', JSON.stringify(savedRecipes))
+
+			if(!dropdown) return
+
+			dropdown.setAttribute('data-active', 'false')
+		})
+	})
+</script>
+
+<div id={`save_${recipe}`} class="dropdown">
+	<button data-recipe={recipe} class="save_recipe">Save Recipe</button>
+	<ul class="list">
+		{days.map(day => (
+			<li>
+				<button 
+					data-day={day.number}
+					data-recipe={recipe}
+				>
+					{day.name}
+				</button>
+			</li>
+		))}
+	</ul>
+</div>
+

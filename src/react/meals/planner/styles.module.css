@@ -1,0 +1,16 @@
+.week {
+	display: flex;
+	margin: 20px 0;
+	padding: 0;
+	list-style: none;
+}
+
+.day {
+	flex: 1 1 100px;
+	margin: 0;
+	padding: 10px;
+
+	& h2 {
+		font-size: 1.2em;
+	}
+}

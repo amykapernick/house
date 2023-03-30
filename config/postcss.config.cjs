@@ -2,12 +2,13 @@ const cssImport = require(`postcss-import`);
 const stylelint = require(`stylelint`);
 const nesting = require(`postcss-nesting`);
 const mixins = require(`postcss-mixins`);
+const path = require(`path`);
 
 module.exports = {
 	plugins: [
 		cssImport,
 		mixins({
-			mixinsFiles: `./styles/mixins/*.css`
+			mixinsFiles: path.join(__dirname, `../src/styles/mixins/*.css`)
 		}),
 		nesting,
 		stylelint({
@@ -15,4 +16,4 @@ module.exports = {
 			quiet: true
 		})
 	],
-};
+}; 

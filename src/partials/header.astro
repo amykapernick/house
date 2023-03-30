@@ -1,4 +1,65 @@
 ---
+import type { MenuItem } from "@ts/global";
+
+const menuItems: MenuItem[] = [
+  {
+	label: 'Home',
+	link: '/',
+  },
+  {
+	label: 'Recipes',
+	link: '/recipes',
+  },
+  {
+	label: 'Meal Planner',
+	link: '/meal-planning'
+  }
+]; 
 ---
 
-<header></header>
+<style>
+	header {
+
+		@mixin container_spacing;
+
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		font-size: 1.2em;
+		font-weight: 700;
+	}
+ 
+	.title {
+		display: block;
+		font-size: 3em;
+		text-decoration: none;
+	}
+
+	nav {
+		& ul {
+			display: flex;
+			margin: -10px;
+		}
+
+		& li {
+			margin: 10px;
+		}
+
+		& a {
+			padding: 10px;
+		}
+	}
+</style>
+
+<header>
+	<a href="/" class="title">🏡</a>
+	  <nav>
+		<ul>
+			{menuItems.map(({label, link}) => (
+				<li>
+					<a href={link}>{label}</a>	
+				</li>
+			))}
+		</ul>
+	</nav>
+</header>

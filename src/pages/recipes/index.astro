@@ -3,14 +3,18 @@ import { getCollection } from 'astro:content';
 import Layout from '@layouts/default.astro';
 import RecipeFeed from '@components/meals/recipeFeed.astro';
 import generateCategories from '@utils/meals/categories';
-import type { Recipe } from '@ts/meals';
+import type { Category } from '@ts/meals';
+import Categories from '@components/meals/categories.astro';
 
-const allRecipes = await getCollection('recipes');
-const recipes = allRecipes.splice(0, 6)
+const recipes = await getCollection('recipes');
+const categories: Category[] = generateCategories(recipes);
 
 ---
 
+
+
 <Layout>
-	<h2>Recipes</h2>
+	<h1>Recipes</h1>
+	<Categories categories={categories} />
 	<RecipeFeed recipes={recipes} />
 </Layout>

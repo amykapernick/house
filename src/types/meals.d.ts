@@ -23,3 +23,8 @@ export type Ingredient = {
 	full?: string | undefined
 	category?: string | undefined
 }
+
+export type Category = {
+	label: string
+	slug: string
+}
