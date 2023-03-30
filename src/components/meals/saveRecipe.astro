@@ -70,8 +70,8 @@ const days = [
 
 	dayButtons.forEach(button => {
 		button.addEventListener('click', () => {
-			const recipe: string = button.getAttribute('data-recipe')
-			const day: number = button.getAttribute('data-day')
+			const recipe = button.getAttribute('data-recipe')
+			const day = button.getAttribute('data-day') || 0
 			const dropdown = document.querySelector(`#save_${recipe}`)
 			const currentWeek = '2023-03-25'
 			const savedRecipes = localStorage.getItem('recipes') ? JSON.parse(localStorage.getItem('recipes')) : {[currentWeek]: []}
