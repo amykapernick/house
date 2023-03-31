@@ -19,8 +19,8 @@ export type RecipeContent = {
 export type Ingredient = {
 	quantity?: number | undefined
 	unit?: string | undefined
-	ingredient?: string | undefined
-	full?: string | undefined
+	ingredient: string
+	full: string
 	category?: string | undefined
 }
 

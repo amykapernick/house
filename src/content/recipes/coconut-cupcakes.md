@@ -15,7 +15,6 @@ ingredients:
   - 1 tbsp vanilla extract
   - 1 tbsp cider vinegar
   - 1/2 cup shredded coconut
-  - ""
 ---
 1. Preheat oven 160C fan forced
 2. Mix flour, sugar, baking powder, bicarb and salt

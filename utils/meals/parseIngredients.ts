@@ -23,7 +23,7 @@ const units: string[] = [
 	'tin',
 	'bunch'
 ]
-const matchQuantity: string = '(?<quantity>(\\d|\\/|\\.|-)+(?:cm)*)*'
+const matchQuantity: string = '(?<quantity>(\\d|\\/|\\.|-| )+(?:cm)*)*'
 const matchUnit: string = `(?:(?<unit>${units.join('|')})s* )`
 const matchIngredient: string = '(?<ingredient>.+?)'
 
