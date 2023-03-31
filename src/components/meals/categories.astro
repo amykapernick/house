@@ -43,7 +43,7 @@ const {categories, current} = Astro.props
 	{categories.map(({label, slug}) => (
 		<li>
 			<a 
-				href={`/recipes/${slug}`}
+				href={`/recipes/category/${slug}`}
 				data-current={slug === current ? 'true' : 'false'}
 			>
 				{label}

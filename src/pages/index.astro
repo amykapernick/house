@@ -9,5 +9,5 @@ const recipes = await getCollection('recipes');
 
 <Layout>
 	<h2>Recipes</h2>
-	<RecipeFeed recipes={recipes.splice(0, 6)} />
+	<RecipeFeed recipes={recipes.slice(0, 6)} />
 </Layout>
