@@ -1,4 +1,5 @@
 import type { RecipeContent } from "@ts/meals"
+import { addDays, format, parse } from "date-fns"
 import { useEffect, useState } from "react"
 import RecipeCard from "../recipeCard"
 
@@ -40,7 +41,7 @@ const MealPlanner = (props: {recipes: RecipeContent[]}) => {
 	const localRecipes = localStorage.getItem('recipes')
 	const [savedRecipes, setRecipes] = useState([])
 	const [currentWeek, setCurrentWeek] = useState('2023-03-25')
-	const [currentRecipes, setCurrentRecipes] = useState<string[]>([])
+	const [currentRecipes, setCurrentRecipes] = useState<string[][]>([])
 	const allRecipes: Record<string, RecipeContent> = {}
 
 	recipes.forEach(recipe => {
@@ -61,12 +62,17 @@ const MealPlanner = (props: {recipes: RecipeContent[]}) => {
 	
 	return (
 		<>
+			<p>{format(parse(currentWeek, 'yyyy-MM-dd', new Date()), 'dd MMM')} - {format(addDays(parse(currentWeek, 'yyyy-MM-dd', new Date()), 6), 'dd MMM')}</p>
 			<ul className={styles.week}>
 				{days.map(({name, number}) => (
 					<li className={styles.day} key={number}>
 						<h2>{name}</h2>
 						{currentRecipes[number] && 
-							<RecipeCard recipe={allRecipes[currentRecipes[number]]} />
+							<ul className={styles.cards}>
+								{currentRecipes[number].map(recipe => (
+								<li key={recipe}><RecipeCard recipe={allRecipes[recipe]} /></li>
+							))}
+							</ul>
 						}
 					</li>
 				))}

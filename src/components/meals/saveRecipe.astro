@@ -1,9 +1,11 @@
 ---
+
 interface Props {
 	recipe: string
+	class?: string
 }
 
-const recipe = Astro.props.recipe
+const {recipe, ...props } = Astro.props
 
 const days = [
 	{
@@ -38,7 +40,10 @@ const days = [
 ---
 
 <style>
-	.dropdown {
+	div {
+		position: relative;
+		font-size: 0.8em;
+
 		& .list {
 			display: none;
 		}
@@ -47,11 +52,45 @@ const days = [
 			display: block;
 		}
 	}
+
+	button {
+		display: block;
+		width: 100%;
+	}
+
+	.list {
+		position: absolute;
+		z-index: 2;
+		width: 100%;
+		margin: 5px 0 0;
+		padding: 10px;
+		background: var(--background);
+		box-shadow: 0 0 10px rgb(0 0 0 / 20%);
+		font-size: 0.8em;
+		list-style: none;
+
+		& li {
+			&:not(:last-child) {
+				margin-bottom: 10px;
+			}
+		}
+
+		& button {
+			&:not([data-selected="true"]) {
+
+				@mixin button_secondary;
+			}
+		}
+	}
 </style>
 
 <script>
 	const buttons = document.querySelectorAll('.save_recipe')
 	const dayButtons = document.querySelectorAll('.list button')
+	const currentWeek = '2023-03-25'
+	const currentSavedRecipes = localStorage.getItem('recipes')
+	const parsedRecipes = currentSavedRecipes ? JSON.parse(currentSavedRecipes) : {}
+	const currentWeekRecipes = parsedRecipes[currentWeek] || []
 
 	buttons.forEach(button => {
 		button.addEventListener('click', (props: {currentTarget: any}) => {
@@ -76,15 +115,33 @@ const days = [
 	})
 
 	dayButtons.forEach(button => {
+		const recipe = button.getAttribute('data-recipe')
+		const day = button.getAttribute('data-day') || 0
+		const dropdown = document.querySelector(`#save_${recipe}`)
+
+		if(currentWeekRecipes[day]?.includes(button.getAttribute('data-recipe'))) {
+			button.setAttribute('data-selected', 'true')
+		}
+
 		button.addEventListener('click', () => {
-			const recipe = button.getAttribute('data-recipe')
-			const day = button.getAttribute('data-day') || 0
-			const dropdown = document.querySelector(`#save_${recipe}`)
-			const currentWeek = '2023-03-25'
 			const local = localStorage.getItem('recipes')
 			const savedRecipes = local ? JSON.parse(local) : {[currentWeek]: []}
 
-			savedRecipes[currentWeek][day] = recipe
+			if(!savedRecipes[currentWeek]) {
+				savedRecipes[currentWeek] = []
+			}
+
+			if(!savedRecipes[currentWeek][day]) {
+				savedRecipes[currentWeek][day] = []
+			}
+
+			if(button.getAttribute('data-selected') === 'true') {
+				savedRecipes[currentWeek][day] = savedRecipes[currentWeek][day].filter((item: string) => item !== recipe)
+				button.setAttribute('data-selected', 'false')
+			}
+			else {
+				savedRecipes[currentWeek][day].push(recipe)
+			}			
 
 			localStorage.setItem('recipes', JSON.stringify(savedRecipes))
 
@@ -95,7 +152,7 @@ const days = [
 	})
 </script>
 
-<div id={`save_${recipe}`} class="dropdown">
+<div id={`save_${recipe}`} {...props}>
 	<button data-recipe={recipe} class="save_recipe">Save Recipe</button>
 	<ul class="list">
 		{days.map(day => (

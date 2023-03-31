@@ -8,7 +8,7 @@ module.exports = {
 	plugins: [
 		cssImport,
 		mixins({
-			mixinsFiles: path.join(__dirname, `../src/styles/mixins/*.css`)
+			mixinsFiles: path.join(__dirname, `../src/styles/mixins/*`)
 		}),
 		nesting,
 		stylelint({

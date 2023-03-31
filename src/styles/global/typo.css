@@ -62,3 +62,8 @@ nav {
 		}
 	}
 }
+
+button, .btn, input[type="submit"] {
+
+	@mixin button;
+}
