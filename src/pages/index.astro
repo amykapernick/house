@@ -3,12 +3,11 @@ import { getCollection } from 'astro:content';
 import Layout from '@layouts/default.astro';
 import RecipeFeed from '@components/meals/recipeFeed.astro';
 
-const allRecipes = await getCollection('recipes');
-const recipes = allRecipes.splice(0, 6)
+const recipes = await getCollection('recipes');
 
 ---
 
 <Layout>
 	<h2>Recipes</h2>
-	<RecipeFeed recipes={recipes} />
+	<RecipeFeed recipes={recipes.splice(0, 6)} />
 </Layout>

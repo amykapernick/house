@@ -1,5 +1,7 @@
 ---
 title: BLT / BLAT (or similar)
+time: 0.25
+difficulty: Easy
 categories:
   - Sandwich
 ingredients:
