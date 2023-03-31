@@ -29,7 +29,7 @@ const ShoppingList = (props: {recipes: RecipeContent[]}) => {
 		if(!localRecipes) return;
 
 		const data = JSON.parse(localRecipes)
-		const currentRecipes = data[currentWeek] || []
+		const currentRecipes: string[][] = data[currentWeek] || []
 		const ingredients: Record<string, IngredientObject[]> = {}
 
 		currentRecipes?.forEach(day => {

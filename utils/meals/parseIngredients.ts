@@ -32,7 +32,7 @@ const formatIngredients = (ingredients: string[]): Ingredient[] => {
 	let ingredientList: Ingredient[] = []
 
 	ingredients.forEach(i => {
-		let data: Ingredient = {}
+		let data = {} as Ingredient
 
 		if(i.match(RegExp(/^#/, 'i'))) {
 			data.category = i.replace(RegExp(/^#/), '')
