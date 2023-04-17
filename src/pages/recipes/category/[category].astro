@@ -1,10 +1,10 @@
 ---
-import RecipeFeed from "@components/meals/recipeFeed.astro";
+import RecipeFeed from "@components/meals/recipeFeed";
 import generateCategories from "@utils/meals/categories";
 import { getCollection } from "astro:content";
-import Layout from '@layouts/default.astro';
+import Layout from '@layouts/default';
 import type { Category, RecipeContent } from '@ts/meals';
-import Categories from "@components/meals/categories.astro";
+import Categories from "@components/meals/categories";
 
 interface Props {
 	category: Category

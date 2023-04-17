@@ -1,13 +1,14 @@
 ---
-import Header from "@partials/header.astro";
-import Footer from "@partials/footer.astro";
-import DevStyles from "@partials/devStyles.astro";
+import "@styles/main.css";
+
+import Header from "@partials/header";
+import Footer from "@partials/footer";
+import DevStyles from "@partials/devStyles";
  
 import type { LayoutData } from "@ts/global";
 
 import Favicon from "@img/favicon.ico";
 
-import "@styles/main.postcss.css";
 
 const env = import.meta.env.MODE; 
 

@@ -1,0 +1,19 @@
+.task {
+
+}
+
+.checkbox {
+	&:checked {
+		& + .task {
+			text-decoration: line-through;
+		}
+	}
+}
+
+.delete {
+	& svg {
+		display: block;
+		width: auto;
+		height: 1em;
+	}
+}

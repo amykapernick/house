@@ -14,7 +14,6 @@
     ],
     "paths": {
       "@components/*": [
-        "src/components/*",
         "src/components/*.astro"
       ],
       "@ts/*": [
@@ -24,24 +23,21 @@
         "src/fonts/*"
       ],
       "@partials/*": [
-        "src/partials/*",
         "src/partials/*.astro"
       ],
       "@img/*": [
         "src/img/*"
       ],
       "@pages/*": [
-        "src/pages/*",
         "src/pages/*.astro"
       ],
       "@styles/*": [
-        "src/styles/*"
+        "src/styles/*",
       ],
       "@utils/*": [
         "utils/*"
       ],
       "@layouts/*": [
-        "src/layouts/*",
         "src/layouts/*.astro"
       ],
       "@data/*": [

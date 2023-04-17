@@ -1,4 +1,4 @@
-@define-mixin button {
+@mixin button {
 	--background: var(--purple_dark);
 	--colour: var(--white);
 	--border: var(--purple_dark);
@@ -19,7 +19,7 @@
 	}
 }  
 
-@define-mixin button_secondary {
+@mixin button_secondary {
 	--background: var(--background);
 	--colour: var(--purple_dark);
 	--border: var(--purple_dark);
@@ -27,5 +27,21 @@
 	&:hover {
 		--background: var(--purple_dark);
 		--colour: var(--white);
+	}
+}
+
+@mixin button_text {
+	--background: transparent;
+	--colour: var(--purple_dark);
+
+	display: inline-flex;
+	padding: 0;
+	border-width: 0;
+
+	&:hover {
+		--background: transparent;
+		--colour: var(--purple_dark);
+
+		text-decoration: underline;
 	}
 }

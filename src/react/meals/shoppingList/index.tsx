@@ -1,6 +1,8 @@
+import { format } from "date-fns"
 import type { Ingredient, RecipeContent } from "@ts/meals"
 import formatIngredients from "@utils/meals/parseIngredients"
 import { useEffect, useState } from "react"
+import getCurrentWeek from "@utils/meals/currentWeek"
 
 import styles from "./styles.module.css"
 
@@ -17,7 +19,7 @@ type IngredientList = {
 const ShoppingList = (props: {recipes: RecipeContent[]}) => {
 	const { recipes } = props
 	const localRecipes = localStorage.getItem('recipes')
-	const [currentWeek, setCurrentWeek] = useState('2023-03-25')
+	const [currentWeek, setCurrentWeek] = useState<string>(format(getCurrentWeek(), 'yyyy-MM-dd'))
 	const [ingredientsList, setIngredientsList] = useState<IngredientList[]>([])
 	const allRecipes: Record<string, RecipeContent> = {}
 
@@ -80,11 +82,11 @@ const ShoppingList = (props: {recipes: RecipeContent[]}) => {
 				{ingredientsList.map(({item, quantities}) => {
 					const slug = item.replace(/ /g, '-')
 					return (
-						<li className={styles.item}>
+						<li key={slug} className={styles.item}>
 							<input type="checkbox" name="shopping_list" value={slug} id={slug} />
 							<label htmlFor={slug}>{item}</label>
 							<ul className={styles.options}>{quantities.map(q => (
-								<li>{q.quantity} <em>({q.recipe})</em></li>
+								<li key={q.recipe}>{q.quantity} <em>({q.recipe})</em></li>
 							))}</ul>
 						</li>
 					)

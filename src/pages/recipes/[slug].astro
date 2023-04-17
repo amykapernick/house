@@ -1,11 +1,11 @@
 ---
 import { getCollection } from "astro:content";
-import Layout from "@layouts/recipe.astro";
+import Layout from "@layouts/recipe";
 import formatIngredients from "@utils/meals/parseIngredients";
 import type { RecipeContent, Ingredient, Category } from "@ts/meals";
-import IngredientItem from "@components/meals/ingredient.astro";
+import IngredientItem from "@components/meals/ingredient";
 import { Picture } from '@astrojs/image/components';
-import Categories from "@components/meals/categories.astro";
+import Categories from "@components/meals/categories";
 import {recipeCategories} from "@utils/meals/categories";
 import SaveRecipe from "@react/meals/saveRecipe";
 

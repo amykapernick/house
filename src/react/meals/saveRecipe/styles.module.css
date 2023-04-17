@@ -1,3 +1,5 @@
+@import '@mixins';
+
 .container {
 	position: relative;
 	font-size: 0.8em;
@@ -31,7 +33,7 @@
 	& button {
 		&:not([data-selected="true"]) {
 
-			@mixin button_secondary;
+			@include button_secondary;
 		}
 	}
 }

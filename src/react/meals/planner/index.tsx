@@ -1,16 +1,17 @@
 import type { RecipeContent } from "@ts/meals"
-import { addDays, format, parse, setDay } from "date-fns"
+import { addDays, format, setDay } from "date-fns"
 import { useEffect, useState } from "react"
 import RecipeCard from "../recipeCard"
 import days from '@data/meals/days'
 
 import styles from "./styles.module.css"
+import getCurrentWeek from "@utils/meals/currentWeek"
 
 
 const MealPlanner = (props: {recipes: RecipeContent[]}) => {
-	const {recipes} = props
+	const { recipes } = props
 	const localRecipes = localStorage.getItem('recipes')
-	const [currentWeek, setCurrentWeek] = useState(addDays(setDay(new Date(), 6), -7))
+	const [currentWeek, setCurrentWeek] = useState(getCurrentWeek())
 	const [currentRecipes, setRecipes] = useState<string[][]>([])
 	const allRecipes: Record<string, RecipeContent> = {}
 	const nextWeek = (date: Date) => addDays(date, 7)

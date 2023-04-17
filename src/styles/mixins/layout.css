@@ -1,4 +1,4 @@
-@define-mixin container_spacing {
+@mixin container_spacing {
 	padding: 20px;
 
 	@media(min-width: 45em) {

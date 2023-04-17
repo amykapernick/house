@@ -1,7 +1,8 @@
 import { useRef, useState, useEffect } from 'react'
-import { setDay, format, addDays, getDay } from 'date-fns'
+import { setDay, format } from 'date-fns'
 import days from '@data/meals/days'
 import styles from "./styles.module.css"
+import getCurrentWeek from '@utils/meals/currentWeek'
 
 type Props = {
 	recipe: string
@@ -11,9 +12,7 @@ type Props = {
 const SaveRecipe = (props: Props) => {
 	const {recipe, className, ...args} = props
 	const [open, setOpen] = useState(false)
-	const today = new Date()
-	const startWeek = addDays(setDay(today, 6), -7)
-	const currentDate = (getDay(today) < 4 && getDay(today) !== 6) ? startWeek : addDays(startWeek, 7) 
+	const currentDate = getCurrentWeek()
 	const currentWeek = format(currentDate, 'yyyy-MM-dd')
 	const [savedRecipes, setRecipes] = useState<string[][]>([])
 	const refs = days.map(() => useRef<HTMLButtonElement>(null))
