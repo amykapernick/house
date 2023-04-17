@@ -8,11 +8,23 @@ module.exports = {
 		'stylelint-config-property-sort-order-smacss',
 		'stylelint-config-standard',
 	],
+	ignoreFiles: [
+		"**/*.tsx",
+		"**/*.ts",
+		"**/*.js",
+		"**/*.jsx",
+		"**/*.json",
+		"**/*.cjs",
+		"**/*.mjs",
+	],
 	rules: {
 		'at-rule-empty-line-before': 'always',
-		'at-rule-no-unknown': [true, {
-			ignoreAtRules: ['define-mixin', 'mixin', 'import']
-		}],
+		'at-rule-no-unknown': [
+			true, 
+			{
+				ignoreAtRules: ['define-mixin', 'mixin', 'import']
+			}
+		],
 		'block-no-empty': true,
 		'color-hex-length': 'long',
 		'color-named': 'never',

@@ -1,7 +1,7 @@
 ---
 import { Picture } from '@astrojs/image/components';
 import SVG from '@components/svg.astro';
-import SaveRecipe from '@components/meals/saveRecipe.astro';
+import SaveRecipe from '@react/meals/saveRecipe';
 import Fallback from '@img/icons/fish.svg?url';
 import type { RecipeContent } from '@ts/meals';
 import formatTime from '@utils/meals/formatTime';
@@ -108,5 +108,5 @@ const recipe: RecipeContent = Astro.props.recipe;
 			</span>
 		)
 	}
-	<SaveRecipe class="save" recipe={recipe.slug} />
+	<SaveRecipe className="save" recipe={recipe.slug} client:only />
 </div>

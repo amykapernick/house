@@ -14,7 +14,8 @@
     ],
     "paths": {
       "@components/*": [
-        "src/components/*"
+        "src/components/*",
+        "src/components/*.astro"
       ],
       "@ts/*": [
         "src/types/*"
@@ -23,13 +24,15 @@
         "src/fonts/*"
       ],
       "@partials/*": [
-        "src/partials/*"
+        "src/partials/*",
+        "src/partials/*.astro"
       ],
       "@img/*": [
         "src/img/*"
       ],
       "@pages/*": [
-        "src/pages/*"
+        "src/pages/*",
+        "src/pages/*.astro"
       ],
       "@styles/*": [
         "src/styles/*"
@@ -38,10 +41,14 @@
         "utils/*"
       ],
       "@layouts/*": [
-        "src/layouts/*"
+        "src/layouts/*",
+        "src/layouts/*.astro"
       ],
       "@data/*": [
         "_data/*"
+      ],
+      "@react/*": [
+        "src/react/*"
       ]
     },
     "jsx": "react-jsx",

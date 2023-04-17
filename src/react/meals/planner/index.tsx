@@ -1,68 +1,55 @@
 import type { RecipeContent } from "@ts/meals"
-import { addDays, format, parse } from "date-fns"
+import { addDays, format, parse, setDay } from "date-fns"
 import { useEffect, useState } from "react"
 import RecipeCard from "../recipeCard"
+import days from '@data/meals/days'
 
 import styles from "./styles.module.css"
 
-const days = [
-	{
-		name: 'Sat',
-		number: 6
-	},
-	{
-		name: 'Sun',
-		number: 0
-	},
-	{
-		name: 'Mon',
-		number: 1
-	},
-	{
-		name: 'Tue',
-		number: 2
-	},
-	{
-		name: 'Wed',
-		number: 3
-	},
-	{
-		name: 'Thu',
-		number: 4
-	},
-	{
-		name: 'Fri',
-		number: 5
-	}
-]
 
 const MealPlanner = (props: {recipes: RecipeContent[]}) => {
 	const {recipes} = props
 	const localRecipes = localStorage.getItem('recipes')
-	const [savedRecipes, setRecipes] = useState([])
-	const [currentWeek, setCurrentWeek] = useState('2023-03-25')
-	const [currentRecipes, setCurrentRecipes] = useState<string[][]>([])
+	const [currentWeek, setCurrentWeek] = useState(addDays(setDay(new Date(), 6), -7))
+	const [currentRecipes, setRecipes] = useState<string[][]>([])
 	const allRecipes: Record<string, RecipeContent> = {}
+	const nextWeek = (date: Date) => addDays(date, 7)
+	const previousWeek = (date: Date) => addDays(date, -7)
 
 	recipes.forEach(recipe => {
 		allRecipes[recipe.slug] = recipe
 	})
 
 	useEffect(() => {
+		const week = format(currentWeek, 'yyyy-MM-dd')
 		if(!localRecipes) {
-			const data = {[currentWeek]: []}
+			const data = {[week]: []}
 			localStorage.setItem('recipes', JSON.stringify(data))
 			return;
 		}
 
 		const data = JSON.parse(localRecipes)
-		setRecipes(data)
-		setCurrentRecipes(data[currentWeek] || [])
+		setRecipes(data[week] || [])
 	}, [])
 	
 	return (
 		<>
-			<p>{format(parse(currentWeek, 'yyyy-MM-dd', new Date()), 'dd MMM')} - {format(addDays(parse(currentWeek, 'yyyy-MM-dd', new Date()), 6), 'dd MMM')}</p>
+			<ul className={styles.nav}>
+				<li>{format(currentWeek, 'dd MMM')} - {format(addDays(currentWeek, 6), 'dd MMM')}</li>
+				<li>
+					<button onClick={() => setCurrentWeek(previousWeek(currentWeek))}>Previous Week</button>
+				</li>
+				<li>
+					<button onClick={() => setCurrentWeek(nextWeek(currentWeek))}>Next Week</button>
+				</li>
+				<li>
+					<button
+						onClick={() => setCurrentWeek(addDays(setDay(new Date(), 6), -7))}
+					>
+						This Week
+					</button>
+				</li>
+			</ul>
 			<ul className={styles.week}>
 				{days.map(({name, number}) => (
 					<li className={styles.day} key={number}>

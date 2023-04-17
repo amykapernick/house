@@ -7,7 +7,7 @@ import IngredientItem from "@components/meals/ingredient.astro";
 import { Picture } from '@astrojs/image/components';
 import Categories from "@components/meals/categories.astro";
 import {recipeCategories} from "@utils/meals/categories";
-import  SaveRecipe from "@components/meals/saveRecipe.astro";
+import SaveRecipe from "@react/meals/saveRecipe";
 
 export async function getStaticPaths() {
   const recipes = await getCollection("recipes");
@@ -63,7 +63,7 @@ const categories: Category[] | null = recipe.data.categories ? recipeCategories(
 				/>
 			}
 			{categories && <Categories categories={categories} />}
-			<SaveRecipe class="save" recipe={recipe.slug} />
+			<SaveRecipe className="save" recipe={recipe.slug} client:only />
 		</header>
 		<h2>Ingredients</h2>
 		<ul>
