@@ -23,6 +23,7 @@ form {
 label, legend {
 	display: block;
 	margin: 0.5em 0 0.1em;
+	color: var(--neutral);
 	font-weight: 600;
 }
 

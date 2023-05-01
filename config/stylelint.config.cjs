@@ -45,6 +45,8 @@ module.exports = {
 			{
 				ignoreShorthands: [
 					'grid-template',
+					'grid-column',
+					'grid-row',
 					'font'
 				]
 			}

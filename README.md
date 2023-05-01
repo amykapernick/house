@@ -1,8 +1,11 @@
 # House Management
 
-- [ ] Recipes
-- [ ] Meal Planning
-- [ ] Shopping List
-- [ ] Calendar
-- [ ] To Do List and Reminders
+- [x] Recipes
+- [x] Meal Planning
+- [x] Shopping List
+- [x] Calendar
+- [ ] ics Calendar Feed
+- [ ] User Auth
+- [x] To Do List
+- [ ] Reminders
 - [ ] Chores

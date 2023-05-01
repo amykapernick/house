@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { SyntheticEvent, useRef, useState } from "react";
 import type { TaskType as Task } from "@react/tasks/task";
 import styles from './styles.module.css'
 
@@ -12,7 +12,7 @@ const AddTask = (props: AddTaskProps) => {
 	const nameField = useRef<HTMLInputElement>(null)
 	const dateField = useRef<HTMLInputElement>(null)
 	const [open, setOpen] = useState(false);
-	const handleAddTask = (e) => {
+	const handleAddTask = (e: SyntheticEvent) => {
 		e.preventDefault();
 
 		if(!nameField?.current) return;

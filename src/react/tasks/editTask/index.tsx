@@ -44,7 +44,7 @@ const EditTask = (props: EditTaskProps) => {
 			</button>
 			{open && (
 				<div className={styles.popup}>
-					<h3 className={styles.heading}>Add New Task</h3>
+					<h3 className={styles.heading}>Edit Task</h3>
 					<form className={styles.form} onSubmit={handleEditTask}>
 						<label htmlFor="add_task">Task Name</label>
 						<input

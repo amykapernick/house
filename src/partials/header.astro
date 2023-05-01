@@ -27,6 +27,10 @@ const menuItems: MenuItem[] = [
   {
 	label: 'To Do',
 	link: '/tasks'
+  },
+  {
+	label: 'Calendar',
+	link: '/calendar'
   }
 ]; 
 ---
@@ -121,7 +125,7 @@ const menuItems: MenuItem[] = [
 
 	menuSections.forEach(section => {
 		section.addEventListener('click', () => {
-			section.nextElementSibling.classList.toggle('open');
+			section.nextElementSibling?.classList.toggle('open');
 		})
 	})
 </script>
