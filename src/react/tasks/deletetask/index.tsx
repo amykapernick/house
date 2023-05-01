@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { SyntheticEvent, useRef, useState } from "react";
 import type { TaskType as Task } from "@react/tasks/task";
 import Close from '@img/icons/close.svg?url'
 import SVG from 'react-inlinesvg';
@@ -14,7 +14,7 @@ type DeleteTaskProps = {
 const DeleteTask = (props: DeleteTaskProps) => {
 	const { tasks, updateTasks, task } = props
 	const [open, setOpen] = useState(false);
-	const handleDeleteTask = (e) => {
+	const handleDeleteTask = (e: SyntheticEvent) => {
 		e.preventDefault();
 
 		updateTasks(tasks.filter((t) => task.id !== t.id))

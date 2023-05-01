@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { SyntheticEvent, useRef, useState } from "react";
 import type { EventType as Event } from "@react/calendar/event";
 import Close from '@img/icons/close.svg?url'
 import SVG from 'react-inlinesvg';
@@ -13,7 +13,7 @@ type DeleteEventProps = {
 const DeleteEvent = (props: DeleteEventProps) => {
 	const { events, updateEvents, event } = props
 	const [open, setOpen] = useState(false);
-	const handleDeleteEvent = (e) => {
+	const handleDeleteEvent = (e: SyntheticEvent) => {
 		e.preventDefault();
 
 		updateEvents(events.filter((t) => event.id !== t.id))

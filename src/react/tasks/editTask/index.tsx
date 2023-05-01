@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { SyntheticEvent, useRef, useState } from "react";
 import type { TaskType as Task } from "@react/tasks/task";
 import Edit from '@img/icons/edit.svg?url'
 import SVG from 'react-inlinesvg';
@@ -16,7 +16,7 @@ const EditTask = (props: EditTaskProps) => {
 	const nameField = useRef<HTMLInputElement>(null)
 	const dateField = useRef<HTMLInputElement>(null)
 	const [open, setOpen] = useState(false);
-	const handleEditTask = (e) => {
+	const handleEditTask = (e: SyntheticEvent) => {
 		e.preventDefault();
 
 		if(!nameField?.current) return;

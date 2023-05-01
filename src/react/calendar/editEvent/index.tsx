@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { SyntheticEvent, useRef, useState } from "react";
 import type { EventType as Event } from "@react/calendar/event";
 import Edit from '@img/icons/edit.svg?url'
 import SVG from 'react-inlinesvg';
@@ -19,7 +19,7 @@ const EditEvent = (props: EditEventProps) => {
 	const [startDate, setStart] = useState<string>(format(new Date(event.start), 'yyyy-MM-dd'))
 	const [endDate, setEnd] = useState<string | undefined>(event?.end && format(new Date(event.end), 'yyyy-MM-dd'))
 	const [open, setOpen] = useState(false);
-	const handleEditEvent = (e) => {
+	const handleEditEvent = (e: SyntheticEvent) => {
 		e.preventDefault();
 
 		if(!nameField?.current) return;
