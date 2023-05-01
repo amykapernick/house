@@ -1,13 +1,33 @@
----
-import { getCollection } from 'astro:content';
-import Layout from '@layouts/default';
-import RecipeFeed from '@components/meals/recipeFeed';
+<style>
+	header {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		font-size: 1.2em;
+		font-weight: 700;
+	}
+</style>
 
-const recipes = await getCollection('recipes');
+<!DOCTYPE html> 
+<html lang="en-AU">
+	<head>
+		<meta charset="utf-8" />
+		<meta http-equiv="x-ua-compatible" content="ie=edge" />
+		<meta
+		name="viewport"
+		content="width=device-width,initial-scale=1,shrink-to-fit=no"
+		/>
+	</head>
 
----
+	<body>
+		<header>
+		<a href="/" class="title">🏡</a>
+		</header>
+		
 
-<Layout>
-	<h2>Recipes</h2>
-	<RecipeFeed recipes={recipes.slice(0, 6)} />
-</Layout>
+		<main>
+		<h1>My App</h1>
+		</main>
+	</body>
+</html>
