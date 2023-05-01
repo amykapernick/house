@@ -1,68 +1,37 @@
 import { useEffect, useState } from 'react';
 import AddTask from '@react/tasks/addTask';
-import { format } from 'date-fns';
-import SVG from 'react-inlinesvg';
-import Close from '@img/icons/close.svg'
+import Task from '@react/tasks/task'
+import type { TaskType } from '@react/tasks/task';
 
 import styles from './styles.module.css'
-
-export type Task = {
-	id: string;
-	name: string;
-	completed: boolean;
-	due?: Date;
-}
+import orderTasks from '@utils/tasks/orderTasks';
 
 const List = () => {
-	const [tasks, setTasks] = useState<Task[]>([]);
-	const updateTasks = (newTasks: Task[]) => {
-		setTasks(newTasks);
+	const [tasks, setTasks] = useState<TaskType[]>([]);
+	const updateTasks = (newTasks: TaskType[]) => {
+		setTasks(orderTasks({tasks: newTasks}));
 		localStorage.setItem('tasks', JSON.stringify(newTasks));
 	}
-	const deleteTask = (id: string) => {
-	updateTasks(tasks.filter((task) => id !== task.id))
-	};
-	const handleCompletion = (id: string) => {
-		const updatedTasks = tasks.map((task) => {
-			if (id === task.id) {
-			task.completed = !task.completed;
-			}
-			return task;
-		});
-
-		updateTasks(updatedTasks);
-	}
-
+	
 	useEffect(() => {
 		const localTasks = localStorage.getItem('tasks');
 
 		if (localTasks) {
-			setTasks(JSON.parse(localTasks));
+			setTasks(orderTasks({tasks: JSON.parse(localTasks)}));
 		}
 	}, [])
 
 	return (
 		<>
 			<AddTask {...{tasks, updateTasks}} />
-			<ul>
-				{tasks.map(({id, name, completed, due}) => (
-					<li key={id}>
-						<input
-							type="checkbox" 
-							name={id} 
-							id={`task_${id}`} 
-							defaultChecked={completed}
-							onChange={() => handleCompletion(id)}
-							className={styles.checkbox}
-						/>
-						<label className={styles.task} htmlFor={`task_${id}`}>
-							{name} {due && <span>(Due: {format(new Date(due), 'dd MMM')})</span>}
-						</label>
-						<button className={styles.delete} onClick={() => deleteTask(id)}>
-							<span className="sr-only">Delete</span>
-							<SVG src={Close.src} />
-						</button>
-					</li>
+			<ul className={styles.list}>
+				{tasks.map((task) => (
+					<Task
+						key={task.id}
+						{...task}
+						updateTasks={updateTasks}
+						tasks={tasks}
+					/>	
 				))}
 			</ul>
 		</>

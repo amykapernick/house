@@ -14,11 +14,28 @@ const recipe: RecipeContent = Astro.props.recipe;
 ---
 
 <style>
+	@import '@mixins';
+
 	.card {
+		position: relative;
 		height: 100%;
 		padding: 20px;
 		border-radius: 20px;
+		background: var(--background);
 		box-shadow: 0 0 10px rgb(0 0 0 / 20%);
+
+		&:hover {
+			background: rgba($purple_bright, 0.3);
+		}
+	}
+
+	a {
+
+		@include block_link;
+
+		&:hover {
+			text-decoration: none;
+		}
 	}
 
 	:global(picture) {

@@ -1,12 +1,13 @@
 body {
 	color:var(--neutral);
-	font-family: var(--font_main);
+	font-family: $font_main;
 	font-size: 1.1em;
+	line-height: 1.5;
 }
 
 h1, h2, h3, h4, h5 {
 	color: var(--navy);
-	font-family: var(--font_heading);
+	font-family: $font_heading;
 
 	& a {
 		color: inherit;

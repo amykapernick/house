@@ -2,7 +2,8 @@
 	"stylelint.autoFixOnSave": true,
 	"stylelint.enable": true,
 	"css.validate": false,
-	"stylelint.configFile": "./config/.stylelint.config.cjs",
+	"stylelint.configFile": "./config/stylelint.config.cjs",
+	"postcss.validate": false,
 	"stylelint.validate": [
 		"css",
 		"less",

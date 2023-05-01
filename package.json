@@ -23,6 +23,7 @@
     "file-system": "^2.2.2",
     "path": "^0.12.7",
     "postcss-advanced-variables": "^3.0.1",
+    "postcss-hexrgba": "^2.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-inlinesvg": "^3.0.2",

@@ -1,19 +1,8 @@
-.task {
+@import '@mixins';
 
-}
-
-.checkbox {
-	&:checked {
-		& + .task {
-			text-decoration: line-through;
-		}
-	}
-}
-
-.delete {
-	& svg {
-		display: block;
-		width: auto;
-		height: 1em;
-	}
+.list {
+	display: flex;
+	flex-direction: column;
+	margin: 10px -20px;
+	padding: 0;
 }

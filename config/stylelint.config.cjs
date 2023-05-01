@@ -22,7 +22,7 @@ module.exports = {
 		'at-rule-no-unknown': [
 			true, 
 			{
-				ignoreAtRules: ['define-mixin', 'mixin', 'import']
+				ignoreAtRules: ['include', 'mixin', 'import']
 			}
 		],
 		'block-no-empty': true,

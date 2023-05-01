@@ -1,46 +1,46 @@
 @mixin button {
-	--background: var(--purple_dark);
-	--colour: var(--white);
-	--border: var(--purple_dark);
+	--button_background: var(--purple_bright);
+	--button_text: var(--neutral_light);
+	--button_border: var(--purple_bright);
 
 	padding: 0.5em 1em;
-	border: 2px solid var(--border);
+	border: 2px solid var(--button_border);
 	border-radius: 0;
-	background: var(--background);
-	color: var(--colour);
+	background: var(--button_background);
+	color: var(--button_text);
 	font-family: var(--font_headings);
 	font-size: 1.1em;
 	font-weight: 500;
 	cursor: pointer;
 
 	&:hover {
-		--background: var(--background);
-		--colour: var(--purple_dark);
+		--button_background: var(--button_background);
+		--button_text: var(--purple_bright);
 	}
 }  
 
 @mixin button_secondary {
-	--background: var(--background);
-	--colour: var(--purple_dark);
-	--border: var(--purple_dark);
+	--button_background: var(--button_background);
+	--button_text: var(--purple_bright);
+	--button_border: var(--purple_bright);
 
 	&:hover {
-		--background: var(--purple_dark);
-		--colour: var(--white);
+		--button_background: var(--purple_bright);
+		--button_text: var(--neutral_light);
 	}
 }
 
 @mixin button_text {
-	--background: transparent;
-	--colour: var(--purple_dark);
+	--button_background: transparent;
+	--button_text: var(--purple_bright);
 
 	display: inline-flex;
 	padding: 0;
 	border-width: 0;
 
 	&:hover {
-		--background: transparent;
-		--colour: var(--purple_dark);
+		--button_background: transparent;
+		--button_text: var(--purple_bright);
 
 		text-decoration: underline;
 	}
