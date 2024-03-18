@@ -4,7 +4,6 @@ import type { TaskType as Task } from "@react/tasks/task";
 import Close from '@img/icons/close.svg?url'
 import SVG from 'react-inlinesvg';
 import styles from './styles.module.css'
-import {format} from 'date-fns'
 
 type DeleteTaskProps = {
 	tasks: Task[];

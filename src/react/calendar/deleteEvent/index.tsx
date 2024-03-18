@@ -1,4 +1,5 @@
-import { SyntheticEvent, useRef, useState } from "react";
+import {  useState } from "react";
+import type { SyntheticEvent } from "react";
 import type { EventType as Event } from "@react/calendar/event";
 import Close from '@img/icons/close.svg?url'
 import SVG from 'react-inlinesvg';

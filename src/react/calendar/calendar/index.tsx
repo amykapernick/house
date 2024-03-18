@@ -1,4 +1,4 @@
-import { CSSProperties, useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import AddEvent from '@react/calendar/addEvent';
 import Event from '@react/calendar/event'
 import type { EventType } from '@react/calendar/event';
