@@ -1,4 +1,5 @@
-import { SyntheticEvent, useRef, useState } from "react";
+import { useRef, useState } from "react";
+import type { SyntheticEvent } from "react";
 import type { EventType as Event } from "@react/calendar/event";
 import styles from './styles.module.css'
 

@@ -2,7 +2,7 @@
 import type { HTMLAttributes } from 'astro/types';
 
 type Props = HTMLAttributes<'div'> & {
-	children: any;
+	children?: any | null
 }
 
 const { ...attrs } = Astro.props
