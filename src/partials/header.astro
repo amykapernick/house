@@ -1,4 +1,8 @@
 ---
+import SignedIn from '@auth/signedIn'
+import UserButton from '@auth/userButton'
+import SignedOut from '@auth/signedOut'
+import SignIn from '@auth/signInButton'
 import type { MenuItem } from "@ts/global";
 
 const menuItems: MenuItem[] = [
@@ -152,6 +156,14 @@ const menuItems: MenuItem[] = [
 					}	
 				</li>
 			))}
+			<li>
+				<SignedIn>
+					<UserButton  />
+				</SignedIn>
+				<SignedOut>
+					<SignIn />
+				</SignedOut>
+			</li>
 		</ul>
 	</nav>
 </header>

@@ -10,5 +10,5 @@ const recipes = await getCollection('recipes');
 
 <Layout>
 	<h1>Meal Planning</h1>
-	<MealPlanner client:load recipes={recipes} />
+	<MealPlanner client:only recipes={recipes} />
 </Layout>

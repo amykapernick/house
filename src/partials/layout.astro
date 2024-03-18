@@ -4,7 +4,6 @@ import "@styles/main.css";
 import Header from "@partials/header";
 import Footer from "@partials/footer";
 import DevStyles from "@partials/devStyles";
- 
 import type { LayoutData } from "@ts/global";
 
 import Favicon from "@img/favicon.ico";
@@ -59,3 +58,8 @@ const { title, description } = content;
     <Footer />
   </body>
 </html>
+
+<script>
+  import { initializeClerk } from '../../lib/clerk'
+  initializeClerk()
+</script>

@@ -2,6 +2,7 @@
   "extends": "astro/tsconfigs/strict",
   "compilerOptions": {
     "baseUrl": ".",
+    "verbatimModuleSyntax": true,
     "plugins": [
       {
         "name": "@astrojs/ts-plugin"
@@ -9,7 +10,6 @@
     ],
     "types": [
       "node",
-      "@astrojs/image/client",
       "astro/client"
     ],
     "paths": {
@@ -45,6 +45,12 @@
       ],
       "@react/*": [
         "src/react/*"
+      ],
+      "@lib/*": [
+        "lib/*"
+      ],
+      "@auth/*": [
+        "src/components/auth/*.astro"
       ]
     },
     "jsx": "react-jsx",

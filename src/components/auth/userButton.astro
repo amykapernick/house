@@ -1,0 +1,24 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+type Props = HTMLAttributes<'div'> & {
+	children: any;
+}
+
+const { ...attrs } = Astro.props
+---
+
+<div {...attrs} id="auth-user-button"></div>
+
+<script>
+	import { auth } from '../../../lib/authStore'
+
+	auth.subscribe((clerk) => {
+		if (clerk !== null && clerk.isReady()) {
+			const userButton = document.querySelector<HTMLDivElement>('#auth-user-button')!
+			clerk.mountUserButton(userButton, {
+				afterSignOutUrl: '/'
+			})
+		}
+	})
+</script>

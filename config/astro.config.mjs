@@ -1,9 +1,13 @@
 import { defineConfig } from 'astro/config';
-import image from '@astrojs/image';
 import react from "@astrojs/react";
+import node from '@astrojs/node';
+import netlify from '@astrojs/netlify';
 
 export default defineConfig({
-	output: 'static',
+	output: 'server',
+	adapter: node({
+		mode: 'middleware',
+	}),
 	vite: {
 		css: {
 			postcss: `./config`
@@ -18,7 +22,6 @@ export default defineConfig({
 		}
 	},
 	integrations: [
-		image(),
 		react()
 	],
 });

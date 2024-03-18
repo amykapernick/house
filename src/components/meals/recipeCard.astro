@@ -1,5 +1,5 @@
 ---
-import { Picture } from '@astrojs/image/components';
+import { Picture } from 'astro:assets';
 import SVG from '@components/svg';
 import SaveRecipe from '@react/meals/saveRecipe';
 import Fallback from '@img/icons/fish.svg?url';
@@ -96,7 +96,8 @@ const recipe: RecipeContent = Astro.props.recipe;
 				src={recipe.data.image}
 				alt={`Photo of ${recipe.data.title}`}
 				widths={[200]}
-				aspectRatio={1}
+				width={200}
+				height={200}
 				sizes={''}
 				formats={['avif', 'webp', 'jpeg']}
 			/>

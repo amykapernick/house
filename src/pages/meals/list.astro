@@ -10,5 +10,5 @@ const recipes = await getCollection('recipes');
 
 <Layout>
 	<h1>Shopping List</h1>
-	<ShoppingList client:load recipes={recipes} />
+	<ShoppingList client:only recipes={recipes} />
 </Layout>

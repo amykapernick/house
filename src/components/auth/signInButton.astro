@@ -1,0 +1,39 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+type Props = HTMLAttributes<'button'> & {
+	children?: any;
+}
+
+const { ...attrs } = Astro.props
+const buttonId = `auth-sign-in-button-${Math.random().toString(36).substring(7)}` 
+---
+
+<button
+	{...attrs}
+	id={buttonId}
+	type="button"
+>
+  <slot>
+	Sign In
+  </slot>
+</button>
+
+<script define:vars={{buttonId}}>
+	import { auth } from '../../../lib/authStore'
+
+	auth.subscribe((clerk) => {
+		if (clerk !== null && clerk.isReady()) {
+			const signInButton = document.getElementById(buttonId)
+
+			if (signInButton) {
+				signInButton.addEventListener('click', () => {
+					clerk.openSignIn({
+						afterSignInUrl: import.meta.env.PUBLIC_CLERK_AFTER_SIGN_IN_URL,
+						afterSignUpUrl: import.meta.env.PUBLIC_CLERK_AFTER_SIGN_UP_URL,
+					})
+				})
+			}
+		}
+	})
+</script>
