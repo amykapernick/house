@@ -1,4 +1,5 @@
-import { SyntheticEvent, useRef, useState } from "react";
+import { useRef, useState } from "react";
+import type { SyntheticEvent } from "react";
 import type { TaskType as Task } from "@react/tasks/task";
 import styles from './styles.module.css'
 

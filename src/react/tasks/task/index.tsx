@@ -1,7 +1,4 @@
 import { format, isBefore, isSameDay } from 'date-fns';
-import SVG from 'react-inlinesvg';
-import Close from '@img/icons/close.svg?url'
-import Edit from '@img/icons/edit.svg?url'
 import styles from './styles.module.css'
 import EditTask from '@react/tasks/editTask';
 import DeleteTask from '@react/tasks/deletetask';
