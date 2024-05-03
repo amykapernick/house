@@ -13,7 +13,7 @@ export const initializeClerk = () => {
 	clerk
 		.load()
 		.then(() => {
-		auth.set(clerk)
+			auth.set(clerk)
 		})
 		.catch(error => console.error(error))
 }

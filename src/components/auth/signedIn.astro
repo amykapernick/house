@@ -35,6 +35,7 @@ const { ...attrs } = Astro.props
 			else {
 				signedIn.forEach((el) => {
 					el.classList.add('hidden')
+					el.remove()
 				})
 			}
 		}
