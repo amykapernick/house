@@ -5,37 +5,7 @@ import SignedOut from '@auth/signedOut'
 import SignIn from '@auth/signInButton'
 import type { MenuItem } from "@ts/global";
 
-const menuItems: MenuItem[] = [
-  {
-	label: 'Home',
-	link: '/',
-  },
-  {
-	label: 'Meals',
-	items: [
-		{
-			label: 'Recipes',
-			link: '/recipes',
-		},
-		{
-			label: 'Meal Planner',
-			link: '/meals/planning'
-		},
-		{
-			label: 'Shopping List',
-			link: '/meals/list'
-		}
-	]
-  },
-  {
-	label: 'To Do',
-	link: '/tasks'
-  },
-  {
-	label: 'Calendar',
-	link: '/calendar'
-  }
-]; 
+
 ---
 
 <style>
