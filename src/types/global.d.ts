@@ -1,3 +1,5 @@
+declare module '*.graphql'
+
 export type LayoutData = {
 	title?: string
 	description?: string
@@ -5,6 +7,7 @@ export type LayoutData = {
 
 export type MenuItemBasics = {
 	label: string
+	auth?: boolean
 }
 
 export type MenuLink = MenuItemBasics & {

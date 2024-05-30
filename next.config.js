@@ -4,9 +4,12 @@
  * @type {import('next').NextConfig}
  **/
 
+
 module.exports = async (phase, { defaultConfig }) => {
 	const nextConfig = {
 		...defaultConfig,
+		output: 'standalone',
+		distDir: '.next',
 		reactStrictMode: true,
 		images: {
 			remotePatterns: [
@@ -17,7 +20,7 @@ module.exports = async (phase, { defaultConfig }) => {
 				},
 			],
 		},
-		webpack(config) {
+		webpack(config, options) {
 			// Grab the existing rule that handles SVG imports
 			const fileLoaderRule = config.module.rules.find((rule) =>
 				rule.test?.test?.('.svg'),
@@ -38,6 +41,20 @@ module.exports = async (phase, { defaultConfig }) => {
 					use: ['@svgr/webpack'],
 				},
 			)
+
+			// config.module.rules.push({
+			// 	test: /\.css$/,
+			// 	use: [
+			// 	  options.defaultLoaders.babel,
+			// 	  {
+			// 		loader: "postcss-loader",
+			// 		options: {
+			// 		  postcssOptions: require("./config/postcss.config.cjs"),
+			// 		  execute: true,
+			// 		},
+			// 	  },
+			// 	],
+			//   },)
 
 			// Modify the file loader rule to ignore *.svg, since we have it handled now.
 			fileLoaderRule.exclude = /\.svg$/i

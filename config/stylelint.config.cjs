@@ -4,7 +4,6 @@ module.exports = {
 		'stylelint-use-nesting',
 	],
 	extends: [
-		'stylelint-config-astro',
 		'stylelint-config-property-sort-order-smacss',
 		'stylelint-config-standard',
 	],

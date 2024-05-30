@@ -10,7 +10,7 @@
 	}
 
 	@media(min-width: 80em) {
-		padding: 40px calc(50vw - 35em);
+		padding: 40px calc(50vw - 35rem);
 	}
 }
 

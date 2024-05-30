@@ -23,7 +23,7 @@
     ],
     "paths": {
       "@components/*": [
-        "src/components/*.astro"
+        "src/components/*"
       ],
       "@ts/*": [
         "src/types/*"
@@ -32,13 +32,13 @@
         "src/fonts/*"
       ],
       "@partials/*": [
-        "src/partials/*.astro"
+        "src/components/partials/*"
+      ],
+      "@parts/*": [
+        "src/components/parts/*"
       ],
       "@img/*": [
         "src/img/*"
-      ],
-      "@pages/*": [
-        "src/pages/*.astro"
       ],
       "@styles/*": [
         "src/styles/*",
@@ -47,20 +47,14 @@
         "utils/*"
       ],
       "@layouts/*": [
-        "src/layouts/*.astro"
+        "src/components/layouts/*"
       ],
       "@data/*": [
         "_data/*"
       ],
-      "@react/*": [
-        "src/react/*"
-      ],
       "@lib/*": [
         "lib/*"
       ],
-      "@auth/*": [
-        "src/components/auth/*.astro"
-      ]
     },
     "allowJs": true,
     "strict": true
