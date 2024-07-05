@@ -7,7 +7,7 @@
     "watch": "tsc -w",
     "clean": "rm -rf dist",
     "prestart": "npm run clean && npm run build",
-    "dev": "doppler run -- func start --typescript --cors *",
+    "dev": "doppler run -- func start --cors *",
     "start": "func start"
   },
   "engines": {

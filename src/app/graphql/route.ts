@@ -7,6 +7,7 @@ import { mergeResolvers } from '@graphql-tools/merge'
 import { mergeSchemas } from '@graphql-tools/schema';
 import { GraphQLFileLoader } from '@graphql-tools/graphql-file-loader';
 import {loadSchema} from '@graphql-tools/load'
+import { headers } from 'next/headers';
 
  
 const schema = mergeSchemas({
@@ -30,4 +31,17 @@ const handler = startServerAndCreateNextHandler<NextRequest>(server, {
 	}
 })
 
-export {handler as GET, handler as POST, handler as OPTIONS}
+const requestFunction = async (req: NextRequest) => {
+	const response = await handler(req)
+
+	response.headers.append('Access-Control-Allow-Origin', '*')
+	response.headers.append('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+
+	return response
+}
+
+export {
+	requestFunction as GET, 
+	requestFunction as POST, 
+	requestFunction as OPTIONS
+}

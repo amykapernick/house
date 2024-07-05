@@ -1,46 +1,61 @@
-import { useEffect, useState } from 'react';
-import AddEvent from '@react/calendar/addEvent';
-import Event from '@react/calendar/event'
-import type { EventType } from '@react/calendar/event';
-import Dates from '@react/calendar/dates';
-import { addWeeks, format, startOfWeek } from 'date-fns';
-import {
-	Scheduler,
-	WeekView,
-	Appointments,
-  } from '@devexpress/dx-react-scheduler-material-ui';
+'use client'
+
+import { Calendar, Views } from 'react-big-calendar'
+import 'react-big-calendar/lib/css/react-big-calendar.css'
+import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
 import styles from './styles.module.css'
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Event } from '@ts/calendar';
+import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop'
+import { accessors, localizer, editFunctions, views } from '@utils/calendar/setup'
 
+type CalendarViewProps = {
+	events: Event[]
+	backgroundEvents?: Event[]
+}
 
-const Calendar = () => {
-	const [events, setEvents] = useState<EventType[]>([]);
-	const weeks = 6
-	const [startWeek, setStartWeek] = useState<string>(format(startOfWeek(new Date(), {weekStartsOn: 1}), 'yyyy-MM-dd'))
-	const [endDate, setEndDate] = useState<string>(format(addWeeks(new Date(startWeek), weeks), 'yyyy-MM-dd'))
-	const updateEvents = (newEvents: EventType[]) => {
-		setEvents(newEvents);
-		localStorage.setItem('events', JSON.stringify(newEvents));
+const DnDCalendar = withDragAndDrop(Calendar)
+
+const CalendarView = (props: CalendarViewProps) => {
+	const [events, setEvents] = useState<Event[]>(props?.events ?? [])
+	const [backgroundEvents, setBackgroundEvents] = useState<Event[]>(props?.backgroundEvents ?? [])
+	const [view, setView] = useState(views.default)
+	const [date, setDate] = useState(new Date())
+	const defaultProps = {
+		date: date,
+		view: view,
 	}
-	const handleChangeWeek = (newStartWeek: Date) => {
-		const newDate = format(newStartWeek, 'yyyy-MM-dd')
-		setStartWeek(newDate);
-		localStorage.setItem('calendar_start', newDate);
+	const calendarFunctions = {
+		onView: useCallback((newView) => setView(newView), []),
+		onNavigate: useCallback((newDate) => setDate(newDate), []),
 	}
+
+	useEffect(() => {
+		if (props?.events) {
+			setEvents(props.events)
+		}
+
+		if (props?.backgroundEvents) {
+			setBackgroundEvents(props.backgroundEvents)
+		}
+
+	}, [props])
 
 	return (
 		<>
-			<Scheduler>
-				<WeekView
-					startDayHour={8}
-					endDayHour={20}
-					cellDuration={60}
-					name="week"
-					excludedDays={[0, 6]}
-				/>
-				<Appointments />
-			</Scheduler>
+			<DnDCalendar
+				className={styles.calendar}
+				localizer={localizer}
+				events={events}
+				backgroundEvents={backgroundEvents}
+				views={views.options}
+				{...defaultProps}
+				{...calendarFunctions}
+				{...accessors}
+				{...editFunctions(setEvents, events)}
+			/>
 		</>
 	);
 }
 
-export default Calendar;
+export default CalendarView;

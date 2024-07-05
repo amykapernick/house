@@ -1,11 +1,30 @@
 {
+    "globalHeaders": {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS, PUT",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization",
+        "Access-Control-Allow-Credentials": "*"
+    },
     "routes": [
         {
-            "route": "/example",
-            "rewrite": "/example.html"
+            "route": "/graphql",
+            "methods": ["GET", "POST", "OPTIONS", "PUT"],
+            "headers": {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "GET, POST, OPTIONS, PUT",
+                "Access-Control-Allow-Headers": "Content-Type, Authorization",
+                "Access-Control-Allow-Credentials": "*"
+            }
+        },
+        {
+            "route": "/graphql/*",
+            "methods": ["GET", "POST", "OPTIONS", "PUT"],
+            "headers": {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "GET, POST, OPTIONS, PUT",
+                "Access-Control-Allow-Headers": "Content-Type, Authorization",
+                "Access-Control-Allow-Credentials": "*"
+            }
         }
-    ],
-    "navigationFallback": {
-        "rewrite": "/index.html"
-    }
+    ]
 }
