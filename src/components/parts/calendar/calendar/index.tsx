@@ -7,7 +7,8 @@ import styles from './styles.module.css'
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Event } from '@ts/calendar';
 import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop'
-import { accessors, localizer, editFunctions, views } from '@utils/calendar/setup'
+import { accessors, localizer, editFunctions, views, customComponents } from '@utils/calendar/setup'
+import CustomEvent from '../customEvent';
 
 type CalendarViewProps = {
 	events: Event[]
@@ -24,6 +25,7 @@ const CalendarView = (props: CalendarViewProps) => {
 	const defaultProps = {
 		date: date,
 		view: view,
+		components: customComponents,
 	}
 	const calendarFunctions = {
 		onView: useCallback((newView) => setView(newView), []),

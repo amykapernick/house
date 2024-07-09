@@ -1,0 +1,46 @@
+.open {
+
+}
+
+.close {
+	display: flex;
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	align-items: center;
+	justify-content: center;
+	width: 1.5em;
+	height: 1.5em;
+	padding: 5px;
+	border-width: 0;
+
+	/* color: $navy; */
+	border-radius: 50%;
+	background: none;
+	line-height: 1;
+
+	&:hover {
+
+		/* background: $navy; */
+
+		/* color: $white; */
+	}
+}
+
+.dialog {
+	position: fixed;
+	z-index: 100;
+	top: 50%;
+	left: 50%;
+	width: min(90vw, 800px);
+	max-width: max-content;
+	height: min(90vh, 800px);
+	max-height: max-content;
+	margin: 0;
+	transform: translate(-50%, -50%);
+
+	&::backdrop {
+		opacity: 0.9;
+		background: var(--black);
+	}
+}

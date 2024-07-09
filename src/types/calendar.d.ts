@@ -1,3 +1,5 @@
+import { TaskStatus } from "./tasks"
+
 export type Resource = {
 	id: string,
 	title: string
@@ -10,6 +12,12 @@ export type Event = {
 	end: Date,
 	allDay?: boolean
 	resource?: any,
+	type: 'event' | 'task'
+}
+
+export type TaskEvent = Event & {
+	status: TaskStatus
+	type: 'task'
 }
 
 export type UpdateEventFunction = (

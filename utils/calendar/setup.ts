@@ -1,9 +1,10 @@
-import { Calendar, Views, dateFnsLocalizer } from 'react-big-calendar'
+import { Views, dateFnsLocalizer } from 'react-big-calendar'
 import enAU from 'date-fns/locale/en-AU'
 import { format, parse, startOfWeek, getDay } from 'date-fns';
 import { resizeEvent, moveEvent } from './updateEvents'
 import { Dispatch, SetStateAction } from 'react';
 import { UpdateEventFunction, Event } from '@ts/calendar';
+import CustomEvent from '@components/parts/calendar/customEvent';
 
 export const locales = {
 	'en-AU': enAU,
@@ -12,7 +13,7 @@ export const locales = {
 export const localizer = dateFnsLocalizer({
 	format,
 	parse,
-	startOfWeek,
+	startOfWeek: () => startOfWeek(new Date(), { weekStartsOn: 1 }),
 	getDay,
 	locales: locales,
 })
@@ -27,6 +28,10 @@ const defaultAccessors: Record<string, (string | any)> = {
 	end: 'end',
 	draggable: (event: Event) => true,
 	resizable: (event: Event) => true,
+}
+
+export const customComponents = {
+	event: CustomEvent
 }
 
 export const accessors = () => {
