@@ -19,3 +19,15 @@ export type User = {
 }
 
 export type ProjectStatus = 'Backlog' | 'Planning' | 'In progress' | 'Paused' | 'Done' | 'Cancelled' | 'Archived'
+
+export type Project = {
+	id: string,
+	name: string,
+	status: ProjectStatus,
+	owner: User[],
+	tasks: Task[],
+	dates: {
+		start: Date,
+		end: Date
+	}
+}

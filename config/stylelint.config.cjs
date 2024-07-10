@@ -1,28 +1,25 @@
 module.exports = {
-	plugins: [
-		'stylelint-order',
-		'stylelint-use-nesting',
-	],
+	plugins: ['stylelint-order', 'stylelint-use-nesting'],
 	extends: [
 		'stylelint-config-property-sort-order-smacss',
 		'stylelint-config-standard',
 	],
 	ignoreFiles: [
-		"**/*.tsx",
-		"**/*.ts",
-		"**/*.js",
-		"**/*.jsx",
-		"**/*.json",
-		"**/*.cjs",
-		"**/*.mjs",
+		'**/*.tsx',
+		'**/*.ts',
+		'**/*.js',
+		'**/*.jsx',
+		'**/*.json',
+		'**/*.cjs',
+		'**/*.mjs',
 	],
 	rules: {
 		'at-rule-empty-line-before': 'always',
 		'at-rule-no-unknown': [
-			true, 
+			true,
 			{
-				ignoreAtRules: ['include', 'mixin', 'import']
-			}
+				ignoreAtRules: ['include', 'mixin', 'import'],
+			},
 		],
 		'block-no-empty': true,
 		'color-hex-length': 'long',
@@ -31,12 +28,12 @@ module.exports = {
 		'comment-empty-line-before': 'always',
 		'comment-no-empty': true,
 		'custom-property-pattern': null,
-		"csstools/use-nesting": "always",
+		'csstools/use-nesting': 'always',
 		'declaration-block-no-duplicate-properties': [
 			true,
 			{
-				ignore: ["consecutive-duplicates"]
-			}
+				ignore: ['consecutive-duplicates'],
+			},
 		],
 		'declaration-block-no-shorthand-property-overrides': true,
 		'declaration-block-no-redundant-longhand-properties': [
@@ -46,9 +43,9 @@ module.exports = {
 					'grid-template',
 					'grid-column',
 					'grid-row',
-					'font'
-				]
-			}
+					'font',
+				],
+			},
 		],
 		'declaration-no-important': true,
 		'function-calc-no-unspaced-operator': true,
@@ -66,20 +63,23 @@ module.exports = {
 		'property-no-unknown': [
 			true,
 			{
-				ignoreProperties: ['composes', 'font-named-instance']
-			}
+				ignoreProperties: ['composes', 'font-named-instance'],
+			},
 		],
-		'rule-empty-line-before': ['always', {
-			except: ['after-single-line-comment', 'first-nested'],
-		}],
-		"selector-class-pattern": null,
+		'rule-empty-line-before': [
+			'always',
+			{
+				except: ['after-single-line-comment', 'first-nested'],
+			},
+		],
+		'selector-class-pattern': null,
 		'selector-max-attribute': 3,
-		"selector-nested-pattern": "^&",
+		'selector-nested-pattern': '^&',
 		'selector-pseudo-class-no-unknown': [
 			true,
 			{
-				ignorePseudoClasses: ['global']
-			}
+				ignorePseudoClasses: ['global'],
+			},
 		],
 		'selector-pseudo-element-colon-notation': 'double',
 		'selector-pseudo-element-no-unknown': true,
@@ -88,10 +88,10 @@ module.exports = {
 		'string-no-newline': true,
 		'unit-no-unknown': true,
 		'value-keyword-case': [
-			'lower', 
+			'lower',
 			{
-				ignoreKeywords: 'currentColor'
-			}
-		]
-	}
-}
+				ignoreKeywords: 'currentColor',
+			},
+		],
+	},
+};
