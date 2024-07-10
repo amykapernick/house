@@ -1,7 +1,4 @@
-import { SignedIn, SignedOut } from '@clerk/nextjs';
-
 import Calendar from '@components/parts/calendar/calendar';
-import { Event } from '@ts/calendar';
 import parseTasks from '@utils/calendar/parseTasks';
 import fetchData from '@utils/fetchData';
 
@@ -9,6 +6,7 @@ export default async function CalendarPage ()
 {
 	const { tasks = [] } = await fetchData({
 		item: 'tasks',
+		authenticated: true,
 		gqlQuery: `
 			query {
 				tasks {

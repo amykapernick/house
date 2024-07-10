@@ -2,7 +2,7 @@ import { RecipeContent } from "@ts/meals"
 import formatTime from "@utils/meals/formatTime"
 import LevelIcon from '@img/icons/level.svg'
 import TimeIcon from '@img/icons/time.svg'
-import FallbackImage from '@img/icons/fish.svg'
+import FallbackImage from '@img/icons/fish.svg?url'
 import styles from './styles.module.css'
 
 type RecipeCardProps = RecipeContent & {
@@ -10,8 +10,7 @@ type RecipeCardProps = RecipeContent & {
 }
 
 const RecipeCard = (props: RecipeCardProps) => {
-	const {data, slug} = props
-	const {image, time, title, difficulty} = data
+	const {image, time, name, difficulty, slug} = props
 	return (
 		<div className={styles.card}>
 			{
@@ -31,10 +30,12 @@ const RecipeCard = (props: RecipeCardProps) => {
 					/>
 				)
 			}
-			<h3><a href={`/recipes/${slug}`}>{title}</a></h3>
+			<h3 className={styles.title}>
+				<a href={`/recipes/${slug}`}>{name}</a>
+			</h3>
 			{
 				difficulty && (
-					<span>
+					<span className={styles.details}>
 						<LevelIcon />
 						{difficulty}
 					</span>
@@ -42,7 +43,7 @@ const RecipeCard = (props: RecipeCardProps) => {
 			}
 			{
 				time && (
-					<span>
+					<span className={styles.details}>
 						<TimeIcon />
 						{formatTime(time)}
 					</span>

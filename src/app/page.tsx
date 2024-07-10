@@ -1,17 +1,29 @@
-import { currentUser } from '@clerk/nextjs/server';
+import RecipeFeed from '@components/parts/meals/RecipeFeed';
+import fetchData from '@utils/fetchData';
 
 export default async function Home ()
 {
-
-	const auth = await currentUser()
-
-	console.log({auth})
-
-
+	const { meals = [] } = await fetchData({
+		item: 'meals',
+		authenticated: true,
+		gqlQuery: `
+			query {
+				meals {
+					name
+					categories
+					image
+					time
+					slug
+					difficulty
+				}
+			}
+		`
+	});
+	
 	return (
 		<>
 			<h2>Recipes</h2>
-			{/* TODO: Add recipe feed back */}
+			<RecipeFeed recipes={meals} />
 		</>
 	)
 }

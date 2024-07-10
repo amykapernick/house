@@ -3,23 +3,33 @@ import { auth } from '@clerk/nextjs/server';
 type fetchDataProps = {
 	item: 'meals' | 'tasks'
 	gqlQuery: string
+	authenticated: boolean
 }
 
 const fetchData = async (props: fetchDataProps) => {
-	const { item, gqlQuery } = props
-	const { getToken } = auth();
-	const token = await getToken();
-
-	return await fetch(`${process.env.API_URL}/graphql`, {
+	const { gqlQuery, authenticated } = props
+	const options: RequestInit = {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
-			'Authorization': `Bearer ${token}`
 		},
 		body: JSON.stringify({
 			query: gqlQuery
 		})
-	}).then(res => res.json())
+	}
+
+	if(authenticated) {
+		const { getToken } = auth();
+		const token = await getToken();
+	
+		options.headers = {
+			...options.headers,
+			Authorization: `Bearer ${token}`
+		}
+	}
+
+
+	return await fetch(`${process.env.API_URL}/graphql`, options).then(res => res.json())
 	.then((res) => res?.data || {})
 	.catch((err) => {
 		console.error(err)
