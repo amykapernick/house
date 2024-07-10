@@ -1,4 +1,4 @@
-import { View, ViewKey, Views, ViewsProps, dateFnsLocalizer } from 'react-big-calendar'
+import { EventProps, View, ViewKey, Views, ViewsProps, dateFnsLocalizer } from 'react-big-calendar'
 import enAU from 'date-fns/locale/en-AU'
 import { format, parse, startOfWeek, getDay } from 'date-fns';
 import { resizeEvent, moveEvent } from './updateEvents'
@@ -30,7 +30,7 @@ const defaultAccessors: Record<string, (string | ((event: Event) => void))> = {
 	resizable: (event: Event) => true,
 }
 
-export const customComponents: Record<string, ComponentType<Event & {event: Event}>> = {
+export const customComponents: Record<string, ComponentType<EventProps<Event>>> = {
 	event: CustomEvent
 }
 
