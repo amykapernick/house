@@ -6,6 +6,7 @@
     "build": "next build && cp -r .next/static .next/standalone/.next/ && cp -r public .next/standalone/",
     "build:local": "doppler run -- npm run build",
     "lint": "npx eslint -c ./config/eslint.config.mjs --fix",
+    "ts": "tsc",
     "start": "doppler run -- npm run dev",
     "clean": "rm -rf .next",
     "api": "cd api && npm run dev",

@@ -1,6 +1,5 @@
-import Modal from "@components/parts/modal"
+import Modal from "@components/parts/Modal"
 import type { TaskEvent } from "@ts/calendar"
-import { format } from "date-fns"
 
 const Task = (props: TaskEvent) => {
 	const {title, start} = props
@@ -8,7 +7,7 @@ const Task = (props: TaskEvent) => {
 		<div>
 			<span>✅ {title}</span>
 			<Modal>
-				Info about task
+				Info about task 
 			</Modal>
 		</div>
 	)

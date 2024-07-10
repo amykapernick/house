@@ -1,12 +1,12 @@
 import { isBefore } from 'date-fns';
-import type { TaskType as Task } from "@react/tasks/task";
+import type { Task } from "@ts/tasks";
 
 type Props = {
 	tasks: Task[]
 }
 
 const orderTasks = (props: Props) => {
-	const sortedTasks: Task[] = props.tasks.sort((a: Task, b: Task) => {
+	const sortedTasks: Task[] = props.tasks.toSorted((a: Task, b: Task) => {
 		if(!a?.due) return 1;
 		if(!b?.due) return -1;
 		

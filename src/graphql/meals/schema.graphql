@@ -1,8 +1,0 @@
-type Meal {
-	title: String
-	tags: [String]
-}
-
-type Query {
-	meals: [Meal]
-}

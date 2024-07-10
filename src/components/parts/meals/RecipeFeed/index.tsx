@@ -12,8 +12,8 @@ const RecipeFeed = (props: RecipeFeedProps) => {
 		<ul className={styles.cards}>
 	{
 		recipes.map((recipe) => (
-			<li>
-				<RecipeCard recipe={recipe} />
+			<li key={recipe.id}>
+				<RecipeCard {...recipe} />
 			</li>
 		))
 	}
