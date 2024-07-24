@@ -2,7 +2,7 @@ import type { TaskEvent } from "@ts/calendar"
 import type { Task } from "@ts/tasks"
 
 const parseTasks = (tasks: Task[]): TaskEvent[] => {
-	const events: TaskEvent[] = tasks.map((task) => {
+	const events: TaskEvent[] = tasks?.map((task) => {
 		const eventData: TaskEvent = {
 			id: task.id,
 			title: task.name,

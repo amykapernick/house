@@ -4,6 +4,7 @@ import Footer from '@partials/Footer'
 import { LayoutData } from '@ts/global'
 import '@styles/main.css'
 import DevStyles from '@components/partials/devStyles'
+import Layout from '@components/layouts/default'
 
 export const metadata: LayoutData = {
 	title: "Home",
@@ -33,7 +34,9 @@ export default function RootLayout ({
 					{process.env.MODE === "development" && <DevStyles />}
 					<Header />
 					<main>
+					<Layout>
 					{children}
+					</Layout>
 					</main>
 					<Footer />
 				</body>

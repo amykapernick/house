@@ -68,3 +68,10 @@ button, .btn, input[type="submit"] {
 
 	@include button;
 }
+
+a, button {
+	& svg {
+		width: auto;
+		height: 1em;
+	}
+}

@@ -1,0 +1,58 @@
+@import '../../../styles/mixins';
+
+.map {
+	--primary: var(--blue);
+
+	max-width: 100vw;
+	max-height: 100vh;
+	object-fit: contain;
+
+	& text {
+		font-family: var(--font_main);
+		font-size: 2em;
+	}
+}
+
+.area {
+	color: var(--colour);
+
+	&:hover, &:focus {
+		& .label {
+			z-index: 20;
+			opacity: 1;
+		}
+	}
+}
+
+.space {
+	stroke-width: 2;
+	stroke: var(--colour);
+	fill: var(--colour);
+	fill-opacity: 0.2;
+}
+
+.label {
+	opacity: 0;
+	fill: var(--neutral);
+	pointer-events: none;
+}
+
+.info {
+	fill: var(--blue);
+
+	& text {
+		fill: var(--neutral);
+	}
+}
+
+.item {
+	z-index: 1000;
+
+	& :global(svg) {
+		display: block;
+		width: 100%;
+		height: 100%;
+		object-fit: contain;
+		object-position: center;
+	}
+}

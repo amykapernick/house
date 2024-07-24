@@ -1,0 +1,43 @@
+.icon {
+
+	@media (prefers-reduced-motion) {
+		transition: none;
+		animation: none;
+
+		& * {
+			transition: none;
+			animation: none;
+		}
+	}
+}
+
+.fan {
+	transform-origin: center;
+
+	&[data-state="on"] {
+
+		/* animation: rotate 10s linear infinite; */
+	}
+}
+
+.light {
+	&[data-state="off"] {
+		& *[data-section="light"] {
+			filter: grayscale(1);
+		}
+
+		& *[data-section="signal"] {
+			display: none;
+		}
+	}
+}
+
+@keyframes rotate {
+	0% {
+		transform: rotate(0deg);
+	}
+
+	100% {
+		transform: rotate(360deg);
+	}
+}

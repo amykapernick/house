@@ -1,7 +1,6 @@
 import { auth } from '@clerk/nextjs/server';
 
 type fetchDataProps = {
-	item: 'meals' | 'tasks'
 	gqlQuery: string
 	authenticated: boolean
 }
@@ -30,7 +29,13 @@ const fetchData = async (props: fetchDataProps) => {
 
 
 	return await fetch(`${process.env.API_URL}/graphql`, options).then(res => res.json())
-	.then((res) => res?.data || {})
+	.then((res) => {
+		if(res?.errors) {
+			console.error({...res})
+			return {}
+		}
+		return res?.data || {}
+	})
 	.catch((err) => {
 		console.error(err)
 		return {}

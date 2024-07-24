@@ -1,0 +1,13 @@
+<svg viewBox="0 0 61 60">
+	<g data-testid="Light">
+		<g data-testid="Light" class="frame-children">
+			<circle cx="31" cy="54" style="fill: rgb(179, 179, 179);" r="5" class="fills" data-testid="svg-circle" />
+			<g data-section="light">
+				<path d="M29.193 13.094c-7.745.803-14.073 6.964-15.052 14.689-.964 7.6 3.099 14.651 9.859 17.702V51h14v-5.515A16.925 16.925 0 0 0 48 30c0-9.97-8.626-17.962-18.807-16.906Z" style="fill: rgb(239, 211, 88);" class="fills" data-testid="svg-path" />
+				<path d="M23 31a1 1 0 0 1-1-1c0-4.963 4.038-9 9-9a1 1 0 1 1 0 2c-3.86 0-7 3.141-7 7a1 1 0 0 1-1 1Z" style="fill: rgb(237, 228, 188);" class="fills" data-testid="svg-path" />
+			</g>
+			<path d="M24 50v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4H24Z" style="fill: rgb(230, 230, 230);" class="fills" data-testid="svg-path" />
+			<path d="M6.63 31.826H1.326a1.326 1.326 0 1 1 0-2.652H6.63a1.326 1.326 0 1 1 0 2.652ZM13.622 14.948c-.34 0-.679-.129-.938-.388l-3.75-3.752a1.325 1.325 0 1 1 1.875-1.875l3.75 3.752a1.325 1.325 0 0 1-.937 2.263ZM30.5 7.957a1.327 1.327 0 0 1-1.326-1.327V1.326a1.326 1.326 0 1 1 2.652 0V6.63c0 .733-.594 1.327-1.326 1.327ZM47.378 14.948a1.325 1.325 0 0 1-.937-2.263l3.75-3.752a1.325 1.325 0 1 1 1.875 1.875l-3.75 3.752a1.32 1.32 0 0 1-.938.388ZM59.674 31.826H54.37a1.326 1.326 0 1 1 0-2.652h5.304a1.326 1.326 0 1 1 0 2.652Z" style="fill: rgb(67, 166, 221);" class="fills" data-testid="svg-path" data-section="signal" />
+		</g>
+	</g>
+</svg>

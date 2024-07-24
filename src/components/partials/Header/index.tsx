@@ -39,6 +39,11 @@ const menuItems: MenuItem[] = [
 	  label: 'Calendar',
 	  link: '/calendar',
 	  auth: true
+	},
+	{
+		label: 'Reference',
+		link: '/reference',
+		auth: true
 	}
   ]; 
 

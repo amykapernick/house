@@ -7,17 +7,17 @@ type RecipeFeedProps = {
 }
 
 const RecipeFeed = (props: RecipeFeedProps) => {
-	const {recipes} = props
+	const { recipes = [] } = props
 	return (
 		<ul className={styles.cards}>
-	{
-		recipes.map((recipe) => (
-			<li key={recipe.id}>
-				<RecipeCard {...recipe} />
-			</li>
-		))
-	}
-</ul>
+			{
+				recipes?.map((recipe) => (
+					<li key={recipe.id}>
+						<RecipeCard {...recipe} />
+					</li>
+				))
+			}
+		</ul>
 	)
 }
 

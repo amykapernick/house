@@ -14,14 +14,14 @@
 	padding: 5px;
 	border-width: 0;
 
-	/* color: $navy; */
+	/* color: $blue_navy; */
 	border-radius: 50%;
 	background: none;
 	line-height: 1;
 
 	&:hover {
 
-		/* background: $navy; */
+		/* background: $blue_navy; */
 
 		/* color: $white; */
 	}

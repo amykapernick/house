@@ -9,6 +9,7 @@ const formatVariables = (variables) => {
       }
     }
   });
+  
 
   return formattedVariables;
 };
