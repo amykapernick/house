@@ -1,1 +1,15 @@
-<svg width="46" xmlns="http://www.w3.org/2000/svg" height="40" fill="none"><g data-testid="aircon"><g class="fills"><rect rx="0" ry="0" width="46" height="40" class="frame-background"/></g><g class="frame-children"><path d="M45 20H1a1 1 0 0 1-1-1V1a1 1 0 0 1 1-1h44a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1Z" style="fill: rgb(230, 230, 230);" class="fills" data-testid="svg-path"/><path d="M41 17H4a1 1 0 1 1 0-2h37a1 1 0 1 1 0 2Z" style="fill: rgb(68, 68, 68);" class="fills" data-testid="svg-path"/><circle cx="40" cy="6" style="fill: rgb(229, 63, 81);" r="2" class="fills" data-testid="svg-circle"/><g data-testid="on"><circle cx="40" cy="6" style="fill: rgb(114, 196, 114);" r="2" class="fills" data-testid="svg-circle"/><path d="M23 40a1 1 0 0 1-1-1v-9a1 1 0 1 1 2 0v9a1 1 0 0 1-1 1ZM13 35a1 1 0 0 1-1-1v-8a1 1 0 1 1 2 0v8a1 1 0 0 1-1 1ZM33 35a1 1 0 0 1-1-1v-8a1 1 0 1 1 2 0v8a1 1 0 0 1-1 1Z" style="fill: rgb(186, 222, 252);" class="fills" data-testid="svg-path"/></g></g></g></svg>
+<svg viewBox="0 0 46 40" fill="none">
+	<g data-testid="aircon">
+		<g class="fills">
+			<rect rx="0" ry="0" width="46" height="40" class="frame-background" />
+		</g>
+		<g class="frame-children">
+			<path d="M45 20H1a1 1 0 0 1-1-1V1a1 1 0 0 1 1-1h44a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1Z" style="fill: rgb(230, 230, 230);" class="fills" data-testid="svg-path" />
+			<path d="M41 17H4a1 1 0 1 1 0-2h37a1 1 0 1 1 0 2Z" style="fill: rgb(68, 68, 68);" class="fills" data-testid="svg-path" />
+			<circle cx="40" cy="6" fill="currentColor" r="2" class="fills" data-section="power" />
+			<g data-section="signal">
+				<path d="M23 40a1 1 0 0 1-1-1v-9a1 1 0 1 1 2 0v9a1 1 0 0 1-1 1ZM13 35a1 1 0 0 1-1-1v-8a1 1 0 1 1 2 0v8a1 1 0 0 1-1 1ZM33 35a1 1 0 0 1-1-1v-8a1 1 0 1 1 2 0v8a1 1 0 0 1-1 1Z" style="fill: rgb(186, 222, 252);" class="fills" data-testid="svg-path" />
+			</g>
+		</g>
+	</g>
+</svg>

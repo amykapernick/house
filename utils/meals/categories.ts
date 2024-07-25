@@ -1,10 +1,10 @@
-import type { Category, RecipeContent } from "@ts/meals";
+import type { Category, Recipe } from "@ts/meals";
 
-export const extractCategories = (recipes: RecipeContent[]) => {
+export const extractCategories = (recipes: Recipe[]) => {
 	const categories: string[] = [];
 
 	recipes.forEach((recipe) => {
-		recipe?.data?.categories?.forEach((category) => {
+		recipe?.categories?.forEach((category) => {
 			categories.push(category);
 		});
 	});
@@ -25,7 +25,7 @@ export const buildCategories = (cats: string[]) => {
 	return categories
 }
 
-const generateCategories = (recipes: RecipeContent[]) => {
+const generateCategories = (recipes: Recipe[]) => {
 	const categories = extractCategories(recipes)
 	return buildCategories(categories)
 }

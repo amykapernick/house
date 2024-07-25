@@ -5,7 +5,6 @@ import fetchData from '@utils/fetchData';
 export default async function CalendarPage ()
 {
 	const { tasks = [] } = await fetchData({
-		item: 'tasks',
 		authenticated: true,
 		gqlQuery: `
 			query {

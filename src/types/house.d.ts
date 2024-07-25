@@ -20,11 +20,11 @@ export type Item = {
 	state?: ItemState[]
 }
 
-export type ItemType = 'fan' | 'aircon' | 'tv' | 'fan_pedestol' | 'oven' | 'washing_machine' | 'bed' | 'fridge' | 'fire' | 'light_switch' | 'light' | 'wifi_router' | 'robot_vacuum' | 'lamp'
+export type ItemType = 'fan' | 'aircon' | 'tv' | 'fan_pedestol' | 'oven' | 'washing_machine' | 'bed' | 'fridge' | 'fire' | 'switch_light' | 'light' | 'wifi_router' | 'robot_vacuum' | 'lamp' | 'computer' | 'laptop' | 'pi' | 'monitor' | 'camera' | 'alarm' | 'fan_light'
 
 export type ItemState = {
 	type?: ItemType
-	state: 'on' | 'off'
+	state: 'on' | 'off' | 'error'
 }
 
 export type Info = {

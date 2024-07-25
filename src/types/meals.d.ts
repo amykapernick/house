@@ -1,20 +1,12 @@
 export type Recipe = {
 	name: string
-	categories?: string[] | undefined
-	image?: string | undefined
-	ingredients: string[]
-	time?: number | undefined
-	difficulty?: string | undefined
-	slug: string
-}
-
-export type RecipeContent = {
 	id: string
+	categories?: string[]
+	image?: string
+	ingredients: string[]
+	time?: number
+	difficulty?: string
 	slug: string
-	body: string
-	collection: string
-	data: Recipe
-	render: any
 }
 
 export type Ingredient = {

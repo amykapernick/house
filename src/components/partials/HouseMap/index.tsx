@@ -1,4 +1,4 @@
-import type { Area, Info, Item } from '@ts/house';
+import type { Area, Item } from '@ts/house';
 import styles from './styles.module.css'
 import ItemIcon from '@components/parts/house/MapItemIcon'
 import { CSSProperties } from 'react';
@@ -20,7 +20,7 @@ const HouseMap = (props: HouseMapProps) => {
 						<g 
 							className={styles.area} 
 							key={area.name}
-							style={{'--colour': `var(--${area.colour || 'primary'})`}}
+							style={{'--colour': `var(--${area.colour || 'primary'})`} as CSSProperties}
 						>
 							<a
 								href={area.link}

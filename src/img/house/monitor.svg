@@ -1,0 +1,16 @@
+<svg viewBox="0 0 48 48" fill="none">
+	<g data-testid="monitor">
+		<g class="fills">
+			<rect rx="0" ry="0" width="48" height="48" class="frame-background" />
+		</g>
+		<g class="frame-children">
+			<rect rx="0" ry="0" x="19" y="34" width="10" height="10" style="fill: rgb(40, 40, 40);" class="fills" data-testid="svg-rect" />
+			<path d="M45 3H3a2 2 0 0 0-2 2v30a2 2 0 0 0 2 2h42a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2Z" style="fill: rgb(68, 68, 68);" class="fills" data-testid="svg-path" />
+			<rect rx="0" ry="0" x="4" y="6" width="40" height="25" style="fill: rgb(54, 76, 147); fill-opacity: 1;" class="fills" data-testid="svg-rect" />
+			<rect rx="0" ry="0" x="14" y="42" width="20" height="3" style="fill: rgb(68, 68, 68);" class="fills" data-testid="svg-rect" />
+			<circle cx="43" cy="34"  fill="currentColor" data-section="power" r="1" class="fills" data-testid="svg-circle" />
+			<circle cx="39" cy="34" style="fill: rgb(179, 179, 179);" r="1" class="fills" data-testid="svg-circle" />
+			<path d="M25 12.481h-2a1 1 0 0 0-1 1v13a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-13a1 1 0 0 0-1-1ZM17 19.981h-2a1 1 0 0 0-1 1v5.5a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-5.5a1 1 0 0 0-1-1ZM33 18.106h-2a1 1 0 0 0-1 1v7.375a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-7.375a1 1 0 0 0-1-1Z" style="fill: rgb(189, 27, 78); fill-opacity: 1;" class="fills" data-testid="svg-path" />
+		</g>
+	</g>
+</svg>

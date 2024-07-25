@@ -11,7 +11,7 @@ const InfoItem = (props: InfoItemProps) => {
 	const { type, value } = props
 	let suffix = ''
 	let prefix = ''
-	let Icon = false
+	let Icon: any = null
 
 	switch(type) {
 		case 'temperature':

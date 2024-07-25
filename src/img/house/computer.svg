@@ -1,0 +1,16 @@
+<svg viewBox="0 0 46 46" fill="none">
+	<g data-testid="computer">
+		<g class="fills">
+			<rect rx="0" ry="0" width="46" height="46" class="frame-background" />
+		</g>
+		<g class="frame-children">
+			<g data-testid="computer" class="nc-icon-wrapper" style="fill: rgb(0, 0, 0);">
+				<rect rx="0" ry="0" x="10" y="26" width="26" height="8" style="fill: rgb(179, 179, 179);" class="fills" data-testid="svg-rect" />
+				<path d="M40 0H6a2 2 0 0 0-2 2v24a2 2 0 0 0 2 2h34a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2ZM40 32H6a6 6 0 0 0-6 6v8h46v-8a6 6 0 0 0-6-6Z" style="fill: rgb(230, 230, 230);" class="fills" data-testid="svg-path" />
+				<circle cx="8.5" cy="39.5" fill="currentColor" data-section="power" r="1.5" class="fills" />
+				<rect rx="0" ry="0" x="24" y="39" width="17" height="2" style="fill: rgb(179, 179, 179);" class="fills" data-testid="svg-rect" />
+				<rect rx="0" ry="0" x="8" y="4" width="30" height="20" style="fill: rgb(67, 166, 221);" class="fills" data-testid="svg-rect" />
+			</g>
+		</g>
+	</g>
+</svg>

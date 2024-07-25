@@ -1,16 +1,17 @@
-import { RecipeContent } from "@ts/meals"
+import { Recipe } from "@ts/meals"
 import formatTime from "@utils/meals/formatTime"
 import LevelIcon from '@img/icons/level.svg'
 import TimeIcon from '@img/icons/time.svg'
-import FallbackImage from '@img/icons/fish.svg?url'
+import FallbackImage from '@img/icons/fish.svg'
 import styles from './styles.module.css'
 
-type RecipeCardProps = RecipeContent & {
+type RecipeCardProps = Recipe & {
 
 }
 
 const RecipeCard = (props: RecipeCardProps) => {
 	const {image, time, name, difficulty, slug} = props
+
 	return (
 		<div className={styles.card}>
 			{
@@ -23,10 +24,10 @@ const RecipeCard = (props: RecipeCardProps) => {
 						height={200}
 					/>
 				) : (
-					<img
-						src={FallbackImage}
-						alt=''
+					<FallbackImage
 						className={`${styles.image} ${styles.fallback}`}
+						width={200}
+						height={200}
 					/>
 				)
 			}

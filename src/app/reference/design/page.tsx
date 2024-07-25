@@ -37,7 +37,7 @@ const formatColour = (slug: string, value: string) => {
 
 export default async function Design ()
 {
-	const colourNames = ['grey', 'brown', 'maroon', 'purple', 'blue', 'teal', 'green', 'yellow', 'orange', 'red', 'pink', 'white', 'black', 'neutral']
+	const colourNames: string[] = ['grey', 'brown', 'maroon', 'purple', 'blue', 'teal', 'green', 'yellow', 'orange', 'red', 'pink', 'white', 'black', 'neutral']
 	const colourTheme: {
 		defaults: Colour[],
 		themes: {
@@ -54,8 +54,7 @@ export default async function Design ()
 		named: []
 	}
 	
-	// Loop through the variables object and filter by only items where the key starts with "font_". Put all the items into an array where the structure is {name: string, value: string} and remove any "font_" from the front of the title, replace any remaining "_" with a space and capitalise the first letter of each word in the name
-	const fonts = Object.entries(variables)
+	const fonts = Object.entries(variables as Record<string, string>)
 		.filter(([name]) => name.startsWith('font_'))
 		.map(([name, value]) => ({
 			name: name
@@ -66,7 +65,7 @@ export default async function Design ()
 		}))
 	
 
-	Object.entries(colours).forEach(colour => {
+	Object.entries(colours as Record<string, string>).forEach(colour => {
 		const [name] = colour
 		if (colourNames.some(colourName => name.startsWith(colourName))) {
 			colourTheme.defaults.push(formatColour(...colour))
@@ -93,7 +92,7 @@ export default async function Design ()
 			<ColourSwatches colours={colourTheme.named} />
 			<h2>Fonts</h2>
 				{fonts.map(({name, value}) => (
-					<div key={name} style={{fontFamily: value}}>
+					<div key={name} style={{fontFamily: value.join(', ')}}>
 						<h3>{name}</h3>
 						<p>{value.map(item => (<span key={item} style={{fontFamily: item}}>{item.replace(/'/g, '')}</span>))}</p>
 					</div>

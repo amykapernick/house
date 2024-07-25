@@ -1,9 +1,9 @@
-import { RecipeContent } from "@ts/meals"
+import { Recipe } from "@ts/meals"
 import styles from './styles.module.css'
 import RecipeCard from "@parts/meals/RecipeCard"
 
 type RecipeFeedProps = {
-	recipes: RecipeContent[]
+	recipes: Recipe[]
 }
 
 const RecipeFeed = (props: RecipeFeedProps) => {

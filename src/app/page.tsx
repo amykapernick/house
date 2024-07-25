@@ -4,7 +4,6 @@ import fetchData from '@utils/fetchData';
 export default async function Home ()
 {
 	const { meals = [] } = await fetchData({
-		item: 'meals',
 		authenticated: true,
 		gqlQuery: `
 			query {
