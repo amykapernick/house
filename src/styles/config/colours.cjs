@@ -51,11 +51,11 @@ const colours = {
   amy_other: "@purple",
   dan: "@green_teal",
   wedding: "@light_green",
-  'crewe-fam': "@green_light",
-  'kapers-crewe': "@red",
-  'holidays+birthdays': "@pink_dark",
+  "crewe-fam": "@green_light",
+  "kapers-crewe": "@red",
+  "holidays+birthdays": "@pink_dark",
   makerx: "@orange",
-  'kapernick-fam': "@yellow",
+  "kapernick-fam": "@yellow",
 };
 
 module.exports = formatVariables(colours);

@@ -3,6 +3,7 @@ import styles from './styles.module.css'
 import ItemIcon from '@components/parts/house/MapItemIcon'
 import { CSSProperties } from 'react';
 import InfoItem from '@components/parts/house/InfoItem';
+import ItemDefaults from '@data/house/items';
 
 type HouseMapProps = {
 	areas: Area[]
@@ -20,7 +21,7 @@ const HouseMap = (props: HouseMapProps) => {
 						<g 
 							className={styles.area} 
 							key={area.name}
-							style={{'--colour': `var(--${area.colour || 'primary'})`} as CSSProperties}
+							style={{'--colour': `var(--${area.colour ?? 'primary'})`} as CSSProperties}
 						>
 							<a
 								href={area.link}
@@ -47,27 +48,31 @@ const HouseMap = (props: HouseMapProps) => {
 						</g>
 					))}
 			</svg>		
-			{items.map((item) => (
-				<a 
-					key={item.start[0]} 
-					className={styles.item}
-					href={item.link}
-					style={{
-						'--width': `${item.size[0] / size[0] * 100}%`,
-						'--height': `${item.size[1] / size[1] * 100}%`,
-						'--offset_x': `${item.start[0] / size[0] * 100}%`,
-						'--offset_y': `${item.start[1] / size[1] * 100}%`
-					} as CSSProperties}
-				>
-					<ItemIcon 
-						type={item.type}
-						state={item.state}
-						size={item.size}
-						start={item.start}
-					/>
-					<span className="sr-only">Control {item.area.name} ${item.type}</span>
-				</a>
-			))}
+			{items.map((item) => {
+				const itemSize = item.size ?? ItemDefaults[item.type].size;
+				return (
+					<a 
+						key={item.start[0]} 
+						className={styles.item}
+						href={item.link}
+						style={{
+							'--width': `${itemSize[0] / size[0] * 100}%`,
+							'--height': `${itemSize[1] / size[1] * 100}%`,
+							'--offset_x': `${item.start[0] / size[0] * 100}%`,
+							'--offset_y': `${item.start[1] / size[1] * 100}%`,
+							'--rotate': item.rotation ? `${item.rotation}deg` : 0,
+						} as CSSProperties}
+					>
+						<ItemIcon 
+							type={item.type}
+							state={item.state}
+							size={itemSize}
+							start={item.start}
+						/>
+						<span className="sr-only">Control {item.area.name} ${item.type}</span>
+					</a>
+				)
+			})}
 			{areas.map(area => (
 				<>
 					{area.info?.length ? (

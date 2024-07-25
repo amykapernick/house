@@ -27,6 +27,7 @@ export default async function House ()
 					}
 					start
 					size
+					rotation
 					link
 					area {
 						name

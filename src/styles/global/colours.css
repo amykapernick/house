@@ -16,6 +16,7 @@
 	--error: var(--red);
 	--warning: var(--orange);
 	--success: var(--green);
+	--transparent: transparent;
 
 	@media(prefers-color-scheme: dark) {
 		--purple_bright: #{$light_purple_bright};
