@@ -1,10 +1,12 @@
 import Fan from '@img/house/fan.svg'
 import Light from '@img/house/light.svg'
+import FanLight from '@img/house/fan-light.svg'
 import styles from './styles.module.css'
+import type { ItemState, ItemType } from '@ts/house'
 
 type ItemIconProps = {
-	type: string
-	state?: string
+	type: ItemType
+	state?: ItemState[]
 	start: number[]
 	size: number[]
 	className?: string
@@ -12,14 +14,30 @@ type ItemIconProps = {
 
 const ItemIcons: Record<string, any> = {
 	fan: Fan,
-	light: Light
+	light: Light,
+	fan_light: FanLight,
 }
 
 const ItemIcon = (props: ItemIconProps) => {
-	const {type, state = 'off', start, size, className = '', ...attrs} = props
+	let {type, state, start, size, className = '', ...attrs} = props
 	const Icon = ItemIcons[type]
 
 	if(!Icon) return null
+	const dataProps: Record<string, string> = {
+		'data-type': type,
+	}
+
+	if(!state) {
+		dataProps['data-state'] = 'off'
+	}
+	else if(state?.length === 1) {
+		dataProps['data-state'] = state[0].state
+	}
+	else {
+		state.forEach((s) => {
+			dataProps[`data-state-${s.type}`] = s.state
+		})
+	}
 
 	return (
 		<Icon
@@ -29,12 +47,7 @@ const ItemIcon = (props: ItemIconProps) => {
 				styles.icon,
 				styles[type]
 			].join(' ')}
-			data-state={state}
-			data-type={type}
-			x={start[0]} 
-			y={start[1]}
-			width={size[0]} 
-			height={size[1]}  
+			{...dataProps}
 		/>
 	)
 }

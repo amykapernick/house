@@ -1,11 +1,22 @@
 @import '../../../styles/mixins';
 
+.container {
+	position: relative;
+	width: calc(100vh * (var(--width) / var(--height)));
+	height: 100vh;
+
+	@media(aspect-ratio <= 1189/1593) {
+		width: 90vw;
+		height: calc(90vw * (var(--height) / var(--width)));
+	}
+}
+
 .map {
 	--primary: var(--blue);
 
-	max-width: 100vw;
-	max-height: 100vh;
-	object-fit: contain;
+	display: block;
+	position: relative;
+	z-index: 2;
 
 	& text {
 		font-family: var(--font_main);
@@ -18,8 +29,10 @@
 
 	&:hover, &:focus {
 		& .label {
-			z-index: 20;
-			opacity: 1;
+
+			/* z-index: 20; */
+
+			/* opacity: 1; */
 		}
 	}
 }
@@ -38,21 +51,46 @@
 }
 
 .info {
-	fill: var(--blue);
+	display: grid;
+	position: absolute;
+	z-index: 10;
+	top: var(--offset_y);
+	left: var(--offset_x);
+	grid-template-columns: repeat(1, minmax(0, max-content));
+	width: var(--width);
+	height: var(--height);
+	margin: 0;
+	padding: 0.1em 0.2em;
+	list-style: none;
+	place-content: end end;
+	place-items: end end;
+	gap: 0.1em;
+	pointer-events: none;
+}
 
-	& text {
-		fill: var(--neutral);
+.stat {
+	display: flex;
+	align-items: center;
+	margin: 0;
+	padding: 0.1em 0.2em;
+	border-radius: 0.2em;
+	background: var(--navy);
+	color: var(--neutral_light);
+	white-space: nowrap;
+
+	& svg {
+		height: 1.2em;
 	}
 }
 
 .item {
-	z-index: 1000;
-
-	& :global(svg) {
-		display: block;
-		width: 100%;
-		height: 100%;
-		object-fit: contain;
-		object-position: center;
-	}
+	display: flex;
+	position: absolute;
+	z-index: 20;
+	top: var(--offset_y);
+	left: var(--offset_x);
+	align-items: center;
+	justify-content: center;
+	width: var(--width);
+	height: var(--height);
 }

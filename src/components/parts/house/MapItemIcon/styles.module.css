@@ -1,4 +1,9 @@
 .icon {
+	display: block;
+	width: auto;
+	height: auto;
+	object-fit: contain;
+	object-position: center;
 
 	@media (prefers-reduced-motion) {
 		transition: none;
@@ -11,17 +16,16 @@
 	}
 }
 
-.fan {
-	transform-origin: center;
+.fan, .fan_light {
+	transform-origin: center 62.5%;
 
-	&[data-state="on"] {
-
-		/* animation: rotate 10s linear infinite; */
+	&[data-state="on"], &[data-state-fan="on"] {
+		animation: rotate 5s linear infinite;
 	}
 }
 
-.light {
-	&[data-state="off"] {
+.light, .fan_light {
+	&[data-state="off"], &[data-state-light="off"] {
 		& *[data-section="light"] {
 			filter: grayscale(1);
 		}

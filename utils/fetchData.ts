@@ -27,11 +27,13 @@ const fetchData = async (props: fetchDataProps) => {
 		}
 	}
 
+	
 
 	return await fetch(`${process.env.API_URL}/graphql`, options).then(res => res.json())
 	.then((res) => {
 		if(res?.errors) {
-			console.error({...res})
+			console.log({...res})
+			console.error({...res?.errors})
 			return {}
 		}
 		return res?.data || {}
