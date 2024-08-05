@@ -2,6 +2,7 @@ import TaskCard from "@components/parts/tasks/Task"
 import type { Task } from "@ts/tasks"
 import styles from './styles.module.css'
 import { add, format, isBefore } from "date-fns"
+import { CSSProperties } from "react"
 
 type TaskViewProps = {
 	tasks: Task[]
@@ -20,7 +21,7 @@ const TaskCalendar = (props: TaskViewProps) => {
 
 			return isBefore(due, today) || isBefore(due, add(today, {days: 7}))
 		})
-		.sort((a, b) => new Date(a.due) - new Date(b.due))
+		.sort((a, b) => isBefore(new Date(a.due), new Date(b.due)) ? -1 : 1)
 		.forEach(task => {
 			const due = new Date(task.due) < today ? 'Overdue' : format(new Date(task.due), 'dd-MMM-yyyy')
 			if(!parsedTasks[due]) parsedTasks[due] = []
