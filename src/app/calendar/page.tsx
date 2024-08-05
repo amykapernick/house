@@ -1,10 +1,17 @@
 import Calendar from '@components/parts/calendar/calendar';
+import parseCalendars from '@utils/calendar/parseCalendarFeeds';
 import parseTasks from '@utils/calendar/parseTasks';
 import fetchData from '@utils/fetchData';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+	title: 'Calendar',
+	description: 'View combined calendars and tasks for the family',
+};
 
 export default async function CalendarPage ()
 {
-	const { tasks = [] } = await fetchData({
+	const { tasks = [], calendars = [] } = await fetchData({
 		authenticated: true,
 		gqlQuery: `
 			query {
@@ -19,11 +26,22 @@ export default async function CalendarPage ()
 					status
 					due
 				}
+				calendars {
+					name
+					url
+					colour
+				}
 			}
 		`
 	});
 
-	const events = [...parseTasks(tasks)]
+	const taskEvents = parseTasks(tasks);
+	// const calendarEvents = parseCalendars(calendars) ?? [];
+
+	const events = [
+		...taskEvents, 
+		// ...calendarEvents
+	];
 
 	return ( 
 		<>

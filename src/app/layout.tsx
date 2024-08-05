@@ -5,10 +5,12 @@ import { LayoutData } from '@ts/global'
 import '@styles/main.css'
 import DevStyles from '@components/partials/devStyles'
 import Layout from '@components/layouts/default'
+import { Metadata } from 'next'
 
-export const metadata: LayoutData = {
-	title: "Home",
-  description: "Meal Planning, Tasks, Reminders, Calendars",
+export const metadata: Metadata = {
+	title: "Kapers Crewe Household",
+	description: "Meal Planning, Tasks, Reminders, Calendars",
+	applicationName: "Kapers Crewe Household",
 }
 
 export default function RootLayout ({
@@ -27,8 +29,6 @@ export default function RootLayout ({
 					name="viewport"
 					content="width=device-width,initial-scale=1,shrink-to-fit=no"
 					/>
-					<title>{metadata.title}</title>
-					<meta name="description" content={metadata.description} />
 				</head>
 				<body>
 					{process.env.MODE === "development" && <DevStyles />}

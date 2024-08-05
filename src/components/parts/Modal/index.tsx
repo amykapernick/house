@@ -12,10 +12,10 @@ const Modal = (props: ModalProps) => {
 	const dialog = useRef<HTMLDialogElement>(null)
 
 	useEffect(() => {
-		console.log({dialog, modalOpen})
+		// console.log({dialog, modalOpen})
 		if(modalOpen) dialog?.current?.showModal()
 		else dialog?.current?.close()
-	}, [open])
+	}, [modalOpen])
 
 	return (
 		<>

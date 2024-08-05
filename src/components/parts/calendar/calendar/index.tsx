@@ -42,6 +42,8 @@ const CalendarView = (props: CalendarViewProps) => {
 
 	}, [props])
 
+	// console.log({events})
+
 	return (
 		<div>
 			<DnDCalendar

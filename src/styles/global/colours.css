@@ -3,6 +3,7 @@
 	--purple: #{$purple};
 	--navy: #{$blue_navy};
 	--blue: #{$blue};
+	--blue_light: #{$blue_light};
 	--green: #{$green};
 	--green_light: #{$green_light};
 	--teal: #{$green_teal};

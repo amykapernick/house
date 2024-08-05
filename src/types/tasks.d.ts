@@ -1,4 +1,4 @@
-export type TaskStatus = 'Not Started' | 'In Progress' | 'Ongoing' | 'Paused' | 'Done' | 'Archived'
+export type TaskStatus = 'Not Started' | 'In Progress' | 'Ongoing' | 'Paused' | 'Done'
 
 export type Task = {
 	id: string,
