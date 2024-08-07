@@ -10,9 +10,7 @@ type Calendar = {
 const parseCalendars = async (calendars: Calendar[]) => {
 	const results: Event[] = [];
 	await Promise.all(
-		calendars
-			.filter((calendar) => calendar.url)
-			.map(async (calendar) => {
+		calendars?.filter((calendar) => calendar.url)?.map(async (calendar) => {
 				const res = await fetch(calendar.url);
 				const text = await res.text();
 				const parsed = sync.parseICS(text);

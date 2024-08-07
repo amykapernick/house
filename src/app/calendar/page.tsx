@@ -48,7 +48,6 @@ export default async function CalendarPage ()
 
 	events.push(...taskEvents);
 
-	console.log({calendars})
 
 	await parseCalendars(calendars)
 		.then(res => {
