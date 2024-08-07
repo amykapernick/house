@@ -6,11 +6,16 @@
 	--blue_light: #{$blue_light};
 	--green: #{$green};
 	--green_light: #{$green_light};
+	--green_lime: #{$green_lime};
 	--teal: #{$green_teal};
+	--green_teal: #{$green_teal};
 	--red: #{$red};
 	--pink: #{$pink};
+	--pink_dark: #{$pink_dark};
 	--orange: #{$orange};
 	--yellow: #{$yellow};
+	--white: #{$white};
+	--black: #{$black};
 	--neutral: #{$neutral};
 	--background: #{$background};
 	--neutral_light: #{$white};

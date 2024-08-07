@@ -4,7 +4,7 @@ import { format, parse, startOfWeek, getDay } from 'date-fns';
 import { resizeEvent, moveEvent } from './updateEvents'
 import { ComponentType, Dispatch, SetStateAction } from 'react';
 import { UpdateEventFunction, Event } from '@ts/calendar';
-import CustomEvent from '@components/parts/calendar/CustomEvent';
+import {CustomEvent, EventWrapper} from '@components/parts/calendar/CustomEvent';
 
 export const locales = {
 	'en-AU': enAU,
@@ -26,12 +26,13 @@ const defaultEditFunctions = {
 const defaultAccessors: Record<string, (string | ((event: Event) => void))> = {
 	start: 'start',
 	end: 'end',
-	draggable: (event: Event) => true,
-	resizable: (event: Event) => true,
+	draggable: 'editable',
+	resizable: 'editable'
 }
 
 export const customComponents: Record<string, ComponentType<EventProps<Event>>> = {
-	event: CustomEvent
+	event: CustomEvent,
+	eventWrapper: EventWrapper
 }
 
 export const accessors = () => {

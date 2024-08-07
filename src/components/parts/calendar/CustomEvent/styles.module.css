@@ -1,0 +1,15 @@
+.event {
+	--feature_colour: var(--red);
+	--contrast_colour: var(--white);
+
+	& :global(.rbc-event) {
+		padding: 0;
+		border: none;
+		border-radius: 0;
+		background: none;
+	}
+
+	& :global(.rbc-event-label) {
+		display: none;
+	}
+}

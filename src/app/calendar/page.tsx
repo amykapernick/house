@@ -20,28 +20,40 @@ export default async function CalendarPage ()
 					name
 					assigned {
 						name
-						id
+						slug
 						profile
+						colour
 					}
 					status
 					due
+					estimate
+					link
+					platform
 				}
 				calendars {
 					name
 					url
 					colour
+					slug
 				}
 			}
 		`
 	});
 
-	const taskEvents = parseTasks(tasks);
-	// const calendarEvents = parseCalendars(calendars) ?? [];
 
-	const events = [
-		...taskEvents, 
-		// ...calendarEvents
-	];
+
+	let events = []
+
+	const taskEvents = parseTasks(tasks);
+
+	events.push(...taskEvents);
+
+	console.log({calendars})
+
+	await parseCalendars(calendars)
+		.then(res => {
+			events.push(...res)
+		});
 
 	return ( 
 		<>

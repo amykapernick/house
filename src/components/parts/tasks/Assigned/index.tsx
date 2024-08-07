@@ -18,7 +18,7 @@ const Assignees = (props: AssignedProps) => {
 					{profile ?
 						<img className={styles.image} src={profile} alt="" />
 						:	<span className={styles.image}>
-							{name.split(' ').map(word => word[0]).join('')}
+							{name?.split(' ').map(word => word[0]).join('')}
 						</span>
 					}
 				</li>

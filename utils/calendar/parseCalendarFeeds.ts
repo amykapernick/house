@@ -10,26 +10,30 @@ type Calendar = {
 const parseCalendars = async (calendars: Calendar[]) => {
 	const results: Event[] = [];
 	await Promise.all(
-		calendars.map(async (calendar) => {
-			const res = await fetch(calendar.url);
-			const text = await res.text();
-			const parsed = sync.parseICS(text);
-			const events = Object.values(parsed).filter(
-				(event: any) => event.type === 'VEVENT'
-			);
-			results.push(
-				...events.map((event: any) => ({
-					...event,
-					start: new Date(),
-					end: new Date(),
-					id: event.uid,
-					title: event.summary,
-					type: 'event',
-					calendar: calendar.name,
-					colour: calendar.colour,
-				}))
-			);
-		})
+		calendars
+			.filter((calendar) => calendar.url)
+			.map(async (calendar) => {
+				const res = await fetch(calendar.url);
+				const text = await res.text();
+				const parsed = sync.parseICS(text);
+				const events = Object.values(parsed).filter(
+					(event: any) => event.type === 'VEVENT'
+				);
+				results.push(
+					...events.map((event: any) => ({
+						start: event.start,
+						end: event.end,
+						id: event.uid,
+						title: event.summary,
+						type: 'event' as 'event',
+						calendar: calendar,
+						resource: [calendar],
+						description: event.description,
+						status: event.status,
+						busy: event.transparency,
+					}))
+				);
+			})
 	);
 	return results;
 };

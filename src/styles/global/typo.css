@@ -71,6 +71,7 @@ button, .btn, input[type="submit"] {
 
 a, button {
 	& svg {
+		display: block;
 		width: auto;
 		height: 1em;
 	}

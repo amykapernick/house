@@ -25,6 +25,8 @@ const CalendarView = (props: CalendarViewProps) => {
 		date: date,
 		view: view,
 		components: customComponents,
+		step: 15,
+		timeslots: 4
 	}
 	const calendarFunctions = {
 		onView: useCallback((newView: View) => setView(newView), []),
@@ -42,19 +44,18 @@ const CalendarView = (props: CalendarViewProps) => {
 
 	}, [props])
 
-	// console.log({events})
-
 	return (
 		<div>
 			<DnDCalendar
 				className={styles.calendar}
 				localizer={localizer}
 				events={events}
+				popup
 				backgroundEvents={backgroundEvents}
 				views={views.options}
 				{...defaultProps}
 				{...calendarFunctions}
-				{...accessors}
+				{...accessors()}
 				{...editFunctions(setEvents, events)}
 			/>
 		</div>

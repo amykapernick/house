@@ -1,3 +1,5 @@
+import type { User, Platform } from './global'
+
 export type TaskStatus = 'Not Started' | 'In Progress' | 'Ongoing' | 'Paused' | 'Done'
 
 export type Task = {
@@ -6,16 +8,12 @@ export type Task = {
 	due: Date,
 	status: TaskStatus,
 	assigned: User[]
-	subtasks: string[],
+	subtasks: Task[],
 	parent: string[],
 	estimate: number,
-	project: string[]
-}
-
-export type User = {
-	id: string,
-	name: string,
-	profile: string
+	project: Project[],
+	platform: Platform,
+	link: string
 }
 
 export type ProjectStatus = 'Backlog' | 'Planning' | 'In progress' | 'Paused' | 'Done' | 'Cancelled' | 'Archived'

@@ -1,5 +1,14 @@
+import type { Colour, User } from "./global"
 import type { TaskStatus } from "./tasks"
 import type { Event as EventType } from "react-big-calendar"
+
+export type Calendar = {
+	name: string
+	id: string
+	url: string
+	colour: Colour
+	slug: string
+}
 
 export type Resource = {
 	id: string,
@@ -12,13 +21,16 @@ export type EventBase = EventType & {
 	start: Date,
 	end: Date,
 	allDay?: boolean | undefined
-	resource?: any,
+	resource?: (User | Calendar)[],
 	type: 'event' | 'task'
+	editable?: boolean
 }
 
 export type TaskEvent = EventBase & {
 	status: TaskStatus
-	type: 'task'
+	type: 'task',
+	link: string,
+	platform: 'notion' | 'todoist'
 }
 
 export type Event = (
