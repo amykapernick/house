@@ -32,7 +32,7 @@ const defaultAccessors: Record<string, (string | ((event: Event) => void))> = {
 
 export const customComponents: Record<string, ComponentType<EventProps<Event>>> = {
 	event: CustomEvent,
-	eventWrapper: EventWrapper
+	eventWrapper: EventWrapper as unknown as ComponentType<EventProps<Event>>
 }
 
 export const accessors = () => {

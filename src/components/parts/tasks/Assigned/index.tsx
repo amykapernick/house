@@ -1,4 +1,4 @@
-import { User } from "@ts/tasks"
+import { User } from "@ts/global"
 import styles from './styles.module.css'
 
 type AssignedProps = {
@@ -12,13 +12,13 @@ const Assignees = (props: AssignedProps) => {
 		<ul
 			className={`${className} ${styles.list}`}
 		>
-			{assignees.map(({ id, name, profile }) => (
-				<li key={id} className={styles.item}>
+			{assignees.map(({ slug, name, profile }) => (
+				<li key={slug} className={styles.item}>
 					<span className="sr-only">{name}</span>
 					{profile ?
 						<img className={styles.image} src={profile} alt="" />
 						:	<span className={styles.image}>
-							{name?.split(' ').map(word => word[0]).join('')}
+							{name.split(' ').map(word => word[0]).join('')}
 						</span>
 					}
 				</li>
