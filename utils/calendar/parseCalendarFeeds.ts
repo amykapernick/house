@@ -17,7 +17,6 @@ const parseCalendars = async (calendars: Calendar[]) => {
 				const events = Object.values(parsed).filter(
 					(event: any) => event.type === 'VEVENT'
 				);
-				console.log({parsed})
 				results.push(
 					...events.map((event: any) => ({
 						start: event.start,

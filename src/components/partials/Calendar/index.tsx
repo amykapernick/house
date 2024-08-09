@@ -17,20 +17,19 @@ const CalendarView = (props: CalendarViewProps) => {
     const { tasks = [], calendars = [] } = props
 	const [events, setEvents] = useState<Event[]>([]);
 
-    useEffect(() => {            
-            const taskEvents = parseTasks(tasks);
-            setEvents((prevEvents) => [...prevEvents, ...taskEvents]);
+    useEffect(() => {           
+        let updatedEvents = events 
+        const taskEvents = parseTasks(tasks);
+        updatedEvents.push(...taskEvents);
+        setEvents(updatedEvents);
 
-    }, [tasks]);
+        // fetchCalendarEvents(calendars)
+        //     .then(res => {
+        //         updatedEvents.push(...res);
+        //         setEvents(updatedEvents);
+        //     })
 
-    useEffect(() => {            
-        fetchCalendarEvents(calendars)
-            .then(res => {
-                console.log({res})
-                setEvents((prevEvents) => [...prevEvents, ...res]);
-            })
-
-    }, [calendars]);
+    }, []);
 
     return (
         <>
