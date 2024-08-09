@@ -4,4 +4,13 @@
 	& :global(.rbc-time-slot) {
 		min-height: 0.8em;
 	}
+
+	&.week {
+		overflow-x: auto;
+
+		& :global(.rbc-time-view) {
+			min-width: calc((7 * 6.5em) + 9ch);
+			
+		}
+	}
 }

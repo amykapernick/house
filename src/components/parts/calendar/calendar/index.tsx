@@ -47,7 +47,7 @@ const CalendarView = (props: CalendarViewProps) => {
 	return (
 		<div>
 			<DnDCalendar
-				className={styles.calendar}
+				className={`${styles.calendar} ${styles[view]}`}
 				localizer={localizer}
 				events={events}
 				popup

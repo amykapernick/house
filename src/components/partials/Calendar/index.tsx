@@ -33,20 +33,20 @@ const CalendarView = (props: CalendarViewProps) => {
 
         setEvents(updatedEvents);
 
-        fetchCalendarEvents(calendars)
-            .then(calendarEvents => {
-                if(
-                    !updatedEvents.some((event) => (
-                        event.title === calendarEvents?.[0].title ||
-                        event.title === calendarEvents?.[1].title ||
-                        event.title === calendarEvents?.[2].title
-                    ))
-                ) {
-                    updatedEvents.push(...calendarEvents);
-                }
+        // fetchCalendarEvents(calendars)
+        //     .then(calendarEvents => {
+        //         if(
+        //             !updatedEvents.some((event) => (
+        //                 event.title === calendarEvents?.[0].title ||
+        //                 event.title === calendarEvents?.[1].title ||
+        //                 event.title === calendarEvents?.[2].title
+        //             ))
+        //         ) {
+        //             updatedEvents.push(...calendarEvents);
+        //         }
 
-                setEvents(updatedEvents);
-            })
+        //         setEvents(updatedEvents);
+        //     })
 
     }, []);
 
