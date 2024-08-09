@@ -4,52 +4,33 @@ import { useEffect, useState } from 'react';
 import Calendar from '@components/parts/calendar/calendar';
 import parseCalendars from '@utils/calendar/parseCalendarFeeds';
 import parseTasks from '@utils/calendar/parseTasks';
-import fetchData from '@utils/fetchData';
-import type { Event } from '@ts/calendar';
+import type { Calendar as CalendarType, Event } from '@ts/calendar';
+import { Task } from '@ts/tasks';
+import { fetchCalendarEvents } from 'src/app/actions';
 
-const CalendarView = () => {
+type CalendarViewProps = {
+    tasks: Task[]
+    calendars: CalendarType[]
+}
+
+const CalendarView = (props: CalendarViewProps) => {
+    const { tasks = [], calendars = [] } = props
 	const [events, setEvents] = useState<Event[]>([]);
 
-    useEffect(() => {
-        const fetchDataAndParseCalendars = async () => {
-            const { tasks = [], calendars = [] } = await fetchData({
-                authenticated: true,
-                gqlQuery: `
-                    query {
-                        tasks {
-                            id
-                            name
-                            assigned {
-								name
-                                slug
-                                profile
-                                colour
-                            }
-                            status
-                            due
-                            estimate
-                            link
-                            platform
-                        }
-                        calendars {
-                            name
-                            url
-                            colour
-                            slug
-                        }
-                    }
-                `
-            });
-
+    useEffect(() => {            
             const taskEvents = parseTasks(tasks);
-            setEvents(taskEvents);
+            setEvents((prevEvents) => [...prevEvents, ...taskEvents]);
 
-            // const calendarEvents = await parseCalendars(calendars);
-            // setEvents((prevEvents) => [...prevEvents, ...calendarEvents]);
-        };
+    }, [tasks]);
 
-        fetchDataAndParseCalendars();
-    }, []);
+    useEffect(() => {            
+        fetchCalendarEvents(calendars)
+            .then(res => {
+                console.log({res})
+                setEvents((prevEvents) => [...prevEvents, ...res]);
+            })
+
+    }, [calendars]);
 
     return (
         <>

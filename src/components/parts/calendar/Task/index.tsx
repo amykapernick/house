@@ -19,8 +19,6 @@ const Task = (props: TaskEvent) => {
 	const {title, start, link, platform, status, ...args} = props
 	const completed = StatusComplete[status]
 
-	console.log({args})
-
 	return (
 		<div className={styles.task}>
 			<Checkbox
