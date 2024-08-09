@@ -16,20 +16,30 @@ type CalendarViewProps = {
 const CalendarView = (props: CalendarViewProps) => {
     const { tasks = [], calendars = [] } = props
 	const [events, setEvents] = useState<Event[]>([]);
+    const [taskEvents, setTaskEvents] = useState<Event[]>([]);
+    const [calendarEvents, setCalendarEvents] = useState<Event[]>([]);
 
     useEffect(() => {           
-        let updatedEvents = events 
-        const taskEvents = parseTasks(tasks);
-        updatedEvents.push(...taskEvents);
-        setEvents(updatedEvents);
+        const updatedTasks = parseTasks(tasks);
+            setTaskEvents(updatedTasks);
+            setEvents([
+                ...calendarEvents,
+                ...updatedTasks
+            ]);
 
-        // fetchCalendarEvents(calendars)
-        //     .then(res => {
-        //         updatedEvents.push(...res);
-        //         setEvents(updatedEvents);
-        //     })
+    }, [tasks]);
 
-    }, []);
+    // useEffect(() => {           
+    //     fetchCalendarEvents(calendars)
+    //         .then(res => {
+    //             setCalendarEvents(res);
+    //             setEvents([
+    //                 ...taskEvents,
+    //                 ...res
+    //             ]);
+    //         })
+
+    // }, [calendars]);
 
     return (
         <>
