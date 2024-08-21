@@ -7,10 +7,6 @@ export default async function Stats () {
 		gqlQuery: `
 			query {
 				guests {
-					name {
-						first
-						last
-					}
 					dietaries
 					age
 					meal
