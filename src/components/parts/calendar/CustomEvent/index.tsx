@@ -1,8 +1,8 @@
-import { CSSProperties, ReactNode } from "react"
 import Event from "../Event"
 import Task from "../Task"
-import type { Event as EventType, TaskEvent } from '@ts/calendar'
 import styles from './styles.module.css'
+import type { CSSProperties, ReactNode } from "react"
+import type { Event as EventType, TaskEvent } from '@ts/calendar'
 import type { Colour } from "@ts/global"
 
 const contrastColours: Record<Colour, Colour> = {
@@ -47,18 +47,18 @@ export const CustomEvent = ({event}: CustomEventProps) => {
 
 export const EventWrapper = (props: CustomEventProps) => {
 	const { children, event } = props
-	const style: CSSProperties & { 
-		`--feature_colour`?: string
-		`--contrast_colour`?: string
-	 } = {}
-
+	let style: CSSProperties = {}
+	
 	if(
 		event.resource 
 		&& event.resource.length === 1
 		&& event.resource?.[0]
 	) {
-		style[`--feature_colour`] = `var(--${event.resource[0].colour})`
-		style[`--contrast_colour`] = `var(--${contrastColours[event.resource[0].colour as Colour]})`
+		style = {
+			...style,
+			'--feature_colour': `var(--${event.resource[0].colour})`,
+			'--contrast_colour': `var(--${contrastColours[event.resource[0].colour as Colour]})`
+		} as CSSProperties
 	}
 
 	return (

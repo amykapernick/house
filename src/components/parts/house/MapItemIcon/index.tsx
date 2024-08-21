@@ -12,7 +12,7 @@ type ItemIconProps = {
 }
 
 const ItemIcon = (props: ItemIconProps) => {
-	let {type, state, start, size, className = ``, ...attrs} = props
+	let {type, state, className = ``, ...attrs} = props
 	const Icon: any = ItemDefaults[type]?.Icon
 
 	if(!Icon) return null

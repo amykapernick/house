@@ -1,6 +1,5 @@
 'use client'
 
-import type { View } from 'react-big-calendar';
 import { Calendar } from 'react-big-calendar'
 import 'react-big-calendar/lib/css/react-big-calendar.css'
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
@@ -9,6 +8,7 @@ import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop'
 import { accessors, localizer, editFunctions, views, customComponents } from '@utils/calendar/setup'
 import styles from './styles.module.css'
 import type { Event } from '@ts/calendar';
+import type { View } from 'react-big-calendar';
 
 type CalendarViewProps = {
 	events: Event[]

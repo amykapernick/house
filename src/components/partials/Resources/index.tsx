@@ -21,7 +21,7 @@ const Resources = (props: {resources: Resource[]}) => {
 				<section key={category} className={styles.category}>
 					<h2>{category}</h2>
 					<ul className={styles.list}>
-						{resources.map(({name, url, id, icon, login, image, description, archived}) => (
+						{resources.map(({name, url, id, icon, login, description, archived}) => (
 							<li key={id} className={styles.item} data-archived={archived}>
 								<a
 									className={styles.title}

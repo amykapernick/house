@@ -1,5 +1,6 @@
 import fetchData from '@utils/fetchData';
 import styles from './styles.module.css'
+import type { Guest } from '@ts/stats';
 
 export default async function Stats () {	
 	const { guests = [] } = await fetchData({
@@ -14,7 +15,7 @@ export default async function Stats () {
 				}
 			}
 		`
-	})
+	}) as { guests: Guest[] }
 	const dietaries: Record<string, number> = {}
 	const allGuests: Record<string, number> = {
 		children: 0,

@@ -21,7 +21,7 @@ module.exports = {
 			{
 				root: path.resolve(__dirname, `./src/styles`),
 				skipDuplicates: true,
-				resolve: (id, basedir, importOptions) => {
+				resolve: (id) => {
 					const [aliasName, filename] = id.split(`/`);
 					if (aliasName[0] !== `@`) return id;
 					return aliases[aliasName](filename);

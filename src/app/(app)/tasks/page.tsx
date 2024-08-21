@@ -1,5 +1,6 @@
 import TaskList from '@components/parts/tasks/TaskView';
 import fetchData from '@utils/fetchData';
+import type { Task } from '@ts/tasks';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -25,7 +26,7 @@ export default async function CalendarPage () {
 				}
 			}
 		`
-	});
+	}) as { tasks: Task[]}
 
 	return ( 
 		<>

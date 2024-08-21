@@ -1,10 +1,10 @@
-import { Views, ViewsProps, dateFnsLocalizer } from 'react-big-calendar'
+import { Views, dateFnsLocalizer } from 'react-big-calendar'
 import enAU from 'date-fns/locale/en-AU'
 import { format, parse, startOfWeek, getDay } from 'date-fns';
 import {CustomEvent, EventWrapper} from '@components/parts/calendar/CustomEvent';
 import { resizeEvent, moveEvent } from './updateEvents'
 import type { ComponentType, Dispatch, SetStateAction } from 'react';
-import type { UpdateEventFunction, Event } from '@ts/calendar';
+import type { Event } from '@ts/calendar';
 import type { EventProps, View, ViewKey} from 'react-big-calendar';
 
 export const locales = {
@@ -24,7 +24,7 @@ const defaultEditFunctions = {
 	onEventDrop: moveEvent,
 }
 
-const defaultAccessors: Record<string, (string | ((event: Event) => void))> = {
+const defaultAccessors: Record<string, (string | (() => void))> = {
 	start: `start`,
 	end: `end`,
 	draggable: `editable`,
@@ -37,7 +37,7 @@ export const customComponents: Record<string, ComponentType<EventProps<Event>>> 
 }
 
 export const accessors = () => {
-	const items: Record<string, (string | ((event: Event) => void))> = {}
+	const items: Record<string, (string | (() => void))> = {}
 
 	Object.entries(defaultAccessors).map(([key, value]) => {
 		items[`${key}Accessor`] = value
@@ -47,10 +47,10 @@ export const accessors = () => {
 }
 
 export const editFunctions = (updateState: Dispatch<SetStateAction<Event[]>>, allEvents: Event[]) => {
-	const items: Record<string, UpdateEventFunction> = {}
+	const items: Record<string, any> = {}
 
 	Object.entries(defaultEditFunctions).map(([key, func]) => {
-		items[key] = (args) => {
+		items[key] = (args: any) => {
 			updateState(func(args, allEvents))
 		}
 	})

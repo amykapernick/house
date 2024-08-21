@@ -1,5 +1,6 @@
 import HouseMap from "@components/partials/HouseMap";
 import fetchData from "@utils/fetchData";
+import type { Area, Item } from "@ts/house";
 
 export default async function House () {
 	const { areas, items } = await fetchData({
@@ -36,7 +37,7 @@ export default async function House () {
 				}
 			}
 		`
-	})
+	}) as { areas: Area[], items: Item[] }
 
 	return (
 		<>

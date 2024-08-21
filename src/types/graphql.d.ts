@@ -1,8 +1,9 @@
+import type { Resource } from '@ts/resources';
 import type { Project, Task } from '@ts/tasks';
 import type { Recipe } from "@ts/meals"
 import type { Area, Info, Item } from '@ts/house';
 import type { Guest } from '@ts/stats';
-import type { Calendar,Resource } from '@ts/calendar';
+import type { Calendar } from '@ts/calendar';
 import type { User } from "@ts/global";
 
 export type Query = {
@@ -14,7 +15,7 @@ export type Query = {
 	projects?: Project[]
 	recipes?: Recipe[]
 	recipe?: Recipe
-	resources?: Resource
+	resources?: Resource[]
 	tasks?: Task[]
 	users?: User[]
 }

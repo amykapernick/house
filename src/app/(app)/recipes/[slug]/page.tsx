@@ -1,5 +1,6 @@
 import RecipeView from "@components/partials/Recipe"
 import fetchData from "@utils/fetchData"
+import type { Recipe as RecipeType } from "@ts/meals"
 
 type RecipeProps = {
 	params: {
@@ -17,8 +18,6 @@ export async function generateStaticParams() {
 			}
 		`
 	})
-
-	console.log({recipes})
 
 	return recipes.map(({slug}) => ({
 		slug
@@ -50,7 +49,7 @@ export default async function Recipe(props: RecipeProps) {
 				}
 			}
 		`
-	})
+	}) as { recipe: RecipeType }
 	
 
 	return (

@@ -1,5 +1,6 @@
 import RecipeFeed from '@components/parts/meals/RecipeFeed';
 import fetchData from '@utils/fetchData';
+import type { Recipe } from '@ts/meals';
 
 export default async function Recipes () {
 	const { recipes = [] } = await fetchData({
@@ -15,9 +16,7 @@ export default async function Recipes () {
 				}
 			}
 		`
-	});
-
-	console.log({recipes})
+	}) as { recipes: Recipe[] }
 	
 	return (
 		<>

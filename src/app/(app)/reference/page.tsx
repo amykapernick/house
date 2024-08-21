@@ -1,5 +1,6 @@
 import Resources from '@components/partials/Resources';
 import fetchData from '@utils/fetchData';
+import type { Resource } from '@ts/resources';
 
 export default async function Home () {
 	const { resources = [] } = await fetchData({
@@ -11,14 +12,14 @@ export default async function Home () {
 					id
 					category
 					description
-					image
+					image 
 					login
 					url
 					icon
 				}
 			}
 		`
-	});
+	}) as { resources: Resource[] }
 	
 	return (
 		<>

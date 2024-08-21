@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import Calendar from '@components/parts/calendar/calendar';
-import parseCalendars from '@utils/calendar/parseCalendarFeeds';
 import parseTasks from '@utils/calendar/parseTasks';
 import { fetchCalendarEvents } from 'src/app/actions';
 import type { Task } from '@ts/tasks';

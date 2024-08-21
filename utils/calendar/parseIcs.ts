@@ -33,8 +33,6 @@ const parseICS = (data: any): Event[] => {
 		.map((event: any) => {
 			let eventData: any = {}
 
-			// console.log({event})
-
 			event.split(`\r\n`).forEach((line: any) => {
 				const [key, value] = line.split(`:`)
 

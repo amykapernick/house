@@ -1,8 +1,6 @@
-import Modal from "@components/parts/Modal"
 import Todoist from '@img/icons/todoist.svg'
 import Notion from '@img/icons/notion.svg'
 import Checkbox from '@img/icons/checkbox.svg'
-import Info from '@img/icons/info.svg'
 import styles from './styles.module.css'
 import type { TaskStatus } from "@ts/tasks"
 import type { TaskEvent } from "@ts/calendar"
@@ -16,7 +14,7 @@ const StatusComplete: Record<TaskStatus, string> = {
 }
 
 const Task = (props: TaskEvent) => {
-	const {title, start, link, platform, status, ...args} = props
+	const {title, link, platform, status} = props
 	const completed = StatusComplete[status]
 
 	return (

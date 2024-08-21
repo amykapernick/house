@@ -40,12 +40,4 @@ export type Event = (
 	| TaskEvent
 )
 
-export type UpdateEventFunction = (
-	args: { 
-		event: Event, 
-		start: Date, 
-		end: Date, 
-		isAllDay?: boolean 
-	},
-	allEvents?: Event[]
-) => any
+export type UpdateEventFunction = () => any

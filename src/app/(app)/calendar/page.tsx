@@ -1,5 +1,7 @@
 import CalendarView from '@components/partials/Calendar';
 import fetchData from '@utils/fetchData';
+import type { Calendar } from '@ts/calendar';
+import type { Task } from '@ts/tasks';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -35,7 +37,7 @@ const CalendarPage = async () => {
                         }
                     }
                 `
-	});
+	}) as { tasks: Task[], calendars: Calendar[] }
     
 	return (
 		<>
