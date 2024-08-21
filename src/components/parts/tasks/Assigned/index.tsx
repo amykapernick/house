@@ -1,5 +1,5 @@
-import { User } from "@ts/global"
 import styles from './styles.module.css'
+import type { User } from "@ts/global"
 
 type AssignedProps = {
 	assignees: User[]
@@ -7,7 +7,7 @@ type AssignedProps = {
 }
 
 const Assignees = (props: AssignedProps) => {
-	const { assignees = [], className = '' } = props
+	const { assignees = [], className = `` } = props
 	return (
 		<ul
 			className={`${className} ${styles.list}`}
@@ -18,7 +18,7 @@ const Assignees = (props: AssignedProps) => {
 					{profile ?
 						<img className={styles.image} src={profile} alt="" />
 						:	<span className={styles.image}>
-							{name.split(' ').map(word => word[0]).join('')}
+							{name.split(` `).map(word => word[0]).join(``)}
 						</span>
 					}
 				</li>

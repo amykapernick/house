@@ -22,20 +22,20 @@ export type EventBase = EventType & {
 	end: Date,
 	allDay?: boolean | undefined
 	resource?: (User | Calendar)[],
-	type: 'event' | 'task'
+	type: `event` | `task`
 	editable?: boolean
 }
 
 export type TaskEvent = EventBase & {
 	status: TaskStatus
-	type: 'task',
+	type: `task`,
 	link: string,
-	platform: 'notion' | 'todoist'
+	platform: `notion` | `todoist`
 }
 
 export type Event = (
 	EventBase & {
-		type: 'event'
+		type: `event`
 	} 
 	| TaskEvent
 )

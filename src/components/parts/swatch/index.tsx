@@ -1,5 +1,5 @@
-import { CSSProperties } from 'react'
 import styles from './styles.module.css'
+import type { CSSProperties } from 'react'
 
 export type Colour = {
 	name: string,
@@ -22,12 +22,12 @@ const ColourSwatches = (props: {colours: Colour[]}) => {
 					className={styles.swatch}
 					data-standard={
 						contrast.ratio < 3 
-							? 'fail' 
+							? `fail` 
 							: contrast.ratio < 4.5 
-								? 'a' 
-									: contrast.ratio < 7 
-										? 'aa' 
-										: 'aaa'
+								? `a` 
+								: contrast.ratio < 7 
+									? `aa` 
+									: `aaa`
 					}
 				>
 					<span className={styles.name}>{name}</span>
@@ -35,12 +35,12 @@ const ColourSwatches = (props: {colours: Colour[]}) => {
 					<details className={styles.a11y}>
 						<summary className={styles.standard}>
 							{contrast.ratio < 3 
-								? 'Fails A ❌' 
+								? `Fails A ❌` 
 								: contrast.ratio < 4.5 
-									? 'Passes A' 
+									? `Passes A` 
 									: contrast.ratio < 7 
-										? 'Passes AA ✅' 
-										: 'Passes AAA 🥳'
+										? `Passes AA ✅` 
+										: `Passes AAA 🥳`
 							}
 						</summary>
 						<span>Paired with {contrast.value}, contrast ratio of {contrast.ratio.toFixed(2)}:1</span>

@@ -1,7 +1,7 @@
 
+import ItemDefaults from '@data/house/items'
 import styles from './styles.module.css'
 import type { ItemState, ItemType } from '@ts/house'
-import ItemDefaults from '@data/house/items'
 
 type ItemIconProps = {
 	type: ItemType
@@ -12,7 +12,7 @@ type ItemIconProps = {
 }
 
 const ItemIcon = (props: ItemIconProps) => {
-	let {type, state, start, size, className = '', ...attrs} = props
+	let {type, state, start, size, className = ``, ...attrs} = props
 	const Icon: any = ItemDefaults[type]?.Icon
 
 	if(!Icon) return null
@@ -22,10 +22,10 @@ const ItemIcon = (props: ItemIconProps) => {
 	}
 
 	if(!state) {
-		dataProps['data-state'] = 'off'
+		dataProps[`data-state`] = `off`
 	}
 	else if(state?.length === 1) {
-		dataProps['data-state'] = state[0].state
+		dataProps[`data-state`] = state[0].state
 	}
 	else {
 		state.forEach((s) => {
@@ -40,7 +40,7 @@ const ItemIcon = (props: ItemIconProps) => {
 				className,
 				styles.icon,
 				styles[type]
-			].join(' ')}
+			].join(` `)}
 			{...dataProps}
 		/>
 	)

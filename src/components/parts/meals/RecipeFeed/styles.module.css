@@ -13,6 +13,51 @@
 	}  
 }
 
+.categories {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	margin: 0;
+	padding: 0;
+}
+
+.tag {
+	--feature_colour: var(--blue);
+	--contrast_colour: var(--neutral_light);
+
+	display: block;
+	margin: 0;
+	padding: 0;
+	font-size: 0.8em;
+	list-style: none;
+
+	& button {
+		--button_background: var(--feature_colour);
+		--button_text: var(--contrast_colour);
+		--button_border: var(--feature_colour);
+
+		padding: 0.1em 0.5em;
+		border-width: 1px;
+		border-radius: 0.1em;
+
+		&:not([data-pressed="true"]) {
+			--button_background: var(--contrast_colour);
+			--button_text: var(--feature_colour);
+			--button_border: var(--feature_colour);
+
+			&:hover {
+				--button_background: var(--feature_colour);
+				--button_text: var(--contrast_colour);
+			}
+		}
+
+		&:hover {
+			--button_background: var(--contrast_colour);
+			--button_text: var(--feature_colour);
+		}
+	}
+}
+
 @supports(grid-template-areas: '.') {
 	.cards {
 		display: grid;

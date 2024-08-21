@@ -7,14 +7,17 @@ export type Recipe = {
 	time?: number
 	difficulty?: string
 	slug: string
+	ingredients?: Ingredient[]
+	method?: string
 }
 
 export type Ingredient = {
-	quantity?: number | undefined
-	unit?: string | undefined
+	quantity?: number
+	unit?: string
 	ingredient: string
 	full: string
-	category?: string | undefined
+	format?: string
+	category?: string
 }
 
 export type Category = {

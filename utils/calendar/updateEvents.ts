@@ -1,5 +1,5 @@
-import { Event } from "@ts/calendar";
 import { parse } from "date-fns";
+import type { Event } from "@ts/calendar";
 import type { EventInteractionArgs } from "react-big-calendar/lib/addons/dragAndDrop";
 
 export const resizeEvent = ({event, start, end}: EventInteractionArgs<Event>, allEvents: Event[]): Event[] => {
@@ -7,8 +7,8 @@ export const resizeEvent = ({event, start, end}: EventInteractionArgs<Event>, al
 		if (e.id === event.id) {
 			return ({ 
 				...e, 
-				start: typeof start === 'string' ? parse(start, 'yyyy-MM-dd', new Date()) : start,
-				end: typeof end === 'string' ? parse(end, 'yyyy-MM-dd', new Date()) : end,
+				start: typeof start === `string` ? parse(start, `yyyy-MM-dd`, new Date()) : start,
+				end: typeof end === `string` ? parse(end, `yyyy-MM-dd`, new Date()) : end,
 			});
 		}
 		return e;
@@ -21,8 +21,8 @@ export const moveEvent = ({event, start, end, isAllDay = false}: EventInteractio
 		if (e.id === event.id) {
 			return ({ 
 				...e, 
-				start: typeof start === 'string' ? parse(start, 'yyyy-MM-dd', new Date()) : start,
-				end: typeof end === 'string' ? parse(end, 'yyyy-MM-dd', new Date()) : end,
+				start: typeof start === `string` ? parse(start, `yyyy-MM-dd`, new Date()) : start,
+				end: typeof end === `string` ? parse(end, `yyyy-MM-dd`, new Date()) : end,
 				allDay: isAllDay
 			});
 		}

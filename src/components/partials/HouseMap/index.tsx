@@ -1,9 +1,9 @@
-import type { Area, Item } from '@ts/house';
-import styles from './styles.module.css'
 import ItemIcon from '@components/parts/house/MapItemIcon'
-import { CSSProperties } from 'react';
 import InfoItem from '@components/parts/house/InfoItem';
 import ItemDefaults from '@data/house/items';
+import styles from './styles.module.css'
+import type { CSSProperties } from 'react';
+import type { Area, Item } from '@ts/house';
 
 type HouseMapProps = {
 	areas: Area[]
@@ -16,37 +16,37 @@ const HouseMap = (props: HouseMapProps) => {
 
 	return (
 		<div className={styles.container} style={{'--width': size[0], '--height': size[1]} as CSSProperties}>
-			<svg className={styles.map} viewBox={`0 0 ${size.join(' ')}`} fill="none" >
-					{areas.map(area => (
-						<g 
-							className={styles.area} 
-							key={area.name}
-							style={{'--colour': `var(--${area.colour ?? 'primary'})`} as CSSProperties}
+			<svg className={styles.map} viewBox={`0 0 ${size.join(` `)}`} fill="none" >
+				{areas.map(area => (
+					<g 
+						className={styles.area} 
+						key={area.name}
+						style={{'--colour': `var(--${area.colour ?? `primary`})`} as CSSProperties}
+					>
+						<a
+							href={area.link}
+							target="_blank"
 						>
-							<a
-								href={area.link}
-								target="_blank"
+							<rect 
+								className={styles.space}
+								rx="0" 
+								ry="0" 
+								x={area.start[0]} 
+								y={area.start[1]}
+								width={area.size[0]} 
+								height={area.size[1]} 
+							/>
+							<span className="sr-only">{area.name}</span>
+							<text 
+								className={styles.label}
+								x={area.start[0] + 10} 
+								y={area.start[1] + 40} 
 							>
-								<rect 
-									className={styles.space}
-									rx="0" 
-									ry="0" 
-									x={area.start[0]} 
-									y={area.start[1]}
-									width={area.size[0]} 
-									height={area.size[1]} 
-								/>
-								<span className="sr-only">{area.name}</span>
-								<text 
-									className={styles.label}
-									x={area.start[0] + 10} 
-									y={area.start[1] + 40} 
-								>
-									{area.name}
-								</text>
-							</a>
-						</g>
-					))}
+								{area.name}
+							</text>
+						</a>
+					</g>
+				))}
 			</svg>		
 			{items.map((item) => {
 				const itemSize = item.size ?? ItemDefaults[item.type].size;

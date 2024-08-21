@@ -1,8 +1,7 @@
 import HouseMap from "@components/partials/HouseMap";
 import fetchData from "@utils/fetchData";
 
-export default async function House ()
-{
+export default async function House () {
 	const { areas, items } = await fetchData({
 		authenticated: true,
 		gqlQuery: `

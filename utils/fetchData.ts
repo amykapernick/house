@@ -1,16 +1,17 @@
 import { auth } from '@clerk/nextjs/server';
+import type { Query } from '@ts/graphql';
 
 type fetchDataProps = {
 	gqlQuery: string
-	authenticated: boolean
+	authenticated?: boolean
 }
 
-const fetchData = async (props: fetchDataProps) => {
+const fetchData = async (props: fetchDataProps): Promise<Query> => {
 	const { gqlQuery, authenticated } = props
 	const options: RequestInit = {
-		method: 'POST',
+		method: `POST`,
 		headers: {
-			'Content-Type': 'application/json',
+			'Content-Type': `application/json`,
 		},
 		body: JSON.stringify({
 			query: gqlQuery
@@ -27,21 +28,19 @@ const fetchData = async (props: fetchDataProps) => {
 		}
 	}
 
-	
-
 	return await fetch(`${process.env.API_URL}/graphql`, options).then(res => res.json())
-	.then((res) => {
-		if(res?.errors) {
-			console.log({...res})
-			console.error({...res?.errors})
+		.then((res) => {
+			if(res?.errors) {
+				console.log({...res})
+				console.error({...res?.errors})
+				return {}
+			}
+			return res?.data || {}
+		})
+		.catch((err) => {
+			console.error(err)
 			return {}
-		}
-		return res?.data || {}
-	})
-	.catch((err) => {
-		console.error(err)
-		return {}
-	})
+		})
 
 }
 

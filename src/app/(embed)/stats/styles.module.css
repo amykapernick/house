@@ -1,0 +1,31 @@
+.stats {
+	display: flex;
+	flex-wrap: wrap;
+	font-size: 1.5em;
+	font-weight: 500;
+	text-align: center;
+	gap: 10px;
+
+	& > * {
+		flex: 1 1 auto;
+		padding: 0.5em;
+		border-radius: 0.2em;
+		background: rgba($blue, 0.3);
+	}
+
+	& dd {
+		margin: 0;
+		font-size: 1.5em;
+		font-weight: 700;
+	}
+}
+
+.table {
+	max-width: 500px;
+
+	& td {
+		&:nth-child(2) {
+			text-align: center;
+		}
+	}
+}

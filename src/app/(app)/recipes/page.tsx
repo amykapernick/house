@@ -1,13 +1,11 @@
 import RecipeFeed from '@components/parts/meals/RecipeFeed';
 import fetchData from '@utils/fetchData';
 
-export default async function Home ()
-{
-	const { meals = [] } = await fetchData({
-		authenticated: true,
+export default async function Recipes () {
+	const { recipes = [] } = await fetchData({
 		gqlQuery: `
 			query {
-				meals {
+				recipes {
 					name
 					categories
 					image
@@ -18,11 +16,13 @@ export default async function Home ()
 			}
 		`
 	});
+
+	console.log({recipes})
 	
 	return (
 		<>
-			<h2>Recipes</h2>
-			<RecipeFeed recipes={meals} />
+			<h1>Recipes</h1>
+			<RecipeFeed recipes={recipes} />
 		</>
 	)
 }

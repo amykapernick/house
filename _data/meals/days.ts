@@ -5,31 +5,31 @@ export type dayType = {
 
 const days: dayType[] = [
 	{
-		name: 'Sat',
+		name: `Sat`,
 		number: 6
 	},
 	{
-		name: 'Sun',
+		name: `Sun`,
 		number: 0
 	},
 	{
-		name: 'Mon',
+		name: `Mon`,
 		number: 1
 	},
 	{
-		name: 'Tue',
+		name: `Tue`,
 		number: 2
 	},
 	{
-		name: 'Wed',
+		name: `Wed`,
 		number: 3
 	},
 	{
-		name: 'Thu',
+		name: `Thu`,
 		number: 4
 	},
 	{
-		name: 'Fri',
+		name: `Fri`,
 		number: 5
 	}
 ]

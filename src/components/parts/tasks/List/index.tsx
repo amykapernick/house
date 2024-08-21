@@ -1,6 +1,6 @@
 import TaskCard from "@components/parts/tasks/Task"
-import type { Task } from "@ts/tasks"
 import styles from './styles.module.css'
+import type { Task } from "@ts/tasks"
 
 type TaskViewProps = {
 	tasks: Task[]

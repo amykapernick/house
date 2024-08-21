@@ -1,10 +1,11 @@
-import { EventProps, View, ViewKey, Views, ViewsProps, dateFnsLocalizer } from 'react-big-calendar'
+import { Views, ViewsProps, dateFnsLocalizer } from 'react-big-calendar'
 import enAU from 'date-fns/locale/en-AU'
 import { format, parse, startOfWeek, getDay } from 'date-fns';
-import { resizeEvent, moveEvent } from './updateEvents'
-import { ComponentType, Dispatch, SetStateAction } from 'react';
-import { UpdateEventFunction, Event } from '@ts/calendar';
 import {CustomEvent, EventWrapper} from '@components/parts/calendar/CustomEvent';
+import { resizeEvent, moveEvent } from './updateEvents'
+import type { ComponentType, Dispatch, SetStateAction } from 'react';
+import type { UpdateEventFunction, Event } from '@ts/calendar';
+import type { EventProps, View, ViewKey} from 'react-big-calendar';
 
 export const locales = {
 	'en-AU': enAU,
@@ -24,10 +25,10 @@ const defaultEditFunctions = {
 }
 
 const defaultAccessors: Record<string, (string | ((event: Event) => void))> = {
-	start: 'start',
-	end: 'end',
-	draggable: 'editable',
-	resizable: 'editable'
+	start: `start`,
+	end: `end`,
+	draggable: `editable`,
+	resizable: `editable`
 }
 
 export const customComponents: Record<string, ComponentType<EventProps<Event>>> = {

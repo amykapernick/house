@@ -1,6 +1,6 @@
-import type { InfoType } from "@ts/house"
 import Temperature from '@img/house/temperature.svg'
 import Humidity from '@img/house/humidity.svg'
+import type { InfoType } from "@ts/house"
 
 type InfoItemProps = {
 	type: InfoType
@@ -9,17 +9,17 @@ type InfoItemProps = {
 
 const InfoItem = (props: InfoItemProps) => {
 	const { type, value } = props
-	let suffix = ''
-	let prefix = ''
+	let suffix = ``
+	let prefix = ``
 	let Icon: any = null
 
 	switch(type) {
-		case 'temperature':
-			suffix = '°C'
+		case `temperature`:
+			suffix = `°C`
 			Icon = Temperature
 			break
-		case 'humidity':
-			suffix = '%'
+		case `humidity`:
+			suffix = `%`
 			Icon = Humidity
 			break
 	}

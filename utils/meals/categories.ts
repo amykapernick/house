@@ -18,7 +18,7 @@ export const buildCategories = (cats: string[]) => {
 	cats.forEach((cat) => {
 		categories.push({
 			label: cat,
-			slug: cat.toLowerCase().replace(/\s/g, '-')
+			slug: cat.toLowerCase().replace(/\s/g, `-`)
 		})
 	})
 

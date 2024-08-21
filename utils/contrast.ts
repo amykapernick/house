@@ -13,12 +13,12 @@ type Colour = {
 }
 
 const convertToRGB = (code: HexCode): RGB => {
-	let hex = code.replace(/^#/, '');
+	let hex = code.replace(/^#/, ``);
 
 	if (hex.length === 3) {
-		hex = hex.split('')
+		hex = hex.split(``)
 			.map(c => c + c)
-			.join('');
+			.join(``);
 	}
 	const num = parseInt(hex, 16);
 	const rgb = [(num >> 16) & 255, (num >> 8) & 255, num & 255];

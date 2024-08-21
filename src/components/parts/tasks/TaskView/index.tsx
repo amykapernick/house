@@ -1,17 +1,17 @@
 'use client'
 
-import type { Task } from "@ts/tasks"
-import styles from './styles.module.css'
 import { useState } from "react"
 import TaskList from "@parts/tasks/List"
 import TaskBoard from '@parts/tasks/Kanban'
 import TaskCalendar from '@parts/tasks/Calendar'
+import styles from './styles.module.css'
+import type { Task } from "@ts/tasks"
 
 type TaskViewProps = {
 	tasks: Task[]
 }
 
-type TaskViewType = 'list' | 'kanban' | 'calendar'
+type TaskViewType = `list` | `kanban` | `calendar`
 
 const views: Record<TaskViewType, {
 	component: React.ComponentType<TaskViewProps> | any,
@@ -19,21 +19,21 @@ const views: Record<TaskViewType, {
 }> = {
 	list: {
 		component: TaskList,
-		name: 'List',
+		name: `List`,
 	},
 	kanban: {
 		component: TaskBoard,
-		name: 'Kanban',
+		name: `Kanban`,
 	},
 	calendar: {
 		component: TaskCalendar,
-		name: 'Calendar',
+		name: `Calendar`,
 	},
 }
 
 const TaskView = (props: TaskViewProps) => {
 	const { tasks = [] } = props
-	const [view, setView] = useState<TaskViewType>('calendar')
+	const [view, setView] = useState<TaskViewType>(`calendar`)
 	const ViewComponent = views[view].component
 
 	return (

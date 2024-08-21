@@ -1,16 +1,16 @@
-import { Metadata } from 'next';
 import CalendarView from '@components/partials/Calendar';
 import fetchData from '@utils/fetchData';
+import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-    title: 'Calendar',
-    description: 'View combined calendars and tasks for the family',
+	title: `Calendar`,
+	description: `View combined calendars and tasks for the family`,
 };
 
 const CalendarPage = async () => {
-    const { tasks = [], calendars = [] } = await fetchData({
-                authenticated: true,
-                gqlQuery: `
+	const { tasks = [], calendars = [] } = await fetchData({
+		authenticated: true,
+		gqlQuery: `
                     query {
                         tasks {
                             id
@@ -35,14 +35,14 @@ const CalendarPage = async () => {
                         }
                     }
                 `
-            });
+	});
     
-    return (
-        <>
-            <h1>Calendar</h1>
+	return (
+		<>
+			<h1>Calendar</h1>
 			<CalendarView tasks={tasks} calendars={calendars} />
-        </>
-    );
+		</>
+	);
 }
 
 export default CalendarPage

@@ -1,14 +1,13 @@
 import TaskList from '@components/parts/tasks/TaskView';
 import fetchData from '@utils/fetchData';
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-	title: 'Tasks',
-	description: 'View all upcoming and overdue tasks in various views',
+	title: `Tasks`,
+	description: `View all upcoming and overdue tasks in various views`,
 };
 
-export default async function CalendarPage ()
-{
+export default async function CalendarPage () {
 	const { tasks = [] } = await fetchData({
 		authenticated: true,
 		gqlQuery: `

@@ -1,9 +1,9 @@
-import { Recipe } from "@ts/meals"
 import formatTime from "@utils/meals/formatTime"
 import LevelIcon from '@img/icons/level.svg'
 import TimeIcon from '@img/icons/time.svg'
 import FallbackImage from '@img/icons/fish.svg'
 import styles from './styles.module.css'
+import type { Recipe } from "@ts/meals"
 
 type RecipeCardProps = Recipe & {
 

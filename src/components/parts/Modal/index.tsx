@@ -1,5 +1,6 @@
-import { ReactNode, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styles from './styles.module.css'
+import type { ReactNode} from 'react';
 
 type ModalProps = {
 	children: ReactNode
@@ -23,7 +24,7 @@ const Modal = (props: ModalProps) => {
 				<OpenButton 
 					onClick={() => setModalOpen(true)} 
 				/> 
-			: 
+				: 
 				<button 
 					className={styles.open} 
 					onClick={() => setModalOpen(true)}

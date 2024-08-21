@@ -1,18 +1,18 @@
 import Modal from "@components/parts/Modal"
-import type { TaskEvent } from "@ts/calendar"
 import Todoist from '@img/icons/todoist.svg'
 import Notion from '@img/icons/notion.svg'
-import styles from './styles.module.css'
-import type { TaskStatus } from "@ts/tasks"
 import Checkbox from '@img/icons/checkbox.svg'
 import Info from '@img/icons/info.svg'
+import styles from './styles.module.css'
+import type { TaskStatus } from "@ts/tasks"
+import type { TaskEvent } from "@ts/calendar"
 
 const StatusComplete: Record<TaskStatus, string> = {
-	'Not Started': 'incomplete',
-	'In Progress': 'partial',
-	'Ongoing': 'partial',
-	'Paused': 'partial',
-	'Done': 'complete',
+	'Not Started': `incomplete`,
+	'In Progress': `partial`,
+	'Ongoing': `partial`,
+	'Paused': `partial`,
+	'Done': `complete`,
 }
 
 const Task = (props: TaskEvent) => {
@@ -26,8 +26,8 @@ const Task = (props: TaskEvent) => {
 			/>
 			<span className={styles.title}>{title}</span>
 			<a href={link} target="_blank" className={styles.link}>
-				{platform === 'todoist' && <Todoist />}
-				{platform === 'notion' && <Notion />}
+				{platform === `todoist` && <Todoist />}
+				{platform === `notion` && <Notion />}
 				<span className="sr-only">Link to task "{title}"</span>
 			</a>
 		</div>

@@ -1,6 +1,6 @@
-import { ReactElement } from "react";
-import RenderToString from "./RenderToString";
 import { useEffect, useState } from 'react';
+import RenderToString from "./RenderToString";
+import type { ReactElement } from "react";
 
 type renderToStringProps = [
 	input: ReactElement | ReactElement[],

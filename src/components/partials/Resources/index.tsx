@@ -1,13 +1,13 @@
-import { Resource } from "@ts/resources";
 import OnePass from '@img/icons/1password.svg'
 import Link from '@img/icons/link.svg'
 import styles from './style.module.css'
+import type { Resource } from "@ts/resources";
 
 const Resources = (props: {resources: Resource[]}) => {
 	const resources: Record<string, Resource[]> = {}
 
 	props.resources.forEach(resource => {
-		const category = resource?.category ?? 'Other'
+		const category = resource?.category ?? `Other`
 		if(!resources[category]) {
 			resources[category] = []
 		}
@@ -26,13 +26,13 @@ const Resources = (props: {resources: Resource[]}) => {
 								<a
 									className={styles.title}
 									href={url}
-									target={url?.startsWith('http') ? '_blank' : '_self'}
+									target={url?.startsWith(`http`) ? `_blank` : `_self`}
 									rel="noreferrer"
 								>
 									{name}
 									<Link />
 								</a>
-								{(icon && icon.startsWith('http')) && (
+								{(icon && icon.startsWith(`http`)) && (
 									<img className={styles.icon} src={icon} alt={name} />
 								)}
 								{description && (

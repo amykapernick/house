@@ -1,6 +1,9 @@
-import { Recipe } from "@ts/meals"
-import styles from './styles.module.css'
+'use client'
+
 import RecipeCard from "@parts/meals/RecipeCard"
+import { useEffect, useState } from "react"
+import styles from './styles.module.css'
+import type { Recipe } from "@ts/meals"
 
 type RecipeFeedProps = {
 	recipes: Recipe[]
@@ -8,16 +11,63 @@ type RecipeFeedProps = {
 
 const RecipeFeed = (props: RecipeFeedProps) => {
 	const { recipes = [] } = props
+	const categories: string[] = []
+	const [filteredRecipes, setFilteredRecipes] = useState<Recipe[]>(recipes)
+	const [filteredCategories, setFilteredCategories] = useState<string[]>([])
+	const setFilter = (category: string) => {
+		if (filteredCategories.includes(category)) {
+			setFilteredCategories(
+				filteredCategories.filter((c) => c !== category)
+			)
+		}
+		else {
+			setFilteredCategories([
+				...filteredCategories, 
+				category
+			])
+		}
+	}
+
+	recipes.forEach((recipe) => {
+		recipe.categories?.forEach((category) => {
+			if (!categories.includes(category)) categories.push(category)
+		})
+	})
+
+	useEffect(() => {
+		setFilteredRecipes(
+			recipes.filter((recipe) => {
+				return filteredCategories.every((category) => {
+					return recipe.categories?.includes(category)
+				})
+			})
+		)
+	}, [filteredCategories])
+
 	return (
-		<ul className={styles.cards}>
-			{
-				recipes?.map((recipe) => (
-					<li key={recipe.id}>
-						<RecipeCard {...recipe} />
+		<div>
+			<ul className={styles.categories}>
+				{categories.map((category) => (
+					<li className={styles.tag} key={category}>
+						<button
+							onClick={() => setFilter(category)}
+							data-pressed={filteredCategories.includes(category)}
+						>
+							{category}
+						</button>
 					</li>
-				))
-			}
-		</ul>
+				))}
+			</ul>
+			<ul className={styles.cards}>
+				{
+					filteredRecipes?.map((recipe) => (
+						<li key={recipe.id}>
+							<RecipeCard {...recipe} />
+						</li>
+					))
+				}
+			</ul>
+		</div>
 	)
 }
 

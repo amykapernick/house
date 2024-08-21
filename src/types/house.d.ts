@@ -9,7 +9,7 @@ export type Area = {
 	info: Info[]
 }
 
-type AreaId = 'bedroom_main' | 'office_amy' | 'office_dan' | 'kitchen' | 'living' | 'dining'
+type AreaId = `bedroom_main` | `office_amy` | `office_dan` | `kitchen` | `living` | `dining`
 
 export type Item = {
 	type: ItemType
@@ -21,11 +21,11 @@ export type Item = {
 	state?: ItemState[]
 }
 
-export type ItemType = 'fan' | 'aircon' | 'tv' | 'fan_pedestol' | 'oven' | 'washing_machine' | 'bed' | 'fridge' | 'fire' | 'switch_light' | 'light' | 'wifi_router' | 'robot_vacuum' | 'lamp' | 'computer' | 'laptop' | 'pi' | 'monitor' | 'camera' | 'alarm' | 'fan_light' | 'doorbell'
+export type ItemType = `fan` | `aircon` | `tv` | `fan_pedestol` | `oven` | `washing_machine` | `bed` | `fridge` | `fire` | `switch_light` | `light` | `wifi_router` | `robot_vacuum` | `lamp` | `computer` | `laptop` | `pi` | `monitor` | `camera` | `alarm` | `fan_light` | `doorbell`
 
 export type ItemState = {
 	type?: ItemType
-	state: 'on' | 'off' | 'error'
+	state: `on` | `off` | `error`
 }
 
 export type Info = {
@@ -34,4 +34,4 @@ export type Info = {
 	value: number
 }
 
-export type InfoType = 'temperature' | 'humidity'
+export type InfoType = `temperature` | `humidity`

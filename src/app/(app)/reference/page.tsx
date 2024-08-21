@@ -1,8 +1,7 @@
 import Resources from '@components/partials/Resources';
 import fetchData from '@utils/fetchData';
 
-export default async function Home ()
-{
+export default async function Home () {
 	const { resources = [] } = await fetchData({
 		authenticated: true,
 		gqlQuery: `

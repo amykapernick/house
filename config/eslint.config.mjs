@@ -1,31 +1,33 @@
 import eslintImport from 'eslint-plugin-import';
 import jsxA11y from 'eslint-plugin-jsx-a11y';
-import prettierConfig from 'eslint-plugin-prettier/recommended';
-import prettierDefaults from './prettier.config.cjs';
+import eslintTs from '@typescript-eslint/eslint-plugin';
+import tsParser from '@typescript-eslint/parser';
+import stylistic from '@stylistic/eslint-plugin-js';
+import styleisticTs from '@stylistic/eslint-plugin-ts';
 
 export default [
-	prettierConfig,
 	{
-		files: [`*.js`, `*.jsx`, `*.ts`, `*.tsx`],
-		ignores: [`node_modules`, `dist`, '.next'],
+		files: [
+			`**/*.js`,
+			`**/*.cjs`,
+			`**/*.mjs`,
+			`**/*.jsx`,
+			`**/*.ts`,
+			`**/*.tsx`,
+		],
+		languageOptions: {
+			parser: tsParser,
+		},
+		ignores: [`node_modules`, `dist`, `.next`],
 		plugins: {
 			'import': eslintImport,
 			'jsx-a11y': jsxA11y,
+			'@typescript-eslint': eslintTs,
+			'@stylistic': stylistic,
+			'@stylistic/ts': styleisticTs,
 		},
 		rules: {
-			'prettier/prettier': [
-				'error',
-				{
-					...prettierDefaults,
-				},
-				{
-					usePrettierrc: true,
-				},
-			],
-			'linebreak-style': 0,
-			'no-tabs': 0,
-			'camelcase': 0,
-			'indent': [
+			'@stylistic/indent': [
 				`error`,
 				`tab`,
 				{
@@ -33,8 +35,14 @@ export default [
 					VariableDeclarator: 1,
 				},
 			],
-			'arrow-spacing': [`error`, { before: true, after: true }],
-			'comma-dangle': [
+			'@stylistic/arrow-spacing': [
+				`error`,
+				{
+					before: true,
+					after: true,
+				},
+			],
+			'@stylistic/comma-dangle': [
 				`error`,
 				{
 					objects: `only-multiline`,
@@ -46,25 +54,33 @@ export default [
 			],
 			'no-var': `error`,
 			'no-unused-vars': 1,
-			'one-var': ['error', 'never'],
+			'one-var': [`error`, `never`],
 			'quotes': [`error`, `backtick`],
 			'no-param-reassign': 0,
 			'class-methods-use-this': 0,
 			'import/order': [
-				'error',
+				`error`,
 				{
 					groups: [
-						'builtin',
-						'external',
-						'internal',
-						'parent',
-						'sibling',
-						'index',
-						'object',
-						'type',
+						`builtin`,
+						`external`,
+						`internal`,
+						`parent`,
+						`sibling`,
+						`index`,
+						`object`,
+						`type`,
 					],
 				},
 			],
+			'@typescript-eslint/consistent-type-imports': [
+				`error`,
+				{
+					prefer: `type-imports`,
+					fixStyle: `separate-type-imports`,
+				},
+			],
+			'@stylistic/brace-style': [`error`, `stroustrup`],
 		},
 	},
 ];
