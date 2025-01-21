@@ -19,9 +19,9 @@ const Task = (props: TaskEvent) => {
 
 	return (
 		<div className={styles.task}>
-			<Checkbox
+			{completed && <Checkbox
 				className={`${styles.checkbox} ${styles[completed]}`}
-			/>
+			/>}
 			<span className={styles.title}>{title}</span>
 			<a href={link} target="_blank" className={styles.link}>
 				{platform === `todoist` && <Todoist />}
