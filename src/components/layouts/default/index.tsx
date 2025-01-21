@@ -1,11 +1,16 @@
 import styles from './styles.module.css'
 import type { ReactNode } from 'react'
 
-const Layout = (props: { children: ReactNode }) => {
-	const { children } = props
+type LayoutProps = {
+	children: ReactNode
+	fullWidth?: boolean
+}
+
+const Layout = (props: LayoutProps) => {
+	const { children, fullWidth } = props
 
 	return (
-		<div className={styles.layout}>
+		<div className={[styles.layout, fullWidth && styles.full].join(` `)}>
 			{children}
 		</div>
 	)

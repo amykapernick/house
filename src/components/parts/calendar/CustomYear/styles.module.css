@@ -1,0 +1,48 @@
+.year {
+	display: grid;
+	position: relative;
+	left: 50%;
+	grid-template-rows: auto repeat(12, 1fr);
+	width: 90vw;
+	transform: translateX(-50%);
+}
+
+.header {
+	display: grid;
+	grid-template-columns: repeat(42, 1fr);
+}
+
+.day {
+	
+}
+
+.row {
+	position: relative;
+}
+
+.name {
+	position: absolute;
+	z-index: 20;
+}
+
+.month {
+	display: grid;
+	grid-template-columns: repeat(6, 1fr);
+
+	& :global(.rbc-month-header) {
+		display: none;
+	}
+
+	/* &.weeks--5 {
+		grid-template-rows: repeat(5, 1fr);
+	}
+
+	&.weeks--6 {
+		grid-template-rows: repeat(6, 1fr);
+	}
+
+	&.weeks--4 {
+		grid-template-rows: repeat(4, 1fr);
+	} */
+}
+

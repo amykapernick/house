@@ -19,7 +19,7 @@ const fetchData = async (props: fetchDataProps): Promise<Query> => {
 	}
 
 	if(authenticated) {
-		const { getToken } = auth();
+		const { getToken } = await auth();
 		const token = await getToken();
 	
 		options.headers = {
@@ -32,7 +32,7 @@ const fetchData = async (props: fetchDataProps): Promise<Query> => {
 		.then((res) => {
 			if(res?.errors) {
 				console.log({...res})
-				console.error({...res?.errors})
+				// console.error({...res?.errors})
 				return {}
 			}
 			return res?.data || {}

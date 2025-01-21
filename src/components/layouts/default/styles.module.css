@@ -1,5 +1,10 @@
 .layout {
 	width: 90vw;
 	max-width: 1200px;
+	height: 100%;
 	margin: 0 auto 20px;
+
+	&.full {
+		max-width: unset;
+	}
 }

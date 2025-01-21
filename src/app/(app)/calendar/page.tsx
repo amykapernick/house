@@ -10,39 +10,48 @@ export const metadata: Metadata = {
 };
 
 const CalendarPage = async () => {
-	const { tasks = [], calendars = [] } = await fetchData({
+	const { tasks = [], calendars = [], events = [] } = await fetchData({
 		authenticated: true,
 		gqlQuery: `
-                    query {
-                        tasks {
-                            id
-                            name
-                            assigned {
-								name
-                                slug
-                                profile
-                                colour
-                            }
-                            status
-                            due
-                            estimate
-                            link
-                            platform
-                        }
-                        calendars {
-                            name
-                            url
-                            colour
-                            slug
-                        }
+            query {
+                tasks {
+                    id
+                    name
+                    assigned {
+                        name
+                        slug
+                        profile
+                        colour
                     }
-                `
+                    status
+                    due
+                    estimate
+                    link
+                    platform
+                }
+                events {
+                    name
+                    dates {
+                        start
+                        end
+                    }
+                    status
+                    id
+                }
+                calendars {
+                    name
+                    url
+                    colour
+                    slug
+                }
+            }
+        `
 	}) as { tasks: Task[], calendars: Calendar[] }
     
 	return (
 		<>
 			<h1>Calendar</h1>
-			<CalendarView tasks={tasks} calendars={calendars} />
+			<CalendarView tasks={tasks} allDayEvents={events} calendars={calendars} />
 		</>
 	);
 }

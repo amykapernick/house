@@ -5,7 +5,7 @@ import 'react-big-calendar/lib/css/react-big-calendar.css'
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
 import { useCallback, useEffect, useState } from 'react';
 import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop'
-import { accessors, localizer, editFunctions, views, customComponents } from '@utils/calendar/setup'
+import { accessors, localizer, editFunctions, views, customComponents, dateFormats, messages } from '@utils/calendar/setup'
 import styles from './styles.module.css'
 import type { Event } from '@ts/calendar';
 import type { View } from 'react-big-calendar';
@@ -27,7 +27,9 @@ const CalendarView = (props: CalendarViewProps) => {
 		view: view,
 		components: customComponents,
 		step: 15,
-		timeslots: 4
+		timeslots: 4,
+		formats: dateFormats,
+		messages,
 	}
 	const calendarFunctions = {
 		onView: useCallback((newView: View) => setView(newView), []),
@@ -45,8 +47,10 @@ const CalendarView = (props: CalendarViewProps) => {
 
 	}, [props])
 
+	console.log({backgroundEvents})
+
 	return (
-		<div>
+		<>
 			<DnDCalendar
 				className={`${styles.calendar} ${styles[view]}`}
 				localizer={localizer}
@@ -59,7 +63,7 @@ const CalendarView = (props: CalendarViewProps) => {
 				{...accessors()}
 				{...editFunctions(setEvents, events)}
 			/>
-		</div>
+		</>
 	);
 }
 
