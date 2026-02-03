@@ -1,5 +1,4 @@
 import { defineConfig } from 'astro/config';
-import image from '@astrojs/image';
 import react from "@astrojs/react";
 
 export default defineConfig({
@@ -18,7 +17,6 @@ export default defineConfig({
 		}
 	},
 	integrations: [
-		image(),
 		react()
 	],
 });

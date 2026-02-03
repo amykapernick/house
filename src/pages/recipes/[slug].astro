@@ -4,7 +4,7 @@ import Layout from "@layouts/recipe";
 import formatIngredients from "@utils/meals/parseIngredients";
 import type { RecipeContent, Ingredient, Category } from "@ts/meals";
 import IngredientItem from "@components/meals/ingredient";
-import { Picture } from '@astrojs/image/components';
+import { Picture } from 'astro:assets';
 import Categories from "@components/meals/categories";
 import {recipeCategories} from "@utils/meals/categories";
 import SaveRecipe from "@react/meals/saveRecipe";
@@ -29,7 +29,7 @@ const categories: Category[] | null = recipe.data.categories ? recipeCategories(
     width: 100%;
     max-width: 400px;
 
-    @media(min-width: 40em) {
+    @media(width >= 40em) {
         width: 40%;
 		margin-left: 20px;
         float: right;
@@ -57,6 +57,8 @@ const categories: Category[] | null = recipe.data.categories ? recipeCategories(
 					src={recipe.data.image}
 					alt={`Photo of ${recipe.data.title}`}
 					widths={[400]}
+					width={400}
+					height={400}
 					aspectRatio={1}
 					sizes={''}
 					formats={['avif', 'webp', 'jpeg']}
