@@ -1,0 +1,24 @@
+@import './colours.css';
+
+@import './fonts.css';
+
+@import './typo.css';
+
+@import './forms.css';
+
+@import './table.css';
+
+*, *::before, *::after {
+	box-sizing: border-box;
+	outline-offset: 0.2em;
+}
+
+*:focus {
+	outline: 2px dotted var(--green);
+	
+}
+
+.sr-only {
+
+	@include sr_only;
+}

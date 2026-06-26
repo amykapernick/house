@@ -1,72 +1,14 @@
 {
+  "extends": "./.svelte-kit/tsconfig.json",
   "compilerOptions": {
-    "baseUrl": ".",
-    "target": "esnext",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
-    "skipLibCheck": true,
-    "noEmit": true,
-    "esModuleInterop": true,
-    "module": "esnext",
-    "moduleResolution": "bundler",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "jsx": "preserve",
-    "incremental": true,
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
-    "paths": {
-      "@components/*": [
-        "src/components/*"
-      ],
-      "@ts/*": [
-        "src/types/*"
-      ],
-      "@fonts/*": [
-        "src/fonts/*"
-      ],
-      "@partials/*": [
-        "src/components/partials/*"
-      ],
-      "@parts/*": [
-        "src/components/parts/*"
-      ],
-      "@img/*": [
-        "src/img/*"
-      ],
-      "@styles/*": [
-        "src/styles/*",
-      ],
-      "@utils/*": [
-        "utils/*"
-      ],
-      "@layouts/*": [
-        "src/components/layouts/*"
-      ],
-      "@data/*": [
-        "_data/*"
-      ],
-      "@lib/*": [
-        "lib/*"
-      ],
-    },
     "allowJs": true,
-    "strict": true
-  },
-  "exclude": [
-    "node_modules",
-    ".next"
-  ],
-  "include": [
-    "next-env.d.ts",
-    ".next/types/**/*.ts",
-    "**/*.ts",
-    "**/*.tsx"
-  ]
+    "checkJs": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "strict": true,
+    "moduleResolution": "bundler"
+  }
 }
