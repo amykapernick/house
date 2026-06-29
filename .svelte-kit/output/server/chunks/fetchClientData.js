@@ -1,2 +1,0 @@
-import "./auth.js";
-export {};
