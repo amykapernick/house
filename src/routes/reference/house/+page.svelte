@@ -12,7 +12,7 @@
 	$effect(() => {
 		if ($isAuthenticated) {
 			fetchClientData({
-
+				cacheKey: 'house',
 				gqlQuery: `
 					query {
 						areas {

@@ -9,30 +9,10 @@
 	let icalEvents = $state<any[]>([]);
 	let loading = $state(true);
 
-	const ICS_CACHE_KEY = 'icsEvents';
-	const ICS_CACHE_TTL = 30 * 60 * 1000;
-
-	function getCachedIcsEvents(): any[] | null {
-		try {
-			const cached = localStorage.getItem(ICS_CACHE_KEY);
-			if (!cached) return null;
-			const { data, timestamp } = JSON.parse(cached);
-			if (Date.now() - timestamp > ICS_CACHE_TTL) return null;
-			return data;
-		} catch {
-			return null;
-		}
-	}
-
-	function cacheIcsEvents(data: any[]) {
-		try {
-			localStorage.setItem(ICS_CACHE_KEY, JSON.stringify({ data, timestamp: Date.now() }));
-		} catch {}
-	}
-
 	$effect(() => {
 		if ($isAuthenticated) {
 			fetchClientData({
+				cacheKey: 'calendar',
 				gqlQuery: `
 					query {
 						tasks {
@@ -67,12 +47,8 @@
 				loading = false;
 			});
 
-			const cached = getCachedIcsEvents();
-			if (cached) {
-				icalEvents = cached;
-			}
-
 			fetchClientData({
+				cacheKey: 'icsEvents',
 				gqlQuery: `
 					query {
 						icsEvents {
@@ -89,9 +65,7 @@
 					}
 				`,
 			}).then((res) => {
-				const data = res.icsEvents ?? [];
-				icalEvents = data;
-				cacheIcsEvents(data);
+				icalEvents = res.icsEvents ?? [];
 			});
 		}
 	});

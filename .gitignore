@@ -24,3 +24,5 @@ pnpm-debug.log*
 certificates
 
 mockdata.ts
+
+.svelte-kit/

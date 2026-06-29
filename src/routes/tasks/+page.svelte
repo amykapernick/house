@@ -11,7 +11,7 @@
 	$effect(() => {
 		if ($isAuthenticated) {
 			fetchClientData({
-
+				cacheKey: 'tasks',
 				gqlQuery: `
 					query {
 						tasks {

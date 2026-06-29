@@ -23,6 +23,11 @@
 			link: '/reference',
 			auth: true,
 		},
+		{
+			label: 'Small Human',
+			link: '/small-human',
+			auth: true,
+		},
 	];
 
 	function handleSignIn() {

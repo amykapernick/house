@@ -11,7 +11,7 @@
 	$effect(() => {
 		if ($isAuthenticated) {
 			fetchClientData({
-
+				cacheKey: 'resources',
 				gqlQuery: `
 					query {
 						resources {
@@ -27,11 +27,7 @@
 					}
 				`,
 			}).then((res) => {
-				console.log('reference response:', res);
 				resources = res.resources ?? [];
-				loading = false;
-			}).catch((err) => {
-				console.error('reference error:', err);
 				loading = false;
 			});
 		}
