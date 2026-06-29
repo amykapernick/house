@@ -9,3 +9,22 @@
 - [x] To Do List
 - [ ] Reminders
 - [ ] Chores
+- [ ] SvelteKit Migration
+	- [x] Project scaffold and config
+	- [x] Styles/PostCSS pipeline
+	- [x] Tasks page (list, kanban, calendar views)
+	- [x] Reference page
+	- [x] House map page
+	- [x] Stats embed page
+	- [x] Dashboard page
+	- [ ] Mealie integration (recipes, meal planning, shopping list)
+	- [x] Full calendar UI (@event-calendar/core)
+	- [x] ICS calendar feed events via API
+	- [x] Authenticated GraphQL requests (client-side via Clerk JS token)
+	- [x] Update .env.sample for SvelteKit
+	- [ ] SVG icon components for house map items and task cards
+	- [ ] Clerk auth sign-in/sign-up pages
+	- [ ] Update CI/CD for SvelteKit build
+	- [ ] Mealie integration (recipes, meal planning, shopping list)
+- [ ] API: Convert to ESM (replace mixed require/module.exports with import/export)
+- [ ] API: Update Notion database property names in parsers to match current schema

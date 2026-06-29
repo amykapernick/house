@@ -1,0 +1,1 @@
+import{n as e}from"./C-BqhzwM.js";var t=async t=>{let{gqlQuery:n}=t,r=await e(),i={"Content-Type":`application/json`};return r&&(i.Authorization=`Bearer ${r}`),await fetch(`/api/graphql`,{method:`POST`,headers:i,body:JSON.stringify({query:n})}).then(e=>e.json()).then(e=>e?.errors?(console.log({...e}),{}):e?.data||{}).catch(e=>(console.error(e),{}))};export{t};

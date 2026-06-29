@@ -1,0 +1,56 @@
+:root {
+	--purple_bright: #{$purple_bright};
+	--purple: #{$purple};
+	--navy: #{$blue_navy};
+	--blue: #{$blue};
+	--blue_light: #{$blue_light};
+	--green: #{$green};
+	--green_light: #{$green_light};
+	--green_lime: #{$green_lime};
+	--teal: #{$green_teal};
+	--green_teal: #{$green_teal};
+	--red: #{$red};
+	--pink: #{$pink};
+	--pink_dark: #{$pink_dark};
+	--orange: #{$orange};
+	--yellow: #{$yellow};
+	--white: #{$white};
+	--black: #{$black};
+	--neutral: #{$neutral};
+	--background: #{$background};
+	--neutral_light: #{$white};
+	--error: var(--red);
+	--warning: var(--orange);
+	--success: var(--green);
+	--transparent: transparent;
+
+	@media(prefers-color-scheme: dark) {
+		--purple_bright: #{$light_purple_bright};
+		--purple: #{$light_purple};
+		--navy: #{$light_navy};
+		--blue: #{$light_blue};
+		--green: #{$light_green};
+		--red: #{$light_red};
+		--pink: #{$light_pink};
+		--orange: #{$light_orange};
+		--yellow: #{$light_yellow};
+		--neutral: #{$neutral};
+		--background: #{$background};
+		--neutral_light: #{$white};
+	}
+
+	@media(prefers-color-scheme: light) {
+		--purple_bright: #{$dark_purple_bright};
+		--purple: #{$dark_purple};
+		--navy: #{$dark_navy};
+		--blue: #{$dark_blue};
+		--green: #{$dark_green};
+		--red: #{$dark_red};
+		--pink: #{$dark_pink};
+		--orange: #{$dark_orange};
+		--yellow: #{$dark_yellow};
+		--neutral: #{$neutral};
+		--background: #{$background};
+		--neutral_light: #{$white};
+	}
+}

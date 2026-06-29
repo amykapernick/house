@@ -1,0 +1,1 @@
+import{B as e,F as t,S as n,h as r,w as i}from"../chunks/Bo5XAPB2.js";import"../chunks/xihTtKlq.js";import"../chunks/DWWRncFo.js";var a=i(`<h1>Dashboard</h1>`);function o(i){var o=a();r(`1uha8ag`,n=>{t(()=>{e.title=`Dashboard | Kapers Crewe Household`})}),n(i,o)}export{o as component};

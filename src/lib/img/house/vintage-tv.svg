@@ -1,0 +1,16 @@
+<svg viewBox="0 0 48 48" fill="none">
+	<g data-testid="vintage-tv">
+		<g class="fills">
+			<rect rx="0" ry="0" width="48" height="48" class="frame-background" />
+		</g>
+		<g class="frame-children">
+			<rect rx="0" ry="0" x="8" y="44" width="32" height="4" style="fill: rgb(135, 97, 62);" class="fills" data-testid="svg-rect" />
+			<path d="M34.641.232a1.002 1.002 0 0 0-1.41.128l-9.19 11.028L18.8 4.4a1 1 0 1 0-1.6 1.2l6 8c.02.027.051.036.072.06.032.035.05.077.087.108.043.036.094.053.14.08.036.021.068.044.107.061a.986.986 0 0 0 .393.091h.002a.983.983 0 0 0 .371-.081c.036-.015.067-.035.102-.053.042-.023.086-.037.126-.066.036-.027.054-.066.085-.096.026-.025.06-.036.084-.064l10-12a1.001 1.001 0 0 0-.128-1.408Z" style="fill: rgb(68, 68, 68);" class="fills" data-testid="svg-path" />
+			<path d="M42 12H6a5 5 0 0 0-5 5v24a5 5 0 0 0 5 5h36a5 5 0 0 0 5-5V17a5 5 0 0 0-5-5Z" style="fill: rgb(193, 159, 133);" class="fills" data-testid="svg-path" />
+			<path d="M42 43H6a2 2 0 0 1-2-2V17a2 2 0 0 1 2-2h36a2 2 0 0 1 2 2v24a2 2 0 0 1-2 2Z" style="fill: rgb(68, 68, 68);" class="fills" data-testid="svg-path" />
+			<rect rx="0" ry="0" x="7" y="18" width="26" height="22" style="fill: rgb(230, 230, 230);" class="fills" data-testid="svg-rect" />
+			<circle cx="38.5" cy="28.5" style="fill: rgb(107, 107, 107);" r="2.5" class="fills" data-testid="svg-circle" />
+			<circle cx="38.5" cy="20.5" fill="currentColor" r="2.5" class="fills" data-section="power" />
+		</g>
+	</g>
+</svg>

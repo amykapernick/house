@@ -1,0 +1,8 @@
+<svg viewBox="0 0 48 48" fill="none">
+	<g data-section="signal">
+		<path d="M30 38a1 1 0 0 1-1-1v-4a1 1 0 1 1 2 0v4a1 1 0 0 1-1 1ZM41.314 33.314a.999.999 0 0 1-1.414 0l-2.828-2.828a.999.999 0 1 1 1.414-1.414l2.828 2.828a.999.999 0 0 1 0 1.414ZM18.686 33.314a.999.999 0 0 1 0-1.414l2.828-2.828a.999.999 0 1 1 1.414 1.414L20.1 33.314a.999.999 0 0 1-1.414 0Z" style="fill: rgb(239, 211, 88);" class="fills" data-testid="svg-path" />
+	</g>
+	<path d="M30 28c-3.309 0-6-2.691-6-6a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1c0 3.309-2.691 6-6 6Z" style="fill: rgb(239, 211, 88);" class="fills" data-section="light" />
+	<path d="M14 47H6a1 1 0 0 1-1-1V12C5 5.935 9.935 1 16 1h6c4.963 0 9 4.037 9 9a1 1 0 1 1-2 0c0-3.859-3.141-7-7-7h-6c-4.963 0-9 4.037-9 9v33h7a1 1 0 1 1 0 2Z" style="fill: rgb(179, 179, 179);" class="fills" data-testid="svg-path" />
+	<path d="M44 23H16a1 1 0 0 1-1-1c0-7.168 5.832-13 13-13h4c7.168 0 13 5.832 13 13a1 1 0 0 1-1 1Z" style="fill: rgb(230, 230, 230);" class="fills" data-testid="svg-path" />
+</svg>

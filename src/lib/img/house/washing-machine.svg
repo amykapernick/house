@@ -1,0 +1,15 @@
+<svg viewBox="0 0 48 48" fill="none">
+	<g data-testid="washing-machine">
+		<g class="fills">
+			<rect rx="0" ry="0" width="48" height="48" class="frame-background" />
+		</g>
+		<g class="frame-children">
+			<path d="M41 1H7a2 2 0 0 0-2 2v42a2 2 0 0 0 2 2h34a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2Z" style="fill: rgb(227, 227, 227);" class="fills" data-testid="svg-path" />
+			<circle cx="24" cy="25" style="fill: rgb(54, 54, 54);" r="12" class="fills" data-testid="svg-circle" />
+			<path d="M14.033 25.648a9.99 9.99 0 0 0 19.954-.395 7.63 7.63 0 0 1-9.141.419 9.677 9.677 0 0 0-10.813-.024Z" style="fill: rgb(99, 99, 99);" class="fills" data-testid="svg-path" />
+			<path d="M17 8h-7a1 1 0 0 1 0-2h7a1 1 0 0 1 0 2Z" style="fill: rgb(54, 54, 54);" class="fills" data-testid="svg-path" />
+			<circle cx="30" cy="7" style="fill: rgb(108, 196, 245);" r="2" class="fills" data-testid="svg-circle" />
+			<circle cx="37" cy="7" fill="currentColor" data-section="power" r="2" class="fills" />
+		</g>
+	</g>
+</svg>
