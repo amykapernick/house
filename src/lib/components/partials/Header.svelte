@@ -19,6 +19,20 @@
 			auth: true,
 		},
 		{
+			label: 'Recipes',
+			link: '/recipes'
+		},
+		{
+			label: 'Meal Plan',
+			link: '/meal-plan',
+			auth: true,
+		},
+		{
+			label: 'Shopping List',
+			link: '/shopping-list',
+			auth: true,
+		},
+		{
 			label: 'Reference',
 			link: '/reference',
 			auth: true,

@@ -7,5 +7,36 @@
 			"path": "../../household_api"
 		}
 	],
-	"settings": {}
+	"settings": {},
+	"tasks": {
+		"version": "2.0.0",
+		"tasks": [
+			{
+				"label": "Frontend: npm start",
+				"type": "shell",
+				"command": "npm start",
+				"isBackground": true,
+				"problemMatcher": [],
+				"options": {
+					"cwd": "${workspaceFolder:household}"
+				},
+				"runOptions": {
+					"runOn": "folderOpen"
+				}
+			},
+			{
+				"label": "API: npm run dev",
+				"type": "shell",
+				"command": "npm run dev",
+				"isBackground": true,
+				"problemMatcher": [],
+				"options": {
+					"cwd": "${workspaceFolder:household_api}"
+				},
+				"runOptions": {
+					"runOn": "folderOpen"
+				}
+			}
+		]
+	}
 }

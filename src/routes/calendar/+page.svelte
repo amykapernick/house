@@ -7,6 +7,7 @@
 	let tasks = $state<Task[]>([]);
 	let events = $state<any[]>([]);
 	let icalEvents = $state<any[]>([]);
+	let mealPlans = $state<any[]>([]);
 	let loading = $state(true);
 
 	$effect(() => {
@@ -67,6 +68,22 @@
 			}).then((res) => {
 				icalEvents = res.icsEvents ?? [];
 			});
+
+			fetchClientData({
+				cacheKey: 'calendar-mealplans',
+				gqlQuery: `
+					query {
+						mealPlans(perPage: 50, orderBy: "date", orderDirection: "asc") {
+							items {
+								id date entryType title
+								recipe { name slug }
+							}
+						}
+					}
+				`,
+			}).then((res) => {
+				mealPlans = res.mealPlans?.items ?? [];
+			});
 		}
 	});
 </script>
@@ -80,5 +97,5 @@
 {#if loading}
 	<p>Loading...</p>
 {:else}
-	<CalendarView {tasks} allDayEvents={events} {icalEvents} />
+	<CalendarView {tasks} allDayEvents={events} {icalEvents} {mealPlans} />
 {/if}

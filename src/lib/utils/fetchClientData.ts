@@ -5,6 +5,7 @@ const CACHE_TTL = 30 * 60 * 1000;
 type FetchClientDataProps = {
 	gqlQuery: string
 	cacheKey?: string
+	skipCache?: boolean
 }
 
 function getCached(key: string): any | null {
@@ -26,9 +27,9 @@ function setCache(key: string, data: any) {
 }
 
 const fetchClientData = async (props: FetchClientDataProps) => {
-	const { gqlQuery, cacheKey } = props;
+	const { gqlQuery, cacheKey, skipCache } = props;
 
-	if (cacheKey) {
+	if (cacheKey && !skipCache) {
 		const cached = getCached(cacheKey);
 		if (cached) return cached;
 	}

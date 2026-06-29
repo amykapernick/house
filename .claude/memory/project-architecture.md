@@ -8,8 +8,8 @@ metadata:
 ---
 
 Two repos in this workspace:
-- `/workspaces/house` — SvelteKit 5 frontend (Svelte 5 runes, Vite 8)
-- `/workspaces/kaperscrewe_api` — Azure Functions v4 GraphQL API (Apollo Server, TypeScript compiled to CommonJS)
+- `/home/amy/dev/household` — SvelteKit 5 frontend (Svelte 5 runes, Vite 8)
+- `/home/amy/dev/household_api` — Azure Functions v4 GraphQL API (Apollo Server, TypeScript compiled to CommonJS)
 
 **Data flow:** SvelteKit pages fetch data client-side after Clerk JS authenticates. Requests go through a SvelteKit proxy at `/api/graphql/+server.ts` which forwards to `localhost:7071/graphql` (the API). This avoids CORS issues in Codespaces.
 
