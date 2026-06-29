@@ -11,7 +11,7 @@
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "lint": "eslint ."
   },
-  "author": "Amy Kapernick <amy@kapers.dev> (https://amyskapers.dev/)",
+  "author": "Amy Kapernick (https://amyskapers.dev/)",
   "license": "MIT",
   "engines": {
     "node": ">=24.0.0"
