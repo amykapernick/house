@@ -1,0 +1,5 @@
+- [Project architecture](project-architecture.md) — SvelteKit + Azure Functions API, client-side auth with Clerk, proxy pattern
+- [API patterns](project-api-patterns.md) — GraphQL resolver → fetch → notion endpoint → parser convention
+- [Frontend patterns](project-frontend-patterns.md) — Client-side data fetching with localStorage cache, page structure, calendar setup
+- [Coding style](feedback-coding-style.md) — Custom CSS only, no Tailwind, follow existing project conventions exactly
+- [User role](user-role.md) — Senior dev, conference speaker, writes own CSS, knows her codebase
