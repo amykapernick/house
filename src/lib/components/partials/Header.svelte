@@ -72,6 +72,7 @@
 		justify-content: space-between;
 		font-size: 1.2em;
 		font-weight: 700;
+		grid-area: header;
 	}
 
 	.title {

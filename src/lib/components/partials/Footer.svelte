@@ -1,1 +1,9 @@
-<footer></footer>
+
+
+<footer class="footer"></footer>
+
+<style>
+	.footer {
+		grid-area: footer;
+	}
+</style>

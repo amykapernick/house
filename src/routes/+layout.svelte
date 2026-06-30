@@ -25,16 +25,21 @@
 	:global(body) {
 		display: grid;
 		grid-template-rows: auto 1fr auto;
+		grid-template-areas: 'header' 'main' 'footer';
 		max-width: 100vw;
 		min-height: 100vh;
 		margin: 0;
 		overflow-x: hidden;
 		background: var(--background);
 	}
+
+	.main {
+		grid-area: main;
+	}
 </style>
 
 <Header />
-<main>
+<main class="main">
 	<Layout>
 		{@render children()}
 	</Layout>
