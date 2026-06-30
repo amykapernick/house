@@ -44,7 +44,11 @@ const fetchClientData = async (props: FetchClientDataProps) => {
 		headers['Authorization'] = `Bearer ${token}`;
 	}
 
-	const result = await fetch('/api/graphql', {
+	const apiUrl = import.meta.env.VITE_API_URL
+		? `${import.meta.env.VITE_API_URL}/graphql`
+		: '/api/graphql';
+
+	const result = await fetch(apiUrl, {
 		method: 'POST',
 		headers,
 		body: JSON.stringify({ query: gqlQuery }),

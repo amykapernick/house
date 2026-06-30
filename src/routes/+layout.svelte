@@ -6,11 +6,12 @@
 	import Footer from '$partials/Footer.svelte';
 	import Layout from '$layouts/Default.svelte';
 
-	let { children, data } = $props();
+	let { children } = $props();
 
 	onMount(async () => {
-		if (data.clerkPublishableKey) {
-			await initClerk(data.clerkPublishableKey);
+		const clerkPublishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+		if (clerkPublishableKey) {
+			await initClerk(clerkPublishableKey);
 		}
 	});
 </script>
