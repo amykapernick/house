@@ -13,6 +13,7 @@
 		'swimming', 'milestones', 'auslan', 'sleep', 'sleep_environment',
 		'clothing_seasonal', 'clothing_daytime', 'vaccinations',
 		'parenting_approach', 'activities', 'sources',
+		'toddler_sleep_prep', 'food_principles',
 	];
 
 	$effect(() => {
@@ -39,6 +40,17 @@
 									allergens { value note }
 								}
 								details { label value }
+								feeding_schedule {
+									source note current_stage
+									stages {
+										id label age_months_min age_months_max
+										breastfeeds_per_day breastfeeds_note
+										solid_meals_per_day solid_meals_note
+										water_per_day_ml_max water_note
+										milk_primary coming_changes
+									}
+									current { stage_id on_track notes }
+								}
 								sources
 							}
 							teeth {
@@ -54,6 +66,7 @@
 								safety_note sources
 							}
 							milestones {
+								note
 								movement { id title status detail tag achieved_age_weeks textbook_age_weeks weeks_early sources }
 								fine_motor { id title status detail tag achieved_age_weeks textbook_age_weeks weeks_early sources }
 								development { id title status detail tag sources }
@@ -63,7 +76,7 @@
 								framework
 								current_pattern {
 									naps_per_day nap_transition nap_duration_range_min nap_duration_range_max
-									nap_duration_typical nap_cap nap_cutoff bedtime typical_wake
+									nap_duration_typical total_daytime_sleep_approx nap_cap nap_cutoff bedtime typical_wake
 									night_waking_pattern suspected_cause notes
 								}
 								items { id title status detail tag sources }
@@ -102,6 +115,18 @@
 							parenting_approach { id title detail sources }
 							activities { id title detail sources }
 							sources { id name badge url desc priority approved approved_date notes }
+							toddler_sleep_prep {
+								note
+								what_changes_from_baby_to_toddler { id title detail }
+								transition_options_when_ready { id title detail }
+								sources
+							}
+							food_principles {
+								note core_philosophy
+								current_and_ongoing { id title detail sources }
+								toddler_forward_look { id title detail sources }
+								sources
+							}
 						}
 					}
 				`,
