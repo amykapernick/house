@@ -124,6 +124,14 @@
 		}
 	});
 
+	let sortedAllergens = $derived(
+		[...allergens].sort((a, b) => {
+			if (!a.due) return 1;
+			if (!b.due) return -1;
+			return parseISO(a.due).getTime() - parseISO(b.due).getTime();
+		})
+	);
+
 	function allergenUrgency(due: string | null): 'red' | 'orange' | 'green' {
 		if (!due) return 'green';
 		const days = differenceInDays(parseISO(due), new Date());
@@ -182,7 +190,7 @@
 	<section class="allergens">
 		<h2>Allergens</h2>
 		<div class="allergen-list">
-			{#each allergens as allergen}
+			{#each sortedAllergens as allergen}
 				{@const urgency = allergenUrgency(allergen.due)}
 				<button
 					class="allergen-btn"
