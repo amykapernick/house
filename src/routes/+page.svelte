@@ -21,8 +21,13 @@
 			const start = format(subDays(new Date(), 1), 'yyyy-MM-dd');
 			const end = format(addDays(new Date(), 7), 'yyyy-MM-dd');
 
+			function handleMeals(res: any) {
+				meals = res.mealPlans?.items ?? [];
+				loading = false;
+			}
 			fetchClientData({
 				cacheKey: 'dashboard-mealplan',
+				onStale: handleMeals,
 				gqlQuery: `
 					query {
 						mealPlans(
@@ -39,10 +44,7 @@
 						}
 					}
 				`,
-			}).then((res) => {
-				meals = res.mealPlans?.items ?? [];
-				loading = false;
-			});
+			}).then(handleMeals);
 		}
 	});
 

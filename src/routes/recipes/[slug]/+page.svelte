@@ -20,8 +20,13 @@
 		{
 			const slug = $page.params.slug;
 
+			function handleRecipe(res: any) {
+				recipe = res.recipe ?? null;
+				loading = false;
+			}
 			fetchClientData({
 				cacheKey: `recipe-${slug}`,
+				onStale: handleRecipe,
 				gqlQuery: `
 					query {
 						recipe(slug: "${slug}") {
@@ -42,10 +47,7 @@
 						}
 					}
 				`,
-			}).then((res) => {
-				recipe = res.recipe ?? null;
-				loading = false;
-			});
+			}).then(handleRecipe);
 		}
 	});
 </script>

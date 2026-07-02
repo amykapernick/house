@@ -2,6 +2,7 @@
 	--purple_bright: #{$purple_bright};
 	--purple: #{$purple};
 	--navy: #{$blue_navy};
+	--blue_navy: #{$blue_navy};
 	--blue: #{$blue};
 	--blue_light: #{$blue_light};
 	--green: #{$green};
@@ -16,6 +17,8 @@
 	--yellow: #{$yellow};
 	--white: #{$white};
 	--black: #{$black};
+	--grey: #{$grey};
+	--grey_light: #{$grey_light};
 	--neutral: #{$neutral};
 	--background: #{$background};
 	--neutral_light: #{$white};

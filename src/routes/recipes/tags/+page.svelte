@@ -7,8 +7,15 @@
 	let search = $state('');
 
 	onMount(() => {
+		function handleTags(res: any) {
+			tags = (res.recipeTags ?? []).sort((a: any, b: any) =>
+				a.name.localeCompare(b.name)
+			);
+			loading = false;
+		}
 		fetchClientData({
 			cacheKey: 'recipe-tags',
+			onStale: handleTags,
 			gqlQuery: `
 				query {
 					recipeTags {
@@ -16,12 +23,7 @@
 					}
 				}
 			`,
-		}).then((res) => {
-			tags = (res.recipeTags ?? []).sort((a: any, b: any) =>
-				a.name.localeCompare(b.name)
-			);
-			loading = false;
-		});
+		}).then(handleTags);
 	});
 
 	let filteredTags = $derived(

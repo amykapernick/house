@@ -1,12 +1,25 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
 import path from 'path';
+import svg from '@poppanator/sveltekit-svg';
+import advancedVariables from 'postcss-advanced-variables';
+import hexrgba from 'postcss-hexrgba';
+import nesting from 'postcss-nesting';
+import mixins from 'postcss-mixins';
 
 const colours = (await import('./src/lib/styles/config/colours.js')).default;
 const variables = (await import('./src/lib/styles/config/variables.js')).default;
 
 export default defineConfig({
-	plugins: [sveltekit()],
+	plugins: [
+		sveltekit(),
+		svg({
+			includePaths: ['./src/lib/img'],
+			svgoOptions: {
+				plugins: []
+			}
+		}),
+	],
 	resolve: {
 		alias: {
 			'@mixins': path.resolve('./src/lib/styles/mixins/index.css'),
@@ -16,18 +29,18 @@ export default defineConfig({
 	css: {
 		postcss: {
 			plugins: [
-				(await import('postcss-advanced-variables')).default({
+				advancedVariables({
 					disable: '@import',
 					variables: {
 						...colours,
 						...variables,
 					},
 				}),
-				(await import('postcss-hexrgba')).default(),
-				(await import('postcss-nesting')).default({
+				hexrgba(),
+				nesting({
 					noIsPseudoSelector: true,
 				}),
-				(await import('postcss-mixins')).default({
+				mixins({
 					mixinsDir: path.resolve('./src/lib/styles/mixins'),
 				}),
 			],

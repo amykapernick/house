@@ -9,9 +9,14 @@
 
 	function fetchList(skipCache = false) {
 		loading = true;
+		function handleList(res: any) {
+			items = res.shoppingList?.items ?? [];
+			loading = false;
+		}
 		fetchClientData({
 			cacheKey: 'shopping-list',
 			skipCache,
+			onStale: handleList,
 			gqlQuery: `
 				query {
 					shoppingList {
@@ -22,10 +27,7 @@
 					}
 				}
 			`,
-		}).then((res) => {
-			items = res.shoppingList?.items ?? [];
-			loading = false;
-		});
+		}).then(handleList);
 	}
 
 	$effect(() => {

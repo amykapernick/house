@@ -11,8 +11,14 @@
 
 	$effect(() => {
 		if ($isAuthenticated) {
+			function handleHouse(res: any) {
+				areas = res.areas ?? [];
+				items = res.items ?? [];
+				loading = false;
+			}
 			fetchClientData({
 				cacheKey: 'house',
+				onStale: handleHouse,
 				gqlQuery: `
 					query {
 						areas {
@@ -45,11 +51,7 @@
 						}
 					}
 				`,
-			}).then((res) => {
-				areas = res.areas ?? [];
-				items = res.items ?? [];
-				loading = false;
-			});
+			}).then(handleHouse);
 		}
 	});
 </script>

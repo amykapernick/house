@@ -12,8 +12,14 @@
 
 	$effect(() => {
 		if ($isAuthenticated) {
+			function handleCalendar(res: any) {
+				tasks = res.tasks ?? [];
+				events = res.events ?? [];
+				loading = false;
+			}
 			fetchClientData({
 				cacheKey: 'calendar',
+				onStale: handleCalendar,
 				gqlQuery: `
 					query {
 						tasks {
@@ -42,14 +48,12 @@
 						}
 					}
 				`,
-			}).then((res) => {
-				tasks = res.tasks ?? [];
-				events = res.events ?? [];
-				loading = false;
-			});
+			}).then(handleCalendar);
 
+			function handleIcs(res: any) { icalEvents = res.icsEvents ?? []; }
 			fetchClientData({
 				cacheKey: 'icsEvents',
+				onStale: handleIcs,
 				gqlQuery: `
 					query {
 						icsEvents {
@@ -65,12 +69,12 @@
 						}
 					}
 				`,
-			}).then((res) => {
-				icalEvents = res.icsEvents ?? [];
-			});
+			}).then(handleIcs);
 
+			function handleCalMeals(res: any) { mealPlans = res.mealPlans?.items ?? []; }
 			fetchClientData({
 				cacheKey: 'calendar-mealplans',
+				onStale: handleCalMeals,
 				gqlQuery: `
 					query {
 						mealPlans(perPage: 50, orderBy: "date", orderDirection: "asc") {
@@ -81,9 +85,7 @@
 						}
 					}
 				`,
-			}).then((res) => {
-				mealPlans = res.mealPlans?.items ?? [];
-			});
+			}).then(handleCalMeals);
 		}
 	});
 </script>

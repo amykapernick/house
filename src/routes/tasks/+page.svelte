@@ -10,8 +10,13 @@
 
 	$effect(() => {
 		if ($isAuthenticated) {
+			function handleTasks(res: any) {
+				tasks = res.tasks ?? [];
+				loading = false;
+			}
 			fetchClientData({
 				cacheKey: 'tasks',
+				onStale: handleTasks,
 				gqlQuery: `
 					query {
 						tasks {
@@ -26,10 +31,7 @@
 						}
 					}
 				`,
-			}).then((res) => {
-				tasks = res.tasks ?? [];
-				loading = false;
-			});
+			}).then(handleTasks);
 		}
 	});
 </script>

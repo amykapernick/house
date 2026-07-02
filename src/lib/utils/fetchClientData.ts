@@ -6,6 +6,8 @@ type FetchClientDataProps = {
 	gqlQuery: string
 	cacheKey?: string
 	skipCache?: boolean
+	/** Called immediately with cached data if available; the promise still resolves with fresh data. */
+	onStale?: (data: any) => void
 }
 
 function getCached(key: string): any | null {
@@ -27,11 +29,18 @@ function setCache(key: string, data: any) {
 }
 
 const fetchClientData = async (props: FetchClientDataProps) => {
-	const { gqlQuery, cacheKey, skipCache } = props;
+	const { gqlQuery, cacheKey, skipCache, onStale } = props;
 
 	if (cacheKey && !skipCache) {
 		const cached = getCached(cacheKey);
-		if (cached) return cached;
+		if (cached) {
+			if (onStale) {
+				// Stale-while-revalidate: show cached immediately, fetch fresh below
+				onStale(cached);
+			} else {
+				return cached;
+			}
+		}
 	}
 
 	const token = await getToken();

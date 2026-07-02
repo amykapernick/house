@@ -11,6 +11,7 @@ export type MenuItemBasics = {
 export type MenuLink = MenuItemBasics & {
 	link: string
 	items?: never
+	Icon: typeof import('svelte').SvelteComponentTyped
 }
 
 export type MenuCategory = MenuItemBasics & {

@@ -1,25 +1,29 @@
 <script lang="ts">
 	import { isAuthenticated } from '$lib/auth';
-	import { differenceInDays, parseISO, format, addDays } from 'date-fns';
+	import { format, addDays } from 'date-fns';
 	import fetchClientData from '$utils/fetchClientData';
 	import { getToken } from '$lib/auth';
+	import Allergens from '$components/parts/smallHuman/Allergens.svelte';
+	import Teeth from '$components/parts/smallHuman/Teeth.svelte';
+	import Stats from '$components/parts/Stats.svelte';
+	import Growth from '$components/parts/smallHuman/Growth.svelte';
+	import Card from '$components/parts/Card.svelte';
+	import Cards from '$components/parts/Cards.svelte';
 
 	let data = $state<any>(null);
 	let allergens = $state<any[]>([]);
 	let loading = $state(true);
 
-	const sections = [
-		'meta', 'alerts', 'growth', 'feeding', 'teeth', 'car_seat',
-		'swimming', 'milestones', 'auslan', 'sleep', 'sleep_environment',
-		'clothing_seasonal', 'clothing_daytime', 'vaccinations',
-		'parenting_approach', 'activities', 'sources',
-		'toddler_sleep_prep', 'food_principles',
-	];
 
 	$effect(() => {
 		if ($isAuthenticated) {
+		function handleSmallHuman(res: any) {
+				data = res.smallHuman ?? null;
+				loading = false;
+			}
 			fetchClientData({
 				cacheKey: 'small-human',
+				onStale: handleSmallHuman,
 				gqlQuery: `
 					query {
 						smallHuman {
@@ -54,9 +58,8 @@
 								sources
 							}
 							teeth {
-								note erupted { id name erupted_age_months }
-								teething_now teething_note
-								expected_next { id name typical_age_months }
+								note possums_note teething_now teething_note
+								teeth { fdi name status erupted_date erupted_age_months typical_eruption_months sources }
 								dental_care { toothbrush toothpaste first_dental_visit sources }
 							}
 							car_seat { current_stage facing facing_note next_transition sources }
@@ -130,12 +133,12 @@
 						}
 					}
 				`,
-			}).then((res) => {
-				data = res.smallHuman ?? null;
-				loading = false;
-			});
+			}).then(handleSmallHuman);
 
+			function handleAllergens(res: any) { allergens = res.allergens ?? []; }
 			fetchClientData({
+				cacheKey: 'allergens',
+				onStale: handleAllergens,
 				gqlQuery: `
 					query {
 						allergens {
@@ -143,35 +146,15 @@
 						}
 					}
 				`,
-			}).then((res) => {
-				allergens = res.allergens ?? [];
-			});
+			}).then(handleAllergens);
 		}
 	});
 
-	let sortedAllergens = $derived(
-		[...allergens].sort((a, b) => {
-			if (!a.due) return 1;
-			if (!b.due) return -1;
-			return parseISO(a.due).getTime() - parseISO(b.due).getTime();
-		})
-	);
-
-	function allergenUrgency(due: string | null): 'red' | 'orange' | 'green' {
-		if (!due) return 'green';
-		const days = differenceInDays(parseISO(due), new Date());
-		if (days <= 2) return 'red';
-		if (days <= 4) return 'orange';
-		return 'green';
-	}
-
-	function allergenDueLabel(due: string | null): string {
-		if (!due) return '';
-		const days = differenceInDays(parseISO(due), new Date());
-		if (days < 0) return `${Math.abs(days)}d overdue`;
-		if (days === 0) return 'today';
-		if (days === 1) return 'tomorrow';
-		return format(parseISO(due), 'EEE');
+	const alertColours = {
+		urgent: 'red',
+		warning: 'orange',
+		info: 'blue',
+		ok: 'green'
 	}
 
 	let completing = $state<Set<string>>(new Set());
@@ -200,9 +183,6 @@
 		completing = next;
 	}
 
-	function formatHeading(key: string) {
-		return key.replaceAll('_', ' ');
-	}
 </script>
 
 <svelte:head>
@@ -211,103 +191,192 @@
 
 <h1>Small Human</h1>
 
-{#if allergens.length}
-	<section class="allergens">
-		<h2>Allergens</h2>
-		<div class="allergen-list">
-			{#each sortedAllergens as allergen}
-				{@const urgency = allergenUrgency(allergen.due)}
-				<button
-					class="allergen-btn"
-					data-urgency={urgency}
-					disabled={completing.has(allergen.id)}
-					onclick={() => completeAllergen(allergen.id)}
-				>
-					<span class="allergen-name">{allergen.name}</span>
-					<span class="allergen-due">{allergenDueLabel(allergen.due)}</span>
-				</button>
-			{/each}
-		</div>
-	</section>
-{/if}
+<Allergens
+	{allergens}
+	{completeAllergen}
+	{completing}
+/>
 
 {#if loading}
 	<p>Loading...</p>
 {:else if !data}
 	<p>No data available</p>
 {:else}
-	{#each sections as section}
-		{#if data[section]}
-			<section>
-				<h2>{formatHeading(section)}</h2>
-				<pre><code>{JSON.stringify(data[section], null, 2)}</code></pre>
-			</section>
-		{/if}
-	{/each}
+<h2>Overview</h2>
+	<Stats items={[
+		{ name: 'Last Updated', value: data.meta.last_updated, colour: 'blue_navy' },
+		{ name: 'Age', value: data.meta.age_display, colour: 'blue_navy' },
+	]} />
+	<Cards>
+		{#each data.alerts as alert}
+			<Card
+			title={alert.title}
+				colour={alertColours[alert.type]}	
+			>
+				{alert.body}
+			</Card>
+		{/each}
+		<Card
+		title="Car Seat"
+		>
+			<p>{data.car_seat.facing_note}</p>
+			<p>{data.car_seat.next_transition}</p>
+		</Card>
+	</Cards>
+	<Growth growth={data.growth} />
+	
+	<Teeth teeth={data.teeth} />
+	<section>
+		<h2>Swimming</h2>
+		<p>{data.swimming.safety_note}</p>
+		<Cards>
+			{#each data.swimming.upcoming_skills as m}
+				<Card
+				title={m.name}
+				>
+					<p>{m.note}</p>
+					<span>{m.status}</span>
+				</Card>
+			{/each}
+			{#each data.swimming.current_skills as m}
+				<Card
+				title={m.name}
+				>
+					<p>{m.note}</p>
+					<span>{m.status}</span>
+				</Card>
+			{/each}
+		</Cards>
+	</section>
+	<section>
+		<h2>Milestones</h2>
+		<p>{data.milestones.note}</p>
+		<Cards>
+			{#each data.milestones.movement as m}
+				<Card
+				title={m.title}
+				>
+					<p>{m.detail}</p>
+					<span>{m.textbook_age_weeks}</span>
+					<span>{m.status}</span>
+					<span>{m.textbook_age_weeks}</span>
+					<span>Movement</span>
+				</Card>
+			{/each}
+			{#each data.milestones.fine_motor as m}
+				<Card
+				title={m.title}
+				>
+					<p>{m.detail}</p>
+					<span>{m.textbook_age_weeks}</span>
+					<span>{m.status}</span>
+					<span>{m.textbook_age_weeks}</span>
+					<span>Fine Movement</span>
+				</Card>
+			{/each}
+			{#each data.milestones.development as m}
+				<Card
+				title={m.title}
+				>
+					<p>{m.detail}</p>
+					<span>{m.status}</span>
+					<span>Development</span>
+				</Card>
+			{/each}
+		</Cards>
+	</section>
+	<section>
+		<h2>Auslan</h2>
+		<p>{data.auslan.note}</p>
+		<Cards>
+			{#each data.auslan.signs as s}
+				<Card
+				title={s.name}
+				>
+					<p>{s.tip}</p>
+					<span>{s.status}</span>
+				</Card>
+			{/each}
+		</Cards>
+	</section>
+	<section>
+		<h2>Feeding</h2>
+		<pre><code>{JSON.stringify(data.feeding, null, 2)}</code></pre>
+	</section>
+	<section>
+		<h2>Sleep</h2>
+		<pre><code>{JSON.stringify(data.sleep, null, 2)}</code></pre>
+	</section>
+	<section>
+		<h2>Sleep Environment</h2>
+		<pre><code>{JSON.stringify(data.sleep_environment, null, 2)}</code></pre>
+	</section>
+	<section>
+		<h2>Clothing Seasonal</h2>
+		<pre><code>{JSON.stringify(data.clothing_seasonal, null, 2)}</code></pre>
+	</section>
+	<section>
+		<h2>Clothing Daytime</h2>
+		<pre><code>{JSON.stringify(data.clothing_daytime, null, 2)}</code></pre>
+	</section>
+	<section>
+		<h2>Vaccinations</h2>
+		<p>{data.vaccinations.alert}</p>
+		<Cards>
+			{#each data.vaccinations.items as s}
+				<Card
+				title={s.name}
+				>
+					<p>{s.detail}</p>
+					<span>{s.date}</span>
+					<span>{s.next_due}</span>
+					<span>{s.status}</span>
+				</Card>
+			{/each}
+		</Cards>
+	</section>
+	<section>
+		<h2>Parenting Approach</h2>
+		<pre><code>{JSON.stringify(data.parenting_approach, null, 2)}</code></pre>
+	</section>
+	<section>
+		<h2>Activities</h2>
+		<Cards>
+			{#each data.activities as a}
+				<Card
+				title={a.title}
+				>
+					<p>{a.detail}</p>
+				</Card>
+			{/each}
+		</Cards>
+	</section>
+	<section>
+		<h2>Toddler Sleep Prep</h2>
+		<pre><code>{JSON.stringify(data.toddler_sleep_prep, null, 2)}</code></pre>
+	</section>
+	<section>
+		<h2>Food Principles</h2>
+		<pre><code>{JSON.stringify(data.food_principles, null, 2)}</code></pre>
+	</section>
+	<section>
+		<h2>Sources</h2>
+		<Cards>
+			{#each data.sources as a}
+				<Card
+				title={a.name}
+				>
+					<p>{a.desc}</p>
+					<p>{a.notes}</p>
+					<a href={a.url} target="_blank">{a.url.replace('https://', '')}</a>
+				</Card>
+			{/each}
+		</Cards>
+	</section>
 {/if}
 
 <style>
 	@import '@mixins';
-
-	.allergens {
-		margin-bottom: 2em;
-		padding-bottom: 1em;
-		border-bottom: 1px solid var(--grey_light);
-	}
-
-	.allergen-list {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.5em;
-	}
-
-	.allergen-btn {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		padding: 0.6em 1em;
-		border: 2px solid;
-		border-radius: 0.4em;
-		cursor: pointer;
-		font-size: 0.9em;
-		transition: opacity 0.15s;
-
-		&:disabled {
-			opacity: 0.4;
-			cursor: wait;
-		}
-
-		&[data-urgency='red'] {
-			border-color: var(--red, #e53e3e);
-			background: rgba(229, 62, 62, 0.1);
-			color: var(--red, #e53e3e);
-		}
-
-		&[data-urgency='orange'] {
-			border-color: var(--orange);
-			background: rgba($orange, 0.1);
-			color: var(--orange);
-		}
-
-		&[data-urgency='green'] {
-			border-color: var(--green);
-			background: rgba($green, 0.1);
-			color: var(--green);
-		}
-
-		&:hover:not(:disabled) {
-			opacity: 0.7;
-		}
-	}
-
-	.allergen-name {
-		font-weight: 600;
-	}
-
-	.allergen-due {
-		font-size: 0.75em;
-		opacity: 0.8;
-	}
 
 	section {
 		margin-bottom: 2em;
@@ -320,11 +389,18 @@
 	}
 
 	pre {
-		background: rgba($blue, 0.08);
+		background: var(--blue);
 		padding: 1em;
 		border-radius: 0.3em;
 		overflow-x: auto;
 		font-size: 0.85em;
 		line-height: 1.4;
+	}
+
+	.alerts {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5em;
+		margin-bottom: 2em;
 	}
 </style>

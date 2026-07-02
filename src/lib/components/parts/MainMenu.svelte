@@ -17,7 +17,7 @@
 
 <nav>
 	<ul class="menu">
-		{#each menuItems.filter(({ auth }) => !auth || isAuthenticated) as { label, link, items }}
+		{#each menuItems.filter(({ auth }) => !auth || isAuthenticated) as { label, link, items, Icon }}
 			<li>
 				{#if items}
 					<button
@@ -36,7 +36,10 @@
 						{/each}
 					</ul>
 				{:else}
-					<a href={link}>{label}</a>
+					<a href={link}>
+						<span class="label">{label}</span>
+						<Icon />
+					</a>
 				{/if}
 			</li>
 		{/each}
@@ -104,6 +107,10 @@
 
 	.menu_section {
 		@include button_text;
+	}
+
+	.label {
+		@include sr_only;
 	}
 
 	@media (width <= 50em) {

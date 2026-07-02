@@ -10,8 +10,13 @@
 
 	$effect(() => {
 		if ($isAuthenticated) {
+			function handleResources(res: any) {
+				resources = res.resources ?? [];
+				loading = false;
+			}
 			fetchClientData({
 				cacheKey: 'resources',
+				onStale: handleResources,
 				gqlQuery: `
 					query {
 						resources {
@@ -26,10 +31,7 @@
 						}
 					}
 				`,
-			}).then((res) => {
-				resources = res.resources ?? [];
-				loading = false;
-			});
+			}).then(handleResources);
 		}
 	});
 </script>
