@@ -10,54 +10,32 @@
 		[...growth.measurements].sort((a, b) => a.date.localeCompare(b.date))
 	);
 
-	const percentileLine = (data: { x: string; y: number }[]): LineChartLine => ({
+	const percentileLine = (data: { x: Date; y: number; tooltip: string }[]): LineChartLine => ({
 		data,
-		colour: 'grey',
-		unit: '%',
+		style: { colour: 'grey', weight: 1.5, style: 'dashed' },
+		unit: '%ile',
 		decimals: 0,
 		axis: 'right',
-		style: 'dashed',
-		weight: 1,
 	});
 
-	const weightLines = $derived<LineChartLine[]>([
+	const measurementLines = (key: 'weight' | 'height' | 'head', colour: string, decimals: number): LineChartLine[] => [
 		{
-			data: sorted.map(m => ({ x: m.date, y: m.weight_kg })),
-			colour: 'green', unit: 'kg', decimals: 1,
+			data: sorted.filter(m => m[key]?.value != null).map(m => ({ x: parseISO(m.date), y: m[key]!.value! })),
+			style: { colour }, unit: sorted.find(m => m[key]?.unit)?.[key]?.unit ?? '', decimals,
 		},
 		percentileLine(
-			sorted.filter(m => m.weight_percentile != null)
-				.map(m => ({ x: m.date, y: m.weight_percentile!, tooltip: `${m.weight_percentile}th %ile` }))
+			sorted.filter(m => m[key]?.percentile != null)
+				.map(m => ({ x: parseISO(m.date), y: m[key]!.percentile!, tooltip: `${m[key]!.percentile}th %ile` }))
 		),
-	]);
+	];
 
-	const heightLines = $derived<LineChartLine[]>([
-		{
-			data: sorted.filter(m => m.height_cm != null).map(m => ({ x: m.date, y: m.height_cm! })),
-			colour: 'blue', unit: 'cm', decimals: 0,
-		},
-		percentileLine(
-			sorted.filter(m => m.height_percentile != null)
-				.map(m => ({ x: m.date, y: m.height_percentile!, tooltip: `${m.height_percentile}th %ile` }))
-		),
-	]);
+	const weightLines = $derived(measurementLines('weight', 'green', 1));
+	const heightLines = $derived(measurementLines('height', 'blue', 0));
+	const headLines = $derived(measurementLines('head', 'purple', 0));
 
-	const headLines = $derived<LineChartLine[]>([
-		{
-			data: sorted.filter(m => m.head_cm != null).map(m => ({ x: m.date, y: m.head_cm! })),
-			colour: 'purple', unit: 'cm', decimals: 0,
-		},
-		percentileLine(
-			sorted.filter(m => m.head_percentile != null)
-				.map(m => ({ x: m.date, y: m.head_percentile!, tooltip: `${m.head_percentile}th %ile` }))
-		),
-	]);
-
-	const formatX = (x: string) => format(parseISO(x), 'd MMM');
+	const formatX = (x: Date) => format(x, 'd MMM');
 </script>
-
-<section>
-	<h2>Growth</h2>
+	
 	<p class="trend">{growth.trend_notes}</p>
 
 	<figure>
@@ -74,7 +52,6 @@
 		<LineChart lines={headLines} {formatX} />
 		<figcaption>Head Circumference</figcaption>
 	</figure>
-</section>
 
 <style>
 	h2 {

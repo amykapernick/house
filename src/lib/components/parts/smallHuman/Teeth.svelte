@@ -1,12 +1,46 @@
 <script lang="ts">
 	import TeethGraphic from '$lib/img/smallHuman/teeth.svg';
-	import type { Teeth } from '$types/smallHuman';
+	import type { Teeth, Tooth } from '$types/smallHuman';
+	import { formatDate, differenceInMonths, parseISO } from 'date-fns';
 	import Pill from '../Pill.svelte';
 	import Stats from '../Stats.svelte';
+	import Modal from '../Modal.svelte';
 
-	const { teeth }: { teeth: Teeth } = $props();
-	const upcoming = $derived(teeth.teeth.filter(t => t.status === 'erupting'));
+	const {
+		teeth,
+		birth,
+		onMarkErupted,
+	}: {
+		teeth: Teeth;
+		birth: string;
+		onMarkErupted?: (fdi: number) => void;
+	} = $props();
+
+	const upcoming = $derived(teeth.teeth.filter(t => t.status === 'upcoming'));
 	const existing = $derived(teeth.teeth.filter(t => t.status === 'erupted'));
+
+	let confirmingTooth = $state<Tooth | null>(null);
+	let confirmOpen = $state(false);
+
+	function handleTeethClick(e: MouseEvent) {
+		if (!onMarkErupted) return;
+
+		const target = (e.target as HTMLElement).closest('[class*="t_"]');
+		const fdi = Number(target?.getAttribute('class')?.match(/t_(\d+)/)?.[1]);
+		if (!fdi) return;
+
+		const tooth = teeth.teeth.find(t => t.fdi === fdi);
+		if (!tooth || tooth.status === 'erupted') return;
+
+		confirmingTooth = tooth;
+		confirmOpen = true;
+	}
+
+	function confirmErupted() {
+		if (confirmingTooth) onMarkErupted?.(confirmingTooth.fdi);
+		confirmOpen = false;
+	}
+	const eruptedAgeMonths = (erupted_date: string) => differenceInMonths(parseISO(erupted_date), parseISO(birth));
 	const upcomingCss = $derived(upcoming.map(t => `
 		svg .t_${t.fdi} { 
 			--tooth: color-mix(var(--blue_light) 10%, var(--white)); 
@@ -28,10 +62,8 @@
 <svelte:head>
 	{@html upcomingStyleBlock}
 </svelte:head>
-
-<section>
-	<h2>Teeth</h2>
-	<figure class="teeth">
+	
+	<figure class="teeth" onclick={handleTeethClick}>
 		<TeethGraphic />
 		<figcaption>{teeth.note}</figcaption>
 	</figure>
@@ -49,9 +81,9 @@
 			<p class={`t_${tooth.fdi}`}>
 				<span class="name">{tooth.fdi}: {tooth.name} - </span>
 				{#if tooth.erupted_date}
-					<span>Erupted at {tooth.erupted_age_months} months</span>
+					<span>Erupted at {eruptedAgeMonths(tooth.erupted_date)} months</span>
 				{:else}
-					<span>Expected at {tooth.typical_eruption_months} months</span>
+					<span>Expected at {tooth.expected_months} months</span>
 				{/if}
 			</p>
 		{/each}
@@ -60,15 +92,43 @@
 	<dl>
 		{#each upcoming as tooth}
 			<dt>{tooth.name}</dt>
-			<dd>Expected at {tooth.typical_eruption_months} months</dd>
+			<dd>Expected at {tooth.expected_months} months</dd>
 		{/each}
 	</dl>
-</section>
+	<h3>Dental Care</h3>
+	<dl>
+		<dt>Toothbrush</dt>
+		<dd>{teeth.dental_care.toothbrush}</dd>
+		<dt>Toothpaste</dt>
+		<dd>{teeth.dental_care.toothpaste}</dd>
+		<dt>Next Dentist Appointment</dt>
+		<dd>{teeth.dental_care.todoist_task && formatDate(new Date(teeth.dental_care.todoist_task.due), 'dd MMM')}</dd>
+	</dl>
+
+<Modal bind:open={confirmOpen} title="Mark tooth as erupted?">
+	{#if confirmingTooth}
+		<p>Mark <strong>{confirmingTooth.name}</strong> (tooth {confirmingTooth.fdi}) as erupted?</p>
+		<div class="confirm_actions">
+			<button onclick={confirmErupted}>Confirm</button>
+			<button onclick={() => (confirmOpen = false)}>Cancel</button>
+		</div>
+	{/if}
+</Modal>
 
 <style>
 	section {
 		clear: both;
 		overflow: hidden;
+	}
+
+	.confirm_actions {
+		display: flex;
+		gap: 0.5em;
+		margin-top: 1em;
+	}
+
+	dt {
+		font-weight: 700;
 	}
 
 	.teeth {

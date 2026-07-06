@@ -21,8 +21,11 @@
   "dependencies": {
     "@clerk/backend": "^3.8.4",
     "@clerk/clerk-js": "^6.22.0",
+    "@clerk/ui": "^1.24.1",
     "date-fns": "^4.4.0",
-    "node-ical": "^0.26.1"
+    "node-ical": "^0.26.1",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7"
   },
   "devDependencies": {
     "@event-calendar/core": "^5.7.1",

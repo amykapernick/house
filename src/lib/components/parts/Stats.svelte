@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Colour } from "$types/global";
+	import type { Component } from "svelte";
 
 
 	const { items, colour }: {
@@ -7,6 +8,7 @@
 			name: string;
 			value: string;
 			colour?: Colour;
+			Icon?: Component
 		}[]
 		colour?: Colour
 	} = $props();
@@ -15,10 +17,11 @@
 <dl
 	style="--colour: var(--{colour || 'blue'})"
 >
-	{#each items as { name, value, colour }}
+	{#each items as { name, value, colour, Icon }}
 		<div style="--colour: var(--{colour})">
-			<dt>{name}</dt>
+			<dt class={Icon ? 'sr-only' : ''}>{name}</dt>
 			<dd>{value}</dd>
+			{#if Icon}<Icon />{/if}
 		</div>
 	{/each}
 </dl>
@@ -26,7 +29,7 @@
 <style>
 	dl {
 		--colour: var(--blue);
-		
+
 		display: flex;
 		font-size: 0.75em;
 		flex-wrap: wrap;
@@ -44,12 +47,17 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
+
+		:global(svg) {
+			order: -1;
+			height: 3em;
+			width: auto;
+		}
 	}
 
 	dd {
 		margin: 0;
 		font-size: 1.5em;
-		order: -1;
 		font-weight: 600;
 	}
 </style>

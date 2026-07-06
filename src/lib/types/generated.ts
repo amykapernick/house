@@ -13,19 +13,21 @@ export type Activity = {
   detail: Scalars['String']['output'];
   id: Scalars['ID']['output'];
   sources: Array<Scalars['String']['output']>;
+  status: MilestoneStatus;
   title: Scalars['String']['output'];
 };
 
 export type Alert = {
-  body: Scalars['String']['output'];
+  detail: Scalars['String']['output'];
   id: Scalars['ID']['output'];
+  level: AlertType;
   title: Scalars['String']['output'];
-  type: AlertType;
 };
 
 export type AlertType =
   | 'info'
   | 'ok'
+  | 'urgent'
   | 'warn';
 
 export type Allergen = {
@@ -65,6 +67,8 @@ export type AreaId =
   | 'virtual';
 
 export type Auslan = {
+  check_frequency: Scalars['Int']['output'];
+  last_updated: Scalars['String']['output'];
   note: Scalars['String']['output'];
   signs: Array<AuslanSign>;
   sources: Array<Scalars['String']['output']>;
@@ -73,6 +77,7 @@ export type Auslan = {
 export type AuslanSign = {
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
+  reference: Maybe<SignbankWord>;
   status: SignStatus;
   tip: Scalars['String']['output'];
 };
@@ -92,9 +97,11 @@ export type Calendar = {
 };
 
 export type CarSeat = {
+  check_frequency: Scalars['Int']['output'];
   current_stage: Scalars['String']['output'];
   facing: Scalars['String']['output'];
   facing_note: Scalars['String']['output'];
+  last_updated: Scalars['String']['output'];
   next_transition: Scalars['String']['output'];
   sources: Array<Scalars['String']['output']>;
 };
@@ -115,6 +122,15 @@ export type ClothingDaytime = {
   sun_safety: SunSafety;
 };
 
+export type ClothingExtras = {
+  beanie: Maybe<Scalars['Boolean']['output']>;
+  hat: Maybe<Scalars['Boolean']['output']>;
+  hat_reason: Maybe<Scalars['String']['output']>;
+  mittens: Maybe<Scalars['Boolean']['output']>;
+  sunscreen: Maybe<Scalars['Boolean']['output']>;
+  sunscreen_reason: Maybe<Scalars['String']['output']>;
+};
+
 export type ClothingLayer = {
   material: Material;
   position: LayerPosition;
@@ -126,13 +142,13 @@ export type ClothingLayer = {
 export type ClothingSeasonal = {
   alerts: Array<SeasonalAlert>;
   current_sizes: Array<Scalars['String']['output']>;
-  noongar_season: NoogarSeason;
+  current_sizes_note: Scalars['String']['output'];
+  noongar_season: NoonarSeason;
   note: Scalars['String']['output'];
-  size_nudge: Scalars['String']['output'];
 };
 
 export type ClothingSet = {
-  extras: Maybe<Array<Scalars['String']['output']>>;
+  extras: Maybe<ClothingExtras>;
   feet: Maybe<FeetRecommendation>;
   layers: Array<ClothingLayer>;
   rain_suit: Maybe<Scalars['Boolean']['output']>;
@@ -182,12 +198,6 @@ export type CurrentClothingRecommendation = {
   outdoor: ClothingSet;
 };
 
-export type CurrentFeedingStage = {
-  notes: Scalars['String']['output'];
-  on_track: Scalars['Boolean']['output'];
-  stage_id: Scalars['String']['output'];
-};
-
 export type DateRange = {
   end: Maybe<Scalars['String']['output']>;
   start: Maybe<Scalars['String']['output']>;
@@ -208,19 +218,11 @@ export type DayForecast = {
 };
 
 export type DentalCare = {
-  first_dental_visit: Scalars['String']['output'];
+  note: Scalars['String']['output'];
   sources: Array<Scalars['String']['output']>;
+  todoist_task: Maybe<Task>;
   toothbrush: Scalars['String']['output'];
   toothpaste: Scalars['String']['output'];
-};
-
-export type DevelopmentMilestone = {
-  detail: Scalars['String']['output'];
-  id: Scalars['ID']['output'];
-  sources: Array<Scalars['String']['output']>;
-  status: MilestoneStatus;
-  tag: Scalars['String']['output'];
-  title: Scalars['String']['output'];
 };
 
 export type Event = {
@@ -238,58 +240,34 @@ export type EventDateRange = {
 };
 
 export type Feeding = {
+  check_frequency: Scalars['Int']['output'];
   details: Array<LabelValue>;
-  feeding_schedule: FeedingSchedule;
+  last_updated: Scalars['String']['output'];
+  schedule: FeedingSchedule;
   sources: Array<Scalars['String']['output']>;
-  summary: FeedingSummary;
 };
 
 export type FeedingSchedule = {
-  current: CurrentFeedingStage;
-  current_stage: Scalars['String']['output'];
   note: Scalars['String']['output'];
   source: Scalars['String']['output'];
   stages: Array<FeedingStage>;
+  upcoming: Array<Scalars['String']['output']>;
 };
 
 export type FeedingStage = {
-  age_months_max: Scalars['Int']['output'];
-  age_months_min: Scalars['Int']['output'];
-  breastfeeds_note: Scalars['String']['output'];
-  breastfeeds_per_day: Scalars['String']['output'];
-  coming_changes: Scalars['String']['output'];
+  breastfeeds: ValueNote;
+  expected_age: Array<Scalars['Int']['output']>;
   id: Scalars['ID']['output'];
-  label: Scalars['String']['output'];
-  milk_primary: Scalars['Boolean']['output'];
-  solid_meals_note: Scalars['String']['output'];
-  solid_meals_per_day: Scalars['Int']['output'];
-  water_note: Scalars['String']['output'];
-  water_per_day_ml_max: Maybe<Scalars['Int']['output']>;
-};
-
-export type FeedingSummary = {
-  allergens: ValueNote;
-  breastfeeds_per_day: ValueNote;
-  solid_meals_per_day: ValueNote;
-  water_per_day: ValueNote;
+  solid_meals: ValueNote;
+  title: Scalars['String']['output'];
+  upcoming: Scalars['String']['output'];
+  water: ValueNote;
 };
 
 export type FeetRecommendation =
   | 'bare'
   | 'shoes'
   | 'socks';
-
-export type FineMotoMilestone = {
-  achieved_age_weeks: Maybe<Scalars['Int']['output']>;
-  detail: Scalars['String']['output'];
-  id: Scalars['ID']['output'];
-  sources: Array<Scalars['String']['output']>;
-  status: MilestoneStatus;
-  tag: Scalars['String']['output'];
-  textbook_age_weeks: Scalars['String']['output'];
-  title: Scalars['String']['output'];
-  weeks_early: Maybe<Scalars['Int']['output']>;
-};
 
 export type FoodPrincipleItem = {
   detail: Scalars['String']['output'];
@@ -307,6 +285,8 @@ export type FoodPrinciples = {
 };
 
 export type Growth = {
+  check_frequency: Scalars['Int']['output'];
+  last_updated: Scalars['String']['output'];
   measurements: Array<GrowthMeasurement>;
   note: Scalars['String']['output'];
   trend_notes: Scalars['String']['output'];
@@ -314,12 +294,9 @@ export type Growth = {
 
 export type GrowthMeasurement = {
   date: Scalars['String']['output'];
-  head_cm: Scalars['Float']['output'];
-  head_percentile: Maybe<Scalars['Int']['output']>;
-  height_cm: Scalars['Float']['output'];
-  height_percentile: Maybe<Scalars['Int']['output']>;
-  weight_kg: Scalars['Float']['output'];
-  weight_percentile: Maybe<Scalars['Int']['output']>;
+  head: Measurement;
+  height: Measurement;
+  weight: Measurement;
 };
 
 export type IcsEvent = {
@@ -438,14 +415,37 @@ export type MealPlanList = {
   totalPages: Scalars['Int']['output'];
 };
 
+export type Measurement = {
+  percentile: Maybe<Scalars['Int']['output']>;
+  unit: MeasurementUnit;
+  value: Maybe<Scalars['Float']['output']>;
+};
+
+export type MeasurementUnit =
+  | 'cm'
+  | 'kg';
+
 export type Meta = {
-  age_display: Scalars['String']['output'];
   age_weeks: Scalars['Int']['output'];
   birth_month: Scalars['String']['output'];
   last_updated: Scalars['String']['output'];
-  name: Scalars['String']['output'];
-  summary_tags: Array<Scalars['String']['output']>;
 };
+
+export type Milestone = {
+  achieved_date: Maybe<Scalars['String']['output']>;
+  category: MilestoneCategory;
+  detail: Scalars['String']['output'];
+  expected_weeks: Maybe<Array<Scalars['Int']['output']>>;
+  id: Scalars['ID']['output'];
+  sources: Array<Scalars['String']['output']>;
+  status: MilestoneStatus;
+  title: Scalars['String']['output'];
+};
+
+export type MilestoneCategory =
+  | 'development'
+  | 'fine_motor'
+  | 'movement';
 
 export type MilestoneStatus =
   | 'done'
@@ -454,27 +454,19 @@ export type MilestoneStatus =
   | 'watch';
 
 export type Milestones = {
-  development: Array<DevelopmentMilestone>;
-  fine_motor: Array<FineMotoMilestone>;
-  movement: Array<MovementMilestone>;
+  check_frequency: Scalars['Int']['output'];
+  items: Array<Milestone>;
+  last_updated: Scalars['String']['output'];
   note: Scalars['String']['output'];
-};
-
-export type MovementMilestone = {
-  achieved_age_weeks: Maybe<Scalars['Int']['output']>;
-  detail: Scalars['String']['output'];
-  id: Scalars['ID']['output'];
-  sources: Array<Scalars['String']['output']>;
-  status: MilestoneStatus;
-  tag: Scalars['String']['output'];
-  textbook_age_weeks: Scalars['String']['output'];
-  title: Scalars['String']['output'];
-  weeks_early: Maybe<Scalars['Int']['output']>;
 };
 
 export type Mutation = {
   checkShoppingItem: Maybe<CheckShoppingItemResult>;
   completeTask: Maybe<CompleteTaskResult>;
+  markToothErupted: Maybe<Tooth>;
+  updateAuslanSignStatus: Maybe<AuslanSign>;
+  updateMilestoneStatus: Maybe<Milestone>;
+  updateSwimSkillStatus: Maybe<SwimSkill>;
 };
 
 
@@ -489,7 +481,30 @@ export type MutationCompleteTaskArgs = {
   taskId: Scalars['String']['input'];
 };
 
-export type NoogarSeason = {
+
+export type MutationMarkToothEruptedArgs = {
+  fdi: Scalars['Int']['input'];
+};
+
+
+export type MutationUpdateAuslanSignStatusArgs = {
+  id: Scalars['ID']['input'];
+  status: SignStatus;
+};
+
+
+export type MutationUpdateMilestoneStatusArgs = {
+  id: Scalars['ID']['input'];
+  status: MilestoneStatus;
+};
+
+
+export type MutationUpdateSwimSkillStatusArgs = {
+  id: Scalars['ID']['input'];
+  status: MilestoneStatus;
+};
+
+export type NoonarSeason = {
   current: Scalars['String']['output'];
   current_description: Scalars['String']['output'];
   current_period: Scalars['String']['output'];
@@ -594,6 +609,13 @@ export type RainSuit = {
   note: Scalars['String']['output'];
   recommended: Scalars['Boolean']['output'];
   trigger: Scalars['String']['output'];
+};
+
+export type ReadingItem = {
+  id: Scalars['ID']['output'];
+  note: Scalars['String']['output'];
+  sources: Array<Scalars['String']['output']>;
+  title: Scalars['String']['output'];
 };
 
 export type Recipe = {
@@ -714,7 +736,7 @@ export type Resource = {
 
 export type SeasonalAlert = {
   action: Scalars['String']['output'];
-  body: Scalars['String']['output'];
+  detail: Scalars['String']['output'];
   id: Scalars['ID']['output'];
   title: Scalars['String']['output'];
   type: AlertType;
@@ -746,10 +768,18 @@ export type SignStatus =
   | 'recognises'
   | 'signing_occasionally';
 
+export type SignbankWord = {
+  note: Maybe<Scalars['String']['output']>;
+  url: Maybe<Scalars['String']['output']>;
+  video: Maybe<Scalars['String']['output']>;
+};
+
 export type Sleep = {
+  check_frequency: Scalars['Int']['output'];
   current_pattern: SleepPattern;
   framework: Scalars['String']['output'];
   items: Array<SleepItem>;
+  last_updated: Scalars['String']['output'];
 };
 
 export type SleepEnvironment = {
@@ -778,10 +808,10 @@ export type SleepPattern = {
   nap_duration_range_max: Scalars['Int']['output'];
   nap_duration_range_min: Scalars['Int']['output'];
   nap_duration_typical: Scalars['String']['output'];
-  nap_transition: Scalars['String']['output'];
-  naps_per_day: Scalars['Int']['output'];
+  nap_transition: Maybe<Scalars['String']['output']>;
+  naps: Scalars['Int']['output'];
   night_waking_pattern: Scalars['String']['output'];
-  notes: Scalars['String']['output'];
+  note: Scalars['String']['output'];
   suspected_cause: Scalars['String']['output'];
   total_daytime_sleep_approx: Scalars['String']['output'];
   typical_wake: Scalars['String']['output'];
@@ -801,12 +831,11 @@ export type SleeveLength =
 
 export type Source = {
   approved: Scalars['Boolean']['output'];
-  approved_date: Scalars['String']['output'];
   badge: Scalars['String']['output'];
-  desc: Scalars['String']['output'];
+  detail: Scalars['String']['output'];
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
-  notes: Maybe<Scalars['String']['output']>;
+  note: Maybe<Scalars['String']['output']>;
   priority: Scalars['Int']['output'];
   url: Scalars['String']['output'];
 };
@@ -817,18 +846,19 @@ export type SunSafety = {
   uv_threshold_for_coverage: Scalars['Int']['output'];
 };
 
-export type Swimming = {
-  current_skills: Array<SwimmingSkill>;
-  safety_note: Scalars['String']['output'];
-  sources: Array<Scalars['String']['output']>;
-  upcoming_skills: Array<SwimmingSkill>;
+export type SwimSkill = {
+  detail: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  status: MilestoneStatus;
+  title: Scalars['String']['output'];
 };
 
-export type SwimmingSkill = {
-  id: Scalars['ID']['output'];
-  name: Scalars['String']['output'];
-  note: Maybe<Scalars['String']['output']>;
-  status: MilestoneStatus;
+export type Swimming = {
+  check_frequency: Scalars['Int']['output'];
+  last_updated: Scalars['String']['output'];
+  note: Scalars['String']['output'];
+  skills: Array<SwimSkill>;
+  sources: Array<Scalars['String']['output']>;
 };
 
 export type Task = {
@@ -848,7 +878,9 @@ export type Task = {
 };
 
 export type Teeth = {
+  check_frequency: Scalars['Int']['output'];
   dental_care: DentalCare;
+  last_updated: Scalars['String']['output'];
   note: Scalars['String']['output'];
   possums_note: Scalars['String']['output'];
   teeth: Array<Tooth>;
@@ -856,17 +888,17 @@ export type Teeth = {
   teething_now: Scalars['Boolean']['output'];
 };
 
-export type ToddlerPrepItem = {
-  detail: Scalars['String']['output'];
-  id: Scalars['ID']['output'];
-  title: Scalars['String']['output'];
-};
+export type ToddlerPrepStatus =
+  | 'due'
+  | 'not_yet_due';
 
 export type ToddlerSleepPrep = {
+  alert_when_due: Alert;
   note: Scalars['String']['output'];
+  reading: Array<ReadingItem>;
   sources: Array<Scalars['String']['output']>;
-  transition_options_when_ready: Array<ToddlerPrepItem>;
-  what_changes_from_baby_to_toddler: Array<ToddlerPrepItem>;
+  status: ToddlerPrepStatus;
+  trigger_age_weeks: Scalars['Int']['output'];
 };
 
 export type TogRecommendation = {
@@ -883,19 +915,18 @@ export type TogReference = {
 };
 
 export type Tooth = {
-  erupted_age_months: Maybe<Scalars['Int']['output']>;
   erupted_date: Maybe<Scalars['String']['output']>;
+  expected_months: Scalars['String']['output'];
   fdi: Scalars['Int']['output'];
   name: Scalars['String']['output'];
   sources: Array<Scalars['String']['output']>;
   status: ToothStatus;
-  typical_eruption_months: Scalars['String']['output'];
 };
 
 export type ToothStatus =
   | 'erupted'
-  | 'erupting'
-  | 'not_yet';
+  | 'not_yet'
+  | 'upcoming';
 
 export type TrackerData = {
   activities: Array<Activity>;
@@ -936,9 +967,10 @@ export type VaccinationItem = {
   date: Maybe<Scalars['String']['output']>;
   detail: Scalars['String']['output'];
   id: Scalars['ID']['output'];
-  name: Scalars['String']['output'];
   next_due: Maybe<Scalars['String']['output']>;
   status: VaccinationStatus;
+  title: Scalars['String']['output'];
+  todoist_task: Maybe<Task>;
 };
 
 export type VaccinationStatus =
@@ -947,12 +979,15 @@ export type VaccinationStatus =
   | 'watch';
 
 export type Vaccinations = {
-  alert: Scalars['String']['output'];
+  check_frequency: Scalars['Int']['output'];
   items: Array<VaccinationItem>;
+  last_updated: Scalars['String']['output'];
+  note: Scalars['String']['output'];
   sources: Array<Scalars['String']['output']>;
 };
 
 export type ValueNote = {
   note: Scalars['String']['output'];
-  value: Scalars['String']['output'];
+  unit: Maybe<Scalars['String']['output']>;
+  value: Maybe<Array<Scalars['Float']['output']>>;
 };

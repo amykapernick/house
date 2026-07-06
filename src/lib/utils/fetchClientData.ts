@@ -22,7 +22,7 @@ function getCached(key: string): any | null {
 	}
 }
 
-function setCache(key: string, data: any) {
+export function setCache(key: string, data: any) {
 	try {
 		localStorage.setItem(`cache:${key}`, JSON.stringify({ data, timestamp: Date.now() }));
 	} catch {}

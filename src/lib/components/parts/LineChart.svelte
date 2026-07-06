@@ -1,79 +1,118 @@
 <script lang="ts">
 	export type LineChartPoint = {
-		/** X axis value — ISO date string or any string label */
-		x: string;
-		/** Y axis value */
+		x: Date;
 		y: number;
-		/** Tooltip override. Defaults to `y` formatted with the line's unit/decimals */
 		tooltip?: string;
 	};
 
 	export type LineChartLine = {
-		/** Data points for this line */
 		data: LineChartPoint[];
-		/** CSS colour variable name without `var()`. Default: `'blue'` */
-		colour?: string;
-		/** Unit appended to axis labels and default tooltip. Default: `''` */
+		style?: {
+			colour?: string;
+			weight?: number;
+			style?: 'solid' | 'dashed';
+		};
 		unit?: string;
-		/** Decimal places on axis labels and tooltip. Default: `1` */
 		decimals?: number;
-		/** Which Y axis to plot against. Default: `'left'` */
 		axis?: 'left' | 'right';
-		/** Line style. Default: `'solid'` */
-		style?: 'solid' | 'dashed';
-		/** Stroke width in SVG units. Default: `2.5` for solid, `1.5` for dashed */
-		weight?: number;
 	};
 
 	type Props = {
 		lines: LineChartLine[];
-		/** Format function for X axis tick labels */
-		formatX?: (x: string) => string;
+		formatX?: (x: Date) => string;
 		class?: string;
+		xLabel?: string;
+		leftLabel?: string;
+		rightLabel?: string;
 	};
 
-	const { lines, formatX = (x) => x, class: className = '' }: Props = $props();
+	const {
+		lines,
+		formatX = (x) => x.toLocaleDateString(),
+		class: className = '',
+		xLabel,
+		leftLabel,
+		rightLabel,
+	}: Props = $props();
 
 	const W = 560;
 	const H = 220;
-	const PAD_LEFT = 48;
 	const PAD_TOP = 16;
-	const PAD_BOTTOM = 56;
 
 	const leftLines = $derived(lines.filter(l => (l.axis ?? 'left') === 'left'));
 	const rightLines = $derived(lines.filter(l => l.axis === 'right'));
 	const hasRightAxis = $derived(rightLines.length > 0);
 
-	const PAD_RIGHT = $derived(hasRightAxis ? 56 : 16);
+	const PAD_LEFT = $derived(42 + (leftLabel ? 14 : 0));
+	const PAD_RIGHT = $derived((hasRightAxis ? 44 : 10) + (rightLabel ? 14 : 0));
+	const PAD_BOTTOM = $derived(40 + (xLabel ? 16 : 0));
 	const innerW = $derived(W - PAD_LEFT - PAD_RIGHT);
-	const innerH = H - PAD_TOP - PAD_BOTTOM;
-	const xAxisY = PAD_TOP + innerH;
+	const innerH = $derived(H - PAD_TOP - PAD_BOTTOM);
+	const xAxisY = $derived(PAD_TOP + innerH);
 
-	// Merged, sorted X values across all lines
-	const allX = $derived(
-		[...new Set(lines.flatMap(l => l.data.map(p => p.x)))].sort()
+	// Deduplicate Date objects by timestamp, sort chronologically
+	const allDates = $derived(
+		[...new Map(lines.flatMap(l => l.data.map(p => [p.x.getTime(), p.x]))).values()]
+			.sort((a, b) => a.getTime() - b.getTime())
 	);
-	function xPos(xVal: string) {
-		const i = allX.indexOf(xVal);
-		if (allX.length < 2) return PAD_LEFT + innerW / 2;
-		return PAD_LEFT + (i / (allX.length - 1)) * innerW;
+	const minMs = $derived(allDates.length ? allDates[0].getTime() : 0);
+	const maxMs = $derived(allDates.length ? allDates[allDates.length - 1].getTime() : 1);
+	const rangeDays = $derived((maxMs - minMs) / 86400000);
+
+	function xPos(date: Date): number {
+		if (minMs === maxMs) return PAD_LEFT + innerW / 2;
+		return PAD_LEFT + ((date.getTime() - minMs) / (maxMs - minMs)) * innerW;
 	}
 
-	// Left Y axis scale (shared across all left lines)
-	const leftValues = $derived(leftLines.flatMap(l => l.data.map(p => p.y)));
-	const minLeftY = $derived(leftValues.length ? Math.max(0, Math.min(...leftValues) - Math.abs(Math.min(...leftValues) * 0.05)) : 0);
-	const maxLeftY = $derived(leftValues.length ? Math.max(...leftValues) + Math.abs(Math.max(...leftValues) * 0.05) : 1);
-	const leftTicks = $derived(Array.from({ length: 5 }, (_, i) => minLeftY + (i / 4) * (maxLeftY - minLeftY)));
+	// Regular interval ticks across the full date range
+	const xTicks = $derived.by<Date[]>(() => {
+		if (allDates.length < 2) return [...allDates];
 
-	// Right Y axis scale (shared across all right lines)
+		const start = allDates[0];
+		const end = allDates[allDates.length - 1];
+		const ticks: Date[] = [];
+
+		if (rangeDays <= 60) {
+			// Weekly, snapped to Monday
+			const d = new Date(start);
+			d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); // Monday
+			while (d <= end) {
+				if (d.getTime() >= minMs) ticks.push(new Date(d));
+				d.setDate(d.getDate() + 7);
+			}
+		} else if (rangeDays <= 120) {
+			// Fortnightly: 1st and 15th of each month
+			const d = new Date(start.getFullYear(), start.getMonth(), 1);
+			while (d <= end) {
+				if (d.getTime() >= minMs) ticks.push(new Date(d));
+				if (d.getDate() === 1) d.setDate(15);
+				else { d.setMonth(d.getMonth() + 1); d.setDate(1); }
+			}
+		} else {
+			// Monthly: 1st of each month; every 2 months for very long ranges
+			const monthStep = rangeDays > 600 ? 2 : 1;
+			const d = new Date(start.getFullYear(), start.getMonth(), 1);
+			while (d <= end) {
+				if (d.getTime() >= minMs) ticks.push(new Date(d));
+				d.setMonth(d.getMonth() + monthStep);
+			}
+		}
+
+		return ticks;
+	});
+
+	// Y axes always start at 0
+	const leftValues = $derived(leftLines.flatMap(l => l.data.map(p => p.y)));
+	const maxLeftY = $derived(leftValues.length ? Math.max(...leftValues) * 1.05 : 1);
+	const leftTicks = $derived(Array.from({ length: 5 }, (_, i) => (i / 4) * maxLeftY));
+
 	const rightValues = $derived(rightLines.flatMap(l => l.data.map(p => p.y)));
-	const minRightY = $derived(rightValues.length ? Math.max(0, Math.min(...rightValues) - 5) : 0);
 	const maxRightY = $derived(rightValues.length ? Math.min(100, Math.max(...rightValues) + 5) : 100);
-	const rightTicks = $derived(Array.from({ length: 5 }, (_, i) => minRightY + (i / 4) * (maxRightY - minRightY)));
+	const rightTicks = $derived(Array.from({ length: 5 }, (_, i) => (i / 4) * maxRightY));
 
 	function yPos(v: number, axis: 'left' | 'right' = 'left') {
-		const [min, max] = axis === 'right' ? [minRightY, maxRightY] : [minLeftY, maxLeftY];
-		return PAD_TOP + (1 - (v - min) / (max - min)) * innerH;
+		const max = axis === 'right' ? maxRightY : maxLeftY;
+		return PAD_TOP + (1 - v / max) * innerH;
 	}
 
 	function polylinePoints(line: LineChartLine) {
@@ -82,22 +121,19 @@
 	}
 
 	function lineStyle(line: LineChartLine) {
-		const w = line.weight ?? (line.style === 'dashed' ? 1.5 : 2.5);
-		const dash = line.style === 'dashed' ? 'stroke-dasharray: 5 3;' : '';
-		return `stroke: var(--${line.colour ?? 'blue'}); stroke-width: ${w}; ${dash}`;
+		const colour = line.style?.colour ?? 'green';
+		const w = line.style?.weight ?? 2;
+		const dash = line.style?.style === 'dashed' ? 'stroke-dasharray: 5 3;' : '';
+		return `stroke: var(--${colour}); stroke-width: ${w}; ${dash}`;
 	}
 
 	function dotFill(line: LineChartLine) {
-		return `fill: var(--${line.colour ?? 'blue'})`;
+		return `fill: var(--${line.style?.colour ?? 'green'})`;
 	}
 
-	// X axis labels
-	const labelStep = $derived(Math.max(1, Math.ceil(allX.length / 8)));
-	function showXLabel(i: number) {
-		return i % labelStep === 0 || i === allX.length - 1;
-	}
-
-	let hoveredX = $state<string | null>(null);
+	// Hover tracked by timestamp so Date identity doesn't matter
+	let hoveredX = $state<number | null>(null);
+	const hoveredTickShown = $derived(hoveredX !== null && xTicks.some(t => t.getTime() === hoveredX));
 </script>
 
 <div class="chart-wrap {className}">
@@ -157,45 +193,93 @@
 				{@const y = yPos(point.y, axis)}
 				<circle
 					cx={x} cy={y}
-					r={hoveredX === point.x ? 6 : 4}
+					r={hoveredX === point.x.getTime() ? 6 : 4}
 					style={dotFill(line)}
 					class="dot"
 					role="img"
-					aria-label="{point.x}: {point.tooltip ?? `${point.y.toFixed(dec)}${unit}`}"
-					onmouseenter={() => hoveredX = point.x}
+					aria-label="{formatX(point.x)}: {point.tooltip ?? `${point.y.toFixed(dec)}${unit}`}"
+					onmouseenter={() => hoveredX = point.x.getTime()}
 					onmouseleave={() => hoveredX = null}
 				/>
 			{/each}
 		{/each}
 
-		<!-- X axis labels -->
-		{#each allX as xVal, i}
-			{#if showXLabel(i) || hoveredX === xVal}
-				{@const x = xPos(xVal)}
-				<text
-					x={x} y={xAxisY + 12}
-					class="tick-label"
-					text-anchor="end"
-					transform="rotate(-40, {x}, {xAxisY + 12})"
-				>
-					{formatX(xVal)}
-				</text>
-			{/if}
+		<!-- Regular X axis ticks + labels -->
+		{#each xTicks as tick}
+			{@const x = xPos(tick)}
+			<line x1={x} y1={xAxisY} x2={x} y2={xAxisY + 4} class="axis-tick" />
+			<text
+				x={x} y={xAxisY + 10}
+				class="tick-label"
+				text-anchor="end"
+				transform="rotate(-40, {x}, {xAxisY + 10})"
+			>
+				{formatX(tick)}
+			</text>
 		{/each}
+
+		<!-- Hovered date label (only if not already a regular tick) -->
+		{#if hoveredX !== null && !hoveredTickShown}
+			{@const x = xPos(new Date(hoveredX))}
+			<text
+				x={x} y={xAxisY + 10}
+				class="tick-label tick-label--hover"
+				text-anchor="end"
+				transform="rotate(-40, {x}, {xAxisY + 10})"
+			>
+				{formatX(new Date(hoveredX))}
+			</text>
+		{/if}
 
 		<!-- Tooltip -->
 		{#if hoveredX !== null}
-			{@const x = xPos(hoveredX)}
+			{@const hovDate = new Date(hoveredX)}
+			{@const x = xPos(hovDate)}
 			{@const tipLines = lines.map(l => {
-				const p = l.data.find(d => d.x === hoveredX);
+				const p = l.data.find(d => d.x.getTime() === hoveredX);
 				if (!p) return null;
 				return p.tooltip ?? `${p.y.toFixed(l.decimals ?? 1)}${l.unit ?? ''}`;
 			}).filter(Boolean)}
 			{@const tipText = tipLines.join(' · ')}
 			{@const tipW = Math.max(80, tipText.length * 7.5)}
-			{@const firstY = (() => { const l = lines.find(ln => ln.data.some(p => p.x === hoveredX)); const p = l?.data.find(p => p.x === hoveredX); return p ? yPos(p.y, l?.axis ?? 'left') : PAD_TOP; })()}
+			{@const firstY = (() => {
+				const l = lines.find(ln => ln.data.some(p => p.x.getTime() === hoveredX));
+				const p = l?.data.find(p => p.x.getTime() === hoveredX);
+				return p ? yPos(p.y, l?.axis ?? 'left') : PAD_TOP;
+			})()}
 			<rect x={x - tipW / 2} y={firstY - 36} width={tipW} height={26} rx={4} class="tooltip-bg" />
 			<text x={x} y={firstY - 18} class="tooltip-text" text-anchor="middle">{tipText}</text>
+		{/if}
+
+		<!-- Axis labels -->
+		{#if leftLabel}
+			<text
+				x={14} y={PAD_TOP + innerH / 2}
+				class="axis-label"
+				text-anchor="middle"
+				transform="rotate(-90, 14, {PAD_TOP + innerH / 2})"
+			>
+				{leftLabel}
+			</text>
+		{/if}
+		{#if rightLabel}
+			<text
+				x={W - 14} y={PAD_TOP + innerH / 2}
+				class="axis-label"
+				text-anchor="middle"
+				transform="rotate(90, {W - 14}, {PAD_TOP + innerH / 2})"
+			>
+				{rightLabel}
+			</text>
+		{/if}
+		{#if xLabel}
+			<text
+				x={PAD_LEFT + innerW / 2} y={H - 6}
+				class="axis-label"
+				text-anchor="middle"
+			>
+				{xLabel}
+			</text>
 		{/if}
 	</svg>
 </div>
@@ -220,6 +304,17 @@
 		opacity: 0.5;
 	}
 
+	.axis-tick {
+		stroke: var(--grey);
+		stroke-width: 1;
+	}
+
+	.axis-label {
+		font-size: 11px;
+		font-weight: 600;
+		fill: var(--grey);
+	}
+
 	.gridline {
 		stroke: var(--grey_light);
 		stroke-width: 1;
@@ -238,6 +333,11 @@
 
 	.tick-label--right {
 		opacity: 0.7;
+	}
+
+	.tick-label--hover {
+		fill: var(--black);
+		font-weight: 600;
 	}
 
 	.tooltip-bg {

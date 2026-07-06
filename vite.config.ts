@@ -16,7 +16,16 @@ export default defineConfig({
 		svg({
 			includePaths: ['./src/lib/img'],
 			svgoOptions: {
-				plugins: []
+				plugins: [
+					{
+						name: 'prefixIds',
+						params: {
+							// Only scope gradient/mask ids per-file - class names (e.g. teeth.svg's
+							// t_<fdi> selectors) are targeted directly by app code and must stay stable.
+							prefixClassNames: false,
+						},
+					},
+				]
 			}
 		}),
 	],

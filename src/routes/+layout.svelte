@@ -1,7 +1,10 @@
 <script lang="ts">
 	import '$styles/main.css';
 	import { onMount } from 'svelte';
-	import { initClerk } from '$lib/auth';
+	import { goto } from '$app/navigation';
+	import { page } from '$app/state';
+	import { initClerk, isAuthenticated, clerkLoaded } from '$lib/auth';
+	import { routeRequiresAuth } from '$lib/navigation';
 	import Header from '$partials/Header.svelte';
 	import Footer from '$partials/Footer.svelte';
 	import Layout from '$layouts/Default.svelte';
@@ -12,6 +15,17 @@
 		const clerkPublishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 		if (clerkPublishableKey) {
 			await initClerk(clerkPublishableKey);
+		}
+	});
+
+	$effect(() => {
+		if (
+			$clerkLoaded &&
+			!$isAuthenticated &&
+			!page.url.pathname.startsWith('/sign-in') &&
+			routeRequiresAuth(page.url.pathname)
+		) {
+			goto(`/sign-in?redirect=${encodeURIComponent(page.url.pathname)}`);
 		}
 	});
 </script>

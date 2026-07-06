@@ -24,6 +24,8 @@
   - [x] Update .env.sample for SvelteKit
   - [ ] SVG icon components for house map items and task cards
   - [x] Clerk auth sign-in/sign-up pages
+    - [ ] Style pages
+    - [ ] Add sign out button
   - [ ] User profile page
   - [x] Update CI/CD for SvelteKit build
   - [x] Mealie integration (recipes, meal planning, shopping list)

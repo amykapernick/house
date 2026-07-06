@@ -1,18 +1,33 @@
 <script lang="ts">
 	import { isAuthenticated } from '$lib/auth';
-	import { format, addDays } from 'date-fns';
-	import fetchClientData from '$utils/fetchClientData';
+	import { format, addDays, formatDate, isWithinInterval, addWeeks, differenceInWeeks } from 'date-fns';
+	import fetchClientData, { setCache } from '$utils/fetchClientData';
 	import { getToken } from '$lib/auth';
+	import type { Colour } from '$types/global';
 	import Allergens from '$components/parts/smallHuman/Allergens.svelte';
 	import Teeth from '$components/parts/smallHuman/Teeth.svelte';
 	import Stats from '$components/parts/Stats.svelte';
 	import Growth from '$components/parts/smallHuman/Growth.svelte';
 	import Card from '$components/parts/Card.svelte';
 	import Cards from '$components/parts/Cards.svelte';
+	import Pill from '$components/parts/Pill.svelte';
+	import type { Alert, AlertType, MilestoneStatus, SignStatus, ValueNote } from '$types/generated';
+	import Milestone from '$components/parts/smallHuman/Milestone.svelte';
+	import Auslan from '$components/parts/smallHuman/Auslan.svelte';
+	import Breasts from '$img/icons/breasts.svg'
+	import Water from '$img/icons/glass-water.svg'
+	import Food from '$img/icons/soup.svg'
+	import type { Component } from 'svelte';
 
 	let data = $state<any>(null);
 	let allergens = $state<any[]>([]);
 	let loading = $state(true);
+
+	function formatValueNote({ value, unit, note }: ValueNote): string {
+		if (!value?.length) return note;
+		const joined = value.length > 1 ? `${Math.min(...value)}-${Math.max(...value)}` : `${value[0]}`;
+		return unit ? `${joined} ${unit}` : joined;
+	}
 
 
 	$effect(() => {
@@ -28,59 +43,62 @@
 					query {
 						smallHuman {
 							meta {
-								last_updated age_weeks age_display name birth_month summary_tags
+								last_updated age_weeks birth_month
 							}
-							alerts { id type title body }
+							alerts { id level title detail }
 							growth {
-								note
-								measurements { date height_cm weight_kg head_cm height_percentile weight_percentile head_percentile }
-								trend_notes
+								last_updated check_frequency note trend_notes
+								measurements {
+									date
+									height { value percentile unit }
+									weight { value percentile unit }
+									head { value percentile unit }
+								}
 							}
 							feeding {
-								summary {
-									breastfeeds_per_day { value note }
-									solid_meals_per_day { value note }
-									water_per_day { value note }
-									allergens { value note }
-								}
+								last_updated check_frequency
 								details { label value }
-								feeding_schedule {
-									source note current_stage
+								schedule {
+									source note
 									stages {
-										id label age_months_min age_months_max
-										breastfeeds_per_day breastfeeds_note
-										solid_meals_per_day solid_meals_note
-										water_per_day_ml_max water_note
-										milk_primary coming_changes
+										id title expected_age
+										breastfeeds { value unit note }
+										solid_meals { value unit note }
+										water { value unit note }
+										upcoming
 									}
-									current { stage_id on_track notes }
+									upcoming
 								}
 								sources
 							}
 							teeth {
-								note possums_note teething_now teething_note
-								teeth { fdi name status erupted_date erupted_age_months typical_eruption_months sources }
-								dental_care { toothbrush toothpaste first_dental_visit sources }
+								last_updated check_frequency note possums_note teething_now teething_note
+								teeth { fdi name status erupted_date expected_months sources }
+								dental_care { toothbrush toothpaste note todoist_task { id name status due link } sources }
 							}
-							car_seat { current_stage facing facing_note next_transition sources }
+							car_seat { last_updated check_frequency current_stage facing facing_note next_transition sources }
 							swimming {
-								current_skills { id name status note }
-								upcoming_skills { id name status note }
-								safety_note sources
+								last_updated check_frequency
+								skills { id title status detail }
+								note sources
 							}
 							milestones {
-								note
-								movement { id title status detail tag achieved_age_weeks textbook_age_weeks weeks_early sources }
-								fine_motor { id title status detail tag achieved_age_weeks textbook_age_weeks weeks_early sources }
-								development { id title status detail tag sources }
+								last_updated check_frequency note
+								items { id category title status detail achieved_date expected_weeks sources }
 							}
-							auslan { note signs { id name status tip } sources }
+							auslan { 
+								last_updated check_frequency note sources
+								signs { 
+									id name status tip 
+									reference { url video note}
+								}
+							}
 							sleep {
-								framework
+								last_updated check_frequency framework
 								current_pattern {
-									naps_per_day nap_transition nap_duration_range_min nap_duration_range_max
+									naps nap_transition nap_duration_range_min nap_duration_range_max
 									nap_duration_typical total_daytime_sleep_approx nap_cap nap_cutoff bedtime typical_wake
-									night_waking_pattern suspected_cause notes
+									night_waking_pattern suspected_cause note
 								}
 								items { id title status detail tag sources }
 							}
@@ -92,9 +110,9 @@
 								current_sizes sleep_sacks_on_hand { tog sizes material note } size_watch
 							}
 							clothing_seasonal {
-								note current_sizes size_nudge
+								note current_sizes current_sizes_note
 								noongar_season { current current_period current_description next next_period next_description weeks_until_next }
-								alerts { id type title body action weeks_ahead }
+								alerts { id type title detail action weeks_ahead }
 							}
 							clothing_daytime {
 								note layer_rule feet_rule
@@ -104,24 +122,24 @@
 								rain_suit { recommended trigger note }
 								current_recommendation {
 									generated_from_temp_c generated_from_feels_like_c last_updated
-									indoor { summary layers { position type sleeve weight material } feet extras rain_suit }
-									outdoor { summary layers { position type sleeve weight material } feet extras rain_suit }
+									indoor { summary layers { position type sleeve weight material } feet extras { hat hat_reason beanie mittens sunscreen sunscreen_reason } rain_suit }
+									outdoor { summary layers { position type sleeve weight material } feet extras { hat hat_reason beanie mittens sunscreen sunscreen_reason } rain_suit }
 								}
 								forecast {
 									date day_label temp_high_c temp_low_c feels_like_high_c feels_like_low_c
 									conditions rain_expected uv_index
-									indoor { summary layers { position type sleeve weight material } feet extras rain_suit }
-									outdoor { summary layers { position type sleeve weight material } feet extras rain_suit }
+									indoor { summary layers { position type sleeve weight material } feet extras { hat hat_reason beanie mittens sunscreen sunscreen_reason } rain_suit }
+									outdoor { summary layers { position type sleeve weight material } feet extras { hat hat_reason beanie mittens sunscreen sunscreen_reason } rain_suit }
 								}
 							}
-							vaccinations { alert items { id name status detail date next_due } sources }
+							vaccinations { note items { id title status detail date next_due todoist_task { id name status due link } } sources }
 							parenting_approach { id title detail sources }
-							activities { id title detail sources }
-							sources { id name badge url desc priority approved approved_date notes }
+							activities { id title status detail sources }
+							sources { id name badge url detail priority approved note }
 							toddler_sleep_prep {
-								note
-								what_changes_from_baby_to_toddler { id title detail }
-								transition_options_when_ready { id title detail }
+								note trigger_age_weeks status
+								alert_when_due { id level title detail }
+								reading { id title note sources }
 								sources
 							}
 							food_principles {
@@ -150,11 +168,11 @@
 		}
 	});
 
-	const alertColours = {
+	const alertColours: Record<AlertType, Colour> = {
 		urgent: 'red',
-		warning: 'orange',
+		warn: 'orange',
 		info: 'blue',
-		ok: 'green'
+		ok: 'green',
 	}
 
 	let completing = $state<Set<string>>(new Set());
@@ -183,6 +201,113 @@
 		completing = next;
 	}
 
+	async function updateStatus({
+		mutation,
+		fields,
+		id,
+		status,
+		sectionKey,
+		itemsKey,
+	}: {
+		mutation: string;
+		fields: string;
+		id: string;
+		status: string;
+		sectionKey: string;
+		itemsKey: string;
+	}) {
+		const token = await getToken();
+
+		const res = await fetch('/api/graphql', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+			},
+			body: JSON.stringify({
+				query: `mutation { ${mutation}(id: "${id}", status: ${status}) { ${fields} } }`,
+			}),
+		}).then(r => r.json());
+
+		const updated = res?.data?.[mutation];
+		if (!updated) return;
+
+		data = {
+			...data,
+			[sectionKey]: {
+				...data[sectionKey],
+				[itemsKey]: data[sectionKey][itemsKey].map((item: any) =>
+					item.id === updated.id ? { ...item, ...updated } : item
+				),
+			},
+		};
+		setCache('small-human', { smallHuman: data });
+	}
+
+	const updateMilestoneStatus = (id: string, status: MilestoneStatus) =>
+		updateStatus({ mutation: 'updateMilestoneStatus', fields: 'id status achieved_date', id, status, sectionKey: 'milestones', itemsKey: 'items' });
+
+	const updateSwimSkillStatus = (id: string, status: MilestoneStatus) =>
+		updateStatus({ mutation: 'updateSwimSkillStatus', fields: 'id status', id, status, sectionKey: 'swimming', itemsKey: 'skills' });
+
+	const updateAuslanSignStatus = (id: string, status: SignStatus) =>
+		updateStatus({ mutation: 'updateAuslanSignStatus', fields: 'id status', id, status, sectionKey: 'auslan', itemsKey: 'signs' });
+
+	async function markToothErupted(fdi: number) {
+		const token = await getToken();
+
+		const res = await fetch('/api/graphql', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+			},
+			body: JSON.stringify({
+				query: `mutation { markToothErupted(fdi: ${fdi}) { fdi status erupted_date } }`,
+			}),
+		}).then(r => r.json());
+
+		const updated = res?.data?.markToothErupted;
+		if (!updated) return;
+
+		data = {
+			...data,
+			teeth: {
+				...data.teeth,
+				teeth: data.teeth.teeth.map((t: any) =>
+					t.fdi === updated.fdi ? { ...t, ...updated } : t
+				),
+			},
+		};
+		setCache('small-human', { smallHuman: data });
+	}
+
+	// TODO: Split sections of data out into separate variables, eg. const { teeth, auslan, vaccinations, etc } = data
+
+	const ageDisplay = $derived.by(() => {
+		const ageWeeks = data?.meta?.age_weeks;
+		if (ageWeeks == null) return '';
+		const ageMonths = Math.floor(ageWeeks / 4.345);
+		const remainingWeeks = Math.round(ageWeeks - ageMonths * 4.345);
+		return ageMonths > 0
+			? `${ageMonths} month${ageMonths !== 1 ? 's' : ''} ${remainingWeeks} week${remainingWeeks !== 1 ? 's' : ''}`
+			: `${ageWeeks} week${ageWeeks !== 1 ? 's' : ''}`;
+	});
+
+	const milestones = $derived.by(() => {
+		const items = data?.milestones?.items ?? [];
+		return [...items].sort((a, b) => {
+			const aWeek = a.expected_weeks?.[0] ?? Infinity;
+			const bWeek = b.expected_weeks?.[0] ?? Infinity;
+			return aWeek - bWeek;
+		});
+	});
+
+	const feedingStage = $derived({
+		current: data?.feeding?.schedule?.stages?.find((s: any) => s.id === data.feeding.schedule.upcoming?.[0]),
+		upcoming: data?.feeding?.schedule?.stages?.find((s: any) => s.id === data.feeding.schedule.upcoming?.[1])
+	})
+
 </script>
 
 <svelte:head>
@@ -202,145 +327,157 @@
 {:else if !data}
 	<p>No data available</p>
 {:else}
-<h2>Overview</h2>
+	<h2 id="overview">Overview</h2>
+
+	<!-- Complete -->
 	<Stats items={[
 		{ name: 'Last Updated', value: data.meta.last_updated, colour: 'blue_navy' },
-		{ name: 'Age', value: data.meta.age_display, colour: 'blue_navy' },
+		{ name: 'Age', value: ageDisplay, colour: 'blue_navy' },
 	]} />
 	<Cards>
+		<!-- TODO: Sort by urgency, most urgent first, but apply at api level, via graphql, add sorting options -->
 		{#each data.alerts as alert}
-			<Card
-			title={alert.title}
-				colour={alertColours[alert.type]}	
-			>
-				{alert.body}
+			<Card {...alert} colour={alertColours[alert.level]}>
+				<p>{alert.detail}</p>
 			</Card>
 		{/each}
-		<Card
-		title="Car Seat"
-		>
+		<Card title="Car Seat">
 			<p>{data.car_seat.facing_note}</p>
 			<p>{data.car_seat.next_transition}</p>
 		</Card>
 	</Cards>
-	<Growth growth={data.growth} />
-	
-	<Teeth teeth={data.teeth} />
-	<section>
-		<h2>Swimming</h2>
-		<p>{data.swimming.safety_note}</p>
+
+	<details name="section">
+		<summary><h2>Growth</h2></summary>
+		<Growth growth={data.growth} />
+	</details>
+
+	<details name="section">
+		<summary><h2>Teeth</h2></summary>
+		<Teeth teeth={data.teeth} birth={data.meta.birth_month} onMarkErupted={markToothErupted} />
+	</details>
+
+	<details name="section">
+		<summary><h2>Swimming</h2></summary>
+		<p>{data.swimming.note}</p>
 		<Cards>
-			{#each data.swimming.upcoming_skills as m}
-				<Card
-				title={m.name}
-				>
-					<p>{m.note}</p>
-					<span>{m.status}</span>
-				</Card>
-			{/each}
-			{#each data.swimming.current_skills as m}
-				<Card
-				title={m.name}
-				>
-					<p>{m.note}</p>
-					<span>{m.status}</span>
-				</Card>
+			{#each data.swimming.skills as m}
+				<Milestone {...m} onStatusChange={updateSwimSkillStatus} />
 			{/each}
 		</Cards>
-	</section>
-	<section>
-		<h2>Milestones</h2>
+	</details>
+	<details name="section">
+		<summary><h2 id="milestones">Milestones</h2></summary>
 		<p>{data.milestones.note}</p>
 		<Cards>
-			{#each data.milestones.movement as m}
-				<Card
-				title={m.title}
-				>
-					<p>{m.detail}</p>
-					<span>{m.textbook_age_weeks}</span>
-					<span>{m.status}</span>
-					<span>{m.textbook_age_weeks}</span>
-					<span>Movement</span>
-				</Card>
-			{/each}
-			{#each data.milestones.fine_motor as m}
-				<Card
-				title={m.title}
-				>
-					<p>{m.detail}</p>
-					<span>{m.textbook_age_weeks}</span>
-					<span>{m.status}</span>
-					<span>{m.textbook_age_weeks}</span>
-					<span>Fine Movement</span>
-				</Card>
-			{/each}
-			{#each data.milestones.development as m}
-				<Card
-				title={m.title}
-				>
-					<p>{m.detail}</p>
-					<span>{m.status}</span>
-					<span>Development</span>
-				</Card>
+			{#each milestones as m}
+				<Milestone {...m} type={m.category} onStatusChange={updateMilestoneStatus} />
 			{/each}
 		</Cards>
-	</section>
-	<section>
-		<h2>Auslan</h2>
+	</details>
+	<details name="section">
+		<summary><h2 id="auslan">Auslan</h2></summary>
 		<p>{data.auslan.note}</p>
 		<Cards>
 			{#each data.auslan.signs as s}
-				<Card
-				title={s.name}
-				>
-					<p>{s.tip}</p>
-					<span>{s.status}</span>
-				</Card>
+				<Auslan {...s} onStatusChange={updateAuslanSignStatus} />
 			{/each}
 		</Cards>
-	</section>
-	<section>
-		<h2>Feeding</h2>
+	</details>
+	<details name="section">
+		<summary><h2 id="feeding">Feeding</h2></summary>
+		{#if feedingStage.current}
+			<h3>Current Stage - {feedingStage.current.title}</h3>
+			<Stats
+				items={[
+					{
+						name: 'Breastfeeds',
+						value: formatValueNote(feedingStage.current.breastfeeds),
+						Icon: Breasts as Component
+					},
+					{
+						name: 'Solid Meals',
+						value: formatValueNote(feedingStage.current.solid_meals),
+						Icon: Food as Component
+					},
+					{
+						name: 'Water',
+						value: formatValueNote(feedingStage.current.water),
+						Icon: Water as Component
+					}
+				]}
+			/>
+		{/if}
+		{#if feedingStage.upcoming}
+			<h3>Upcoming Stage - {feedingStage.upcoming.title}</h3>
+			<Stats
+				items={[
+					{
+						name: 'Breastfeeds',
+						value: formatValueNote(feedingStage.current.breastfeeds),
+						Icon: Breasts as Component
+					},
+					{
+						name: 'Solid Meals',
+						value: formatValueNote(feedingStage.current.solid_meals),
+						Icon: Food as Component
+					},
+					{
+						name: 'Water',
+						value: formatValueNote(feedingStage.current.water),
+						Icon: Water as Component
+					}
+				]}
+			/>
+		{/if}
 		<pre><code>{JSON.stringify(data.feeding, null, 2)}</code></pre>
-	</section>
-	<section>
-		<h2>Sleep</h2>
+	</details>
+	<details name="section">
+		<summary><h2>Sleep</h2></summary>
 		<pre><code>{JSON.stringify(data.sleep, null, 2)}</code></pre>
-	</section>
-	<section>
-		<h2>Sleep Environment</h2>
+	</details>
+	<details name="section">
+		<summary><h2>Sleep Environment</h2></summary>
 		<pre><code>{JSON.stringify(data.sleep_environment, null, 2)}</code></pre>
-	</section>
-	<section>
-		<h2>Clothing Seasonal</h2>
+	</details>
+	<details name="section">
+		<summary><h2>Clothing Seasonal</h2></summary>
 		<pre><code>{JSON.stringify(data.clothing_seasonal, null, 2)}</code></pre>
-	</section>
-	<section>
-		<h2>Clothing Daytime</h2>
+	</details>
+	<details name="section">
+		<summary><h2>Clothing Daytime</h2></summary>
 		<pre><code>{JSON.stringify(data.clothing_daytime, null, 2)}</code></pre>
-	</section>
-	<section>
-		<h2>Vaccinations</h2>
-		<p>{data.vaccinations.alert}</p>
+	</details>
+	<details name="section">
+		<summary><h2>Vaccinations</h2></summary>
+		<p>{data.vaccinations.note}</p>
 		<Cards>
-			{#each data.vaccinations.items as s}
+			<!-- TODO: Sort by newest todoist date, then by next_due, then by date, but apply sorting at api level, when returning via graphql, add sorting options -->
+			{#each data.vaccinations.items as v}
 				<Card
-				title={s.name}
+					title={v.title}
+					icon={v.todoist_task ? 'calendar' : 'vaccine'}
+					footer={v.todoist_task && formatDate(new Date(v.todoist_task.due), 'dd MMM')}
 				>
-					<p>{s.detail}</p>
-					<span>{s.date}</span>
-					<span>{s.next_due}</span>
-					<span>{s.status}</span>
+					<p>{v.detail}</p>
 				</Card>
 			{/each}
 		</Cards>
-	</section>
-	<section>
-		<h2>Parenting Approach</h2>
-		<pre><code>{JSON.stringify(data.parenting_approach, null, 2)}</code></pre>
-	</section>
-	<section>
-		<h2>Activities</h2>
+	</details>
+	<details name="section">
+		<summary><h2>Parenting Approach</h2></summary>
+		<Cards>
+			{#each data.parenting_approach as a}
+				<Card
+				title={a.title}
+				>
+					<p>{a.detail}</p>
+				</Card>
+			{/each}
+		</Cards>
+	</details>
+	<details name="section">
+		<summary><h2>Activities</h2></summary>
 		<Cards>
 			{#each data.activities as a}
 				<Card
@@ -350,29 +487,50 @@
 				</Card>
 			{/each}
 		</Cards>
-	</section>
-	<section>
-		<h2>Toddler Sleep Prep</h2>
-		<pre><code>{JSON.stringify(data.toddler_sleep_prep, null, 2)}</code></pre>
-	</section>
-	<section>
-		<h2>Food Principles</h2>
-		<pre><code>{JSON.stringify(data.food_principles, null, 2)}</code></pre>
-	</section>
-	<section>
-		<h2>Sources</h2>
-		<Cards>
-			{#each data.sources as a}
-				<Card
-				title={a.name}
-				>
-					<p>{a.desc}</p>
-					<p>{a.notes}</p>
-					<a href={a.url} target="_blank">{a.url.replace('https://', '')}</a>
-				</Card>
-			{/each}
-		</Cards>
-	</section>
+	</details>
+	<details name="section">
+		<summary><h2>Toddler Sleep Prep</h2></summary>
+		<p>{data.toddler_sleep_prep.note}</p>
+		{#if data.toddler_sleep_prep.status === 'due'}
+			<Card
+				title={data.toddler_sleep_prep.alert_when_due.title}
+				colour={alertColours[data.toddler_sleep_prep.alert_when_due.level as AlertType]}
+			>
+				<p>{data.toddler_sleep_prep.alert_when_due.detail}</p>
+			</Card>
+		{:else}
+			<Pill colour="blue">Not yet due</Pill>
+		{/if}
+		<h3>Reading</h3>
+		{#each data.toddler_sleep_prep.reading as i}
+			<h4>{i.title}</h4>
+			<p>{i.note}</p>
+		{/each}
+	</details>
+	<details name="section">
+		<summary><h2>Food Principles</h2></summary>
+		<p>{data.food_principles.core_philosophy}</p>
+		<p>{data.food_principles.note}</p>
+		<h3>Current Principles</h3>
+		{#each data.food_principles.current_and_ongoing as i}
+			<h4>{i.title}</h4>
+			<p>{i.detail}</p>
+		{/each}
+		<h3>What to expect from a toddler</h3>
+		{#each data.food_principles.toddler_forward_look as i}
+			<h4>{i.title}</h4>
+			<p>{i.detail}</p>
+		{/each}
+	</details>
+	<details name="section">
+		<summary><h2>Sources</h2></summary>
+		{#each data.sources as s}
+			<h3>{s.name}</h3>
+			<p>{s.detail}</p>
+			{#if s.note}<p>{s.note}</p>{/if}
+			<a href={s.url} target="_blank">{s.url.replace('https://', '')}</a>
+		{/each}
+	</details>
 {/if}
 
 <style>
@@ -381,7 +539,6 @@
 	section {
 		margin-bottom: 2em;
 		padding-bottom: 1em;
-		border-bottom: 1px solid var(--grey_light);
 	}
 
 	h2 {
@@ -402,5 +559,25 @@
 		flex-wrap: wrap;
 		gap: 0.5em;
 		margin-bottom: 2em;
+	}
+
+	details {
+		
+	}
+
+	summary {
+		cursor: pointer;
+
+		& h2 {
+			display: inline;
+			margin: 0;
+			font-size: 1em;
+		}
+
+		&:has(h2) {
+			color: var(--navy);
+			font-size: 1.5em;
+			margin-top: 1em;
+		}
 	}
 </style>
