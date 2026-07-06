@@ -24,6 +24,9 @@ export type Alert = {
   title: Scalars['String']['output'];
 };
 
+export type AlertOrderBy =
+  | 'urgency';
+
 export type AlertType =
   | 'info'
   | 'ok'
@@ -950,6 +953,11 @@ export type TrackerData = {
   vaccinations: Vaccinations;
 };
 
+
+export type TrackerDataAlertsArgs = {
+  orderBy?: InputMaybe<AlertOrderBy>;
+};
+
 export type User = {
   colour: Maybe<Colour>;
   ids: Maybe<UserIds>;
@@ -973,6 +981,9 @@ export type VaccinationItem = {
   todoist_task: Maybe<Task>;
 };
 
+export type VaccinationOrderBy =
+  | 'due_date';
+
 export type VaccinationStatus =
   | 'done'
   | 'upcoming'
@@ -984,6 +995,11 @@ export type Vaccinations = {
   last_updated: Scalars['String']['output'];
   note: Scalars['String']['output'];
   sources: Array<Scalars['String']['output']>;
+};
+
+
+export type VaccinationsItemsArgs = {
+  orderBy?: InputMaybe<VaccinationOrderBy>;
 };
 
 export type ValueNote = {

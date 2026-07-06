@@ -45,7 +45,7 @@
 							meta {
 								last_updated age_weeks birth_month
 							}
-							alerts { id level title detail }
+							alerts(orderBy: urgency) { id level title detail }
 							growth {
 								last_updated check_frequency note trend_notes
 								measurements {
@@ -132,7 +132,7 @@
 									outdoor { summary layers { position type sleeve weight material } feet extras { hat hat_reason beanie mittens sunscreen sunscreen_reason } rain_suit }
 								}
 							}
-							vaccinations { note items { id title status detail date next_due todoist_task { id name status due link } } sources }
+							vaccinations { note items(orderBy: due_date) { id title status detail date next_due todoist_task { id name status due link } } sources }
 							parenting_approach { id title detail sources }
 							activities { id title status detail sources }
 							sources { id name badge url detail priority approved note }
@@ -335,7 +335,6 @@
 		{ name: 'Age', value: ageDisplay, colour: 'blue_navy' },
 	]} />
 	<Cards>
-		<!-- TODO: Sort by urgency, most urgent first, but apply at api level, via graphql, add sorting options -->
 		{#each data.alerts as alert}
 			<Card {...alert} colour={alertColours[alert.level]}>
 				<p>{alert.detail}</p>
@@ -452,7 +451,6 @@
 		<summary><h2>Vaccinations</h2></summary>
 		<p>{data.vaccinations.note}</p>
 		<Cards>
-			<!-- TODO: Sort by newest todoist date, then by next_due, then by date, but apply sorting at api level, when returning via graphql, add sorting options -->
 			{#each data.vaccinations.items as v}
 				<Card
 					title={v.title}
