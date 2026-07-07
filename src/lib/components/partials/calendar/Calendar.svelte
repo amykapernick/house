@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { Calendar, TimeGrid, DayGrid, List, Interaction } from '@event-calendar/core';
-	import '@event-calendar/core/index.css';
+	import { TimeGrid, DayGrid, List, Interaction } from '@event-calendar/core';
 	import { parseISO, setHours } from 'date-fns';
+	import CalendarBase from './CalendarBase.svelte';
 	import parseTasks from '$utils/calendar/parseTasks';
 	import parseEvents from '$utils/calendar/parseEvents';
 	import type { Task } from '$types/tasks';
@@ -75,13 +75,11 @@
 		return base;
 	});
 
-	let options = $state({
+	const optionsOverride = {
 		view: 'timeGridWeek',
-		locale: 'en-AU',
-		firstDay: 1,
 		editable: false,
 		selectable: true,
-		events: [] as any[],
+		dayMaxEvents: true,
 		viewDidMount: (info: any) => {
 			currentView = info?.type ?? info?.view?.type ?? 'timeGridWeek';
 		},
@@ -97,10 +95,6 @@
 			timeGridDay: 'Day',
 			listMonth: 'List',
 		},
-		nowIndicator: true,
-		dayMaxEvents: true,
-		slotDuration: '00:30',
-		scrollTime: '08:00',
 		eventContent: (info: any) => {
 			const { type } = info.event.extendedProps;
 			let icon = '●';
@@ -118,28 +112,8 @@
 				window.open(link, '_blank');
 			}
 		},
-	});
-
-	$effect(() => {
-		options.events = calendarEvents;
-	});
+	};
 </script>
 
-<div class="calendar-container">
-	<Calendar plugins={[TimeGrid, DayGrid, List, Interaction]} {options} />
-</div>
-
-<style>
-	.calendar-container {
-		height: 80vh;
-
-		:global(.ec) {
-			font-family: inherit;
-		}
-
-		:global(.ec-toolbar) {
-			flex-wrap: wrap;
-			gap: 10px;
-		}
-	}
-</style>
+<!-- TODO: Allow filtering calendar items by user -->
+<CalendarBase plugins={[TimeGrid, DayGrid, List, Interaction]} events={calendarEvents} {optionsOverride} />

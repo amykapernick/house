@@ -1,5 +1,5 @@
 <script lang="ts">
-	import CalendarView from '$partials/Calendar.svelte';
+	import CalendarView from '$components/partials/calendar/Calendar.svelte';
 	import { isAuthenticated } from '$lib/auth';
 	import fetchClientData from '$utils/fetchClientData';
 	import type { Task } from '$types/tasks';

@@ -3,6 +3,7 @@
   "version": "3.0.0",
   "private": true,
   "scripts": {
+    "predev": "npm run generate",
     "dev": "vite dev",
     "build": "vite build",
     "build:local": "npm run build",

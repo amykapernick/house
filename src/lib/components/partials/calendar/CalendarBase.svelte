@@ -1,0 +1,50 @@
+<script lang="ts">
+	import { Calendar } from '@event-calendar/core';
+	import '@event-calendar/core/index.css';
+
+	let {
+		plugins,
+		events = [],
+		optionsOverride = {},
+	}: {
+		plugins: any[];
+		events: any[];
+		optionsOverride?: Record<string, any>;
+	} = $props();
+
+	// svelte-ignore state_referenced_locally -- optionsOverride is a static config object per caller, not a value that changes after mount
+	let options = $state({
+		locale: 'en-AU',
+		firstDay: 1,
+		nowIndicator: true,
+		slotDuration: '00:30',
+		scrollTime: '08:00',
+		...optionsOverride,
+		events: [] as any[],
+	});
+
+	$effect(() => {
+		options.events = events;
+	});
+</script>
+
+<!-- TODO: Look into resource calendar options for user and calendar -->
+
+<div class="calendar-container">
+	<Calendar {plugins} {options} />
+</div>
+
+<style>
+	.calendar-container {
+		height: 80vh;
+
+		:global(.ec) {
+			font-family: inherit;
+		}
+
+		:global(.ec-toolbar) {
+			flex-wrap: wrap;
+			gap: 10px;
+		}
+	}
+</style>

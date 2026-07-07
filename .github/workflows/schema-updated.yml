@@ -1,0 +1,54 @@
+name: Regenerate GraphQL Types
+
+on:
+  repository_dispatch:
+    types: [schema-updated]
+
+jobs:
+  regenerate-types:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: prod
+
+      - name: Write schema files from kaperscrewe_api
+        env:
+          SCHEMA_FILES: ${{ toJson(github.event.client_payload.files) }}
+        run: |
+          node -e "
+            const fs = require('fs');
+            const path = require('path');
+            const files = JSON.parse(process.env.SCHEMA_FILES);
+            for (const [relPath, content] of Object.entries(files)) {
+              const dest = path.join('..', 'household_api', relPath);
+              fs.mkdirSync(path.dirname(dest), { recursive: true });
+              fs.writeFileSync(dest, content);
+            }
+          "
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Regenerate GraphQL types
+        run: npm run generate
+
+      - name: Commit updated types
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add src/lib/types/generated.ts
+          if git diff --cached --quiet; then
+            echo "No type changes"
+          else
+            git commit -m "chore: regenerate GraphQL types from schema update (kaperscrewe_api@${{ github.event.client_payload.sha }})"
+            git push origin HEAD:prod
+          fi

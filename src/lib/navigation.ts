@@ -8,6 +8,8 @@ import Plan from '$img/icons/diet-plan.svg?component';
 import Cart from '$img/icons/cart.svg?component';
 import Recipes from '$img/icons/recipe-book-47.svg?component';
 import Baby from '$img/icons/baby.svg?component';
+import Schedule from '$img/icons/calendar-day-view.svg?component'
+import Budget from '$img/icons/chart-bar-33.svg?component'
 
 export const menuItems: MenuItem[] = [
 	{
@@ -26,6 +28,18 @@ export const menuItems: MenuItem[] = [
 		link: resolve(`/calendar`),
 		auth: true,
 		Icon: Calendar
+	},
+	{
+		label: `Schedule`,
+		link: resolve(`/schedule`),
+		auth: true,
+		Icon: Schedule
+	},
+	{
+		label: `Budget`,
+		link: resolve(`/budget`),
+		auth: true,
+		Icon: Budget
 	},
 	{
 		label: `Recipes`,

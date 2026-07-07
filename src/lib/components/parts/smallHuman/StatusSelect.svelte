@@ -2,6 +2,7 @@
 	import Icon from "../Icon.svelte";
 	import type { IconName } from "../Icon.svelte";
 	import Modal from "../Modal.svelte";
+	import Select from "../Select.svelte";
 
 	const {
 		id,
@@ -19,6 +20,10 @@
 	let pendingValue = $state<Status | null>(null);
 	let confirmOpen = $state(false);
 	let confirmed = false;
+
+	let options = $derived(
+		Object.entries(labels).map(([value, label]) => ({ value: value as Status, label: label as string }))
+	);
 
 	function handleChange() {
 		pendingValue = selectedValue;
@@ -40,23 +45,12 @@
 	});
 </script>
 
-<label class="sr-only" for="status-{id}">Change Status</label>
-<select
-	class="select"
-	id="status-{id}"
-	bind:value={selectedValue}
-	onchange={handleChange}
->
-	<button>
-        <selectedcontent></selectedcontent>
-	</button>
-	{#each Object.entries(labels) as [value, label] (value)}
-		<option {value}>
-			<Icon name={value as Status} />
-			<span class="label">{label}</span>
-		</option>
-	{/each}
-</select>
+<Select id="status-{id}" label="Change Status" bind:value={selectedValue} {options} onchange={handleChange}>
+	{#snippet children(option)}
+		<Icon name={option.value} />
+		<span class="label">{option.label}</span>
+	{/snippet}
+</Select>
 
 <Modal bind:open={confirmOpen} title="Change status?">
 	{#if pendingValue}
@@ -69,12 +63,6 @@
 </Modal>
 
 <style>
-	.select {
-		&, &::picker(select) {
-			appearance: base-select;
-		}
-	}
-
 	.confirm_actions {
 		display: flex;
 		gap: 0.5em;
