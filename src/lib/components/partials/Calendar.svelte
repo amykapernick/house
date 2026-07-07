@@ -18,7 +18,7 @@
 		mealPlans: any[];
 	} = $props();
 
-	let currentView = $state('dayGridMonth');
+	let currentView = $state('dayGridWeek');
 
 	let calendarEvents = $derived.by(() => {
 		const taskEvents = parseTasks(tasks);
@@ -76,7 +76,7 @@
 	});
 
 	let options = $state({
-		view: 'dayGridMonth',
+		view: 'dayGridWeek',
 		locale: 'en-AU',
 		firstDay: 1,
 		editable: true,
