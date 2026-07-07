@@ -17,7 +17,8 @@ function getCached(key: string): any | null {
 		const { data, timestamp } = JSON.parse(cached);
 		if (Date.now() - timestamp > CACHE_TTL) return null;
 		return data;
-	} catch {
+	}
+	catch {
 		return null;
 	}
 }
@@ -25,7 +26,8 @@ function getCached(key: string): any | null {
 export function setCache(key: string, data: any) {
 	try {
 		localStorage.setItem(`cache:${key}`, JSON.stringify({ data, timestamp: Date.now() }));
-	} catch {}
+	}
+	catch {}
 }
 
 const fetchClientData = async (props: FetchClientDataProps) => {
@@ -37,7 +39,8 @@ const fetchClientData = async (props: FetchClientDataProps) => {
 			if (onStale) {
 				// Stale-while-revalidate: show cached immediately, fetch fresh below
 				onStale(cached);
-			} else {
+			}
+			else {
 				return cached;
 			}
 		}
@@ -46,19 +49,19 @@ const fetchClientData = async (props: FetchClientDataProps) => {
 	const token = await getToken();
 
 	const headers: Record<string, string> = {
-		'Content-Type': 'application/json',
+		'Content-Type': `application/json`,
 	};
 
 	if (token) {
-		headers['Authorization'] = `Bearer ${token}`;
+		headers[`Authorization`] = `Bearer ${token}`;
 	}
 
 	const apiUrl = import.meta.env.VITE_API_URL
 		? `${import.meta.env.VITE_API_URL}/graphql`
-		: '/api/graphql';
+		: `/api/graphql`;
 
 	const result = await fetch(apiUrl, {
-		method: 'POST',
+		method: `POST`,
 		headers,
 		body: JSON.stringify({ query: gqlQuery }),
 	})

@@ -3,10 +3,12 @@
 	import { isAuthenticated, clerk } from '$lib/auth';
 	import { menuItems } from '$lib/navigation';
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 
 	function handleSignIn() {
-		goto(`/sign-in?redirect=${encodeURIComponent(page.url.pathname)}`);
+		// eslint-disable-next-line svelte/no-navigation-without-resolve -- resolve() is used; the rule can't trace it through template-literal concatenation with the query string
+		goto(`${resolve('/sign-in')}?redirect=${encodeURIComponent(page.url.pathname)}`);
 	}
 
 	function handleSignOut() {
@@ -15,7 +17,7 @@
 </script>
 
 <header class="header">
-	<a href="/" class="title">🏡</a>
+	<a href={resolve('/')} class="title">🏡</a>
 	<MainMenu {menuItems} isAuthenticated={$isAuthenticated}>
 		{#if $isAuthenticated}
 			<li>

@@ -17,7 +17,7 @@
 </script>
 
 <div class="board" style="--columns: {columnCount}">
-	{#each Object.entries(parsedTasks) as [status, statusTasks]}
+	{#each Object.entries(parsedTasks) as [status, statusTasks] (status)}
 		<div class="column">
 			<h2>{status}</h2>
 			<ul class="list">

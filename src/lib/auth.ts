@@ -7,8 +7,8 @@ export const isAuthenticated = derived(clerk, ($clerk) => !!$clerk?.session);
 export const user = derived(clerk, ($clerk) => $clerk?.user ?? null);
 
 export async function initClerk(publishableKey: string) {
-	const { Clerk } = await import('@clerk/clerk-js');
-	const { ClerkUI } = await import('@clerk/ui/entry');
+	const { Clerk } = await import(`@clerk/clerk-js`);
+	const { ClerkUI } = await import(`@clerk/ui/entry`);
 	const clerkInstance = new Clerk(publishableKey);
 	await clerkInstance.load({ ui: { ClerkUI } });
 

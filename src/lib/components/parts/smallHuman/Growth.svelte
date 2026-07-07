@@ -54,10 +54,6 @@
 	</figure>
 
 <style>
-	h2 {
-		color: var(--green);
-	}
-
 	.trend {
 		font-size: 0.9rem;
 		opacity: 0.7;

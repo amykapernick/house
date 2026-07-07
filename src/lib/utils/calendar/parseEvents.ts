@@ -8,7 +8,7 @@ const parseEvents = (events: any[]): Event[] => {
 			title: event.name,
 			status: event.status,
 			allDay: event.allDay ?? true,
-			type: 'event' as const,
+			type: `event` as const,
 			start: new Date(event.dates.start),
 			end: event.dates?.end ? new Date(event.dates.end) : new Date(event.dates.start),
 			colour: event.colour,

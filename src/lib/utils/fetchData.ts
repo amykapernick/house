@@ -1,5 +1,5 @@
-import { env } from '$env/dynamic/private';
 import type { Query } from '$types/graphql';
+import { env } from '$env/dynamic/private';
 
 type FetchDataProps = {
 	gqlQuery: string
@@ -9,15 +9,15 @@ type FetchDataProps = {
 const fetchData = async (props: FetchDataProps): Promise<Query> => {
 	const { gqlQuery, token } = props;
 	const headers: Record<string, string> = {
-		'Content-Type': 'application/json',
+		'Content-Type': `application/json`,
 	};
 
 	if (token) {
-		headers['Authorization'] = `Bearer ${token}`;
+		headers[`Authorization`] = `Bearer ${token}`;
 	}
 
 	const options: RequestInit = {
-		method: 'POST',
+		method: `POST`,
 		headers,
 		body: JSON.stringify({
 			query: gqlQuery,

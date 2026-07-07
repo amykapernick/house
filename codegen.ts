@@ -1,14 +1,14 @@
 import type { CodegenConfig } from '@graphql-codegen/cli';
 
 const config: CodegenConfig = {
-	schema: '../household_api/src/graphql/**/*.graphql',
+	schema: `../household_api/src/graphql/**/*.graphql`,
 	generates: {
 		'./src/lib/types/generated.ts': {
-			plugins: ['typescript'],
+			plugins: [`typescript`],
 			config: {
 				enumsAsTypes: true,
 				skipTypename: true,
-				declarationKind: 'type',
+				declarationKind: `type`,
 				avoidOptionals: {
 					field: true,
 					inputValue: false,

@@ -2,26 +2,26 @@
 	import type { Component } from "svelte";
 	import type { MilestoneStatus, SignStatus } from "$types/generated";
 	import Calendar from '$img/icons/calendar-date.svg?component'
-	import Watch from '$img/icons/time-machine.svg'
-	import Checked from '$img/icons/s-check.svg'
-	import Unchecked from '$img/icons/s-unchecked.svg'
-	import Progress from '$img/icons/progress-indicator.svg'
-	import View from '$img/icons/view.svg'
-	import Syringe from '$img/icons/syringe.svg'
+	import Watch from '$img/icons/time-machine.svg?component'
+	import Checked from '$img/icons/s-check.svg?component'
+	import Unchecked from '$img/icons/s-unchecked.svg?component'
+	import Progress from '$img/icons/progress-indicator.svg?component'
+	import View from '$img/icons/view.svg?component'
+	import Syringe from '$img/icons/syringe.svg?component'
 
 	export type IconName = MilestoneStatus | SignStatus | 'calendar' | 'vaccine';
 
 	const icons: Record<IconName, Component> = {
-		calendar: Calendar as Component,
-		done: Checked as Component,
-		in_progress: Progress as Component,
-		upcoming: Unchecked as Component,
-		watch: Watch as Component,
-		introduce_next: Unchecked as Component,
-		signing_occasionally: Progress as Component,
-		recognises: View as Component,
-		coming_soon: Watch as Component,
-		vaccine: Syringe as Component,
+		calendar: Calendar,
+		done: Checked,
+		in_progress: Progress,
+		upcoming: Unchecked,
+		watch: Watch,
+		introduce_next: Unchecked,
+		signing_occasionally: Progress,
+		recognises: View,
+		coming_soon: Watch,
+		vaccine: Syringe,
 	};
 
 	const { name }: { name: IconName } = $props();
@@ -43,6 +43,7 @@
 		const svg = wrapper.querySelector('svg');
 		if (!svg) return;
 
+		// eslint-disable-next-line svelte/prefer-svelte-reactivity -- built and discarded synchronously within this effect, never read reactively
 		const idMap = new Map<string, string>();
 		svg.querySelectorAll('[id]').forEach((el) => {
 			const newId = `${el.id}-${uid}`;

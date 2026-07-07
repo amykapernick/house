@@ -2,6 +2,7 @@
 	import { isAuthenticated } from '$lib/auth';
 	import { format, subDays, addDays, intervalToDuration } from 'date-fns';
 	import fetchClientData from '$utils/fetchClientData';
+	import { resolve } from '$app/paths';
 
 	let meals = $state<any[]>([]);
 	let loading = $state(true);
@@ -49,6 +50,7 @@
 	});
 
 	let weekRecipes = $derived.by(() => {
+		// eslint-disable-next-line svelte/prefer-svelte-reactivity -- built and discarded synchronously within this derivation, never read reactively
 		const seen = new Set<string>();
 		const recipes: any[] = [];
 		for (const meal of meals) {
@@ -69,7 +71,7 @@
 <section class="widget">
 	<div class="widget-header">
 		<h2>This week's meals</h2>
-		<a href="/meal-plan">View all</a>
+		<a href={resolve('/meal-plan')}>View all</a>
 	</div>
 
 	{#if loading}
@@ -78,8 +80,8 @@
 		<p class="empty">No meals planned this week.</p>
 	{:else}
 		<div class="grid">
-			{#each weekRecipes as recipe}
-				<a class="card" href="/recipes/{recipe.slug}">
+			{#each weekRecipes as recipe (recipe.slug)}
+				<a class="card" href={resolve('/recipes/[slug]', { slug: recipe.slug })}>
 					{#if recipe.image}
 						<img src={recipe.image} alt={recipe.name} loading="lazy" />
 					{:else}
@@ -96,7 +98,7 @@
 						</div>
 						{#if recipe.tags?.length}
 							<ul class="tags">
-								{#each recipe.tags as tag}
+								{#each recipe.tags as tag (tag.slug)}
 									<li>{tag.name}</li>
 								{/each}
 							</ul>
@@ -170,7 +172,7 @@
 		& .no-image {
 			width: 100%;
 			height: 140px;
-			background: rgba($purple_bright, 0.08);
+			background: color-mix(in srgb, var(--purple_bright) 8%, transparent);
 		}
 	}
 

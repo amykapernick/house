@@ -65,5 +65,5 @@ export type {
 	ToddlerPrepStatus,
 	ReadingItem,
 	FoodPrinciples,
-	FoodPrincipleItem,
+	FoodPrincipleItem
 } from './generated';

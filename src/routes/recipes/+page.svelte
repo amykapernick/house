@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { intervalToDuration } from 'date-fns';
 	import fetchClientData from '$utils/fetchClientData';
+	import { resolve } from '$app/paths';
 
 	function formatMinutes(mins: number | string | null): string {
 		if (!mins) return '';
@@ -159,8 +160,8 @@
 <h1>Recipes</h1>
 
 <nav class="sub-nav">
-	<a href="/recipes/tags">All tags</a>
-	<a href="/meal-plan">Meal plan</a>
+	<a href={resolve('/recipes/tags')}>All tags</a>
+	<a href={resolve('/meal-plan')}>Meal plan</a>
 </nav>
 
 {#if !tagsLoading}
@@ -179,7 +180,7 @@
 		</div>
 
 		<div class="tag-list">
-			{#each filteredCloudTags() as tag}
+			{#each filteredCloudTags() as tag (tag.slug)}
 				<div class="tag-pill" class:selected={selectedTags.includes(tag.slug)}>
 					<input
 						type="checkbox"
@@ -245,8 +246,8 @@
 	<p class="count">{total} recipes</p>
 
 	<div class="grid">
-		{#each recipes as recipe}
-			<a class="card" href="/recipes/{recipe.slug}">
+		{#each recipes as recipe (recipe.slug)}
+			<a class="card" href={resolve('/recipes/[slug]', { slug: recipe.slug })}>
 				{#if recipe.image}
 					<img src={recipe.image} alt={recipe.name} loading="lazy" />
 				{:else}
@@ -263,7 +264,7 @@
 					</div>
 					{#if recipe.tags?.length}
 						<ul class="card-tags">
-							{#each recipe.tags as tag}
+							{#each recipe.tags as tag (tag.slug)}
 								<li>
 									<button
 										class="card-tag"
@@ -312,7 +313,7 @@
 	.tag-cloud {
 		margin-bottom: 1.5em;
 		padding: 1em;
-		background: rgba($blue, 0.04);
+		background: color-mix(in srgb, var(--blue) 4%, transparent);
 		border-radius: 0.5em;
 		border: 1px solid var(--grey_light);
 	}
@@ -509,7 +510,7 @@
 		& .no-image {
 			width: 100%;
 			height: 180px;
-			background: rgba($purple_bright, 0.08);
+			background: color-mix(in srgb, var(--purple_bright) 8%, transparent);
 		}
 	}
 

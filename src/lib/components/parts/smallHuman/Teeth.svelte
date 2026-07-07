@@ -1,5 +1,5 @@
 <script lang="ts">
-	import TeethGraphic from '$lib/img/smallHuman/teeth.svg';
+	import TeethGraphic from '$lib/img/smallHuman/teeth.svg?component';
 	import type { Teeth, Tooth } from '$types/smallHuman';
 	import { formatDate, differenceInMonths, parseISO } from 'date-fns';
 	import Pill from '../Pill.svelte';
@@ -21,20 +21,44 @@
 
 	let confirmingTooth = $state<Tooth | null>(null);
 	let confirmOpen = $state(false);
+	let wrapper: HTMLElement | undefined = $state();
 
-	function handleTeethClick(e: MouseEvent) {
-		if (!onMarkErupted) return;
-
-		const target = (e.target as HTMLElement).closest('[class*="t_"]');
-		const fdi = Number(target?.getAttribute('class')?.match(/t_(\d+)/)?.[1]);
+	function toothFromTarget(target: EventTarget | null): Tooth | undefined {
+		const el = (target as HTMLElement)?.closest?.('[class*="t_"]');
+		const fdi = Number(el?.getAttribute('class')?.match(/t_(\d+)/)?.[1]);
 		if (!fdi) return;
+		return teeth.teeth.find(t => t.fdi === fdi);
+	}
 
-		const tooth = teeth.teeth.find(t => t.fdi === fdi);
-		if (!tooth || tooth.status === 'erupted') return;
-
+	function tryOpenConfirm(tooth: Tooth | undefined) {
+		if (!onMarkErupted || !tooth || tooth.status === 'erupted') return;
 		confirmingTooth = tooth;
 		confirmOpen = true;
 	}
+
+	function handleTeethClick(e: MouseEvent) {
+		tryOpenConfirm(toothFromTarget(e.target));
+	}
+
+	function handleTeethKeydown(e: KeyboardEvent) {
+		if (e.key !== 'Enter' && e.key !== ' ') return;
+		const tooth = toothFromTarget(e.target);
+		if (!tooth) return;
+		e.preventDefault();
+		tryOpenConfirm(tooth);
+	}
+
+	// Tooth groups are plain SVG <g> elements - role/aria-label can't be set
+	// statically in the source asset per-tooth, so apply them once mounted.
+	$effect(() => {
+		if (!wrapper) return;
+		for (const tooth of teeth.teeth) {
+			const el = wrapper.querySelector(`.t_${tooth.fdi}`);
+			if (!el) continue;
+			el.setAttribute('role', 'button');
+			el.setAttribute('aria-label', `${tooth.name}${onMarkErupted && tooth.status !== 'erupted' ? ' - mark as erupted' : ''}`);
+		}
+	});
 
 	function confirmErupted() {
 		if (confirmingTooth) onMarkErupted?.(confirmingTooth.fdi);
@@ -60,10 +84,13 @@
 </script>
 
 <svelte:head>
+	<!-- eslint-disable-next-line svelte/no-at-html-tags -- content is built entirely from internal numeric FDI values and static CSS, no user input -->
 	{@html upcomingStyleBlock}
 </svelte:head>
-	
-	<figure class="teeth" onclick={handleTeethClick}>
+
+	<!-- Event delegation wrapper - the actual interactive targets (tooth groups) have role="button"/tabindex/keydown handling set individually -->
+	<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+	<figure class="teeth" bind:this={wrapper} onclick={handleTeethClick} onkeydown={handleTeethKeydown}>
 		<TeethGraphic />
 		<figcaption>{teeth.note}</figcaption>
 	</figure>
@@ -77,7 +104,7 @@
 	]} />
 	<p>{teeth.teething_note}</p>
 	<div class="teeth_details">
-		{#each teeth.teeth as tooth}
+		{#each teeth.teeth as tooth (tooth.fdi)}
 			<p class={`t_${tooth.fdi}`}>
 				<span class="name">{tooth.fdi}: {tooth.name} - </span>
 				{#if tooth.erupted_date}
@@ -90,7 +117,7 @@
 	</div>
 	<h3>Upcoming Teeth</h3>
 	<dl>
-		{#each upcoming as tooth}
+		{#each upcoming as tooth (tooth.fdi)}
 			<dt>{tooth.name}</dt>
 			<dd>Expected at {tooth.expected_months} months</dd>
 		{/each}
@@ -116,11 +143,6 @@
 </Modal>
 
 <style>
-	section {
-		clear: both;
-		overflow: hidden;
-	}
-
 	.confirm_actions {
 		display: flex;
 		gap: 0.5em;

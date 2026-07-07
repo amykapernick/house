@@ -14,10 +14,11 @@
 	import type { Alert, AlertType, MilestoneStatus, SignStatus, ValueNote } from '$types/generated';
 	import Milestone from '$components/parts/smallHuman/Milestone.svelte';
 	import Auslan from '$components/parts/smallHuman/Auslan.svelte';
-	import Breasts from '$img/icons/breasts.svg'
-	import Water from '$img/icons/glass-water.svg'
-	import Food from '$img/icons/soup.svg'
+	import Breasts from '$img/icons/breasts.svg?component'
+	import Water from '$img/icons/glass-water.svg?component'
+	import Food from '$img/icons/soup.svg?component'
 	import type { Component } from 'svelte';
+	import { SvelteSet } from 'svelte/reactivity';
 
 	let data = $state<any>(null);
 	let allergens = $state<any[]>([]);
@@ -175,10 +176,10 @@
 		ok: 'green',
 	}
 
-	let completing = $state<Set<string>>(new Set());
+	let completing = new SvelteSet<string>();
 
 	async function completeAllergen(taskId: string) {
-		completing = new Set([...completing, taskId]);
+		completing.add(taskId);
 		const token = await getToken();
 
 		await fetch('/api/graphql', {
@@ -196,9 +197,7 @@
 		allergens = allergens.map(a =>
 			a.id === taskId ? { ...a, due: newDue } : a
 		);
-		const next = new Set(completing);
-		next.delete(taskId);
-		completing = next;
+		completing.delete(taskId);
 	}
 
 	async function updateStatus({
@@ -354,7 +353,7 @@
 		{ name: 'Age', value: ageDisplay, colour: 'blue_navy' },
 	]} />
 	<Cards>
-		{#each alerts as alert}
+		{#each alerts as alert (alert.id)}
 			<Card {...alert} colour={alertColours[alert.level]}>
 				<p>{alert.detail}</p>
 			</Card>
@@ -379,7 +378,7 @@
 		<summary><h2>Swimming</h2></summary>
 		<p>{swimming.note}</p>
 		<Cards>
-			{#each swimming.skills as m}
+			{#each swimming.skills as m (m.id)}
 				<Milestone {...m} onStatusChange={updateSwimSkillStatus} />
 			{/each}
 		</Cards>
@@ -388,7 +387,7 @@
 		<summary><h2 id="milestones">Milestones</h2></summary>
 		<p>{milestones.note}</p>
 		<Cards>
-			{#each sortedMilestones as m}
+			{#each sortedMilestones as m (m.id)}
 				<Milestone {...m} type={m.category} onStatusChange={updateMilestoneStatus} />
 			{/each}
 		</Cards>
@@ -397,7 +396,7 @@
 		<summary><h2 id="auslan">Auslan</h2></summary>
 		<p>{auslan.note}</p>
 		<Cards>
-			{#each auslan.signs as s}
+			{#each auslan.signs as s (s.id)}
 				<Auslan {...s} onStatusChange={updateAuslanSignStatus} />
 			{/each}
 		</Cards>
@@ -411,17 +410,17 @@
 					{
 						name: 'Breastfeeds',
 						value: formatValueNote(feedingStage.current.breastfeeds),
-						Icon: Breasts as Component
+						Icon: Breasts
 					},
 					{
 						name: 'Solid Meals',
 						value: formatValueNote(feedingStage.current.solid_meals),
-						Icon: Food as Component
+						Icon: Food
 					},
 					{
 						name: 'Water',
 						value: formatValueNote(feedingStage.current.water),
-						Icon: Water as Component
+						Icon: Water
 					}
 				]}
 			/>
@@ -433,17 +432,17 @@
 					{
 						name: 'Breastfeeds',
 						value: formatValueNote(feedingStage.current.breastfeeds),
-						Icon: Breasts as Component
+						Icon: Breasts
 					},
 					{
 						name: 'Solid Meals',
 						value: formatValueNote(feedingStage.current.solid_meals),
-						Icon: Food as Component
+						Icon: Food
 					},
 					{
 						name: 'Water',
 						value: formatValueNote(feedingStage.current.water),
-						Icon: Water as Component
+						Icon: Water
 					}
 				]}
 			/>
@@ -470,7 +469,7 @@
 		<summary><h2>Vaccinations</h2></summary>
 		<p>{vaccinations.note}</p>
 		<Cards>
-			{#each vaccinations.items as v}
+			{#each vaccinations.items as v (v.id)}
 				<Card
 					title={v.title}
 					icon={v.todoist_task ? 'calendar' : 'vaccine'}
@@ -484,7 +483,7 @@
 	<details name="section">
 		<summary><h2>Parenting Approach</h2></summary>
 		<Cards>
-			{#each parenting_approach as a}
+			{#each parenting_approach as a (a.id)}
 				<Card
 				title={a.title}
 				>
@@ -496,7 +495,7 @@
 	<details name="section">
 		<summary><h2>Activities</h2></summary>
 		<Cards>
-			{#each activities as a}
+			{#each activities as a (a.id)}
 				<Card
 				title={a.title}
 				>
@@ -519,7 +518,7 @@
 			<Pill colour="blue">Not yet due</Pill>
 		{/if}
 		<h3>Reading</h3>
-		{#each toddler_sleep_prep.reading as i}
+		{#each toddler_sleep_prep.reading as i (i.id)}
 			<h4>{i.title}</h4>
 			<p>{i.note}</p>
 		{/each}
@@ -529,22 +528,23 @@
 		<p>{food_principles.core_philosophy}</p>
 		<p>{food_principles.note}</p>
 		<h3>Current Principles</h3>
-		{#each food_principles.current_and_ongoing as i}
+		{#each food_principles.current_and_ongoing as i (i.id)}
 			<h4>{i.title}</h4>
 			<p>{i.detail}</p>
 		{/each}
 		<h3>What to expect from a toddler</h3>
-		{#each food_principles.toddler_forward_look as i}
+		{#each food_principles.toddler_forward_look as i (i.id)}
 			<h4>{i.title}</h4>
 			<p>{i.detail}</p>
 		{/each}
 	</details>
 	<details name="section">
 		<summary><h2>Sources</h2></summary>
-		{#each sources as s}
+		{#each sources as s (s.id)}
 			<h3>{s.name}</h3>
 			<p>{s.detail}</p>
 			{#if s.note}<p>{s.note}</p>{/if}
+			<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- s.url is an external reference source, not an internal route -->
 			<a href={s.url} target="_blank">{s.url.replace('https://', '')}</a>
 		{/each}
 	</details>
@@ -552,11 +552,6 @@
 
 <style>
 	@import '@mixins';
-
-	section {
-		margin-bottom: 2em;
-		padding-bottom: 1em;
-	}
 
 	h2 {
 		text-transform: capitalize;
@@ -569,17 +564,6 @@
 		overflow-x: auto;
 		font-size: 0.85em;
 		line-height: 1.4;
-	}
-
-	.alerts {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.5em;
-		margin-bottom: 2em;
-	}
-
-	details {
-		
 	}
 
 	summary {

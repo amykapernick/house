@@ -14,13 +14,13 @@ const ASSETS = [
 	...files,
 ];
 
-sw.addEventListener('install', (event) => {
+sw.addEventListener(`install`, (event) => {
 	event.waitUntil(
 		caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
 	);
 });
 
-sw.addEventListener('activate', (event) => {
+sw.addEventListener(`activate`, (event) => {
 	event.waitUntil(
 		caches.keys().then(async (keys) => {
 			for (const key of keys) {
@@ -30,12 +30,12 @@ sw.addEventListener('activate', (event) => {
 	);
 });
 
-sw.addEventListener('fetch', (event) => {
-	if (event.request.method !== 'GET') return;
+sw.addEventListener(`fetch`, (event) => {
+	if (event.request.method !== `GET`) return;
 
 	const url = new URL(event.request.url);
 
-	if (url.pathname.startsWith('/api/')) return;
+	if (url.pathname.startsWith(`/api/`)) return;
 
 	const isAsset = ASSETS.includes(url.pathname);
 
@@ -56,11 +56,12 @@ sw.addEventListener('fetch', (event) => {
 				}
 
 				return response;
-			} catch {
+			}
+			catch {
 				const cached = await cache.match(event.request);
 				if (cached) return cached;
 
-				return new Response('Offline', { status: 503 });
+				return new Response(`Offline`, { status: 503 });
 			}
 		})()
 	);

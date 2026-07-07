@@ -33,7 +33,7 @@
 </script>
 
 <div class="board" style="--columns: {columnCount}">
-	{#each Object.entries(parsedTasks) as [due, dueTasks]}
+	{#each Object.entries(parsedTasks) as [due, dueTasks] (due)}
 		<div class="column">
 			<h2>{due}</h2>
 			<ul class="list">

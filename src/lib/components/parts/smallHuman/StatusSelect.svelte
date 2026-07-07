@@ -15,14 +15,10 @@
 		onChange: (id: string, status: Status) => void;
 	} = $props();
 
-	let selectedValue = $state(status);
+	let selectedValue = $derived(status);
 	let pendingValue = $state<Status | null>(null);
 	let confirmOpen = $state(false);
 	let confirmed = false;
-
-	$effect(() => {
-		selectedValue = status;
-	});
 
 	function handleChange() {
 		pendingValue = selectedValue;
@@ -54,7 +50,7 @@
 	<button>
         <selectedcontent></selectedcontent>
 	</button>
-	{#each Object.entries(labels) as [value, label]}
+	{#each Object.entries(labels) as [value, label] (value)}
 		<option {value}>
 			<Icon name={value as Status} />
 			<span class="label">{label}</span>

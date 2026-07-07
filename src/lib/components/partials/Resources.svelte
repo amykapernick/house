@@ -15,12 +15,14 @@
 </script>
 
 <div class="resources">
-	{#each Object.entries(grouped) as [category, categoryResources]}
+	{#each Object.entries(grouped) as [category, categoryResources] (category)}
 		<section class="category">
 			<h2>{category}</h2>
 			<ul class="list">
-				{#each categoryResources as { name, url, id, icon, login, description, archived }}
+				{#each categoryResources as { name, url, id, icon, login, description, archived } (id)}
 					<li class="item" data-archived={archived}>
+						<!-- url is an external resource link, not an internal route -->
+						<!-- eslint-disable svelte/no-navigation-without-resolve -->
 						<a
 							class="title"
 							href={url}
@@ -34,6 +36,7 @@
 								<line x1="10" y1="14" x2="21" y2="3" />
 							</svg>
 						</a>
+						<!-- eslint-enable svelte/no-navigation-without-resolve -->
 						{#if icon && icon.startsWith('http')}
 							<img class="icon" src={icon} alt={name} />
 						{/if}
@@ -41,6 +44,7 @@
 							<p>{description}</p>
 						{/if}
 						{#if login}
+							<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- login is an external 1Password link, not an internal route -->
 							<a href={login} target="_blank" rel="noreferrer" class="login">
 								<span class="sr-only">Login details for {name} on 1Password (access required)</span>
 								🔐
@@ -151,10 +155,5 @@
 		display: flex;
 		grid-area: login;
 		align-items: center;
-
-		& svg {
-			width: auto;
-			height: 2em;
-		}
 	}
 </style>

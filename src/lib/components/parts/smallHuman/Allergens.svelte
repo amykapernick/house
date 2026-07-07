@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { differenceInDays, parseISO, format } from 'date-fns';
-	import Wheat from '$lib/img/icons/grain.svg';
-	import Cow from '$lib/img/icons/cow-2.svg';
-	import Sesame from '$lib/img/icons/sesame.svg';
-	import Prawn from '$lib/img/icons/shrimp.svg';
-	import Fish from '$lib/img/icons/fish-2.svg';
-	import Egg from '$lib/img/icons/fried-egg.svg';
-	import Peanut from '$lib/img/icons/peanut.svg';
-	import SoySauce from '$lib/img/icons/soy-sauce.svg';
+	import Wheat from '$lib/img/icons/grain.svg?component';
+	import Cow from '$lib/img/icons/cow-2.svg?component';
+	import Sesame from '$lib/img/icons/sesame.svg?component';
+	import Prawn from '$lib/img/icons/shrimp.svg?component';
+	import Fish from '$lib/img/icons/fish-2.svg?component';
+	import Egg from '$lib/img/icons/fried-egg.svg?component';
+	import Peanut from '$lib/img/icons/peanut.svg?component';
+	import SoySauce from '$lib/img/icons/soy-sauce.svg?component';
 
 	let { 
 		allergens = [], 
@@ -50,7 +50,7 @@
 
 {#if allergens.length}
 	<ul class="list">
-		{#each allergens as allergen}
+		{#each allergens as allergen (allergen.id)}
 			{@const Icon = Allergens[allergen.name]}
 			<button
 				class="allergen-btn"

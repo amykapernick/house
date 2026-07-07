@@ -2,6 +2,7 @@
 	import '$styles/main.css';
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import { initClerk, isAuthenticated, clerkLoaded } from '$lib/auth';
 	import { routeRequiresAuth } from '$lib/navigation';
@@ -25,7 +26,8 @@
 			!page.url.pathname.startsWith('/sign-in') &&
 			routeRequiresAuth(page.url.pathname)
 		) {
-			goto(`/sign-in?redirect=${encodeURIComponent(page.url.pathname)}`);
+			// eslint-disable-next-line svelte/no-navigation-without-resolve -- resolve() is used; the rule can't trace it through template-literal concatenation with the query string
+			goto(`${resolve('/sign-in')}?redirect=${encodeURIComponent(page.url.pathname)}`);
 		}
 	});
 </script>

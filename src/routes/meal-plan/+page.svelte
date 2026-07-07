@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { isAuthenticated } from '$lib/auth';
 	import fetchClientData from '$utils/fetchClientData';
+	import { resolve } from '$app/paths';
 	import {
 		format, startOfWeek, endOfWeek, addWeeks, addDays, subDays,
 		eachDayOfInterval, isToday, isYesterday, parseISO, intervalToDuration
@@ -125,7 +126,7 @@
 	<p>Loading...</p>
 {:else}
 	<div class="week">
-		{#each entriesByDay() as day}
+		{#each entriesByDay() as day (day.date)}
 			<div class="day" class:today={day.isToday} class:yesterday={day.isYesterday}>
 				<h2>
 					{day.label}
@@ -135,11 +136,11 @@
 				{#if day.entries.length === 0}
 					<p class="empty">No meals planned</p>
 				{:else}
-					{#each day.entries as entry}
+					{#each day.entries as entry (entry.id)}
 						<div class="meal">
 							<span class="meal-type">{entry.entryType}</span>
 							{#if entry.recipe}
-								<a href="/recipes/{entry.recipe.slug}" class="recipe-link">
+								<a href={resolve('/recipes/[slug]', { slug: entry.recipe.slug })} class="recipe-link">
 									{#if entry.recipe.image}
 										<img src={entry.recipe.image} alt={entry.recipe.name} loading="lazy" />
 									{/if}
@@ -208,7 +209,7 @@
 
 		&.today {
 			border-color: var(--purple_bright);
-			background: rgba($purple_bright, 0.04);
+			background: color-mix(in srgb, var(--purple_bright) 4%, transparent);
 		}
 
 		&.yesterday {
@@ -238,7 +239,7 @@
 	.meal {
 		margin-bottom: 0.5em;
 		padding: 0.4em;
-		background: rgba($blue, 0.06);
+		background: color-mix(in srgb, var(--blue) 6%, transparent);
 		border-radius: 0.3em;
 	}
 

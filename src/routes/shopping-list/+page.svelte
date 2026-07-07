@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { isAuthenticated, getToken } from '$lib/auth';
 	import fetchClientData from '$utils/fetchClientData';
+	import { SvelteSet } from 'svelte/reactivity';
 
 	let items = $state<any[]>([]);
 	let loading = $state(true);
 	let showChecked = $state(false);
-	let checking = $state<Set<string>>(new Set());
+	let checking = new SvelteSet<string>();
 
 	function fetchList(skipCache = false) {
 		loading = true;
@@ -38,7 +39,7 @@
 
 	async function toggleItem(item: any) {
 		const newChecked = !item.checked;
-		checking = new Set([...checking, item.id]);
+		checking.add(item.id);
 
 		const token = await getToken();
 		await fetch('/api/graphql', {
@@ -56,9 +57,7 @@
 			i.id === item.id ? { ...i, checked: newChecked } : i
 		);
 
-		const next = new Set(checking);
-		next.delete(item.id);
-		checking = next;
+		checking.delete(item.id);
 	}
 
 	let uncheckedItems = $derived(items.filter(i => !i.checked));
@@ -135,23 +134,23 @@
 		</label>
 	</div>
 
-	{#each storeGroups as store}
+	{#each storeGroups as store (store.name)}
 		<details class="store" open>
 			<summary><h2>{sentenceCase(store.name)}</h2></summary>
 
 			{#if store.items.length}
 				<ul>
-					{#each store.items as item}
+					{#each store.items as item (item.id)}
 						{@render itemRow(item)}
 					{/each}
 				</ul>
 			{/if}
 
-			{#each store.subGroups as sub}
+			{#each store.subGroups as sub (sub.name)}
 				<details class="sub-group" open>
 					<summary><h3>{sub.name}</h3></summary>
 					<ul>
-						{#each sub.items as item}
+						{#each sub.items as item (item.id)}
 							{@render itemRow(item)}
 						{/each}
 					</ul>
@@ -305,7 +304,7 @@
 		align-items: center;
 		gap: 0.5em;
 		padding: 0.5em 0.3em;
-		border-bottom: 1px solid rgba($grey_light, 0.5);
+		border-bottom: 1px solid color-mix(in srgb, var(--grey_light) 50%, transparent);
 
 		&.checked {
 			opacity: 0.4;

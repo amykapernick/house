@@ -10,7 +10,7 @@ const parseTasks = (tasks: Task[]): TaskEvent[] => {
 				id: task.id,
 				title: task.name,
 				status: task.status,
-				type: 'task',
+				type: `task`,
 				link: task.link,
 				platform: task.platform,
 				resource: task.assigned,
@@ -21,7 +21,7 @@ const parseTasks = (tasks: Task[]): TaskEvent[] => {
 					: add(new Date(task.due), { minutes: 15 }),
 			};
 
-			if (isMatch(task.due as unknown as string, 'yyyy-MM-dd')) {
+			if (isMatch(task.due as unknown as string, `yyyy-MM-dd`)) {
 				eventData.allDay = true;
 			}
 

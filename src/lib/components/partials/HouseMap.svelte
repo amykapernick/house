@@ -8,8 +8,9 @@
 
 <div class="container" style="--width: {size[0]}; --height: {size[1]}">
 	<svg class="map" viewBox="0 0 {size.join(' ')}" fill="none">
-		{#each areas as area}
+		{#each areas as area (area.id)}
 			<g class="area" style="--colour: var(--{area.colour ?? 'primary'})">
+				<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- area.link is an external smart-home control URL, not an internal route -->
 				<a href={area.link} target="_blank">
 					<rect
 						class="space"
@@ -27,8 +28,10 @@
 			</g>
 		{/each}
 	</svg>
-	{#each items as item}
+	{#each items as item (item.area.id + '-' + item.type + '-' + item.start.join(','))}
 		{@const itemSize = item.size ?? ItemDefaults[item.type]?.size ?? [30, 30]}
+		<!-- item.link is an external smart-home control URL, not an internal route -->
+		<!-- eslint-disable svelte/no-navigation-without-resolve -->
 		<a
 			class="item"
 			href={item.link}
@@ -37,14 +40,15 @@
 			<span class="item-label">{item.type.replaceAll('_', ' ')}</span>
 			<span class="sr-only">Control {item.area.name} {item.type}</span>
 		</a>
+		<!-- eslint-enable svelte/no-navigation-without-resolve -->
 	{/each}
-	{#each areas as area}
+	{#each areas as area (area.id)}
 		{#if area.info?.length}
 			<ul
 				class="info"
 				style="--offset_x: {(area.start[0] / size[0]) * 100}%; --offset_y: {(area.start[1] / size[1]) * 100}%; --width: {(area.size[0] / size[0]) * 100}%; --height: {(area.size[1] / size[1]) * 100}%"
 			>
-				{#each area.info as info}
+				{#each area.info as info (info.type)}
 					<li class="stat">
 						{#if info.type === 'temperature'}
 							🌡️ {info.value}°C

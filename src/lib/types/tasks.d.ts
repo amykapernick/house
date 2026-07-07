@@ -1,6 +1,6 @@
 import type { User, Platform } from './global'
 
-export type TaskStatus = 'Not Started' | 'In Progress' | 'Ongoing' | 'Paused' | 'Done'
+export type TaskStatus = `Not Started` | `In Progress` | `Ongoing` | `Paused` | `Done`
 
 export type Task = {
 	id: string,
@@ -16,7 +16,7 @@ export type Task = {
 	link: string
 }
 
-export type ProjectStatus = 'Backlog' | 'Planning' | 'In progress' | 'Paused' | 'Done' | 'Cancelled' | 'Archived'
+export type ProjectStatus = `Backlog` | `Planning` | `In progress` | `Paused` | `Done` | `Cancelled` | `Archived`
 
 export type Project = {
 	id: string,

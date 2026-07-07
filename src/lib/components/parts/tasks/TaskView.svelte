@@ -29,7 +29,7 @@
 
 <div>
 	<nav class="switcher">
-		{#each Object.entries(views) as [viewType, { name }]}
+		{#each Object.entries(views) as [viewType, { name }] (viewType)}
 			<button onclick={() => (view = viewType as TaskViewType)} data-active={view === viewType}>
 				{name}
 			</button>

@@ -6,18 +6,18 @@ const config = {
 	preprocess: vitePreprocess(),
 	kit: {
 		adapter: adapter({
-			fallback: 'index.html',
+			fallback: `index.html`,
 		}),
 		alias: {
-			'$components': 'src/lib/components',
-			'$partials': 'src/lib/components/partials',
-			'$parts': 'src/lib/components/parts',
-			'$layouts': 'src/lib/components/layouts',
-			'$utils': 'src/lib/utils',
-			'$types': 'src/lib/types',
-			'$data': 'src/lib/data',
-			'$img': 'src/lib/img',
-			'$styles': 'src/lib/styles'
+			'$components': `src/lib/components`,
+			'$partials': `src/lib/components/partials`,
+			'$parts': `src/lib/components/parts`,
+			'$layouts': `src/lib/components/layouts`,
+			'$utils': `src/lib/utils`,
+			'$types': `src/lib/types`,
+			'$data': `src/lib/data`,
+			'$img': `src/lib/img`,
+			'$styles': `src/lib/styles`
 		}
 	}
 };

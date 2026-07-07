@@ -17,7 +17,7 @@
 <dl
 	style="--colour: var(--{colour || 'blue'})"
 >
-	{#each items as { name, value, colour, Icon }}
+	{#each items as { name, value, colour, Icon } (name)}
 		<div style="--colour: var(--{colour})">
 			<dt class={Icon ? 'sr-only' : ''}>{name}</dt>
 			<dd>{value}</dd>

@@ -2,6 +2,7 @@
 	import { page } from '$app/stores';
 	import { format, parseISO, intervalToDuration } from 'date-fns';
 	import fetchClientData from '$utils/fetchClientData';
+	import { resolve } from '$app/paths';
 
 	function formatMinutes(mins: number | string | null): string {
 		if (!mins) return '';
@@ -56,7 +57,7 @@
 	<title>{recipe?.name ?? 'Recipe'} | Kapers Crewe Household</title>
 </svelte:head>
 
-<a href="/recipes" class="back">← Recipes</a>
+<a href={resolve('/recipes')} class="back">← Recipes</a>
 
 {#if loading}
 	<p>Loading...</p>
@@ -85,10 +86,10 @@
 
 		{#if recipe.tags?.length || recipe.categories?.length}
 			<div class="tag-bar">
-				{#each recipe.categories as cat}
+				{#each recipe.categories as cat (cat.slug)}
 					<span class="tag category">{cat.name}</span>
 				{/each}
-				{#each recipe.tags as tag}
+				{#each recipe.tags as tag (tag.slug)}
 					<span class="tag">{tag.name}</span>
 				{/each}
 			</div>
@@ -99,7 +100,7 @@
 				<h2>Ingredients</h2>
 				{#if recipe.ingredients?.length}
 					<ul>
-						{#each recipe.ingredients as ingredient}
+						{#each recipe.ingredients as ingredient, i (i)}
 							{#if ingredient.title}
 								<li class="section-title">{ingredient.title}</li>
 							{:else}
@@ -116,7 +117,7 @@
 				<h2>Instructions</h2>
 				{#if recipe.instructions?.length}
 					<ol>
-						{#each recipe.instructions as step}
+						{#each recipe.instructions as step, i (i)}
 							<li>
 								{#if step.title}<strong>{step.title}</strong>{/if}
 								<p>{step.text}</p>
@@ -147,7 +148,7 @@
 		{#if recipe.notes?.length}
 			<section>
 				<h2>Notes</h2>
-				{#each recipe.notes as note}
+				{#each recipe.notes as note, i (i)}
 					<div class="note">
 						{#if note.title}<strong>{note.title}</strong>{/if}
 						<p>{note.text}</p>
@@ -160,7 +161,7 @@
 			<section>
 				<h2>Tools</h2>
 				<ul class="tools">
-					{#each recipe.tools as tool}
+					{#each recipe.tools as tool, i (i)}
 						<li>{tool}</li>
 					{/each}
 				</ul>
@@ -169,6 +170,7 @@
 
 		<div class="footer-meta">
 			{#if recipe.orgURL}
+				<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- orgURL is the external source recipe page, not an internal route -->
 				<a href={recipe.orgURL} target="_blank" rel="noreferrer">Original recipe</a>
 			{/if}
 			{#if recipe.dateAdded}<span>Added: {format(parseISO(recipe.dateAdded), 'd MMM yyyy')}</span>{/if}
@@ -216,7 +218,7 @@
 		gap: 1.5em;
 		margin-bottom: 1em;
 		padding: 0.8em;
-		background: rgba($blue, 0.08);
+		background: color-mix(in srgb, var(--blue) 8%, transparent);
 		border-radius: 0.3em;
 	}
 
@@ -308,7 +310,7 @@
 
 		& div {
 			padding: 0.5em;
-			background: rgba($blue, 0.08);
+			background: color-mix(in srgb, var(--blue) 8%, transparent);
 			border-radius: 0.3em;
 		}
 
@@ -327,7 +329,7 @@
 	.note {
 		padding: 0.5em;
 		margin: 0.3em 0;
-		background: rgba($orange, 0.08);
+		background: color-mix(in srgb, var(--orange) 8%, transparent);
 		border-radius: 0.3em;
 
 		& p {
@@ -344,7 +346,7 @@
 
 		& li {
 			padding: 0.3em 0.7em;
-			background: rgba($blue, 0.08);
+			background: color-mix(in srgb, var(--blue) 8%, transparent);
 			border-radius: 0.3em;
 			font-size: 0.9em;
 		}

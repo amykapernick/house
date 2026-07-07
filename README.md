@@ -71,12 +71,24 @@ Custom PWA for house managemetn and info. Integrates with a bunch of different s
   - [ ] User profile page
   - [x] Update CI/CD for SvelteKit build
   - [x] Mealie integration (recipes, meal planning, shopping list)
-- [ ] API: Convert to ESM (replace mixed require/module.exports with import/export)
-- [ ] API: Update Notion database property names in parsers to match current schema
+- [x] API: Convert to ESM (replace mixed require/module.exports with import/export)
+- [x] API: Update Notion database property names in parsers to match current schema
+- [x] API: Setup CD pipeline
 - [x] Convert to PWA
   - [ ] Check offline
   - [x] Keep cached data while loading fresh
-- [ ] Investigate alternate data source to Notion
+- [x] Investigate alternate data source to Notion
+  - [x] Connect pocketbase to api
+  - [ ] Migrate relevant Notion data to Pocketbase
 - [ ] Add schedule/routine
   - [ ] Pomodoro/focus timer
-- [ ] 
+- [x] Hook up linting for both api and front end
+  - [x] Check updates/standard format for linting files
+  - [x] Automate linting in vscode and as part of deployment build
+  - [x] Add a11y linting
+  - [x] Move other config files to config folder (eg. svelte, vite, tsconfig, etc)
+- [ ] Auto create issues from comments, linting errors and readme items
+- [ ] Front end testing on deployment
+  - [ ] A11y testing
+- [ ] pa11y testing dashboard
+- [ ] Add postcss config file

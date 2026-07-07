@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import fetchClientData from '$utils/fetchClientData';
+	import { resolve } from '$app/paths';
 
 	let tags = $state<any[]>([]);
 	let loading = $state(true);
@@ -37,7 +38,7 @@
 	<title>Recipe Tags | Kapers Crewe Household</title>
 </svelte:head>
 
-<a href="/recipes" class="back">← Recipes</a>
+<a href={resolve('/recipes')} class="back">← Recipes</a>
 
 <h1>Tags</h1>
 
@@ -54,8 +55,8 @@
 	<p class="count">{filteredTags.length} tags</p>
 
 	<div class="grid">
-		{#each filteredTags as tag}
-			<a class="tag-card" href="/recipes/tags/{tag.slug}">
+		{#each filteredTags as tag (tag.slug)}
+			<a class="tag-card" href={resolve('/recipes/tags/[slug]', { slug: tag.slug })}>
 				{tag.name}
 			</a>
 		{/each}
@@ -110,7 +111,7 @@
 		transition: background 0.15s, border-color 0.15s;
 
 		&:hover {
-			background: rgba($purple_bright, 0.08);
+			background: color-mix(in srgb, var(--purple_bright) 8%, transparent);
 			border-color: var(--purple_bright);
 			color: var(--purple_bright);
 		}

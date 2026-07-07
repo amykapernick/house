@@ -48,6 +48,7 @@
 
 	{#snippet footer()}
 		{#if reference?.url}
+			<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- reference.url is the external Signbank dictionary page, not an internal route -->
 			<a href={reference.url} target="_blank" class="sign_link">
 				<span class="sr-only">Signbank page for {name}</span>
 				<span aria-hidden="true">Signbank</span>

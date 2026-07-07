@@ -7,17 +7,15 @@
 	"stylelint.validate": [
 		"css",
 		"less",
-		"postcss",
-		"astro"
+		"postcss"
 	],
 	"prettier.configPath": "./config/prettier.config.cjs",
-	"[astro]": {
-		"editor.defaultFormatter": "stylelint.vscode-stylelint"
+	"eslint.options": {
+		"overrideConfigFile": "./config/eslint.config.mjs"
 	},
 	"editor.formatOnSave": false,
 	"editor.codeActionsOnSave": {
 		"source.fixAll.eslint": "explicit",
-		"source.fixAll.tslint": "explicit",
 		"source.fixAll.stylelint": "explicit"
 	},
 	"azureFunctions.deploySubpath": "api",
@@ -26,5 +24,5 @@
 	"azureFunctions.projectRuntime": "~4",
 	"debug.internalConsoleOptions": "neverOpen",
 	"azureFunctions.projectLanguageModel": 4,
-	"azureFunctions.preDeployTask": "npm prune (functions)",
-} 
+	"azureFunctions.preDeployTask": "npm prune (functions)"
+}

@@ -65,6 +65,8 @@
 	}
 
 	// Regular interval ticks across the full date range
+	/* eslint-disable svelte/prefer-svelte-reactivity -- `d` is a scratch variable mutated via setDate/setMonth
+	   during tick generation and discarded; only the plain Date copies pushed to `ticks` escape this function. */
 	const xTicks = $derived.by<Date[]>(() => {
 		if (allDates.length < 2) return [...allDates];
 
@@ -97,6 +99,7 @@
 				d.setMonth(d.getMonth() + monthStep);
 			}
 		}
+		/* eslint-enable svelte/prefer-svelte-reactivity */
 
 		return ticks;
 	});
@@ -148,7 +151,7 @@
 		{/if}
 
 		<!-- Left Y ticks + gridlines -->
-		{#each leftTicks as tick}
+		{#each leftTicks as tick, i (i)}
 			{@const y = yPos(tick, 'left')}
 			{@const unit = leftLines[0]?.unit ?? ''}
 			{@const dec = leftLines[0]?.decimals ?? 1}
@@ -162,7 +165,7 @@
 		{#if hasRightAxis}
 			{@const unit = rightLines[0]?.unit ?? ''}
 			{@const dec = rightLines[0]?.decimals ?? 0}
-			{#each rightTicks as tick}
+			{#each rightTicks as tick, i (i)}
 				{@const y = yPos(tick, 'right')}
 				<text x={PAD_LEFT + innerW + 6} {y} class="tick-label tick-label--right" text-anchor="start" dominant-baseline="middle">
 					{tick.toFixed(dec)}{unit}
@@ -171,7 +174,7 @@
 		{/if}
 
 		<!-- Lines -->
-		{#each lines as line}
+		{#each lines as line, i (i)}
 			{#if line.data.length > 1}
 				<polyline
 					points={polylinePoints(line)}
@@ -184,11 +187,11 @@
 		{/each}
 
 		<!-- Dots -->
-		{#each lines as line}
+		{#each lines as line, i (i)}
 			{@const axis = line.axis ?? 'left'}
 			{@const dec = line.decimals ?? 1}
 			{@const unit = line.unit ?? ''}
-			{#each line.data as point}
+			{#each line.data as point (point.x.getTime())}
 				{@const x = xPos(point.x)}
 				{@const y = yPos(point.y, axis)}
 				<circle
@@ -205,7 +208,7 @@
 		{/each}
 
 		<!-- Regular X axis ticks + labels -->
-		{#each xTicks as tick}
+		{#each xTicks as tick (tick.getTime())}
 			{@const x = xPos(tick)}
 			<line x1={x} y1={xAxisY} x2={x} y2={xAxisY + 4} class="axis-tick" />
 			<text

@@ -17,7 +17,7 @@
 
 <nav>
 	<ul class="menu">
-		{#each menuItems.filter(({ auth }) => !auth || isAuthenticated) as { label, link, items, Icon }}
+		{#each menuItems.filter(({ auth }) => !auth || isAuthenticated) as { label, link, items, Icon } (label)}
 			<li>
 				{#if items}
 					<button
@@ -29,13 +29,15 @@
 						{label}
 					</button>
 					<ul class="sub" data-open={subMenu === label}>
-						{#each items.filter(({ auth }) => !auth || isAuthenticated) as item}
+						{#each items.filter(({ auth }) => !auth || isAuthenticated) as item (item.link)}
 							<li>
+								<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- item.link is already resolve()d in navigation.ts -->
 								<a href={item.link}>{item.label}</a>
 							</li>
 						{/each}
 					</ul>
 				{:else}
+					<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- link is already resolve()d in navigation.ts -->
 					<a href={link}>
 						<span class="label">{label}</span>
 						<Icon />
@@ -82,7 +84,7 @@
 		margin: 0;
 		padding: 0;
 		background: var(--background);
-		box-shadow: 0 0 10px rgba($neutral, 0.2);
+		box-shadow: 0 0 10px color-mix(in srgb, var(--neutral) 20%, transparent);
 		font-size: 0.8em;
 		list-style: none;
 
@@ -95,8 +97,7 @@
 			padding: 0;
 		}
 
-		& a,
-		& button {
+		& a {
 			padding: 10px;
 			background: var(--background);
 			color: inherit;

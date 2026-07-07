@@ -51,15 +51,15 @@
 		font-size: 1.2em;
 
 		&.incomplete {
-			color: $grey;
+			color: var(--grey);
 		}
 
 		&.partial {
-			color: $orange;
+			color: var(--orange);
 		}
 
 		&.complete {
-			color: $green;
+			color: var(--green);
 		}
 	}
 
@@ -83,21 +83,21 @@
 		justify-self: end;
 
 		&[data-status='not-started'] {
-			background: $grey;
-			color: $white;
+			background: var(--grey);
+			color: var(--white);
 		}
 
 		&[data-status='in-progress'],
 		&[data-status='ongoing'] {
-			background: $blue;
+			background: var(--blue);
 		}
 
 		&[data-status='paused'] {
-			background: $orange;
+			background: var(--orange);
 		}
 
 		&[data-status='done'] {
-			background: $green;
+			background: var(--green);
 		}
 	}
 

@@ -3,6 +3,7 @@
 	import { page } from '$app/stores';
 	import { intervalToDuration } from 'date-fns';
 	import fetchClientData from '$utils/fetchClientData';
+	import { resolve } from '$app/paths';
 
 	function formatMinutes(mins: number | string | null): string {
 		if (!mins) return '';
@@ -24,7 +25,7 @@
 
 	function fetchRecipes() {
 		loading = true;
-		const slug = $page.params.slug;
+		const slug = $page.params.slug ?? '';
 
 		fetchClientData({
 			gqlQuery: `
@@ -70,9 +71,9 @@
 </svelte:head>
 
 <nav class="breadcrumb">
-	<a href="/recipes">Recipes</a>
+	<a href={resolve('/recipes')}>Recipes</a>
 	<span>/</span>
-	<a href="/recipes/tags">Tags</a>
+	<a href={resolve('/recipes/tags')}>Tags</a>
 	<span>/</span>
 	<span>{tagName}</span>
 </nav>
@@ -87,8 +88,8 @@
 	<p class="count">{total} recipes</p>
 
 	<div class="grid">
-		{#each recipes as recipe}
-			<a class="card" href="/recipes/{recipe.slug}">
+		{#each recipes as recipe (recipe.slug)}
+			<a class="card" href={resolve('/recipes/[slug]', { slug: recipe.slug })}>
 				{#if recipe.image}
 					<img src={recipe.image} alt={recipe.name} loading="lazy" />
 				{:else}
@@ -174,7 +175,7 @@
 		& .no-image {
 			width: 100%;
 			height: 180px;
-			background: rgba($purple_bright, 0.08);
+			background: color-mix(in srgb, var(--purple_bright) 8%, transparent);
 		}
 	}
 

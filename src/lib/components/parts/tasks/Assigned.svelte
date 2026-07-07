@@ -5,7 +5,7 @@
 </script>
 
 <ul class="list {className}">
-	{#each assignees as { slug, name, profile }}
+	{#each assignees as { slug, name, profile } (slug)}
 		<li class="item">
 			<span class="sr-only">{name}</span>
 			{#if profile}

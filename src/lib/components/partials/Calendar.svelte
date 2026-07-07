@@ -25,7 +25,19 @@
 		const calEvents = parseEvents(allDayEvents);
 		const icsEvents = parseEvents(icalEvents);
 
-		const base = [...taskEvents, ...calEvents, ...icsEvents].map((event) => ({
+		const base: {
+			id: string;
+			title: string;
+			start: Date;
+			end: Date;
+			allDay: boolean;
+			backgroundColor: string;
+			extendedProps: {
+				type: 'event' | 'task' | 'meal';
+				link: string | undefined;
+				status: unknown;
+			};
+		}[] = [...taskEvents, ...calEvents, ...icsEvents].map((event) => ({
 			id: event.id,
 			title: event.title,
 			start: new Date(event.start),
