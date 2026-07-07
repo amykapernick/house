@@ -1,28 +1,70 @@
 # House Management
 
+Custom PWA for house managemetn and info. Integrates with a bunch of different services to give one place to find/do things
+
+## To Do
+
 - [x] Recipes
-- [x] Meal Planning
-- [x] Shopping List
+  - [x] Meal Planning
+  - [x] Shopping List
+  - [x] Mealie integration (recipes, meal planning, shopping list)
+  - [ ] Automated meal planning
+  - [ ] Reminders for groceries and getting stuff o ut of the freezer
+  - [ ] Add stores to mealie shopping list
+  - [ ] Convert units
+  - [ ] Multiply recipe quantities
 - [x] Calendar
-- [ ] ics Calendar Feed
+  - [x] ICS calendar feed events via API
+  - [ ] Optimise data loading
+  - [ ] Week view by default
+  - [ ] Disable drag and drop
+  - [ ] Update/complete tasks
 - [x] User Auth
 - [x] To Do List
-- [ ] Reminders
-- [ ] Chores
+  - [ ] Reminders
+  - [ ] Chores
+  - [ ] Habits and home tasks
+  - [ ] Update/complete tasks
+  - [ ] Link to todoist/notion
+- [ ] Dashboard
+  - [ ] Hide authenticated sections when not logged in
+  - [ ] Add upcoming tasks/calendar section
+  - [ ] Quick-add to shopping list
+  - [ ] Urgent small human alerts
+- [ ] Small Human Dashboard
+  - [ ] Upcoming baby content and reading section
+    - [ ] Replace "toddler prep" with more generic upcoming reading
+    - [ ] Auto-find and generate reading content for each week
+    - [ ] Add possums
+  - [ ] Auto-generate gif of signbank video
+  - [ ] Add extra info to overview section
+  - [ ] Allow dismissing alerts
+  - [ ] Style status dropdown
+  - [ ] Hide/lazy load completed cards
+  - [ ] Tab interface
+  - [ ] Section navigation
+  - [ ] Feeding section
+  - [ ] Sleep and Sleep Environment section
+  - [ ] Clothing sections
+  - [ ] Tracking illness, medication and appt history
+- [ ] Home assistant map
+  - [ ] Find previous code and version to work from
+- [x] Reference Page
+  - [ ] Update reference list
+  - [ ] Local and remote URLs
+  - [ ] 
 - [ ] SvelteKit Migration
   - [x] Project scaffold and config
   - [x] Styles/PostCSS pipeline
   - [x] Tasks page (list, kanban, calendar views)
   - [x] Reference page
-  - [x] House map page
-  - [x] Stats embed page
+  - [ ] House map page
+  - [x] Stats embed page <!-- No longer relevant, removed -->
   - [x] Dashboard page
-  - [x] Mealie integration (recipes, meal planning, shopping list)
   - [x] Full calendar UI (@event-calendar/core)
-  - [x] ICS calendar feed events via API
   - [x] Authenticated GraphQL requests (client-side via Clerk JS token)
   - [x] Update .env.sample for SvelteKit
-  - [ ] SVG icon components for house map items and task cards
+  - [x] SVG icon components for house map items and task cards
   - [x] Clerk auth sign-in/sign-up pages
     - [ ] Style pages
     - [ ] Add sign out button
@@ -31,14 +73,10 @@
   - [x] Mealie integration (recipes, meal planning, shopping list)
 - [ ] API: Convert to ESM (replace mixed require/module.exports with import/export)
 - [ ] API: Update Notion database property names in parsers to match current schema
-- [ ] Automated meal planning
-- [ ] Add stores to mealie shopping list
-- [ ] Convert units
-- [ ] Multiply recipe quantities
-- [ ] Check offline
-- [x] Keep cached data while loading fresh
-- [ ] Upcoming baby content and reading
-- [ ] Home assistant map
-- [ ] Habits and home tasks
-- [ ] Reminders for groceries and getting stuff o ut of the freezer
-- [ ]
+- [x] Convert to PWA
+  - [ ] Check offline
+  - [x] Keep cached data while loading fresh
+- [ ] Investigate alternate data source to Notion
+- [ ] Add schedule/routine
+  - [ ] Pomodoro/focus timer
+- [ ] 

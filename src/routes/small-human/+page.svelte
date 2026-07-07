@@ -282,8 +282,6 @@
 		setCache('small-human', { smallHuman: data });
 	}
 
-	// TODO: Split sections of data out into separate variables, eg. const { teeth, auslan, vaccinations, etc } = data
-
 	const ageDisplay = $derived.by(() => {
 		const ageWeeks = data?.meta?.age_weeks;
 		if (ageWeeks == null) return '';
@@ -294,7 +292,7 @@
 			: `${ageWeeks} week${ageWeeks !== 1 ? 's' : ''}`;
 	});
 
-	const milestones = $derived.by(() => {
+	const sortedMilestones = $derived.by(() => {
 		const items = data?.milestones?.items ?? [];
 		return [...items].sort((a, b) => {
 			const aWeek = a.expected_weeks?.[0] ?? Infinity;
@@ -327,58 +325,79 @@
 {:else if !data}
 	<p>No data available</p>
 {:else}
+	{@const {
+		meta,
+		alerts,
+		car_seat,
+		growth,
+		teeth,
+		swimming,
+		milestones,
+		auslan,
+		feeding,
+		sleep,
+		sleep_environment,
+		clothing_seasonal,
+		clothing_daytime,
+		vaccinations,
+		parenting_approach,
+		activities,
+		toddler_sleep_prep,
+		food_principles,
+		sources,
+	} = data}
+
 	<h2 id="overview">Overview</h2>
 
-	<!-- Complete -->
 	<Stats items={[
-		{ name: 'Last Updated', value: data.meta.last_updated, colour: 'blue_navy' },
+		{ name: 'Last Updated', value: meta.last_updated, colour: 'blue_navy' },
 		{ name: 'Age', value: ageDisplay, colour: 'blue_navy' },
 	]} />
 	<Cards>
-		{#each data.alerts as alert}
+		{#each alerts as alert}
 			<Card {...alert} colour={alertColours[alert.level]}>
 				<p>{alert.detail}</p>
 			</Card>
 		{/each}
 		<Card title="Car Seat">
-			<p>{data.car_seat.facing_note}</p>
-			<p>{data.car_seat.next_transition}</p>
+			<p>{car_seat.facing_note}</p>
+			<p>{car_seat.next_transition}</p>
 		</Card>
 	</Cards>
 
 	<details name="section">
 		<summary><h2>Growth</h2></summary>
-		<Growth growth={data.growth} />
+		<Growth {growth} />
 	</details>
 
 	<details name="section">
 		<summary><h2>Teeth</h2></summary>
-		<Teeth teeth={data.teeth} birth={data.meta.birth_month} onMarkErupted={markToothErupted} />
+		<Teeth {teeth} birth={meta.birth_month} onMarkErupted={markToothErupted} />
 	</details>
 
 	<details name="section">
 		<summary><h2>Swimming</h2></summary>
-		<p>{data.swimming.note}</p>
+		<p>{swimming.note}</p>
 		<Cards>
-			{#each data.swimming.skills as m}
+			{#each swimming.skills as m}
 				<Milestone {...m} onStatusChange={updateSwimSkillStatus} />
 			{/each}
 		</Cards>
 	</details>
 	<details name="section">
 		<summary><h2 id="milestones">Milestones</h2></summary>
-		<p>{data.milestones.note}</p>
+		<p>{milestones.note}</p>
 		<Cards>
-			{#each milestones as m}
+			{#each sortedMilestones as m}
 				<Milestone {...m} type={m.category} onStatusChange={updateMilestoneStatus} />
 			{/each}
 		</Cards>
 	</details>
 	<details name="section">
 		<summary><h2 id="auslan">Auslan</h2></summary>
-		<p>{data.auslan.note}</p>
+		<p>{auslan.note}</p>
 		<Cards>
-			{#each data.auslan.signs as s}
+			{#each auslan.signs as s}
 				<Auslan {...s} onStatusChange={updateAuslanSignStatus} />
 			{/each}
 		</Cards>
@@ -429,29 +448,29 @@
 				]}
 			/>
 		{/if}
-		<pre><code>{JSON.stringify(data.feeding, null, 2)}</code></pre>
+		<pre><code>{JSON.stringify(feeding, null, 2)}</code></pre>
 	</details>
 	<details name="section">
 		<summary><h2>Sleep</h2></summary>
-		<pre><code>{JSON.stringify(data.sleep, null, 2)}</code></pre>
+		<pre><code>{JSON.stringify(sleep, null, 2)}</code></pre>
 	</details>
 	<details name="section">
 		<summary><h2>Sleep Environment</h2></summary>
-		<pre><code>{JSON.stringify(data.sleep_environment, null, 2)}</code></pre>
+		<pre><code>{JSON.stringify(sleep_environment, null, 2)}</code></pre>
 	</details>
 	<details name="section">
 		<summary><h2>Clothing Seasonal</h2></summary>
-		<pre><code>{JSON.stringify(data.clothing_seasonal, null, 2)}</code></pre>
+		<pre><code>{JSON.stringify(clothing_seasonal, null, 2)}</code></pre>
 	</details>
 	<details name="section">
 		<summary><h2>Clothing Daytime</h2></summary>
-		<pre><code>{JSON.stringify(data.clothing_daytime, null, 2)}</code></pre>
+		<pre><code>{JSON.stringify(clothing_daytime, null, 2)}</code></pre>
 	</details>
 	<details name="section">
 		<summary><h2>Vaccinations</h2></summary>
-		<p>{data.vaccinations.note}</p>
+		<p>{vaccinations.note}</p>
 		<Cards>
-			{#each data.vaccinations.items as v}
+			{#each vaccinations.items as v}
 				<Card
 					title={v.title}
 					icon={v.todoist_task ? 'calendar' : 'vaccine'}
@@ -465,7 +484,7 @@
 	<details name="section">
 		<summary><h2>Parenting Approach</h2></summary>
 		<Cards>
-			{#each data.parenting_approach as a}
+			{#each parenting_approach as a}
 				<Card
 				title={a.title}
 				>
@@ -477,7 +496,7 @@
 	<details name="section">
 		<summary><h2>Activities</h2></summary>
 		<Cards>
-			{#each data.activities as a}
+			{#each activities as a}
 				<Card
 				title={a.title}
 				>
@@ -488,41 +507,41 @@
 	</details>
 	<details name="section">
 		<summary><h2>Toddler Sleep Prep</h2></summary>
-		<p>{data.toddler_sleep_prep.note}</p>
-		{#if data.toddler_sleep_prep.status === 'due'}
+		<p>{toddler_sleep_prep.note}</p>
+		{#if toddler_sleep_prep.status === 'due'}
 			<Card
-				title={data.toddler_sleep_prep.alert_when_due.title}
-				colour={alertColours[data.toddler_sleep_prep.alert_when_due.level as AlertType]}
+				title={toddler_sleep_prep.alert_when_due.title}
+				colour={alertColours[toddler_sleep_prep.alert_when_due.level as AlertType]}
 			>
-				<p>{data.toddler_sleep_prep.alert_when_due.detail}</p>
+				<p>{toddler_sleep_prep.alert_when_due.detail}</p>
 			</Card>
 		{:else}
 			<Pill colour="blue">Not yet due</Pill>
 		{/if}
 		<h3>Reading</h3>
-		{#each data.toddler_sleep_prep.reading as i}
+		{#each toddler_sleep_prep.reading as i}
 			<h4>{i.title}</h4>
 			<p>{i.note}</p>
 		{/each}
 	</details>
 	<details name="section">
 		<summary><h2>Food Principles</h2></summary>
-		<p>{data.food_principles.core_philosophy}</p>
-		<p>{data.food_principles.note}</p>
+		<p>{food_principles.core_philosophy}</p>
+		<p>{food_principles.note}</p>
 		<h3>Current Principles</h3>
-		{#each data.food_principles.current_and_ongoing as i}
+		{#each food_principles.current_and_ongoing as i}
 			<h4>{i.title}</h4>
 			<p>{i.detail}</p>
 		{/each}
 		<h3>What to expect from a toddler</h3>
-		{#each data.food_principles.toddler_forward_look as i}
+		{#each food_principles.toddler_forward_look as i}
 			<h4>{i.title}</h4>
 			<p>{i.detail}</p>
 		{/each}
 	</details>
 	<details name="section">
 		<summary><h2>Sources</h2></summary>
-		{#each data.sources as s}
+		{#each sources as s}
 			<h3>{s.name}</h3>
 			<p>{s.detail}</p>
 			{#if s.note}<p>{s.note}</p>{/if}
