@@ -4,16 +4,16 @@
 	import fetchClientData, { setCache } from '$utils/fetchClientData';
 	import { getToken } from '$lib/auth';
 	import type { Colour } from '$types/global';
-	import Allergens from '$components/parts/smallHuman/Allergens.svelte';
-	import Teeth from '$components/parts/smallHuman/Teeth.svelte';
-	import Stats from '$components/parts/Stats.svelte';
-	import Growth from '$components/parts/smallHuman/Growth.svelte';
-	import Card from '$components/parts/Card.svelte';
-	import Cards from '$components/parts/Cards.svelte';
-	import Pill from '$components/parts/Pill.svelte';
+	import Allergens from '$parts/smallHuman/Allergens.svelte';
+	import Teeth from '$parts/smallHuman/Teeth.svelte';
+	import Stats from '$parts/Stats.svelte';
+	import Growth from '$parts/smallHuman/Growth.svelte';
+	import Card from '$parts/Card.svelte';
+	import Cards from '$parts/Cards.svelte';
+	import Pill from '$parts/Pill.svelte';
 	import type { Alert, AlertType, MilestoneStatus, SignStatus, ValueNote } from '$types/generated';
-	import Milestone from '$components/parts/smallHuman/Milestone.svelte';
-	import Auslan from '$components/parts/smallHuman/Auslan.svelte';
+	import Milestone from '$parts/smallHuman/Milestone.svelte';
+	import Auslan from '$parts/smallHuman/Auslan.svelte';
 	import Breasts from '$img/icons/breasts.svg?component'
 	import Water from '$img/icons/glass-water.svg?component'
 	import Food from '$img/icons/soup.svg?component'

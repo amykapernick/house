@@ -1,8 +1,8 @@
 <script lang="ts" generics="Status extends IconName">
-	import Icon from "../Icon.svelte";
-	import type { IconName } from "../Icon.svelte";
-	import Modal from "../Modal.svelte";
-	import Select from "../Select.svelte";
+	import Icon from "$parts/Icon.svelte";
+	import type { IconName } from "$parts/Icon.svelte";
+	import Modal from "$parts/Modal.svelte";
+	import Select from "$parts/Select.svelte";
 
 	const {
 		id,

@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { differenceInDays, parseISO, format } from 'date-fns';
-	import Wheat from '$lib/img/icons/grain.svg?component';
-	import Cow from '$lib/img/icons/cow-2.svg?component';
-	import Sesame from '$lib/img/icons/sesame.svg?component';
-	import Prawn from '$lib/img/icons/shrimp.svg?component';
-	import Fish from '$lib/img/icons/fish-2.svg?component';
-	import Egg from '$lib/img/icons/fried-egg.svg?component';
-	import Peanut from '$lib/img/icons/peanut.svg?component';
-	import SoySauce from '$lib/img/icons/soy-sauce.svg?component';
+	import Wheat from '$img/icons/grain.svg?component';
+	import Cow from '$img/icons/cow-2.svg?component';
+	import Sesame from '$img/icons/sesame.svg?component';
+	import Prawn from '$img/icons/shrimp.svg?component';
+	import Fish from '$img/icons/fish-2.svg?component';
+	import Egg from '$img/icons/fried-egg.svg?component';
+	import Peanut from '$img/icons/peanut.svg?component';
+	import SoySauce from '$img/icons/soy-sauce.svg?component';
 
 	let { 
 		allergens = [], 

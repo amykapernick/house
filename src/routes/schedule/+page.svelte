@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { format, startOfWeek, endOfWeek } from 'date-fns';
-	import ScheduleView from '$components/partials/calendar/ScheduleView.svelte';
+	import ScheduleView from '$partials/calendar/ScheduleView.svelte';
 	import { isAuthenticated, getToken } from '$lib/auth';
 	import fetchClientData from '$utils/fetchClientData';
 	import type { ScheduleBlock, ScheduleSavePayload, RoutineDays, PaletteColour } from '$types/schedule';

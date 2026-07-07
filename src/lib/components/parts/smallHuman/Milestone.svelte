@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { MilestoneStatus, MilestoneCategory } from "$types/generated";
-	import Card from "../Card.svelte";
+	import Card from "$parts/Card.svelte";
 	import StatusSelect from "./StatusSelect.svelte";
 
 	const {

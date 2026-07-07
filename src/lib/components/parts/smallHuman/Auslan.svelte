@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { AuslanSign, SignStatus } from "$types/generated";
-	import Card from "../Card.svelte";
-	import Modal from "../Modal.svelte";
+	import Card from "$parts/Card.svelte";
+	import Modal from "$parts/Modal.svelte";
 	import StatusSelect from "./StatusSelect.svelte";
 
 	const {

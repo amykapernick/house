@@ -1,10 +1,10 @@
 <script lang="ts">
-	import TeethGraphic from '$lib/img/smallHuman/teeth.svg?component';
+	import TeethGraphic from '$img/smallHuman/teeth.svg?component';
 	import type { Teeth, Tooth } from '$types/smallHuman';
 	import { formatDate, differenceInMonths, parseISO } from 'date-fns';
-	import Pill from '../Pill.svelte';
-	import Stats from '../Stats.svelte';
-	import Modal from '../Modal.svelte';
+	import Pill from '$parts/Pill.svelte';
+	import Stats from '$parts/Stats.svelte';
+	import Modal from '$parts/Modal.svelte';
 
 	const {
 		teeth,
