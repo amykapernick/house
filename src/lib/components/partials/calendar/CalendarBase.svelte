@@ -12,7 +12,8 @@
 		optionsOverride?: Record<string, any>;
 	} = $props();
 
-	// svelte-ignore state_referenced_locally -- optionsOverride is a static config object per caller, not a value that changes after mount
+	// optionsOverride is a static config object per caller, not a value that changes after mount
+	// svelte-ignore state_referenced_locally
 	let options = $state({
 		locale: 'en-AU',
 		firstDay: 1,
