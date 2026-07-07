@@ -18,7 +18,7 @@
 		mealPlans: any[];
 	} = $props();
 
-	let currentView = $state('dayGridWeek');
+	let currentView = $state('timeGridWeek');
 
 	let calendarEvents = $derived.by(() => {
 		const taskEvents = parseTasks(tasks);
@@ -76,14 +76,14 @@
 	});
 
 	let options = $state({
-		view: 'dayGridWeek',
+		view: 'timeGridWeek',
 		locale: 'en-AU',
 		firstDay: 1,
-		editable: true,
+		editable: false,
 		selectable: true,
 		events: [] as any[],
 		viewDidMount: (info: any) => {
-			currentView = info?.type ?? info?.view?.type ?? 'dayGridMonth';
+			currentView = info?.type ?? info?.view?.type ?? 'timeGridWeek';
 		},
 		headerToolbar: {
 			start: 'title',
