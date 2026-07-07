@@ -22,6 +22,17 @@ jobs:
         with:
           submodules: true
           lfs: false
+      - name: Track TODOs as issues
+        if: github.ref_name == 'prod' || github.ref_name == 'dev'
+        uses: ribtoks/tdg-github-action@master
+        with:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.sha }}
+          REF: ${{ github.ref }}
+          ASSIGN_FROM_BLAME: true
+          COMMENT_ON_ISSUES: true
+          EXCLUDE_PATTERN: '(node_modules|dist|build|\.svelte-kit)/'
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -36,16 +47,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: node .github/scripts/lint-and-file-issues.mjs
-      - name: Track TODOs as issues
-        if: github.ref_name == 'prod' || github.ref_name == 'dev'
-        uses: ribtoks/tdg-github-action@master
-        with:
-          TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REPO: ${{ github.repository }}
-          SHA: ${{ github.sha }}
-          REF: ${{ github.ref }}
-          ASSIGN_FROM_BLAME: true
-          COMMENT_ON_ISSUES: true
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
