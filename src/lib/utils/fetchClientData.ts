@@ -34,6 +34,15 @@ export function setCache(key: string, data: any) {
 	catch {}
 }
 
+// adapter-static means /api/* server routes don't exist at runtime in production -
+// mutation call sites doing their own fetch() must resolve the same way, or they
+// silently 405 against the deployed static host instead of reaching the API.
+export function getGraphqlUrl(): string {
+	return import.meta.env.VITE_API_URL
+		? `${import.meta.env.VITE_API_URL}/graphql`
+		: `/api/graphql`;
+}
+
 const fetchClientData = async (props: FetchClientDataProps) => {
 	const { gqlQuery, cacheKey, skipCache, ttl = DEFAULT_CACHE_TTL, onStale } = props;
 
@@ -60,12 +69,8 @@ const fetchClientData = async (props: FetchClientDataProps) => {
 		headers[`Authorization`] = `Bearer ${token}`;
 	}
 
-	const apiUrl = import.meta.env.VITE_API_URL
-		? `${import.meta.env.VITE_API_URL}/graphql`
-		: `/api/graphql`;
-
 	try {
-		const res = await fetch(apiUrl, {
+		const res = await fetch(getGraphqlUrl(), {
 			method: `POST`,
 			headers,
 			body: JSON.stringify({ query: gqlQuery }),

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { isAuthenticated } from '$lib/auth';
 	import { format, addDays, formatDate, isWithinInterval, addWeeks, differenceInWeeks } from 'date-fns';
-	import fetchClientData, { setCache } from '$utils/fetchClientData';
+	import fetchClientData, { setCache, getGraphqlUrl } from '$utils/fetchClientData';
 	import { getToken } from '$lib/auth';
 	import type { Colour } from '$types/global';
 	import Allergens from '$parts/smallHuman/Allergens.svelte';
@@ -196,7 +196,7 @@
 		completing.add(taskId);
 		const token = await getToken();
 
-		await fetch('/api/graphql', {
+		await fetch(getGraphqlUrl(), {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -231,7 +231,7 @@
 	}) {
 		const token = await getToken();
 
-		const res = await fetch('/api/graphql', {
+		const res = await fetch(getGraphqlUrl(), {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -269,7 +269,7 @@
 	async function markToothErupted(fdi: number) {
 		const token = await getToken();
 
-		const res = await fetch('/api/graphql', {
+		const res = await fetch(getGraphqlUrl(), {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',

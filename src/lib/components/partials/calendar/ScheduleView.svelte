@@ -5,19 +5,66 @@
 	import CalendarBase from './CalendarBase.svelte';
 	import ScheduleBlockModal from './ScheduleBlockModal.svelte';
 	import ScheduleSaveModal from './ScheduleSaveModal.svelte';
+	import TaskEventModal from './TaskEventModal.svelte';
+	import parseTasks from '$utils/calendar/parseTasks';
+	import parseEvents from '$utils/calendar/parseEvents';
+	import { getToken } from '$lib/auth';
+	import { getGraphqlUrl } from '$utils/fetchClientData';
 	import type { ScheduleBlock, ScheduleSavePayload, RoutineDays, PaletteColour } from '$types/schedule';
+	import type { Task } from '$types/tasks';
 
 	let {
 		blocks = [],
 		colours = [],
+		tasks = [],
+		events = [],
+		icalEvents = [],
 		onRangeChange,
 		onSave,
+		onTaskCompleted,
 	}: {
 		blocks: ScheduleBlock[];
 		colours?: PaletteColour[];
+		tasks?: Task[];
+		events?: any[];
+		icalEvents?: any[];
 		onRangeChange?: (start: Date, end: Date) => void;
 		onSave?: (payload: ScheduleSavePayload) => Promise<void>;
+		onTaskCompleted?: (taskId: string) => void;
 	} = $props();
+
+	let selectedTask = $state<{ id: string; title: string; due?: Date; status?: string; platform: `notion` | `todoist`; link: string } | null>(null);
+	let taskModalOpen = $state(false);
+	let completing = $state(false);
+	let completeError = $state(``);
+
+	async function completeSelectedTask() {
+		if (!selectedTask) return;
+		completing = true;
+		completeError = ``;
+
+		const token = await getToken();
+		const res = await fetch(getGraphqlUrl(), {
+			method: `POST`,
+			headers: {
+				'Content-Type': `application/json`,
+				...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+			},
+			body: JSON.stringify({
+				query: `mutation { completeTask(taskId: "${selectedTask.id}", platform: ${selectedTask.platform}) { success } }`,
+			}),
+		}).then((r) => r.json());
+
+		completing = false;
+
+		if (!res?.data?.completeTask?.success) {
+			completeError = `Couldn't mark this task complete. Try again.`;
+			return;
+		}
+
+		onTaskCompleted?.(selectedTask.id);
+		taskModalOpen = false;
+	}
 
 	const DEFAULT_COLOUR_NAME = `purple_bright`;
 
@@ -64,19 +111,42 @@
 		return days;
 	}
 
-	let calendarEvents = $derived(
-		editableBlocks.map((block) => ({
+	let calendarEvents = $derived.by(() => {
+		const blockEvents = editableBlocks.map((block) => ({
 			id: block.id,
 			title: block.label,
 			start: new Date(block.start),
 			end: new Date(block.end),
 			allDay: false,
+			editable: true,
 			backgroundColor: block.colour
 				? (block.colour.startsWith('#') ? block.colour : `var(--${block.colour})`)
 				: 'var(--purple_bright)',
 			classNames: block.isOverride ? ['schedule-override'] : [],
-		}))
-	);
+			extendedProps: { type: 'block', link: undefined, status: undefined, platform: undefined },
+		}));
+
+		const taskEvents = parseTasks(tasks);
+		const otherEvents = [...parseEvents(events), ...parseEvents(icalEvents)];
+
+		const readOnlyEvents = [...taskEvents, ...otherEvents].map((event) => ({
+			id: event.id,
+			title: event.title,
+			start: new Date(event.start),
+			end: new Date(event.end),
+			allDay: event.allDay ?? false,
+			editable: false,
+			backgroundColor: event.type === 'task' ? 'var(--purple_bright)' : 'var(--blue)',
+			extendedProps: {
+				type: event.type,
+				link: 'link' in event ? event.link : undefined,
+				status: 'status' in event ? event.status : undefined,
+				platform: 'platform' in event ? event.platform : undefined,
+			},
+		}));
+
+		return [...blockEvents, ...readOnlyEvents];
+	});
 
 	// Block create/edit modal
 	let blockModalOpen = $state(false);
@@ -154,6 +224,27 @@
 	}
 
 	function handleEventClick(info: any) {
+		const { type, link, status, platform } = info.event.extendedProps ?? {};
+
+		if (type === `task`) {
+			completeError = ``;
+			selectedTask = {
+				id: info.event.id,
+				title: info.event.title,
+				due: info.event.start,
+				status,
+				platform,
+				link,
+			};
+			taskModalOpen = true;
+			return;
+		}
+
+		if (type === `event`) {
+			if (link) window.open(link, `_blank`);
+			return;
+		}
+
 		const block = editableBlocks.find((b) => b.id === info.event.id);
 		if (block) openEditModal(block);
 	}
@@ -189,7 +280,7 @@
 		view: 'timeGridWeek',
 		editable: true,
 		selectable: true,
-		allDaySlot: false,
+		allDaySlot: true,
 		slotMinTime: '05:00:00',
 		slotMaxTime: '23:00:00',
 		headerToolbar: {
@@ -205,6 +296,13 @@
 			end.setDate(end.getDate() - 1);
 			visibleRange = { start: info.start, end };
 			onRangeChange?.(info.start, end);
+		},
+		eventContent: (info: any) => {
+			const { type } = info.event.extendedProps ?? {};
+			let icon = '';
+			if (type === 'task') icon = '☐ ';
+			else if (type === 'event') icon = '📅 ';
+			return { html: `<span>${icon}${info.event.title}</span>` };
 		},
 		select: handleSelect,
 		eventClick: handleEventClick,
@@ -242,6 +340,20 @@
 	error={saveError}
 	onConfirm={confirmSave}
 />
+
+{#if selectedTask}
+	<TaskEventModal
+		bind:open={taskModalOpen}
+		title={selectedTask.title}
+		due={selectedTask.due}
+		status={selectedTask.status}
+		platform={selectedTask.platform}
+		link={selectedTask.link}
+		saving={completing}
+		error={completeError}
+		onComplete={completeSelectedTask}
+	/>
+{/if}
 
 <style>
 	.schedule_toolbar {

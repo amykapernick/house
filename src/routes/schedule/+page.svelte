@@ -2,14 +2,85 @@
 	import { format, startOfWeek, endOfWeek } from 'date-fns';
 	import ScheduleView from '$partials/calendar/ScheduleView.svelte';
 	import { isAuthenticated, getToken } from '$lib/auth';
-	import fetchClientData from '$utils/fetchClientData';
+	import fetchClientData, { getGraphqlUrl } from '$utils/fetchClientData';
 	import type { ScheduleBlock, ScheduleSavePayload, RoutineDays, PaletteColour } from '$types/schedule';
+	import type { Task } from '$types/tasks';
 
 	let blocks = $state<ScheduleBlock[]>([]);
 	let colours = $state<PaletteColour[]>([]);
 	let defaultRoutineId = $state<string | null>(null);
 	let loading = $state(true);
 	let currentRange = $state<{ from: string; to: string } | null>(null);
+
+	let tasks = $state<Task[]>([]);
+	let events = $state<any[]>([]);
+	let icalEvents = $state<any[]>([]);
+
+	function loadCalendarItems() {
+		function handleCalendar(res: any) {
+			tasks = res.tasks ?? [];
+			events = res.events ?? [];
+		}
+		fetchClientData({
+			cacheKey: 'calendar',
+			onStale: handleCalendar,
+			gqlQuery: `
+				query {
+					tasks {
+						id
+						name
+						assigned {
+							name
+							slug
+							profile
+							colour
+						}
+						status
+						due
+						end
+						allDay
+						estimate
+						link
+						platform
+					}
+					events {
+						name
+						dates {
+							start
+							end
+						}
+						status
+						id
+					}
+				}
+			`,
+		}).then(handleCalendar);
+
+		function handleIcs(res: any) { icalEvents = res.icsEvents ?? []; }
+		fetchClientData({
+			cacheKey: 'icsEvents',
+			onStale: handleIcs,
+			gqlQuery: `
+				query {
+					icsEvents {
+						id
+						name
+						dates {
+							start
+							end
+						}
+						status
+						allDay
+						colour
+					}
+				}
+			`,
+		}).then(handleIcs);
+	}
+
+	function handleTaskCompleted(taskId: string) {
+		tasks = tasks.filter((task) => task.id !== taskId);
+	}
 
 	function loadColours() {
 		function handleColours(res: any) {
@@ -71,6 +142,7 @@
 				endOfWeek(today, { weekStartsOn: 1 })
 			);
 			loadColours();
+			loadCalendarItems();
 		}
 	});
 
@@ -96,7 +168,7 @@
 				: `mutation { createRoutineOverride(start: ${gqlStr(payload.start)}, end: ${gqlStr(payload.end)}, ${daysArgs}) { success } }`;
 
 		const token = await getToken();
-		const res = await fetch(`/api/graphql`, {
+		const res = await fetch(getGraphqlUrl(), {
 			method: `POST`,
 			headers: {
 				'Content-Type': `application/json`,
@@ -129,5 +201,14 @@
 {#if loading}
 	<p>Loading...</p>
 {:else}
-	<ScheduleView {blocks} {colours} onRangeChange={handleRangeChange} onSave={handleSave} />
+	<ScheduleView
+		{blocks}
+		{colours}
+		{tasks}
+		{events}
+		{icalEvents}
+		onRangeChange={handleRangeChange}
+		onSave={handleSave}
+		onTaskCompleted={handleTaskCompleted}
+	/>
 {/if}

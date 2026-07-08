@@ -5,6 +5,7 @@
 	import { graphql, updateSchema } from 'cm6-graphql';
 	import { buildClientSchema, getIntrospectionQuery, type GraphQLSchema } from 'graphql';
 	import { getToken, isAuthenticated } from '$lib/auth';
+	import { getGraphqlUrl } from '$utils/fetchClientData';
 
 	const DEFAULT_QUERY = `query {\n  \n}\n`;
 
@@ -20,11 +21,7 @@
 		const headers: Record<string, string> = { 'Content-Type': `application/json` };
 		if (token) headers.Authorization = `Bearer ${token}`;
 
-		const apiUrl = import.meta.env.VITE_API_URL
-			? `${import.meta.env.VITE_API_URL}/graphql`
-			: `/api/graphql`;
-
-		const res = await fetch(apiUrl, {
+		const res = await fetch(getGraphqlUrl(), {
 			method: `POST`,
 			headers,
 			body: JSON.stringify({ query }),

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { isAuthenticated, getToken } from '$lib/auth';
-	import fetchClientData from '$utils/fetchClientData';
+	import fetchClientData, { getGraphqlUrl } from '$utils/fetchClientData';
 	import { getWeekRange } from '$utils/dateRanges';
 	import { resolve } from '$app/paths';
 	import { format, parseISO, isToday, isYesterday, intervalToDuration } from 'date-fns';
@@ -118,7 +118,7 @@
 
 	async function postMutation(mutation: string) {
 		const token = await getToken();
-		return fetch(`/api/graphql`, {
+		return fetch(getGraphqlUrl(), {
 			method: `POST`,
 			headers: {
 				'Content-Type': `application/json`,

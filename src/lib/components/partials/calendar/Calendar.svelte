@@ -6,6 +6,7 @@
 	import parseTasks from '$utils/calendar/parseTasks';
 	import parseEvents from '$utils/calendar/parseEvents';
 	import { getToken } from '$lib/auth';
+	import { getGraphqlUrl } from '$utils/fetchClientData';
 	import type { Task } from '$types/tasks';
 
 	let {
@@ -33,7 +34,7 @@
 		completeError = ``;
 
 		const token = await getToken();
-		const res = await fetch(`/api/graphql`, {
+		const res = await fetch(getGraphqlUrl(), {
 			method: `POST`,
 			headers: {
 				'Content-Type': `application/json`,

@@ -4,7 +4,7 @@
 	import BudgetBuckets from '$partials/finance/BudgetBuckets.svelte';
 	import BudgetCharts from '$partials/finance/BudgetCharts.svelte';
 	import { isAuthenticated, getToken } from '$lib/auth';
-	import fetchClientData from '$utils/fetchClientData';
+	import fetchClientData, { getGraphqlUrl } from '$utils/fetchClientData';
 	import type { BudgetItem } from '$types/budget';
 	import type { BudgetBucket } from '$types/budgetBucket';
 
@@ -157,7 +157,7 @@
 
 		try {
 			const token = await getToken();
-			const res = await fetch('/api/graphql', {
+			const res = await fetch(getGraphqlUrl(), {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
