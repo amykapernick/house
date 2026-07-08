@@ -16,6 +16,32 @@
 
 	let recipe = $state<any>(null);
 	let loading = $state(true);
+	let multiplier = $state(1);
+
+	const SCALE_PRESETS = [1, 2, 3];
+
+	// Common cooking fractions, checked in descending order so eg. 0.75 matches ¾ before ½.
+	const FRACTIONS: [number, string][] = [
+		[7 / 8, '⅞'], [3 / 4, '¾'], [5 / 8, '⅝'], [2 / 3, '⅔'], [1 / 2, '½'],
+		[3 / 8, '⅜'], [1 / 3, '⅓'], [1 / 4, '¼'], [1 / 8, '⅛'],
+	];
+
+	function formatQuantity(value: number): string {
+		const whole = Math.floor(value);
+		const frac = value - whole;
+		if (frac < 0.02) return `${whole}`;
+		for (const [f, symbol] of FRACTIONS) {
+			if (Math.abs(frac - f) < 0.02) return whole > 0 ? `${whole}${symbol}` : symbol;
+		}
+		return `${Math.round(value * 100) / 100}`;
+	}
+
+	function scaledIngredientText(ingredient: any): string {
+		if (multiplier === 1 || ingredient.quantity == null) return ingredient.display;
+		const parts = [formatQuantity(ingredient.quantity * multiplier), ingredient.unit, ingredient.food].filter(Boolean);
+		const text = parts.join(' ');
+		return ingredient.note ? `${text} (${ingredient.note})` : text;
+	}
 
 	$effect(() => {
 		{
@@ -80,7 +106,7 @@
 			{#if recipe.cookTime}<div class="meta-item"><span class="label">Cook</span><span>{formatMinutes(recipe.cookTime)}</span></div>{/if}
 			{#if recipe.totalTime}<div class="meta-item"><span class="label">Total</span><span>{formatMinutes(recipe.totalTime)}</span></div>{/if}
 			{#if recipe.performTime}<div class="meta-item"><span class="label">Perform</span><span>{formatMinutes(recipe.performTime)}</span></div>{/if}
-			{#if recipe.servings}<div class="meta-item"><span class="label">Servings</span><span>{recipe.servings}</span></div>{/if}
+			{#if recipe.servings}<div class="meta-item"><span class="label">Servings</span><span>{formatQuantity(recipe.servings * multiplier)}</span></div>{/if}
 			{#if recipe.recipeYield}<div class="meta-item"><span class="label">Yield</span><span>{recipe.recipeYield}</span></div>{/if}
 		</div>
 
@@ -97,14 +123,35 @@
 
 		<div class="columns">
 			<section class="ingredients">
-				<h2>Ingredients</h2>
+				<div class="ingredients-header">
+					<h2>Ingredients</h2>
+					<div class="scale-bar">
+						<span class="label">Scale</span>
+						{#each SCALE_PRESETS as preset (preset)}
+							<button
+								type="button"
+								class="scale-btn"
+								class:active={multiplier === preset}
+								onclick={() => (multiplier = preset)}
+							>×{preset}</button>
+						{/each}
+						<input
+							type="number"
+							min="0.25"
+							step="0.25"
+							bind:value={multiplier}
+							class="scale-custom"
+							aria-label="Custom scale"
+						/>
+					</div>
+				</div>
 				{#if recipe.ingredients?.length}
 					<ul>
 						{#each recipe.ingredients as ingredient, i (i)}
 							{#if ingredient.title}
 								<li class="section-title">{ingredient.title}</li>
 							{:else}
-								<li>{ingredient.display}</li>
+								<li>{scaledIngredientText(ingredient)}</li>
 							{/if}
 						{/each}
 					</ul>
@@ -266,6 +313,60 @@
 	}
 
 	.ingredients {
+		& .ingredients-header {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			justify-content: space-between;
+			gap: 0.5em;
+
+			& h2 {
+				margin: 0;
+			}
+		}
+
+		& .scale-bar {
+			display: flex;
+			align-items: center;
+			gap: 0.3em;
+
+			& .label {
+				font-size: 0.75em;
+				text-transform: uppercase;
+				color: var(--grey);
+				font-weight: 600;
+				margin-right: 0.2em;
+			}
+		}
+
+		& .scale-btn {
+			padding: 0.2em 0.6em;
+			border: 1px solid var(--grey_light);
+			border-radius: 0.3em;
+			background: transparent;
+			cursor: pointer;
+			font-size: 0.85em;
+
+			&:hover {
+				border-color: var(--purple_bright);
+				color: var(--purple_bright);
+			}
+
+			&.active {
+				background: var(--purple_bright);
+				border-color: var(--purple_bright);
+				color: var(--white);
+			}
+		}
+
+		& .scale-custom {
+			width: 3.5em;
+			padding: 0.2em 0.4em;
+			border: 1px solid var(--grey_light);
+			border-radius: 0.3em;
+			font-size: 0.85em;
+		}
+
 		& ul {
 			margin: 0;
 			padding: 0;
