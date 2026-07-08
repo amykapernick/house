@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { format } from 'date-fns';
+	import { SvelteDate } from 'svelte/reactivity';
 	import { TimeGrid, Interaction } from '@event-calendar/core';
 	import CalendarBase from './CalendarBase.svelte';
 	import ScheduleBlockModal from './ScheduleBlockModal.svelte';
@@ -24,7 +25,7 @@
 		if (!colour) return DEFAULT_COLOUR_NAME;
 		if (colours.some((c) => c.name === colour)) return colour;
 		if (colour.startsWith(`#`)) {
-			const match = colours.find((c) => c.hex.toLowerCase() === colour.toLowerCase());
+			const match = colours.find((c) => c.hex?.toLowerCase() === colour.toLowerCase());
 			if (match) return match.name;
 		}
 		return DEFAULT_COLOUR_NAME;
@@ -200,7 +201,7 @@
 			today: 'This Week',
 		},
 		datesSet: (info: any) => {
-			const end = new Date(info.end);
+			const end = new SvelteDate(info.end);
 			end.setDate(end.getDate() - 1);
 			visibleRange = { start: info.start, end };
 			onRangeChange?.(info.start, end);
