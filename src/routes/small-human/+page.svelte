@@ -203,7 +203,7 @@
 				...(token ? { 'Authorization': `Bearer ${token}` } : {}),
 			},
 			body: JSON.stringify({
-				query: `mutation { completeTask(taskId: "${taskId}") { success } }`,
+				query: `mutation { completeTask(taskId: "${taskId}", platform: todoist) { success } }`,
 			}),
 		}).then(r => r.json());
 

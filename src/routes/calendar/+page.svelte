@@ -10,6 +10,10 @@
 	let mealPlans = $state<any[]>([]);
 	let loading = $state(true);
 
+	function handleTaskCompleted(taskId: string) {
+		tasks = tasks.filter((task) => task.id !== taskId);
+	}
+
 	$effect(() => {
 		if ($isAuthenticated) {
 			function handleCalendar(res: any) {
@@ -101,5 +105,5 @@
 {#if loading}
 	<p>Loading...</p>
 {:else}
-	<CalendarView {tasks} allDayEvents={events} {icalEvents} {mealPlans} />
+	<CalendarView {tasks} allDayEvents={events} {icalEvents} {mealPlans} onTaskCompleted={handleTaskCompleted} />
 {/if}

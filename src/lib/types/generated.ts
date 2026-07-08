@@ -521,6 +521,7 @@ export type MutationCheckShoppingItemArgs = {
 
 
 export type MutationCompleteTaskArgs = {
+  platform: Platform;
   taskId: Scalars['String']['input'];
 };
 
