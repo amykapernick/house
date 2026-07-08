@@ -19,6 +19,7 @@
 </script>
 
 <label class="sr-only" for={id}>{label}</label>
+<!-- TODO: Fix base-select dialog issue -https://share.gemini.google/zQwwapLfeqcY -->
 <select class="select" {id} bind:value {onchange}>
 	<button>
 		<selectedcontent></selectedcontent>
