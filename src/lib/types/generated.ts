@@ -219,6 +219,11 @@ export type CompleteTaskResult = {
   success: Scalars['Boolean']['output'];
 };
 
+export type CreateShoppingItemResult = {
+  item: Maybe<ShoppingItem>;
+  success: Scalars['Boolean']['output'];
+};
+
 export type CurrentClothingRecommendation = {
   generated_from_feels_like_c: Maybe<Scalars['Float']['output']>;
   generated_from_temp_c: Maybe<Scalars['Float']['output']>;
@@ -500,6 +505,7 @@ export type Mutation = {
   createBudgetItem: Maybe<BudgetMutationResult>;
   createMealPlanEntry: Maybe<MealPlanEntry>;
   createRoutineOverride: Maybe<ScheduleMutationResult>;
+  createShoppingItem: Maybe<CreateShoppingItemResult>;
   deleteBudgetItem: Maybe<BudgetMutationResult>;
   deleteMealPlanEntry: Maybe<MealPlanMutationResult>;
   markToothErupted: Maybe<Tooth>;
@@ -550,6 +556,12 @@ export type MutationCreateRoutineOverrideArgs = {
   thursday: Array<RoutineDayBlockInput>;
   tuesday: Array<RoutineDayBlockInput>;
   wednesday: Array<RoutineDayBlockInput>;
+};
+
+
+export type MutationCreateShoppingItemArgs = {
+  note: Scalars['String']['input'];
+  quantity?: InputMaybe<Scalars['Float']['input']>;
 };
 
 

@@ -362,6 +362,22 @@
 	{@const clothing_seasonal = clothing.seasonal}
 	{@const clothing_daytime = clothing.daytime}
 	{@const food_principles = feeding.principles}
+	{@const urgentAlerts = alerts.filter((a: Alert) => a.level === 'urgent')}
+	{@const otherAlerts = alerts.filter((a: Alert) => a.level !== 'urgent')}
+
+	{#if urgentAlerts.length}
+		<div class="urgent-alerts">
+			{#each urgentAlerts as alert (alert.id)}
+				<div class="urgent-alert">
+					<span class="urgent-badge">Urgent</span>
+					<div class="urgent-body">
+						<h2>{alert.title}</h2>
+						<p>{alert.detail}</p>
+					</div>
+				</div>
+			{/each}
+		</div>
+	{/if}
 
 	<h2 id="overview">Overview</h2>
 
@@ -370,7 +386,7 @@
 		{ name: 'Age', value: ageDisplay, colour: 'blue_navy' },
 	]} />
 	<Cards>
-		{#each alerts as alert (alert.id)}
+		{#each otherAlerts as alert (alert.id)}
 			<Card {...alert} colour={alertColours[alert.level]}>
 				<p>{alert.detail}</p>
 			</Card>
@@ -572,6 +588,47 @@
 
 	h2 {
 		text-transform: capitalize;
+	}
+
+	.urgent-alerts {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75em;
+		margin-bottom: 1.5em;
+	}
+
+	.urgent-alert {
+		display: flex;
+		align-items: flex-start;
+		gap: 0.75em;
+		padding: 1em;
+		border: 2px solid var(--red);
+		border-radius: 0.5em;
+		background: color-mix(in srgb, var(--red) 12%, white);
+	}
+
+	.urgent-badge {
+		flex-shrink: 0;
+		padding: 0.2em 0.6em;
+		border-radius: 1em;
+		background: var(--red);
+		color: var(--red_text);
+		font-size: 0.75em;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.03em;
+	}
+
+	.urgent-body {
+		& h2 {
+			margin: 0 0 0.2em;
+			font-size: 1.1em;
+			color: var(--red);
+		}
+
+		& p {
+			margin: 0;
+		}
 	}
 
 	pre {

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { isAuthenticated, getToken } from '$lib/auth';
-	import fetchClientData, { setCache } from '$utils/fetchClientData';
+	import fetchClientData, { setCache, getGraphqlUrl } from '$utils/fetchClientData';
 	import { SvelteSet } from 'svelte/reactivity';
 
 	type SubGroup = { name: string; items: any[] };
@@ -11,6 +11,9 @@
 	let loading = $state(true);
 	let showChecked = $state(false);
 	let checking = new SvelteSet<string>();
+	let newItemText = $state('');
+	let adding = $state(false);
+	let addError = $state('');
 
 	function fetchList(skipCache = false) {
 		loading = true;
@@ -50,12 +53,42 @@
 		}
 	});
 
+	async function addItem() {
+		const note = newItemText.trim();
+		if (!note) return;
+
+		adding = true;
+		addError = '';
+
+		const token = await getToken();
+		const res = await fetch(getGraphqlUrl(), {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+			},
+			body: JSON.stringify({
+				query: `mutation { createShoppingItem(note: ${JSON.stringify(note)}) { success } }`,
+			}),
+		}).then(r => r.json());
+
+		adding = false;
+
+		if (res?.errors || !res?.data?.createShoppingItem?.success) {
+			addError = 'Failed to add item.';
+			return;
+		}
+
+		newItemText = '';
+		fetchList(true);
+	}
+
 	async function toggleItem(item: any) {
 		const newChecked = !item.checked;
 		checking.add(item.id);
 
 		const token = await getToken();
-		const res = await fetch('/api/graphql', {
+		const res = await fetch(getGraphqlUrl(), {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -116,6 +149,18 @@
 </svelte:head>
 
 <h1>Shopping List</h1>
+
+<form class="quick-add" onsubmit={(e) => { e.preventDefault(); addItem(); }}>
+	<input
+		type="text"
+		placeholder="Add an item..."
+		bind:value={newItemText}
+		disabled={adding}
+		aria-label="Add an item to the shopping list"
+	/>
+	<button type="submit" disabled={adding || !newItemText.trim()}>{adding ? 'Adding…' : 'Add'}</button>
+</form>
+{#if addError}<p class="error">{addError}</p>{/if}
 
 {#if loading}
 	<p>Loading...</p>
@@ -180,6 +225,40 @@
 
 <style>
 	@import '@mixins';
+
+	.quick-add {
+		display: flex;
+		gap: 0.5em;
+		margin-bottom: 1em;
+
+		& input {
+			flex: 1;
+			padding: 0.5em 0.75em;
+			border: 1px solid var(--grey_light);
+			border-radius: 0.3em;
+			font-size: 0.95em;
+		}
+
+		& button {
+			padding: 0.5em 1em;
+			border: none;
+			border-radius: 0.3em;
+			background: var(--purple_bright);
+			color: var(--purple_bright_text);
+			cursor: pointer;
+			font-size: 0.95em;
+
+			&:disabled {
+				opacity: 0.5;
+				cursor: wait;
+			}
+		}
+	}
+
+	.error {
+		color: var(--red);
+		margin: 0 0 1em;
+	}
 
 	.controls {
 		display: flex;

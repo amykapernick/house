@@ -1,12 +1,16 @@
 <script lang="ts">
 	import { isAuthenticated } from '$lib/auth';
-	import { intervalToDuration } from 'date-fns';
+	import { intervalToDuration, format, startOfDay, addDays } from 'date-fns';
 	import fetchClientData from '$utils/fetchClientData';
 	import { getWeekRange } from '$utils/dateRanges';
 	import { resolve } from '$app/paths';
 
 	let meals = $state<any[]>([]);
 	let loading = $state(true);
+
+	let upcomingTasks = $state<any[]>([]);
+	let upcomingEvents = $state<any[]>([]);
+	let upcomingLoading = $state(true);
 
 	function formatMinutes(mins: number | string | null): string {
 		if (!mins) return '';
@@ -49,6 +53,64 @@
 		}
 	});
 
+	$effect(() => {
+		if ($isAuthenticated) {
+			const today = format(new Date(), 'yyyy-MM-dd');
+			const startOfToday = startOfDay(new Date());
+			const in7Days = addDays(startOfToday, 7);
+
+			function handleUpcoming(res: any) {
+				upcomingTasks = res.tasks ?? [];
+				upcomingEvents = (res.events ?? []).filter((event: any) => {
+					if (!event.dates?.start) return false;
+					const start = new Date(event.dates.start);
+					return start >= startOfToday && start <= in7Days;
+				});
+				upcomingLoading = false;
+			}
+			fetchClientData({
+				cacheKey: 'dashboard-upcoming',
+				onStale: handleUpcoming,
+				gqlQuery: `
+					query {
+						tasks {
+							id
+							name
+							status
+							due
+							dueLabel(today: "${today}")
+						}
+						events {
+							id
+							name
+							dates { start end }
+						}
+					}
+				`,
+			}).then(handleUpcoming);
+		}
+	});
+
+	let upcomingItems = $derived.by(() => {
+		const items: { id: string; label: string; date: Date; meta: string }[] = [];
+
+		for (const task of upcomingTasks) {
+			if (task.status === 'Done' || !task.dueLabel || !task.due) continue;
+			items.push({ id: `task-${task.id}`, label: task.name, date: new Date(task.due), meta: task.dueLabel });
+		}
+
+		for (const event of upcomingEvents) {
+			items.push({
+				id: `event-${event.id}`,
+				label: event.name,
+				date: new Date(event.dates.start),
+				meta: format(new Date(event.dates.start), 'dd MMM'),
+			});
+		}
+
+		return items.sort((a, b) => a.date.getTime() - b.date.getTime()).slice(0, 6);
+	});
+
 	let weekRecipes = $derived.by(() => {
 		// eslint-disable-next-line svelte/prefer-svelte-reactivity -- built and discarded synchronously within this derivation, never read reactively
 		const seen = new Set<string>();
@@ -68,47 +130,73 @@
 
 <h1>Dashboard</h1>
 
-<section class="widget">
-	<div class="widget-header">
-		<h2>This week's meals</h2>
-		<a href={resolve('/meal-plan')}>View all</a>
-	</div>
-
-	{#if loading}
-		<p>Loading...</p>
-	{:else if weekRecipes.length === 0}
-		<p class="empty">No meals planned this week.</p>
-	{:else}
-		<div class="grid">
-			{#each weekRecipes as recipe (recipe.slug)}
-				<a class="card" href={resolve('/recipes/[slug]', { slug: recipe.slug })}>
-					{#if recipe.image}
-						<img src={recipe.image} alt={recipe.name} loading="lazy" />
-					{:else}
-						<div class="no-image"></div>
-					{/if}
-					<div class="info">
-						<h3>{recipe.name}</h3>
-						{#if recipe.description}
-							<p class="description">{recipe.description}</p>
-						{/if}
-						<div class="meta">
-							{#if recipe.totalTime}<span>{formatMinutes(recipe.totalTime)}</span>{/if}
-							{#if recipe.servings}<span>{recipe.servings} servings</span>{/if}
-						</div>
-						{#if recipe.tags?.length}
-							<ul class="tags">
-								{#each recipe.tags as tag (tag.slug)}
-									<li>{tag.name}</li>
-								{/each}
-							</ul>
-						{/if}
-					</div>
-				</a>
-			{/each}
+{#if $isAuthenticated}
+	<section class="widget">
+		<div class="widget-header">
+			<h2>Upcoming</h2>
+			<a href={resolve('/calendar')}>View calendar</a>
 		</div>
-	{/if}
-</section>
+
+		{#if upcomingLoading}
+			<p>Loading...</p>
+		{:else if upcomingItems.length === 0}
+			<p class="empty">Nothing due in the next week.</p>
+		{:else}
+			<ul class="agenda">
+				{#each upcomingItems as item (item.id)}
+					<li class="agenda-item">
+						<span class="agenda-label">{item.label}</span>
+						<span class="agenda-meta" class:overdue={item.meta === 'Overdue'}>{item.meta}</span>
+					</li>
+				{/each}
+			</ul>
+		{/if}
+	</section>
+
+	<section class="widget">
+		<div class="widget-header">
+			<h2>This week's meals</h2>
+			<a href={resolve('/meal-plan')}>View all</a>
+		</div>
+
+		{#if loading}
+			<p>Loading...</p>
+		{:else if weekRecipes.length === 0}
+			<p class="empty">No meals planned this week.</p>
+		{:else}
+			<div class="grid">
+				{#each weekRecipes as recipe (recipe.slug)}
+					<a class="card" href={resolve('/recipes/[slug]', { slug: recipe.slug })}>
+						{#if recipe.image}
+							<img src={recipe.image} alt={recipe.name} loading="lazy" />
+						{:else}
+							<div class="no-image"></div>
+						{/if}
+						<div class="info">
+							<h3>{recipe.name}</h3>
+							{#if recipe.description}
+								<p class="description">{recipe.description}</p>
+							{/if}
+							<div class="meta">
+								{#if recipe.totalTime}<span>{formatMinutes(recipe.totalTime)}</span>{/if}
+								{#if recipe.servings}<span>{recipe.servings} servings</span>{/if}
+							</div>
+							{#if recipe.tags?.length}
+								<ul class="tags">
+									{#each recipe.tags as tag (tag.slug)}
+										<li>{tag.name}</li>
+									{/each}
+								</ul>
+							{/if}
+						</div>
+					</a>
+				{/each}
+			</div>
+		{/if}
+	</section>
+{:else}
+	<p class="empty">Sign in to see your upcoming tasks and this week's meals.</p>
+{/if}
 
 <style>
 	@import '@mixins';
@@ -142,6 +230,40 @@
 	.empty {
 		color: var(--grey);
 		font-style: italic;
+	}
+
+	.agenda {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.agenda-item {
+		display: flex;
+		justify-content: space-between;
+		align-items: baseline;
+		gap: 1em;
+		padding: 0.5em 0;
+		border-bottom: 1px solid var(--grey_light);
+
+		&:last-child {
+			border-bottom: none;
+		}
+	}
+
+	.agenda-label {
+		font-size: 0.9em;
+	}
+
+	.agenda-meta {
+		flex-shrink: 0;
+		font-size: 0.8em;
+		color: var(--grey);
+
+		&.overdue {
+			color: var(--red);
+			font-weight: 600;
+		}
 	}
 
 	.grid {
