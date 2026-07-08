@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { isAuthenticated, getToken } from '$lib/auth';
-	import fetchClientData from '$utils/fetchClientData';
+	import fetchClientData, { setCache } from '$utils/fetchClientData';
 	import { SvelteSet } from 'svelte/reactivity';
 
 	type SubGroup = { name: string; items: any[] };
@@ -55,7 +55,7 @@
 		checking.add(item.id);
 
 		const token = await getToken();
-		await fetch('/api/graphql', {
+		const res = await fetch('/api/graphql', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -65,6 +65,10 @@
 				query: `mutation { checkShoppingItem(itemId: "${item.id}", source: "${item.source}", checked: ${newChecked}) { success } }`,
 			}),
 		}).then(r => r.json());
+
+		checking.delete(item.id);
+
+		if (res?.errors || !res?.data?.checkShoppingItem?.success) return;
 
 		items = items.map(i =>
 			i.id === item.id ? { ...i, checked: newChecked } : i
@@ -78,7 +82,9 @@
 			})),
 		}));
 
-		checking.delete(item.id);
+		// Keep the shared cache in sync so a revisit within the TTL (or another
+		// device/tab reading the same cache key) doesn't show the pre-toggle state.
+		setCache('shopping-list', { shoppingList: { items, storeGroups } });
 	}
 
 	let uncheckedItems = $derived(items.filter(i => !i.checked));

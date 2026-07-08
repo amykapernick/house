@@ -12,8 +12,12 @@
 	let currentRange = $state<{ from: string; to: string } | null>(null);
 
 	function loadColours() {
+		function handleColours(res: any) {
+			colours = res.colours ?? [];
+		}
 		fetchClientData({
 			cacheKey: `colours`,
+			onStale: handleColours,
 			gqlQuery: `
 				query {
 					colours {
@@ -23,18 +27,22 @@
 					}
 				}
 			`,
-		}).then((res) => {
-			colours = res.colours ?? [];
-		});
+		}).then(handleColours);
 	}
 
 	const toDateStr = (date: Date) => format(date, 'yyyy-MM-dd');
 
 	function loadSchedule(from: string, to: string, skipCache = false) {
 		currentRange = { from, to };
+		function handleSchedule(res: any) {
+			blocks = res.schedule ?? [];
+			defaultRoutineId = res.defaultRoutineId ?? null;
+			loading = false;
+		}
 		fetchClientData({
 			cacheKey: `schedule-${from}-${to}`,
 			skipCache,
+			onStale: handleSchedule,
 			gqlQuery: `
 				query {
 					schedule(from: "${from}", to: "${to}") {
@@ -48,11 +56,7 @@
 					defaultRoutineId
 				}
 			`,
-		}).then((res) => {
-			blocks = res.schedule ?? [];
-			defaultRoutineId = res.defaultRoutineId ?? null;
-			loading = false;
-		});
+		}).then(handleSchedule);
 	}
 
 	function handleRangeChange(start: Date, end: Date) {

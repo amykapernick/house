@@ -45,7 +45,6 @@
 	let recipeResults = $state<Result[]>([]);
 	let recipesLoading = $state(false);
 	let upcomingMealPlan = new SvelteMap<string, PlannedMeal>();
-	let mealPlanLoaded = false;
 
 	function flattenPages(items: MenuItem[], sublabel?: string): Result[] {
 		return items.flatMap((item) => {
@@ -80,22 +79,7 @@
 		return value.replace(/\\/g, `\\\\`).replace(/"/g, `\\"`);
 	}
 
-	async function loadUpcomingMealPlan() {
-		if (!isAuthenticated || mealPlanLoaded) return;
-		mealPlanLoaded = true;
-		const start = format(new Date(), `yyyy-MM-dd`);
-		const end = format(addDays(new Date(), MEAL_PLAN_LOOKAHEAD_DAYS), `yyyy-MM-dd`);
-		const res = await fetchClientData({
-			cacheKey: `mealplan-upcoming-${start}`,
-			gqlQuery: `
-				query {
-					mealPlanByDay(startDate: "${start}", endDate: "${end}") {
-						date
-						entries { entryType recipe { slug } }
-					}
-				}
-			`,
-		});
+	function applyMealPlanResult(res: any) {
 		const map = new SvelteMap<string, PlannedMeal>();
 		for (const day of res.mealPlanByDay ?? []) {
 			for (const entry of day.entries ?? []) {
@@ -105,6 +89,25 @@
 			}
 		}
 		upcomingMealPlan = map;
+	}
+
+	async function loadUpcomingMealPlan() {
+		if (!isAuthenticated) return;
+		const start = format(new Date(), `yyyy-MM-dd`);
+		const end = format(addDays(new Date(), MEAL_PLAN_LOOKAHEAD_DAYS), `yyyy-MM-dd`);
+		const res = await fetchClientData({
+			cacheKey: `mealplan-upcoming-${start}`,
+			onStale: applyMealPlanResult,
+			gqlQuery: `
+				query {
+					mealPlanByDay(startDate: "${start}", endDate: "${end}") {
+						date
+						entries { entryType recipe { slug } }
+					}
+				}
+			`,
+		});
+		applyMealPlanResult(res);
 	}
 
 	function formatPlannedLabel(planned: PlannedMeal): string {

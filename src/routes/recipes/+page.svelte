@@ -83,19 +83,21 @@
 	}
 
 	function fetchTags() {
+		function handleTags(res: any) {
+			allTags = (res.recipeTags ?? []).sort((a: any, b: any) =>
+				a.name.localeCompare(b.name)
+			);
+			tagsLoading = false;
+		}
 		fetchClientData({
 			cacheKey: 'recipe-tags',
+			onStale: handleTags,
 			gqlQuery: `
 				query {
 					recipeTags { name slug }
 				}
 			`,
-		}).then((res) => {
-			allTags = (res.recipeTags ?? []).sort((a: any, b: any) =>
-				a.name.localeCompare(b.name)
-			);
-			tagsLoading = false;
-		});
+		}).then(handleTags);
 	}
 
 	onMount(() => {

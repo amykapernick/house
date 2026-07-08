@@ -23,9 +23,15 @@
 		loading = true;
 		const range = getWeekRange(weekOffset);
 
+		function handleMealPlan(res: any) {
+			days = res.mealPlanByDay ?? [];
+			loading = false;
+		}
+
 		fetchClientData({
 			cacheKey: `mealplan-${range.start}`,
 			skipCache,
+			onStale: handleMealPlan,
 			gqlQuery: `
 				query {
 					mealPlanByDay(startDate: "${range.start}", endDate: "${range.end}") {
@@ -41,10 +47,7 @@
 					}
 				}
 			`,
-		}).then((res) => {
-			days = res.mealPlanByDay ?? [];
-			loading = false;
-		});
+		}).then(handleMealPlan);
 	}
 
 	$effect(() => {
