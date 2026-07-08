@@ -134,6 +134,7 @@ export type BudgetMutationResult = {
 
 export type Calendar = {
   colour: Maybe<Scalars['String']['output']>;
+  family: Maybe<Array<Maybe<User>>>;
   id: Maybe<Scalars['String']['output']>;
   name: Maybe<Scalars['String']['output']>;
   slug: Maybe<Scalars['String']['output']>;
@@ -338,6 +339,7 @@ export type IcsEvent = {
   allDay: Maybe<Scalars['Boolean']['output']>;
   colour: Maybe<Scalars['String']['output']>;
   dates: Maybe<IcsEventDateRange>;
+  family: Maybe<Array<Maybe<User>>>;
   id: Maybe<Scalars['String']['output']>;
   name: Maybe<Scalars['String']['output']>;
   status: Maybe<Scalars['String']['output']>;

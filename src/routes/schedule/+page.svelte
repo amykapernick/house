@@ -1,10 +1,13 @@
 <script lang="ts">
 	import { format, startOfWeek, endOfWeek } from 'date-fns';
 	import ScheduleView from '$partials/calendar/ScheduleView.svelte';
+	import Select from '$parts/Select.svelte';
 	import { isAuthenticated, getToken } from '$lib/auth';
 	import fetchClientData, { getGraphqlUrl } from '$utils/fetchClientData';
 	import type { ScheduleBlock, ScheduleSavePayload, RoutineDays, PaletteColour } from '$types/schedule';
 	import type { Task } from '$types/tasks';
+
+	const EVERYONE = `everyone`;
 
 	let blocks = $state<ScheduleBlock[]>([]);
 	let colours = $state<PaletteColour[]>([]);
@@ -15,6 +18,30 @@
 	let tasks = $state<Task[]>([]);
 	let events = $state<any[]>([]);
 	let icalEvents = $state<any[]>([]);
+	let familyMembers = $state<{ slug: string; name: string }[]>([]);
+	let selectedUserSlug = $state(EVERYONE);
+
+	let visibleIcalEvents = $derived(
+		selectedUserSlug === EVERYONE
+			? icalEvents
+			: icalEvents.filter((event) => event.family?.some((member: any) => member.slug === selectedUserSlug))
+	);
+
+	function loadFamily() {
+		function handleFamily(res: any) { familyMembers = res.users ?? []; }
+		fetchClientData({
+			cacheKey: 'family',
+			onStale: handleFamily,
+			gqlQuery: `
+				query {
+					users {
+						slug
+						name
+					}
+				}
+			`,
+		}).then(handleFamily);
+	}
 
 	function loadCalendarItems() {
 		function handleCalendar(res: any) {
@@ -72,6 +99,9 @@
 						status
 						allDay
 						colour
+						family {
+							slug
+						}
 					}
 				}
 			`,
@@ -143,6 +173,7 @@
 			);
 			loadColours();
 			loadCalendarItems();
+			loadFamily();
 		}
 	});
 
@@ -201,12 +232,23 @@
 {#if loading}
 	<p>Loading...</p>
 {:else}
+	{#if familyMembers.length}
+		<Select
+			id="schedule-user-filter"
+			label="Filter by family member"
+			bind:value={selectedUserSlug}
+			options={[
+				{ value: EVERYONE, label: 'Everyone' },
+				...familyMembers.map((member) => ({ value: member.slug, label: member.name })),
+			]}
+		/>
+	{/if}
 	<ScheduleView
 		{blocks}
 		{colours}
 		{tasks}
 		{events}
-		{icalEvents}
+		icalEvents={visibleIcalEvents}
 		onRangeChange={handleRangeChange}
 		onSave={handleSave}
 		onTaskCompleted={handleTaskCompleted}

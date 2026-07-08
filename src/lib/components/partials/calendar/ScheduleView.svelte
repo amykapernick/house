@@ -286,10 +286,12 @@
 		headerToolbar: {
 			start: 'title',
 			center: '',
-			end: 'today prev,next',
+			end: 'today prev,next timeGridWeek,timeGridDay',
 		},
 		buttonText: {
 			today: 'This Week',
+			timeGridWeek: 'Week',
+			timeGridDay: 'Day',
 		},
 		datesSet: (info: any) => {
 			const end = new SvelteDate(info.end);
