@@ -1,5 +1,7 @@
 @import './colours.css';
 
+@import './colours.generated.css';
+
 @import './fonts.css';
 
 @import './typo.css';

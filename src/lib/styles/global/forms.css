@@ -35,6 +35,7 @@ input, select, textarea {
 	border: 1px solid var(--neutral);
 	border-radius: none;
 	background: var(--neutral_light);
+	color: var(--neutral_light_text);
 	box-shadow: none;
 	line-height: 1.5;
 	accent-color: var(--purple_bright);

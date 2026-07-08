@@ -391,7 +391,7 @@
 
 		&.selected {
 			background: var(--purple_bright);
-			color: white;
+			color: var(--purple_bright_text);
 			border-color: var(--purple_bright);
 
 			& input[type="checkbox"] {
@@ -439,7 +439,7 @@
 			border: 1px solid var(--grey_light);
 			border-radius: 0.3em;
 			background: var(--purple_bright);
-			color: white;
+			color: var(--purple_bright_text);
 			cursor: pointer;
 
 			&.clear {
@@ -470,7 +470,7 @@
 
 			&.active {
 				background: var(--purple_bright);
-				color: white;
+				color: var(--purple_bright_text);
 				border-color: var(--purple_bright);
 			}
 		}
@@ -566,7 +566,7 @@
 
 		&.selected {
 			background: var(--purple_bright);
-			color: white;
+			color: var(--purple_bright_text);
 			border-color: var(--purple_bright);
 		}
 	}

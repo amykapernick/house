@@ -1,59 +1,19 @@
+/* Base palette + linked colours are generated into colours.generated.css from
+   the PocketBase "colours" collection. This file only holds app-semantic
+   aliases that aren't colour data themselves - "navy" and "neutral_light"
+   have no matching PocketBase record, they're just names this app uses.
+   Must be imported before colours.generated.css so its theme-derived
+   overrides for --navy take precedence over the plain default here. */
 :root {
-	--purple_bright: #{$purple_bright};
-	--purple: #{$purple};
-	--navy: #{$blue_navy};
-	--blue_navy: #{$blue_navy};
-	--blue: #{$blue};
-	--blue_light: #{$blue_light};
-	--green: #{$green};
-	--green_light: #{$green_light};
-	--green_lime: #{$green_lime};
-	--teal: #{$green_teal};
-	--green_teal: #{$green_teal};
-	--red: #{$red};
-	--pink: #{$pink};
-	--pink_dark: #{$pink_dark};
-	--orange: #{$orange};
-	--yellow: #{$yellow};
-	--white: #{$white};
-	--black: #{$black};
-	--grey: #{$grey};
-	--grey_light: #{$grey_light};
-	--neutral: #{$neutral};
-	--background: #{$background};
-	--neutral_light: #{$white};
+	--navy: var(--blue_navy);
+	--navy_text: var(--blue_navy_text);
+	--neutral_light: var(--white);
+	--neutral_light_text: var(--white_text);
 	--error: var(--red);
+	--error_text: var(--red_text);
 	--warning: var(--orange);
+	--warning_text: var(--orange_text);
 	--success: var(--green);
+	--success_text: var(--green_text);
 	--transparent: transparent;
-
-	@media(prefers-color-scheme: dark) {
-		--purple_bright: #{$light_purple_bright};
-		--purple: #{$light_purple};
-		--navy: #{$light_navy};
-		--blue: #{$light_blue};
-		--green: #{$light_green};
-		--red: #{$light_red};
-		--pink: #{$light_pink};
-		--orange: #{$light_orange};
-		--yellow: #{$light_yellow};
-		--neutral: #{$neutral};
-		--background: #{$background};
-		--neutral_light: #{$white};
-	}
-
-	@media(prefers-color-scheme: light) {
-		--purple_bright: #{$dark_purple_bright};
-		--purple: #{$dark_purple};
-		--navy: #{$dark_navy};
-		--blue: #{$dark_blue};
-		--green: #{$dark_green};
-		--red: #{$dark_red};
-		--pink: #{$dark_pink};
-		--orange: #{$dark_orange};
-		--yellow: #{$dark_yellow};
-		--neutral: #{$neutral};
-		--background: #{$background};
-		--neutral_light: #{$white};
-	}
 }

@@ -1,11 +1,9 @@
 <script lang="ts">
 	import { isAuthenticated } from '$lib/auth';
 	import fetchClientData from '$utils/fetchClientData';
+	import { getWeekRange } from '$utils/dateRanges';
 	import { resolve } from '$app/paths';
-	import {
-		format, startOfWeek, endOfWeek, addWeeks, addDays, subDays,
-		eachDayOfInterval, isToday, isYesterday, parseISO, intervalToDuration
-	} from 'date-fns';
+	import { format, parseISO, isToday, isYesterday, intervalToDuration } from 'date-fns';
 
 	function formatMinutes(mins: number | string | null): string {
 		if (!mins) return '';
@@ -17,37 +15,22 @@
 		return `${minutes}m`;
 	}
 
-	let entries = $state<any[]>([]);
+	let days = $state<any[]>([]);
 	let loading = $state(true);
 	let weekOffset = $state(0);
 
-	function getOffsetWeekRange(offset: number) {
-		const yesterday = subDays(addWeeks(new Date(), offset), 1);
-		const end = addDays(yesterday, 7);
-
-		return {
-			start: format(yesterday, 'yyyy-MM-dd'),
-			end: format(end, 'yyyy-MM-dd'),
-		};
-	}
-
 	function fetchMealPlan(skipCache = false) {
 		loading = true;
-		const range = getOffsetWeekRange(weekOffset);
+		const range = getWeekRange(weekOffset);
 
 		fetchClientData({
 			cacheKey: `mealplan-${range.start}`,
 			skipCache,
 			gqlQuery: `
 				query {
-					mealPlans(
-						perPage: 50
-						startDate: "${range.start}"
-						endDate: "${range.end}"
-						orderBy: "date"
-						orderDirection: "asc"
-					) {
-						items {
+					mealPlanByDay(startDate: "${range.start}", endDate: "${range.end}") {
+						date
+						entries {
 							id date entryType title text
 							recipe {
 								name slug image
@@ -59,7 +42,7 @@
 				}
 			`,
 		}).then((res) => {
-			entries = res.mealPlans?.items ?? [];
+			days = res.mealPlanByDay ?? [];
 			loading = false;
 		});
 	}
@@ -85,28 +68,20 @@
 		fetchMealPlan();
 	}
 
-	function entriesByDay() {
-		const range = getOffsetWeekRange(weekOffset);
-		const start = parseISO(range.start);
-		const end = parseISO(range.end);
-		const days = eachDayOfInterval({ start, end });
-
-		const grouped = days.map(d => ({
-			label: format(d, 'EEEE'),
-			date: format(d, 'yyyy-MM-dd'),
-			displayDate: format(d, 'd MMM'),
-			isToday: isToday(d),
-			isYesterday: isYesterday(d),
-			entries: [] as any[],
-		}));
-
-		for (const entry of entries) {
-			const day = grouped.find(d => d.date === entry.date);
-			if (day) day.entries.push(entry);
-		}
-
-		return grouped;
-	}
+	// isToday/isYesterday are relative to the viewer's own clock, so they stay
+	// here rather than coming from the API alongside the day grouping itself.
+	let displayDays = $derived(
+		days.map((day) => {
+			const d = parseISO(day.date);
+			return {
+				...day,
+				label: format(d, 'EEEE'),
+				displayDate: format(d, 'd MMM'),
+				isToday: isToday(d),
+				isYesterday: isYesterday(d),
+			};
+		})
+	);
 </script>
 
 <svelte:head>
@@ -126,7 +101,7 @@
 	<p>Loading...</p>
 {:else}
 	<div class="week">
-		{#each entriesByDay() as day (day.date)}
+		{#each displayDays as day (day.date)}
 			<div class="day" class:today={day.isToday} class:yesterday={day.isYesterday}>
 				<h2>
 					{day.label}
@@ -181,7 +156,7 @@
 
 			&.today {
 				background: var(--purple_bright);
-				color: white;
+				color: var(--purple_bright_text);
 				border-color: var(--purple_bright);
 			}
 

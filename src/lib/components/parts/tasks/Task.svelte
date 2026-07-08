@@ -84,20 +84,23 @@
 
 		&[data-status='not-started'] {
 			background: var(--grey);
-			color: var(--white);
+			color: var(--grey_text);
 		}
 
 		&[data-status='in-progress'],
 		&[data-status='ongoing'] {
 			background: var(--blue);
+			color: var(--blue_text);
 		}
 
 		&[data-status='paused'] {
 			background: var(--orange);
+			color: var(--orange_text);
 		}
 
 		&[data-status='done'] {
 			background: var(--green);
+			color: var(--green_text);
 		}
 	}
 

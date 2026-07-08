@@ -6,6 +6,9 @@ export type Task = {
 	id: string,
 	name: string,
 	due: Date,
+	end?: string | null,
+	allDay?: boolean | null,
+	dueLabel?: string | null,
 	status: TaskStatus,
 	assigned: User[]
 	subtasks: Task[],

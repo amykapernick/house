@@ -1,18 +1,16 @@
 <script lang="ts">
 	import TeethGraphic from '$img/smallHuman/teeth.svg?component';
 	import type { Teeth, Tooth } from '$types/smallHuman';
-	import { formatDate, differenceInMonths, parseISO } from 'date-fns';
+	import { formatDate } from 'date-fns';
 	import Pill from '$parts/Pill.svelte';
 	import Stats from '$parts/Stats.svelte';
 	import Modal from '$parts/Modal.svelte';
 
 	const {
 		teeth,
-		birth,
 		onMarkErupted,
 	}: {
 		teeth: Teeth;
-		birth: string;
 		onMarkErupted?: (fdi: number) => void;
 	} = $props();
 
@@ -64,7 +62,6 @@
 		if (confirmingTooth) onMarkErupted?.(confirmingTooth.fdi);
 		confirmOpen = false;
 	}
-	const eruptedAgeMonths = (erupted_date: string) => differenceInMonths(parseISO(erupted_date), parseISO(birth));
 	const upcomingCss = $derived(upcoming.map(t => `
 		svg .t_${t.fdi} { 
 			--tooth: color-mix(var(--blue_light) 10%, var(--white)); 
@@ -108,7 +105,7 @@
 			<p class={`t_${tooth.fdi}`}>
 				<span class="name">{tooth.fdi}: {tooth.name} - </span>
 				{#if tooth.erupted_date}
-					<span>Erupted at {eruptedAgeMonths(tooth.erupted_date)} months</span>
+					<span>Erupted at {tooth.erupted_age_months} months</span>
 				{:else}
 					<span>Expected at {tooth.expected_months} months</span>
 				{/if}
@@ -160,6 +157,7 @@
 		max-width: 400px;
 		float: right;
 		background: var(--background);
+		color: var(--background_text);
 		padding: 1em;
 		border: 2px solid var(--navy);
 	}

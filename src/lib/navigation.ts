@@ -10,6 +10,7 @@ import Recipes from '$img/icons/recipe-book-47.svg?component';
 import Baby from '$img/icons/baby.svg?component';
 import Schedule from '$img/icons/calendar-day-view.svg?component'
 import Budget from '$img/icons/chart-bar-33.svg?component'
+import Graphql from '$img/icons/graphql.svg?component'
 
 export const menuItems: MenuItem[] = [
 	{
@@ -70,6 +71,11 @@ export const menuItems: MenuItem[] = [
 		auth: true,
 		Icon: Baby
 	},
+	...(import.meta.env.DEV ? [{
+		label: `GraphQL`,
+		link: resolve(`/dev/graphql`),
+		Icon: Graphql
+	}] : []),
 ];
 
 export function routeRequiresAuth(pathname: string): boolean {

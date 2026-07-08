@@ -1,6 +1,7 @@
 export type PaletteColour = {
 	name: string
-	hex: string
+	hex: string | null
+	link: string | null
 }
 
 export type ScheduleBlock = {

@@ -3,7 +3,11 @@
 	import fetchClientData from '$utils/fetchClientData';
 	import { SvelteSet } from 'svelte/reactivity';
 
+	type SubGroup = { name: string; items: any[] };
+	type StoreGroup = { name: string; items: any[]; subGroups: SubGroup[] };
+
 	let items = $state<any[]>([]);
+	let storeGroups = $state<StoreGroup[]>([]);
 	let loading = $state(true);
 	let showChecked = $state(false);
 	let checking = new SvelteSet<string>();
@@ -12,6 +16,7 @@
 		loading = true;
 		function handleList(res: any) {
 			items = res.shoppingList?.items ?? [];
+			storeGroups = res.shoppingList?.storeGroups ?? [];
 			loading = false;
 		}
 		fetchClientData({
@@ -24,6 +29,14 @@
 						items {
 							id display checked quantity note
 							category labels source link
+						}
+						storeGroups {
+							name
+							items { id display checked quantity note category labels source link }
+							subGroups {
+								name
+								items { id display checked quantity note category labels source link }
+							}
 						}
 					}
 				}
@@ -56,6 +69,14 @@
 		items = items.map(i =>
 			i.id === item.id ? { ...i, checked: newChecked } : i
 		);
+		storeGroups = storeGroups.map((store) => ({
+			...store,
+			items: store.items.map((i) => (i.id === item.id ? { ...i, checked: newChecked } : i)),
+			subGroups: store.subGroups.map((sub) => ({
+				...sub,
+				items: sub.items.map((i) => (i.id === item.id ? { ...i, checked: newChecked } : i)),
+			})),
+		}));
 
 		checking.delete(item.id);
 	}
@@ -67,50 +88,20 @@
 		return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 	}
 
-	type SubGroup = { name: string; items: any[] };
-	type StoreGroup = { name: string; items: any[]; subGroups: SubGroup[] };
+	// The store grouping itself comes from the API - this just hides checked
+	// items (and drops any group/sub-group that's now empty) when the toggle is off.
+	let visibleStoreGroups = $derived.by((): StoreGroup[] => {
+		const filterItems = (list: any[]) => (showChecked ? list : list.filter((i) => !i.checked));
 
-	let storeGroups = $derived.by((): StoreGroup[] => {
-		const source = showChecked ? items : uncheckedItems;
-		const stores: Record<string, { items: any[]; subGroups: Record<string, any[]> }> = {};
-
-		function ensureStore(name: string) {
-			if (!stores[name]) stores[name] = { items: [], subGroups: {} };
-		}
-
-		for (const item of source) {
-			if (item.source === 'mealie') {
-				ensureStore('Groceries');
-				if (item.category) {
-					if (!stores['Groceries'].subGroups[item.category]) {
-						stores['Groceries'].subGroups[item.category] = [];
-					}
-					stores['Groceries'].subGroups[item.category].push(item);
-				} else {
-					stores['Groceries'].items.push(item);
-				}
-			} else {
-				const storeLabels = item.labels?.length ? item.labels : ['Groceries'];
-				for (const store of storeLabels) {
-					ensureStore(store);
-					stores[store].items.push(item);
-				}
-			}
-		}
-
-		return Object.entries(stores)
-			.map(([name, data]) => ({
-				name,
-				items: data.items,
-				subGroups: Object.entries(data.subGroups)
-					.map(([subName, subItems]) => ({ name: subName, items: subItems }))
-					.sort((a, b) => a.name.localeCompare(b.name)),
+		return storeGroups
+			.map((store) => ({
+				name: store.name,
+				items: filterItems(store.items),
+				subGroups: store.subGroups
+					.map((sub) => ({ name: sub.name, items: filterItems(sub.items) }))
+					.filter((sub) => sub.items.length > 0),
 			}))
-			.sort((a, b) => {
-				if (a.name === 'Groceries') return 1;
-				if (b.name === 'Groceries') return -1;
-				return a.name.localeCompare(b.name);
-			});
+			.filter((store) => store.items.length > 0 || store.subGroups.length > 0);
 	});
 </script>
 
@@ -134,7 +125,7 @@
 		</label>
 	</div>
 
-	{#each storeGroups as store (store.name)}
+	{#each visibleStoreGroups as store (store.name)}
 		<details class="store" open>
 			<summary><h2>{sentenceCase(store.name)}</h2></summary>
 
@@ -338,7 +329,7 @@
 		&.is-checked {
 			background: var(--green);
 			border-color: var(--green);
-			color: white;
+			color: var(--green_text);
 		}
 
 		&:disabled {

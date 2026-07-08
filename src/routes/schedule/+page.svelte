@@ -19,6 +19,7 @@
 					colours {
 						name
 						hex
+						link
 					}
 				}
 			`,

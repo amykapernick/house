@@ -22,7 +22,6 @@
 	} = $props();
 
 	let colourOptions = $derived(colours.map((c) => ({ value: c.name, label: c.name })));
-	let hexByName = $derived(new Map(colours.map((c) => [c.name, c.hex])));
 </script>
 
 <Modal bind:open title={mode === `create` ? `New block` : `Edit block`}>
@@ -34,7 +33,7 @@
 		Colour
 		<Select id="block-colour" label="Colour" bind:value={colour} options={colourOptions}>
 			{#snippet children(option)}
-				<span class="swatch" style:background={hexByName.get(option.value)}></span>
+				<span class="swatch" style:background={`var(--${option.value})`}></span>
 				<span class="label">{option.label}</span>
 			{/snippet}
 		</Select>

@@ -1,29 +1,19 @@
 <script lang="ts">
 	import TaskCard from './Task.svelte';
-	import { add, format, isBefore } from 'date-fns';
 	import type { Task } from '$types/tasks';
 
 	let { tasks = [] }: { tasks: Task[] } = $props();
 
 	let parsedTasks = $derived.by(() => {
 		const grouped: Record<string, Task[]> = {};
-		const today = new Date();
 
-		tasks
-			.filter(({ due }) => due)
-			.filter(({ due, status }) => !(status === 'Done' && isBefore(new Date(due), today)))
-			.filter((task) => {
-				const due = new Date(task.due);
-				return isBefore(due, today) || isBefore(due, add(today, { days: 7 }));
-			})
-			.sort((a, b) => (isBefore(new Date(a.due), new Date(b.due)) ? -1 : 1))
+		[...tasks]
+			.filter((task) => task.dueLabel)
+			.sort((a, b) => (a.due < b.due ? -1 : 1))
 			.forEach((task) => {
-				const due =
-					new Date(task.due) < today
-						? 'Overdue'
-						: format(new Date(task.due), 'dd-MMM-yyyy');
-				if (!grouped[due]) grouped[due] = [];
-				grouped[due].push(task);
+				const label = task.dueLabel as string;
+				if (!grouped[label]) grouped[label] = [];
+				grouped[label].push(task);
 			});
 
 		return grouped;

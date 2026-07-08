@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { format } from 'date-fns';
 	import TaskView from '$parts/tasks/TaskView.svelte';
 	import { isAuthenticated } from '$lib/auth';
 	import fetchClientData from '$utils/fetchClientData';
@@ -14,8 +15,9 @@
 				tasks = res.tasks ?? [];
 				loading = false;
 			}
+			const today = format(new Date(), 'yyyy-MM-dd');
 			fetchClientData({
-				cacheKey: 'tasks',
+				cacheKey: `tasks-${today}`,
 				onStale: handleTasks,
 				gqlQuery: `
 					query {
@@ -28,6 +30,7 @@
 							}
 							status
 							due
+							dueLabel(today: "${today}")
 						}
 					}
 				`,

@@ -1,22 +1,37 @@
 <script lang="ts">
 	import '$styles/main.css';
 	import { onMount } from 'svelte';
-	import { goto } from '$app/navigation';
+	import { goto, afterNavigate } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import { initClerk, isAuthenticated, clerkLoaded } from '$lib/auth';
-	import { routeRequiresAuth } from '$lib/navigation';
+	import { routeRequiresAuth, menuItems } from '$lib/navigation';
+	import { recordPageVisit } from '$utils/recentPages';
 	import Header from '$partials/Header.svelte';
 	import Footer from '$partials/Footer.svelte';
 	import Layout from '$layouts/Default.svelte';
+	import CommandPalette from '$parts/CommandPalette.svelte';
 
 	let { children } = $props();
+
+	let commandPaletteOpen = $state(false);
 
 	onMount(async () => {
 		const clerkPublishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 		if (clerkPublishableKey) {
 			await initClerk(clerkPublishableKey);
 		}
+	});
+
+	function handleKeydown(event: KeyboardEvent) {
+		if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === `k`) {
+			event.preventDefault();
+			commandPaletteOpen = !commandPaletteOpen;
+		}
+	}
+
+	afterNavigate(({ to }) => {
+		if (to) recordPageVisit(to.url.pathname);
 	});
 
 	$effect(() => {
@@ -37,6 +52,8 @@
 	<meta name="description" content="Meal Planning, Tasks, Reminders, Calendars" />
 </svelte:head>
 
+<svelte:window onkeydown={handleKeydown} />
+
 <style>
 	:global(body) {
 		display: grid;
@@ -47,6 +64,7 @@
 		margin: 0;
 		overflow-x: hidden;
 		background: var(--background);
+		color: var(--background_text);
 	}
 
 	.main {
@@ -61,3 +79,4 @@
 	</Layout>
 </main>
 <Footer />
+<CommandPalette bind:open={commandPaletteOpen} {menuItems} isAuthenticated={$isAuthenticated} />

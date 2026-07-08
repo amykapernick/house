@@ -34,12 +34,18 @@ export type AlertType =
   | 'warn';
 
 export type Allergen = {
+  daysUntilDue: Maybe<Scalars['Int']['output']>;
   due: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
   isRecurring: Scalars['Boolean']['output'];
   link: Maybe<Scalars['String']['output']>;
   name: Scalars['String']['output'];
+  urgency: Maybe<AllergenUrgency>;
 };
+
+export type AllergenUrgency =
+  | 'upcoming'
+  | 'urgent';
 
 export type Area = {
   colour: Maybe<Scalars['String']['output']>;
@@ -91,15 +97,39 @@ export type BedroomTempPattern = {
   swing_note: Scalars['String']['output'];
 };
 
+export type BudgetBucket = {
+  id: Maybe<Scalars['String']['output']>;
+  items: Maybe<Array<Maybe<BudgetItem>>>;
+  name: Maybe<Scalars['String']['output']>;
+  percentage: Maybe<Scalars['Float']['output']>;
+  percentageGoal: Maybe<Scalars['Float']['output']>;
+};
+
 export type BudgetItem = {
   amount: Maybe<Scalars['Float']['output']>;
-  bucket: Maybe<Scalars['String']['output']>;
+  bucket: Maybe<BudgetBucket>;
   description: Maybe<Scalars['String']['output']>;
   id: Maybe<Scalars['String']['output']>;
   income: Maybe<Scalars['Boolean']['output']>;
+  monthlyAmount: Maybe<Scalars['Float']['output']>;
   note: Maybe<Scalars['String']['output']>;
   period: Maybe<Scalars['String']['output']>;
   tags: Maybe<Scalars['String']['output']>;
+};
+
+export type BudgetItemInput = {
+  amount?: InputMaybe<Scalars['Float']['input']>;
+  bucket?: InputMaybe<Scalars['String']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  income?: InputMaybe<Scalars['Boolean']['input']>;
+  note?: InputMaybe<Scalars['String']['input']>;
+  period?: InputMaybe<Scalars['String']['input']>;
+  tags?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type BudgetMutationResult = {
+  id: Maybe<Scalars['String']['output']>;
+  success: Scalars['Boolean']['output'];
 };
 
 export type Calendar = {
@@ -116,12 +146,18 @@ export type CarSeat = {
   facing: Scalars['String']['output'];
   facing_note: Scalars['String']['output'];
   last_updated: Scalars['String']['output'];
+  name: Scalars['String']['output'];
   next_transition: Scalars['String']['output'];
   sources: Array<Scalars['String']['output']>;
 };
 
 export type CheckShoppingItemResult = {
   success: Scalars['Boolean']['output'];
+};
+
+export type Clothing = {
+  daytime: ClothingDaytime;
+  seasonal: ClothingSeasonal;
 };
 
 export type ClothingDaytime = {
@@ -236,6 +272,7 @@ export type Feeding = {
   check_frequency: Scalars['Int']['output'];
   details: Array<LabelValue>;
   last_updated: Scalars['String']['output'];
+  principles: FoodPrinciples;
   schedule: FeedingSchedule;
   sources: Array<Scalars['String']['output']>;
 };
@@ -391,6 +428,11 @@ export type Material =
   | 'softshell'
   | 'waterproof';
 
+export type MealPlanDay = {
+  date: Scalars['String']['output'];
+  entries: Array<MealPlanEntry>;
+};
+
 export type MealPlanEntry = {
   date: Scalars['String']['output'];
   entryType: Scalars['String']['output'];
@@ -418,16 +460,11 @@ export type MeasurementUnit =
   | 'cm'
   | 'kg';
 
-export type Meta = {
-  age_weeks: Scalars['Int']['output'];
-  birth_month: Scalars['String']['output'];
-  last_updated: Scalars['String']['output'];
-};
-
 export type Milestone = {
   achieved_date: Maybe<Scalars['String']['output']>;
   category: MilestoneCategory;
   detail: Scalars['String']['output'];
+  expected_months: Maybe<Array<Scalars['Float']['output']>>;
   expected_weeks: Maybe<Array<Scalars['Int']['output']>>;
   id: Scalars['ID']['output'];
   sources: Array<Scalars['String']['output']>;
@@ -456,9 +493,13 @@ export type Milestones = {
 export type Mutation = {
   checkShoppingItem: Maybe<CheckShoppingItemResult>;
   completeTask: Maybe<CompleteTaskResult>;
+  createBudgetItem: Maybe<BudgetMutationResult>;
   createRoutineOverride: Maybe<ScheduleMutationResult>;
+  deleteBudgetItem: Maybe<BudgetMutationResult>;
   markToothErupted: Maybe<Tooth>;
   updateAuslanSignStatus: Maybe<AuslanSign>;
+  updateBudgetBucketPercentage: Maybe<BudgetMutationResult>;
+  updateBudgetItem: Maybe<BudgetMutationResult>;
   updateDefaultRoutine: Maybe<ScheduleMutationResult>;
   updateMilestoneStatus: Maybe<Milestone>;
   updateSwimSkillStatus: Maybe<SwimSkill>;
@@ -477,6 +518,11 @@ export type MutationCompleteTaskArgs = {
 };
 
 
+export type MutationCreateBudgetItemArgs = {
+  input: BudgetItemInput;
+};
+
+
 export type MutationCreateRoutineOverrideArgs = {
   end: Scalars['String']['input'];
   friday: Array<RoutineDayBlockInput>;
@@ -490,6 +536,11 @@ export type MutationCreateRoutineOverrideArgs = {
 };
 
 
+export type MutationDeleteBudgetItemArgs = {
+  id: Scalars['String']['input'];
+};
+
+
 export type MutationMarkToothEruptedArgs = {
   fdi: Scalars['Int']['input'];
 };
@@ -498,6 +549,18 @@ export type MutationMarkToothEruptedArgs = {
 export type MutationUpdateAuslanSignStatusArgs = {
   id: Scalars['ID']['input'];
   status: SignStatus;
+};
+
+
+export type MutationUpdateBudgetBucketPercentageArgs = {
+  id: Scalars['String']['input'];
+  percentage: Scalars['Float']['input'];
+};
+
+
+export type MutationUpdateBudgetItemArgs = {
+  id: Scalars['String']['input'];
+  input: BudgetItemInput;
 };
 
 
@@ -534,6 +597,8 @@ export type NoonarSeason = {
   weeks_until_next: Scalars['Int']['output'];
 };
 
+export type Note = CarSeat | ParentingApproachNote | ToddlerSleepPrepNote;
+
 export type OutdoorClothingRef = {
   extras: Array<Scalars['String']['output']>;
   feels_like_c_max: Maybe<Scalars['Float']['output']>;
@@ -542,9 +607,18 @@ export type OutdoorClothingRef = {
   recommendation: Scalars['String']['output'];
 };
 
+export type Overview = {
+  age_months: Scalars['Float']['output'];
+  age_weeks: Scalars['Int']['output'];
+  birth_month: Scalars['String']['output'];
+  last_updated: Scalars['String']['output'];
+};
+
 export type PaletteColour = {
   hex: Maybe<Scalars['String']['output']>;
+  link: Maybe<Scalars['String']['output']>;
   name: Maybe<Scalars['String']['output']>;
+  text: Maybe<PaletteColour>;
   theme: Maybe<Scalars['String']['output']>;
 };
 
@@ -553,6 +627,11 @@ export type ParentingApproachItem = {
   id: Scalars['ID']['output'];
   sources: Array<Scalars['String']['output']>;
   title: Scalars['String']['output'];
+};
+
+export type ParentingApproachNote = {
+  items: Array<ParentingApproachItem>;
+  name: Scalars['String']['output'];
 };
 
 export type Platform =
@@ -579,6 +658,7 @@ export type Query = {
   allergens: Array<Allergen>;
   areas: Maybe<Array<Maybe<Area>>>;
   budget: Maybe<Array<Maybe<BudgetItem>>>;
+  budgetBuckets: Maybe<Array<Maybe<BudgetBucket>>>;
   calendars: Maybe<Array<Maybe<Calendar>>>;
   colour: Maybe<PaletteColour>;
   colours: Maybe<Array<Maybe<PaletteColour>>>;
@@ -587,6 +667,7 @@ export type Query = {
   icsEvents: Maybe<Array<Maybe<IcsEvent>>>;
   info: Maybe<Array<Maybe<Info>>>;
   items: Maybe<Array<Maybe<Item>>>;
+  mealPlanByDay: Array<MealPlanDay>;
   mealPlans: Maybe<MealPlanList>;
   projects: Maybe<Array<Maybe<Project>>>;
   recipe: Maybe<Recipe>;
@@ -601,6 +682,11 @@ export type Query = {
 };
 
 
+export type QueryAllergensArgs = {
+  today: Scalars['String']['input'];
+};
+
+
 export type QueryColourArgs = {
   name: Scalars['String']['input'];
 };
@@ -608,6 +694,12 @@ export type QueryColourArgs = {
 
 export type QueryColoursArgs = {
   name?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type QueryMealPlanByDayArgs = {
+  endDate: Scalars['String']['input'];
+  startDate: Scalars['String']['input'];
 };
 
 
@@ -825,6 +917,18 @@ export type ShoppingItem = {
 
 export type ShoppingList = {
   items: Array<ShoppingItem>;
+  storeGroups: Array<ShoppingListStoreGroup>;
+};
+
+export type ShoppingListStoreGroup = {
+  items: Array<ShoppingItem>;
+  name: Scalars['String']['output'];
+  subGroups: Array<ShoppingListSubGroup>;
+};
+
+export type ShoppingListSubGroup = {
+  items: Array<ShoppingItem>;
+  name: Scalars['String']['output'];
 };
 
 export type SignStatus =
@@ -844,6 +948,7 @@ export type SignbankWord = {
 export type Sleep = {
   check_frequency: Scalars['Int']['output'];
   current_pattern: SleepPattern;
+  environment: SleepEnvironment;
   framework: Scalars['String']['output'];
   items: Array<SleepItem>;
   last_updated: Scalars['String']['output'];
@@ -929,8 +1034,11 @@ export type Swimming = {
 };
 
 export type Task = {
+  allDay: Maybe<Scalars['Boolean']['output']>;
   assigned: Maybe<Array<Maybe<User>>>;
   due: Maybe<Scalars['String']['output']>;
+  dueLabel: Maybe<Scalars['String']['output']>;
+  end: Maybe<Scalars['String']['output']>;
   estimate: Maybe<Scalars['Float']['output']>;
   id: Maybe<Scalars['String']['output']>;
   link: Maybe<Scalars['String']['output']>;
@@ -942,6 +1050,12 @@ export type Task = {
   subtasks: Maybe<Array<Maybe<Task>>>;
   tags: Maybe<Array<Maybe<Scalars['String']['output']>>>;
   uuid: Maybe<Scalars['String']['output']>;
+};
+
+
+export type TaskDueLabelArgs = {
+  daysAhead?: InputMaybe<Scalars['Int']['input']>;
+  today: Scalars['String']['input'];
 };
 
 export type Teeth = {
@@ -959,13 +1073,18 @@ export type ToddlerPrepStatus =
   | 'due'
   | 'not_yet_due';
 
-export type ToddlerSleepPrep = {
+export type ToddlerSleepPrepDetail = {
   alert_when_due: Alert;
   note: Scalars['String']['output'];
   reading: Array<ReadingItem>;
   sources: Array<Scalars['String']['output']>;
   status: ToddlerPrepStatus;
   trigger_age_weeks: Scalars['Int']['output'];
+};
+
+export type ToddlerSleepPrepNote = {
+  items: ToddlerSleepPrepDetail;
+  name: Scalars['String']['output'];
 };
 
 export type TogRecommendation = {
@@ -982,6 +1101,7 @@ export type TogReference = {
 };
 
 export type Tooth = {
+  erupted_age_months: Maybe<Scalars['Int']['output']>;
   erupted_date: Maybe<Scalars['String']['output']>;
   expected_months: Scalars['String']['output'];
   fdi: Scalars['Int']['output'];
@@ -999,21 +1119,16 @@ export type TrackerData = {
   activities: Array<Activity>;
   alerts: Array<Alert>;
   auslan: Auslan;
-  car_seat: CarSeat;
-  clothing_daytime: ClothingDaytime;
-  clothing_seasonal: ClothingSeasonal;
+  clothing: Clothing;
   feeding: Feeding;
-  food_principles: FoodPrinciples;
   growth: Growth;
-  meta: Meta;
   milestones: Milestones;
-  parenting_approach: Array<ParentingApproachItem>;
+  notes: Array<Note>;
+  overview: Overview;
   sleep: Sleep;
-  sleep_environment: SleepEnvironment;
   sources: Array<Source>;
   swimming: Swimming;
   teeth: Teeth;
-  toddler_sleep_prep: ToddlerSleepPrep;
   vaccinations: Vaccinations;
 };
 

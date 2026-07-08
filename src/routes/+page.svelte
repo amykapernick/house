@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { isAuthenticated } from '$lib/auth';
-	import { format, subDays, addDays, intervalToDuration } from 'date-fns';
+	import { intervalToDuration } from 'date-fns';
 	import fetchClientData from '$utils/fetchClientData';
+	import { getWeekRange } from '$utils/dateRanges';
 	import { resolve } from '$app/paths';
 
 	let meals = $state<any[]>([]);
@@ -19,8 +20,7 @@
 
 	$effect(() => {
 		if ($isAuthenticated) {
-			const start = format(subDays(new Date(), 1), 'yyyy-MM-dd');
-			const end = format(addDays(new Date(), 7), 'yyyy-MM-dd');
+			const { start, end } = getWeekRange();
 
 			function handleMeals(res: any) {
 				meals = res.mealPlans?.items ?? [];

@@ -129,7 +129,7 @@
 		padding: 0.1em 0.2em;
 		border-radius: 0.2em;
 		background: var(--navy);
-		color: var(--neutral_light);
+		color: var(--navy_text);
 		white-space: nowrap;
 	}
 

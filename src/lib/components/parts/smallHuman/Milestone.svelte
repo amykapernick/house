@@ -9,7 +9,7 @@
 		status,
 		note,
 		detail,
-		expected_weeks,
+		expected_months,
 		type,
 		onStatusChange,
 	}: {
@@ -18,7 +18,7 @@
 		status: MilestoneStatus;
 		note?: string | null;
 		detail?: string;
-		expected_weeks?: number[];
+		expected_months?: number[];
 		type?: MilestoneCategory;
 		onStatusChange?: (id: string, status: MilestoneStatus) => void;
 	} = $props();
@@ -35,8 +35,6 @@
 		fine_motor: 'Fine Motor',
 		development: 'Development',
 	};
-
-	const calculatedAge = $derived(expected_weeks?.map(week => Math.round(week / 4)));
 </script>
 
 <Card
@@ -52,8 +50,8 @@
 	{#if note}
 		<p>{note}</p>
 	{/if}
-	{#if calculatedAge}
-		<p>{calculatedAge.join(' - ')} months</p>
+	{#if expected_months}
+		<p>{expected_months.map(m => Math.round(m)).join(' - ')} months</p>
 	{/if}
 	{#if !onStatusChange}
 		<span class="sr-only">{statusLabel[status]}</span>

@@ -1,6 +1,6 @@
 @mixin button {
 	--button_background: var(--purple_bright);
-	--button_text: var(--neutral_light);
+	--button_text: var(--purple_bright_text);
 	--button_border: var(--purple_bright);
 
 	padding: 0.5em 1em;
@@ -26,7 +26,7 @@
 
 	&:hover {
 		--button_background: var(--purple_bright);
-		--button_text: var(--neutral_light);
+		--button_text: var(--purple_bright_text);
 	}
 }
 

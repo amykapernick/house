@@ -84,6 +84,7 @@
 		margin: 0;
 		padding: 0;
 		background: var(--background);
+		color: var(--background_text);
 		box-shadow: 0 0 10px color-mix(in srgb, var(--neutral) 20%, transparent);
 		font-size: 0.8em;
 		list-style: none;

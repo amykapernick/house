@@ -43,8 +43,8 @@
 				gqlQuery: `
 					query {
 						smallHuman {
-							meta {
-								last_updated age_weeks birth_month
+							overview {
+								last_updated age_weeks age_months birth_month
 							}
 							alerts(orderBy: urgency) { id level title detail }
 							growth {
@@ -71,13 +71,18 @@
 									upcoming
 								}
 								sources
+								principles {
+									note core_philosophy
+									current_and_ongoing { id title detail sources }
+									toddler_forward_look { id title detail sources }
+									sources
+								}
 							}
 							teeth {
 								last_updated check_frequency note possums_note teething_now teething_note
-								teeth { fdi name status erupted_date expected_months sources }
+								teeth { fdi name status erupted_date erupted_age_months expected_months sources }
 								dental_care { toothbrush toothpaste note todoist_task { id name status due link } sources }
 							}
-							car_seat { last_updated check_frequency current_stage facing facing_note next_transition sources }
 							swimming {
 								last_updated check_frequency
 								skills { id title status detail }
@@ -85,12 +90,12 @@
 							}
 							milestones {
 								last_updated check_frequency note
-								items { id category title status detail achieved_date expected_weeks sources }
+								items { id category title status detail achieved_date expected_weeks expected_months sources }
 							}
-							auslan { 
+							auslan {
 								last_updated check_frequency note sources
-								signs { 
-									id name status tip 
+								signs {
+									id name status tip
 									reference { url video note}
 								}
 							}
@@ -102,66 +107,75 @@
 									night_waking_pattern suspected_cause note
 								}
 								items { id title status detail tag sources }
-							}
-							sleep_environment {
-								note
-								bedroom_temp_pattern { bedtime_temp_c early_morning_temp_c swing_note }
-								tog_reference { temp_range_c tog layer }
-								current_recommendation { challenge strategy recommended_setup { sleep_sack_tog pj_layer reasoning } sources }
-								current_sizes sleep_sacks_on_hand { tog sizes material note } size_watch
-							}
-							clothing_seasonal {
-								note current_sizes current_sizes_note
-								noongar_season { current current_period current_description next next_period next_description weeks_until_next }
-								alerts { id type title detail action weeks_ahead }
-							}
-							clothing_daytime {
-								note layer_rule feet_rule
-								sun_safety { uv_threshold_for_coverage note sources }
-								indoor_reference { indoor_temp_c_min indoor_temp_c_max recommendation layers }
-								outdoor_reference { feels_like_c_min feels_like_c_max recommendation layers extras }
-								rain_suit { recommended trigger note }
-								current_recommendation {
-									generated_from_temp_c generated_from_feels_like_c last_updated
-									indoor { summary layers { position type sleeve weight material } feet extras { hat hat_reason beanie mittens sunscreen sunscreen_reason } rain_suit }
-									outdoor { summary layers { position type sleeve weight material } feet extras { hat hat_reason beanie mittens sunscreen sunscreen_reason } rain_suit }
+								environment {
+									note
+									bedroom_temp_pattern { bedtime_temp_c early_morning_temp_c swing_note }
+									tog_reference { temp_range_c tog layer }
+									current_recommendation { challenge strategy recommended_setup { sleep_sack_tog pj_layer reasoning } sources }
+									current_sizes sleep_sacks_on_hand { tog sizes material note } size_watch
 								}
-								forecast {
-									date day_label temp_high_c temp_low_c feels_like_high_c feels_like_low_c
-									conditions rain_expected uv_index
-									indoor { summary layers { position type sleeve weight material } feet extras { hat hat_reason beanie mittens sunscreen sunscreen_reason } rain_suit }
-									outdoor { summary layers { position type sleeve weight material } feet extras { hat hat_reason beanie mittens sunscreen sunscreen_reason } rain_suit }
+							}
+							clothing {
+								seasonal {
+									note current_sizes current_sizes_note
+									noongar_season { current current_period current_description next next_period next_description weeks_until_next }
+									alerts { id type title detail action weeks_ahead }
+								}
+								daytime {
+									note layer_rule feet_rule
+									sun_safety { uv_threshold_for_coverage note sources }
+									indoor_reference { indoor_temp_c_min indoor_temp_c_max recommendation layers }
+									outdoor_reference { feels_like_c_min feels_like_c_max recommendation layers extras }
+									rain_suit { recommended trigger note }
+									current_recommendation {
+										generated_from_temp_c generated_from_feels_like_c last_updated
+										indoor { summary layers { position type sleeve weight material } feet extras { hat hat_reason beanie mittens sunscreen sunscreen_reason } rain_suit }
+										outdoor { summary layers { position type sleeve weight material } feet extras { hat hat_reason beanie mittens sunscreen sunscreen_reason } rain_suit }
+									}
+									forecast {
+										date day_label temp_high_c temp_low_c feels_like_high_c feels_like_low_c
+										conditions rain_expected uv_index
+										indoor { summary layers { position type sleeve weight material } feet extras { hat hat_reason beanie mittens sunscreen sunscreen_reason } rain_suit }
+										outdoor { summary layers { position type sleeve weight material } feet extras { hat hat_reason beanie mittens sunscreen sunscreen_reason } rain_suit }
+									}
 								}
 							}
 							vaccinations { note items(orderBy: due_date) { id title status detail date next_due todoist_task { id name status due link } } sources }
-							parenting_approach { id title detail sources }
+							notes {
+								__typename
+								... on CarSeat {
+									name last_updated check_frequency current_stage facing facing_note next_transition sources
+								}
+								... on ParentingApproachNote {
+									name
+									parentingApproachItems: items { id title detail sources }
+								}
+								... on ToddlerSleepPrepNote {
+									name
+									toddlerSleepPrepDetail: items {
+										note trigger_age_weeks status
+										alert_when_due { id level title detail }
+										reading { id title note sources }
+										sources
+									}
+								}
+							}
 							activities { id title status detail sources }
 							sources { id name badge url detail priority approved note }
-							toddler_sleep_prep {
-								note trigger_age_weeks status
-								alert_when_due { id level title detail }
-								reading { id title note sources }
-								sources
-							}
-							food_principles {
-								note core_philosophy
-								current_and_ongoing { id title detail sources }
-								toddler_forward_look { id title detail sources }
-								sources
-							}
 						}
 					}
 				`,
 			}).then(handleSmallHuman);
 
 			function handleAllergens(res: any) { allergens = res.allergens ?? []; }
+			const today = format(new Date(), 'yyyy-MM-dd');
 			fetchClientData({
-				cacheKey: 'allergens',
+				cacheKey: `allergens-${today}`,
 				onStale: handleAllergens,
 				gqlQuery: `
 					query {
-						allergens {
-							id name due isRecurring link
+						allergens(today: "${today}") {
+							id name due isRecurring link urgency daysUntilDue
 						}
 					}
 				`,
@@ -282,12 +296,13 @@
 	}
 
 	const ageDisplay = $derived.by(() => {
-		const ageWeeks = data?.meta?.age_weeks;
-		if (ageWeeks == null) return '';
-		const ageMonths = Math.floor(ageWeeks / 4.345);
-		const remainingWeeks = Math.round(ageWeeks - ageMonths * 4.345);
-		return ageMonths > 0
-			? `${ageMonths} month${ageMonths !== 1 ? 's' : ''} ${remainingWeeks} week${remainingWeeks !== 1 ? 's' : ''}`
+		const ageWeeks = data?.overview?.age_weeks;
+		const ageMonths = data?.overview?.age_months;
+		if (ageWeeks == null || ageMonths == null) return '';
+		const wholeMonths = Math.floor(ageMonths);
+		const remainingWeeks = Math.round(ageWeeks - (wholeMonths * 52) / 12);
+		return wholeMonths > 0
+			? `${wholeMonths} month${wholeMonths !== 1 ? 's' : ''} ${remainingWeeks} week${remainingWeeks !== 1 ? 's' : ''}`
 			: `${ageWeeks} week${ageWeeks !== 1 ? 's' : ''}`;
 	});
 
@@ -325,9 +340,8 @@
 	<p>No data available</p>
 {:else}
 	{@const {
-		meta,
+		overview,
 		alerts,
-		car_seat,
 		growth,
 		teeth,
 		swimming,
@@ -335,21 +349,24 @@
 		auslan,
 		feeding,
 		sleep,
-		sleep_environment,
-		clothing_seasonal,
-		clothing_daytime,
+		clothing,
 		vaccinations,
-		parenting_approach,
+		notes,
 		activities,
-		toddler_sleep_prep,
-		food_principles,
 		sources,
 	} = data}
+	{@const car_seat = notes.find((n: any) => n.__typename === 'CarSeat')}
+	{@const parenting_approach = notes.find((n: any) => n.__typename === 'ParentingApproachNote')?.parentingApproachItems ?? []}
+	{@const toddler_sleep_prep = notes.find((n: any) => n.__typename === 'ToddlerSleepPrepNote')?.toddlerSleepPrepDetail}
+	{@const sleep_environment = sleep.environment}
+	{@const clothing_seasonal = clothing.seasonal}
+	{@const clothing_daytime = clothing.daytime}
+	{@const food_principles = feeding.principles}
 
 	<h2 id="overview">Overview</h2>
 
 	<Stats items={[
-		{ name: 'Last Updated', value: meta.last_updated, colour: 'blue_navy' },
+		{ name: 'Last Updated', value: overview.last_updated, colour: 'blue_navy' },
 		{ name: 'Age', value: ageDisplay, colour: 'blue_navy' },
 	]} />
 	<Cards>
@@ -371,7 +388,7 @@
 
 	<details name="section">
 		<summary><h2>Teeth</h2></summary>
-		<Teeth {teeth} birth={meta.birth_month} onMarkErupted={markToothErupted} />
+		<Teeth {teeth} onMarkErupted={markToothErupted} />
 	</details>
 
 	<details name="section">
@@ -559,6 +576,7 @@
 
 	pre {
 		background: var(--blue);
+		color: var(--blue_text);
 		padding: 1em;
 		border-radius: 0.3em;
 		overflow-x: auto;

@@ -26,3 +26,6 @@ certificates/
 mockdata.ts
 .svelte-kit/
 build
+
+# fetched fresh from the API on every dev/build start, see vite.config.ts
+src/lib/styles/global/colours.generated.css

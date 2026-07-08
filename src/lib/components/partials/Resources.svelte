@@ -72,7 +72,7 @@
 
 		& h2 {
 			margin-top: 0;
-			color: var(--background);
+			color: var(--navy_text);
 		}
 	}
 
@@ -95,6 +95,7 @@
 		gap: 5px 10px;
 		border-radius: 0.5em;
 		background: var(--orange);
+		color: var(--orange_text);
 
 		&[data-archived='true'] {
 			opacity: 0.5;
@@ -102,21 +103,22 @@
 
 		&:nth-child(5n - 1) {
 			background: var(--green);
-			color: var(--neutral_light);
+			color: var(--green_text);
 		}
 
 		&:nth-child(5n - 2) {
 			background: var(--blue);
-			color: var(--neutral_light);
+			color: var(--blue_text);
 		}
 
 		&:nth-child(5n - 3) {
 			background: var(--pink);
+			color: var(--pink_text);
 		}
 
 		&:nth-child(5n - 4) {
 			background: var(--purple_bright);
-			color: var(--neutral_light);
+			color: var(--purple_bright_text);
 		}
 
 		& p {

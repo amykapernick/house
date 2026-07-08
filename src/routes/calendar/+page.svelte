@@ -33,6 +33,8 @@
 							}
 							status
 							due
+							end
+							allDay
 							estimate
 							link
 							platform

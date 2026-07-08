@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { differenceInDays, parseISO, format } from 'date-fns';
+	import { parseISO, format } from 'date-fns';
 	import Wheat from '$img/icons/grain.svg?component';
 	import Cow from '$img/icons/cow-2.svg?component';
 	import Sesame from '$img/icons/sesame.svg?component';
@@ -30,20 +30,11 @@
 		'Soy': SoySauce
 	}
 
-	function allergenUrgency(due: string | null): 'urgent' | 'upcoming' | undefined {
-		if (!due) return;
-		const days = differenceInDays(parseISO(due), new Date());
-		if (days < 2) return 'urgent';
-		if (days < 4) return 'upcoming';
-		return;
-	}
-
-	function allergenDueLabel(due: string | null): string {
-		if (!due) return '';
-		const days = differenceInDays(parseISO(due), new Date());
-		if (days < 0) return `${Math.abs(days)}d overdue`;
-		if (days === 0) return 'today';
-		if (days === 1) return 'tomorrow';
+	function allergenDueLabel(daysUntilDue: number | null, due: string | null): string {
+		if (daysUntilDue == null || !due) return '';
+		if (daysUntilDue < 0) return `${Math.abs(daysUntilDue)}d overdue`;
+		if (daysUntilDue === 0) return 'today';
+		if (daysUntilDue === 1) return 'tomorrow';
 		return format(parseISO(due), 'EEE');
 	}
 </script>
@@ -54,14 +45,14 @@
 			{@const Icon = Allergens[allergen.name]}
 			<button
 				class="allergen-btn"
-				data-urgency={allergenUrgency(allergen.due)}
+				data-urgency={allergen.urgency}
 				disabled={completing.has(allergen.id)}
 				onclick={() => completeAllergen(allergen.id)}
-				style:order={differenceInDays(parseISO(allergen.due), new Date())}
+				style:order={allergen.daysUntilDue}
 			>
 				<span class="label">{allergen.name}</span>
 				{#if Icon}<Icon class="icon" />{/if}
-				<span class="due">{allergenDueLabel(allergen.due)}</span>
+				<span class="due">{allergenDueLabel(allergen.daysUntilDue, allergen.due)}</span>
 			</button>
 		{/each}
 	</ul>
