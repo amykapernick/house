@@ -450,6 +450,10 @@ export type MealPlanList = {
   totalPages: Scalars['Int']['output'];
 };
 
+export type MealPlanMutationResult = {
+  success: Scalars['Boolean']['output'];
+};
+
 export type Measurement = {
   percentile: Maybe<Scalars['Int']['output']>;
   unit: MeasurementUnit;
@@ -494,13 +498,16 @@ export type Mutation = {
   checkShoppingItem: Maybe<CheckShoppingItemResult>;
   completeTask: Maybe<CompleteTaskResult>;
   createBudgetItem: Maybe<BudgetMutationResult>;
+  createMealPlanEntry: Maybe<MealPlanEntry>;
   createRoutineOverride: Maybe<ScheduleMutationResult>;
   deleteBudgetItem: Maybe<BudgetMutationResult>;
+  deleteMealPlanEntry: Maybe<MealPlanMutationResult>;
   markToothErupted: Maybe<Tooth>;
   updateAuslanSignStatus: Maybe<AuslanSign>;
   updateBudgetBucketPercentage: Maybe<BudgetMutationResult>;
   updateBudgetItem: Maybe<BudgetMutationResult>;
   updateDefaultRoutine: Maybe<ScheduleMutationResult>;
+  updateMealPlanEntry: Maybe<MealPlanEntry>;
   updateMilestoneStatus: Maybe<Milestone>;
   updateSwimSkillStatus: Maybe<SwimSkill>;
 };
@@ -523,6 +530,15 @@ export type MutationCreateBudgetItemArgs = {
 };
 
 
+export type MutationCreateMealPlanEntryArgs = {
+  date: Scalars['String']['input'];
+  entryType: Scalars['String']['input'];
+  recipeId?: InputMaybe<Scalars['String']['input']>;
+  text?: InputMaybe<Scalars['String']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
+};
+
+
 export type MutationCreateRoutineOverrideArgs = {
   end: Scalars['String']['input'];
   friday: Array<RoutineDayBlockInput>;
@@ -538,6 +554,11 @@ export type MutationCreateRoutineOverrideArgs = {
 
 export type MutationDeleteBudgetItemArgs = {
   id: Scalars['String']['input'];
+};
+
+
+export type MutationDeleteMealPlanEntryArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -573,6 +594,16 @@ export type MutationUpdateDefaultRoutineArgs = {
   thursday: Array<RoutineDayBlockInput>;
   tuesday: Array<RoutineDayBlockInput>;
   wednesday: Array<RoutineDayBlockInput>;
+};
+
+
+export type MutationUpdateMealPlanEntryArgs = {
+  date: Scalars['String']['input'];
+  entryType: Scalars['String']['input'];
+  id: Scalars['ID']['input'];
+  recipeId?: InputMaybe<Scalars['String']['input']>;
+  text?: InputMaybe<Scalars['String']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
 };
 
 

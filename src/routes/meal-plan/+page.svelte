@@ -1,9 +1,10 @@
 <script lang="ts">
-	import { isAuthenticated } from '$lib/auth';
+	import { isAuthenticated, getToken } from '$lib/auth';
 	import fetchClientData from '$utils/fetchClientData';
 	import { getWeekRange } from '$utils/dateRanges';
 	import { resolve } from '$app/paths';
 	import { format, parseISO, isToday, isYesterday, intervalToDuration } from 'date-fns';
+	import MealPlanEntryModal from '$lib/components/partials/mealPlan/MealPlanEntryModal.svelte';
 
 	function formatMinutes(mins: number | string | null): string {
 		if (!mins) return '';
@@ -39,7 +40,7 @@
 						entries {
 							id date entryType title text
 							recipe {
-								name slug image
+								id name slug image
 								totalTime servings
 								tags { name slug }
 							}
@@ -69,6 +70,109 @@
 	function thisWeek() {
 		weekOffset = 0;
 		fetchMealPlan();
+	}
+
+	// Meal entry create/edit modal
+	let modalOpen = $state(false);
+	let modalMode = $state<`create` | `edit`>(`create`);
+	let draftId = $state(``);
+	let draftDate = $state(``);
+	let draftEntryType = $state(`dinner`);
+	let draftLinkMode = $state<`recipe` | `custom`>(`recipe`);
+	let draftTitle = $state(``);
+	let draftText = $state(``);
+	let draftRecipeId = $state<string | null>(null);
+	let draftRecipeName = $state(``);
+	let saving = $state(false);
+	let saveError = $state(``);
+
+	function openCreateModal(date: string) {
+		modalMode = `create`;
+		draftId = ``;
+		draftDate = date;
+		draftEntryType = `dinner`;
+		draftLinkMode = `recipe`;
+		draftTitle = ``;
+		draftText = ``;
+		draftRecipeId = null;
+		draftRecipeName = ``;
+		saveError = ``;
+		modalOpen = true;
+	}
+
+	function openEditModal(entry: any, date: string) {
+		modalMode = `edit`;
+		draftId = entry.id;
+		draftDate = date;
+		draftEntryType = entry.entryType;
+		draftLinkMode = entry.recipe ? `recipe` : `custom`;
+		draftTitle = entry.title ?? ``;
+		draftText = entry.text ?? ``;
+		draftRecipeId = entry.recipe?.id ?? null;
+		draftRecipeName = entry.recipe?.name ?? ``;
+		saveError = ``;
+		modalOpen = true;
+	}
+
+	const gqlStr = (value: string) => JSON.stringify(value);
+
+	async function postMutation(mutation: string) {
+		const token = await getToken();
+		return fetch(`/api/graphql`, {
+			method: `POST`,
+			headers: {
+				'Content-Type': `application/json`,
+				...(token ? { Authorization: `Bearer ${token}` } : {}),
+			},
+			body: JSON.stringify({ query: mutation }),
+		}).then((r) => r.json());
+	}
+
+	async function handleSave() {
+		saving = true;
+		saveError = ``;
+
+		const parts = [`date: ${gqlStr(draftDate)}`, `entryType: ${gqlStr(draftEntryType)}`];
+		if (draftLinkMode === `recipe`) {
+			parts.push(`recipeId: ${gqlStr(draftRecipeId ?? ``)}`);
+		}
+		else {
+			parts.push(`title: ${gqlStr(draftTitle.trim())}`);
+			if (draftText.trim()) parts.push(`text: ${gqlStr(draftText.trim())}`);
+		}
+		const args = parts.join(`, `);
+
+		const mutation =
+			modalMode === `create`
+				? `mutation { createMealPlanEntry(${args}) { id } }`
+				: `mutation { updateMealPlanEntry(id: ${gqlStr(draftId)}, ${args}) { id } }`;
+
+		const res = await postMutation(mutation);
+		saving = false;
+
+		if (res?.errors) {
+			saveError = `Failed to save meal.`;
+			return;
+		}
+
+		modalOpen = false;
+		fetchMealPlan(true);
+	}
+
+	async function handleDelete() {
+		saving = true;
+		saveError = ``;
+
+		const res = await postMutation(`mutation { deleteMealPlanEntry(id: ${gqlStr(draftId)}) { success } }`);
+		saving = false;
+
+		if (res?.errors || !res?.data?.deleteMealPlanEntry?.success) {
+			saveError = `Failed to delete meal.`;
+			return;
+		}
+
+		modalOpen = false;
+		fetchMealPlan(true);
 	}
 
 	// isToday/isYesterday are relative to the viewer's own clock, so they stay
@@ -116,7 +220,15 @@
 				{:else}
 					{#each day.entries as entry (entry.id)}
 						<div class="meal">
-							<span class="meal-type">{entry.entryType}</span>
+							<div class="meal-header">
+								<span class="meal-type">{entry.entryType}</span>
+								<button
+									type="button"
+									class="edit-btn"
+									onclick={() => openEditModal(entry, day.date)}
+									aria-label="Edit meal"
+								>✎</button>
+							</div>
 							{#if entry.recipe}
 								<a href={resolve('/recipes/[slug]', { slug: entry.recipe.slug })} class="recipe-link">
 									{#if entry.recipe.image}
@@ -137,10 +249,28 @@
 						</div>
 					{/each}
 				{/if}
+
+				<button type="button" class="add-meal" onclick={() => openCreateModal(day.date)}>+ Add meal</button>
 			</div>
 		{/each}
 	</div>
 {/if}
+
+<MealPlanEntryModal
+	bind:open={modalOpen}
+	mode={modalMode}
+	date={draftDate}
+	bind:entryType={draftEntryType}
+	bind:linkMode={draftLinkMode}
+	bind:title={draftTitle}
+	bind:text={draftText}
+	bind:recipeId={draftRecipeId}
+	bind:recipeName={draftRecipeName}
+	{saving}
+	error={saveError}
+	onSave={handleSave}
+	onDelete={modalMode === `edit` ? handleDelete : undefined}
+/>
 
 <style>
 	@import '@mixins';
@@ -171,7 +301,7 @@
 
 	.week {
 		display: grid;
-		grid-template-columns: repeat(8, 1fr);
+		grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
 		gap: 0.5em;
 
 		@media (max-width: 900px) {
@@ -221,6 +351,13 @@
 		border-radius: 0.3em;
 	}
 
+	.meal-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.5em;
+	}
+
 	.meal-type {
 		display: inline-block;
 		font-size: 0.65em;
@@ -228,6 +365,38 @@
 		font-weight: 600;
 		color: var(--grey);
 		margin-bottom: 0.2em;
+	}
+
+	.edit-btn {
+		flex-shrink: 0;
+		border: none;
+		background: none;
+		color: var(--grey);
+		cursor: pointer;
+		font-size: 0.75em;
+		padding: 0;
+		line-height: 1;
+
+		&:hover {
+			color: var(--purple_bright);
+		}
+	}
+
+	.add-meal {
+		width: 100%;
+		margin-top: 0.3em;
+		padding: 0.4em;
+		border: 1px dashed var(--grey_light);
+		border-radius: 0.3em;
+		background: transparent;
+		color: var(--grey);
+		font-size: 0.75em;
+		cursor: pointer;
+
+		&:hover {
+			border-color: var(--purple_bright);
+			color: var(--purple_bright);
+		}
 	}
 
 	.recipe-link {
