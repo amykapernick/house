@@ -64,29 +64,38 @@ const fetchClientData = async (props: FetchClientDataProps) => {
 		? `${import.meta.env.VITE_API_URL}/graphql`
 		: `/api/graphql`;
 
-	const result = await fetch(apiUrl, {
-		method: `POST`,
-		headers,
-		body: JSON.stringify({ query: gqlQuery }),
-	})
-		.then((res) => res.json())
-		.then((res) => {
-			if (res?.errors) {
-				console.log({ ...res });
-				return {};
-			}
-			return res?.data || {};
-		})
-		.catch((err) => {
-			console.error(err);
+	try {
+		const res = await fetch(apiUrl, {
+			method: `POST`,
+			headers,
+			body: JSON.stringify({ query: gqlQuery }),
+		}).then((r) => r.json());
+
+		if (res?.errors) {
+			console.log({ ...res });
 			return {};
-		});
+		}
 
-	if (cacheKey && Object.keys(result).length > 0) {
-		setCache(cacheKey, result);
+		const result = res?.data || {};
+
+		if (cacheKey && Object.keys(result).length > 0) {
+			setCache(cacheKey, result);
+		}
+
+		return result;
 	}
-
-	return result;
+	catch (err) {
+		console.error(err);
+		// The request itself failed (offline, DNS, timeout, etc.) rather than the
+		// API responding with an error - fall back to whatever's cached regardless
+		// of ttl, rather than resolving with {} and blanking out data a caller may
+		// already be showing via onStale.
+		if (cacheKey) {
+			const stale = getCached(cacheKey, Infinity);
+			if (stale) return stale;
+		}
+		return {};
+	}
 };
 
 export default fetchClientData;

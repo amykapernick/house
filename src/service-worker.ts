@@ -9,9 +9,16 @@ const sw = self as unknown as ServiceWorkerGlobalScope;
 
 const CACHE_NAME = `cache-${version}`;
 
+// adapter-static's SPA fallback page - not part of `build`/`files` (it's a
+// generated artifact, not a static/ source file), but every route falls back
+// to it (see staticwebapp.config.json's navigationFallback), so it needs to
+// be precached explicitly to act as the offline app shell.
+const SHELL_URL = `/index.html`;
+
 const ASSETS = [
 	...build,
 	...files,
+	SHELL_URL,
 ];
 
 sw.addEventListener(`install`, (event) => {
@@ -60,6 +67,16 @@ sw.addEventListener(`fetch`, (event) => {
 			catch {
 				const cached = await cache.match(event.request);
 				if (cached) return cached;
+
+				// Offline and this exact URL was never cached (e.g. a route only ever
+				// reached via client-side routing, never as a hard navigation). Every
+				// route falls back to the same SPA shell anyway (see
+				// staticwebapp.config.json), so serve that instead of a bare error -
+				// the client router can still boot and render from locally-cached data.
+				if (event.request.mode === `navigate`) {
+					const shell = await cache.match(SHELL_URL);
+					if (shell) return shell;
+				}
 
 				return new Response(`Offline`, { status: 503 });
 			}

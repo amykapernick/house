@@ -7,6 +7,7 @@
 	import { initClerk, isAuthenticated, clerkLoaded } from '$lib/auth';
 	import { routeRequiresAuth, menuItems } from '$lib/navigation';
 	import { recordPageVisit } from '$utils/recentPages';
+	import { isOnline } from '$utils/online';
 	import Header from '$partials/Header.svelte';
 	import Footer from '$partials/Footer.svelte';
 	import Layout from '$layouts/Default.svelte';
@@ -20,6 +21,12 @@
 		const clerkPublishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 		if (clerkPublishableKey) {
 			await initClerk(clerkPublishableKey);
+		}
+
+		// Only register in production - registering during `vite dev` fights with
+		// its own module reloading and just causes confusing stale-asset issues.
+		if (import.meta.env.PROD && `serviceWorker` in navigator) {
+			navigator.serviceWorker.register(`/service-worker.js`);
 		}
 	});
 
@@ -54,11 +61,15 @@
 
 <svelte:window onkeydown={handleKeydown} />
 
+{#if !$isOnline}
+	<p class="offline_banner">You're offline - showing the last cached data.</p>
+{/if}
+
 <style>
 	:global(body) {
 		display: grid;
-		grid-template-rows: auto 1fr auto;
-		grid-template-areas: 'header' 'main' 'footer';
+		grid-template-rows: auto auto 1fr auto;
+		grid-template-areas: 'offline' 'header' 'main' 'footer';
 		max-width: 100vw;
 		min-height: 100vh;
 		margin: 0;
@@ -69,6 +80,16 @@
 
 	.main {
 		grid-area: main;
+	}
+
+	.offline_banner {
+		margin: 0;
+		padding: 0.5em 1em;
+		background: var(--warning);
+		color: var(--warning_text);
+		font-size: 0.85em;
+		text-align: center;
+		grid-area: offline;
 	}
 </style>
 
