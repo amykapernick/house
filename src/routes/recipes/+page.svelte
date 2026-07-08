@@ -24,7 +24,7 @@
 	let total = $state(0);
 	let search = $state('');
 	let searchInput = $state('');
-	let orderBy = $state('dateAdded');
+	let orderBy = $state('lastMade');
 	let orderDirection = $state('desc');
 	let tagSearch = $state('');
 	let showAllTags = $state(false);
