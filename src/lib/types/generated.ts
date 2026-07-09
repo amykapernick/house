@@ -718,6 +718,7 @@ export type Query = {
   projects: Maybe<Array<Maybe<Project>>>;
   recipe: Maybe<Recipe>;
   recipeTags: Array<RecipeTag>;
+  recipeUnits: Array<RecipeIngredientUnit>;
   recipes: Maybe<RecipeList>;
   resources: Maybe<Array<Maybe<Resource>>>;
   schedule: Array<ScheduleBlock>;
@@ -842,7 +843,19 @@ export type RecipeIngredient = {
   quantity: Maybe<Scalars['Float']['output']>;
   referenceId: Maybe<Scalars['ID']['output']>;
   title: Maybe<Scalars['String']['output']>;
-  unit: Maybe<Scalars['String']['output']>;
+  unit: Maybe<RecipeIngredientUnit>;
+};
+
+export type RecipeIngredientUnit = {
+  abbreviation: Maybe<Scalars['String']['output']>;
+  fraction: Scalars['Boolean']['output'];
+  id: Maybe<Scalars['ID']['output']>;
+  name: Maybe<Scalars['String']['output']>;
+  pluralAbbreviation: Maybe<Scalars['String']['output']>;
+  pluralName: Maybe<Scalars['String']['output']>;
+  standardQuantity: Maybe<Scalars['Float']['output']>;
+  standardUnit: Maybe<Scalars['String']['output']>;
+  useAbbreviation: Scalars['Boolean']['output'];
 };
 
 export type RecipeInstruction = {
