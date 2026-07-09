@@ -29,3 +29,10 @@ build
 
 # fetched fresh from the API on every dev/build start, see vite.config.ts
 src/lib/styles/global/colours.generated.css
+
+# accessibility test artifacts
+tests/a11y/.auth/
+playwright-report/
+test-results/
+pa11y-report/
+blob-report/
