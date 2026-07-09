@@ -66,6 +66,25 @@ export function compatibleUnits(
 	});
 }
 
+/** The shared root label used to group interconvertible units (eg. "gram", "liter"), or null if this unit has no configured conversion. */
+export function unitRoot(unit: RecipeIngredientUnit, allUnits: RecipeIngredientUnit[]): string | null {
+	if (unit.standardQuantity == null || !unit.standardUnit) return null;
+	return resolveRoot(unit, byNormalisedName(allUnits))?.root ?? null;
+}
+
+/** All configured units (including this one) that share the given root. */
+export function unitsInFamily(root: string, allUnits: RecipeIngredientUnit[]): RecipeIngredientUnit[] {
+	const unitsByName = byNormalisedName(allUnits);
+	return allUnits.filter((u) => resolveRoot(u, unitsByName)?.root === root);
+}
+
+/** Human-friendly label for a root (eg. "gram" -> "Gram"), based on whichever unit is actually named that. */
+export function unitFamilyLabel(root: string, allUnits: RecipeIngredientUnit[]): string {
+	const rootUnit = allUnits.find((u) => u.name && normalise(u.name) === root);
+	const label = rootUnit?.name ?? root;
+	return label.charAt(0).toUpperCase() + label.slice(1);
+}
+
 export function convertQuantity(
 	quantity: number,
 	from: RecipeIngredientUnit,

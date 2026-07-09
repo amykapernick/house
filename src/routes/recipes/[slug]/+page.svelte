@@ -3,7 +3,15 @@
 	import { format, parseISO, intervalToDuration } from 'date-fns';
 	import fetchClientData from '$utils/fetchClientData';
 	import { resolve } from '$app/paths';
-	import { compatibleUnits, convertQuantity, unitLabel, unitOptionLabel } from '$lib/utils/units';
+	import {
+		compatibleUnits,
+		convertQuantity,
+		unitFamilyLabel,
+		unitLabel,
+		unitOptionLabel,
+		unitRoot,
+		unitsInFamily,
+	} from '$lib/utils/units';
 	import type { RecipeIngredientUnit } from '$lib/types/generated';
 
 	function formatMinutes(mins: number | string | null): string {
@@ -21,6 +29,22 @@
 	let multiplier = $state(1);
 	let allUnits = $state<RecipeIngredientUnit[]>([]);
 	let selectedUnitId = $state<Record<number, string>>({});
+	let defaultUnitId = $state<Record<string, string>>({});
+
+	// Distinct unit families (mass, volume, ...) present across the recipe's ingredients,
+	// each with every configured unit that can be converted to/from it - powers the
+	// top-of-page "default unit" pickers.
+	let unitFamilies = $derived.by(() => {
+		const families: { root: string; units: RecipeIngredientUnit[] }[] = [];
+		for (const ingredient of recipe?.ingredients ?? []) {
+			if (!ingredient.unit) continue;
+			const root = unitRoot(ingredient.unit, allUnits);
+			if (!root || families.some((f) => f.root === root)) continue;
+			const units = unitsInFamily(root, allUnits);
+			if (units.length > 1) families.push({ root, units });
+		}
+		return families;
+	});
 
 	const SCALE_PRESETS = [1, 2, 3];
 
@@ -47,9 +71,16 @@
 
 	function selectedUnit(ingredient: any, i: number): RecipeIngredientUnit | null {
 		if (!ingredient.unit) return null;
+
+		// An explicit per-ingredient choice always wins over the family default.
 		const chosenId = selectedUnitId[i];
-		if (!chosenId || chosenId === ingredient.unit.id) return ingredient.unit;
-		return allUnits.find((u) => u.id === chosenId) ?? ingredient.unit;
+		if (chosenId) return allUnits.find((u) => u.id === chosenId) ?? ingredient.unit;
+
+		const root = unitRoot(ingredient.unit, allUnits);
+		const defaultId = root ? defaultUnitId[root] : undefined;
+		if (defaultId) return allUnits.find((u) => u.id === defaultId) ?? ingredient.unit;
+
+		return ingredient.unit;
 	}
 
 	function scaledIngredientText(ingredient: any, i: number): string {
@@ -76,6 +107,7 @@
 				recipe = res.recipe ?? null;
 				allUnits = res.recipeUnits ?? [];
 				selectedUnitId = {};
+				defaultUnitId = {};
 				loading = false;
 			}
 			fetchClientData({
@@ -176,6 +208,32 @@
 						/>
 					</div>
 				</div>
+				{#if unitFamilies.length}
+					<div class="unit-defaults-bar">
+						<span class="label">Units</span>
+						{#each unitFamilies as family (family.root)}
+							{@const fieldId = `unit-default-${family.root}`}
+							<div class="unit-default">
+								<label for={fieldId}>{unitFamilyLabel(family.root, allUnits)}</label>
+								<select
+									id={fieldId}
+									class="unit-select"
+									value={defaultUnitId[family.root] ?? ''}
+									onchange={(e) => {
+										const value = e.currentTarget.value;
+										if (value) defaultUnitId[family.root] = value;
+										else delete defaultUnitId[family.root];
+									}}
+								>
+									<option value="">As written</option>
+									{#each family.units as unit (unit.id)}
+										<option value={unit.id}>{unitOptionLabel(unit)}</option>
+									{/each}
+								</select>
+							</div>
+						{/each}
+					</div>
+				{/if}
 				{#if recipe.ingredients?.length}
 					<ul>
 						{#each recipe.ingredients as ingredient, i (i)}
@@ -412,6 +470,32 @@
 			border: 1px solid var(--grey_light);
 			border-radius: 0.3em;
 			font-size: 0.85em;
+		}
+
+		& .unit-defaults-bar {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			gap: 0.8em;
+			margin: 0.6em 0 0.8em;
+
+			& .label {
+				font-size: 0.75em;
+				text-transform: uppercase;
+				color: var(--grey);
+				font-weight: 600;
+			}
+		}
+
+		& .unit-default {
+			display: flex;
+			align-items: center;
+			gap: 0.3em;
+			font-size: 0.85em;
+
+			& label {
+				color: var(--grey);
+			}
 		}
 
 		& ul {
