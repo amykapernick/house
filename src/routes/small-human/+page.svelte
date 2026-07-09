@@ -5,6 +5,7 @@
 	import { getToken } from '$lib/auth';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import type { Colour } from '$types/global';
 	import Allergens from '$parts/smallHuman/Allergens.svelte';
 	import Teeth from '$parts/smallHuman/Teeth.svelte';
@@ -354,7 +355,8 @@
 
 	function setActiveTab(id: string) {
 		activeTab = id;
-		goto(`#${id}`, { replaceState: true, noScroll: true, keepFocus: true });
+		// eslint-disable-next-line svelte/no-navigation-without-resolve -- resolve() is used; the rule can't trace it through template-literal concatenation with the hash
+		goto(`${resolve('/small-human')}#${id}`, { replaceState: true, noScroll: true, keepFocus: true });
 	}
 
 </script>
@@ -419,7 +421,7 @@
 	<Tabs {tabs} active={activeTab} onSelect={setActiveTab} />
 
 	{#if activeTab === 'overview'}
-	<section id="panel-overview" role="tabpanel" aria-labelledby="tab-overview">
+	<div id="panel-overview" role="tabpanel" aria-labelledby="tab-overview" tabindex="0">
 	<h2>Overview</h2>
 
 	<Stats items={[
@@ -437,25 +439,25 @@
 			<p>{car_seat.next_transition}</p>
 		</Card>
 	</Cards>
-	</section>
+	</div>
 	{/if}
 
 	{#if activeTab === 'growth'}
-	<section id="panel-growth" role="tabpanel" aria-labelledby="tab-growth">
+	<div id="panel-growth" role="tabpanel" aria-labelledby="tab-growth" tabindex="0">
 		<h2>Growth</h2>
 		<Growth {growth} />
-	</section>
+	</div>
 	{/if}
 
 	{#if activeTab === 'teeth'}
-	<section id="panel-teeth" role="tabpanel" aria-labelledby="tab-teeth">
+	<div id="panel-teeth" role="tabpanel" aria-labelledby="tab-teeth" tabindex="0">
 		<h2>Teeth</h2>
 		<Teeth {teeth} onMarkErupted={markToothErupted} />
-	</section>
+	</div>
 	{/if}
 
 	{#if activeTab === 'swimming'}
-	<section id="panel-swimming" role="tabpanel" aria-labelledby="tab-swimming">
+	<div id="panel-swimming" role="tabpanel" aria-labelledby="tab-swimming" tabindex="0">
 		<h2>Swimming</h2>
 		<p>{swimming.note}</p>
 		<Cards>
@@ -463,10 +465,10 @@
 				<Milestone {...m} onStatusChange={updateSwimSkillStatus} />
 			{/each}
 		</Cards>
-	</section>
+	</div>
 	{/if}
 	{#if activeTab === 'milestones'}
-	<section id="panel-milestones" role="tabpanel" aria-labelledby="tab-milestones">
+	<div id="panel-milestones" role="tabpanel" aria-labelledby="tab-milestones" tabindex="0">
 		<h2>Milestones</h2>
 		<p>{milestones.note}</p>
 		<Cards>
@@ -474,10 +476,10 @@
 				<Milestone {...m} type={m.category} onStatusChange={updateMilestoneStatus} />
 			{/each}
 		</Cards>
-	</section>
+	</div>
 	{/if}
 	{#if activeTab === 'auslan'}
-	<section id="panel-auslan" role="tabpanel" aria-labelledby="tab-auslan">
+	<div id="panel-auslan" role="tabpanel" aria-labelledby="tab-auslan" tabindex="0">
 		<h2>Auslan</h2>
 		<p>{auslan.note}</p>
 		<Cards>
@@ -485,10 +487,10 @@
 				<Auslan {...s} onStatusChange={updateAuslanSignStatus} />
 			{/each}
 		</Cards>
-	</section>
+	</div>
 	{/if}
 	{#if activeTab === 'feeding'}
-	<section id="panel-feeding" role="tabpanel" aria-labelledby="tab-feeding">
+	<div id="panel-feeding" role="tabpanel" aria-labelledby="tab-feeding" tabindex="0">
 		<h2>Feeding</h2>
 		{#if feedingStage.current}
 			<h3>Current Stage - {feedingStage.current.title}</h3>
@@ -535,34 +537,34 @@
 			/>
 		{/if}
 		<pre><code>{JSON.stringify(feeding, null, 2)}</code></pre>
-	</section>
+	</div>
 	{/if}
 	{#if activeTab === 'sleep'}
-	<section id="panel-sleep" role="tabpanel" aria-labelledby="tab-sleep">
+	<div id="panel-sleep" role="tabpanel" aria-labelledby="tab-sleep" tabindex="0">
 		<h2>Sleep</h2>
 		<pre><code>{JSON.stringify(sleep, null, 2)}</code></pre>
-	</section>
+	</div>
 	{/if}
 	{#if activeTab === 'sleep-environment'}
-	<section id="panel-sleep-environment" role="tabpanel" aria-labelledby="tab-sleep-environment">
+	<div id="panel-sleep-environment" role="tabpanel" aria-labelledby="tab-sleep-environment" tabindex="0">
 		<h2>Sleep Environment</h2>
 		<pre><code>{JSON.stringify(sleep_environment, null, 2)}</code></pre>
-	</section>
+	</div>
 	{/if}
 	{#if activeTab === 'clothing-seasonal'}
-	<section id="panel-clothing-seasonal" role="tabpanel" aria-labelledby="tab-clothing-seasonal">
+	<div id="panel-clothing-seasonal" role="tabpanel" aria-labelledby="tab-clothing-seasonal" tabindex="0">
 		<h2>Clothing Seasonal</h2>
 		<pre><code>{JSON.stringify(clothing_seasonal, null, 2)}</code></pre>
-	</section>
+	</div>
 	{/if}
 	{#if activeTab === 'clothing-daytime'}
-	<section id="panel-clothing-daytime" role="tabpanel" aria-labelledby="tab-clothing-daytime">
+	<div id="panel-clothing-daytime" role="tabpanel" aria-labelledby="tab-clothing-daytime" tabindex="0">
 		<h2>Clothing Daytime</h2>
 		<pre><code>{JSON.stringify(clothing_daytime, null, 2)}</code></pre>
-	</section>
+	</div>
 	{/if}
 	{#if activeTab === 'vaccinations'}
-	<section id="panel-vaccinations" role="tabpanel" aria-labelledby="tab-vaccinations">
+	<div id="panel-vaccinations" role="tabpanel" aria-labelledby="tab-vaccinations" tabindex="0">
 		<h2>Vaccinations</h2>
 		<p>{vaccinations.note}</p>
 		<Cards>
@@ -576,10 +578,10 @@
 				</Card>
 			{/each}
 		</Cards>
-	</section>
+	</div>
 	{/if}
 	{#if activeTab === 'parenting-approach'}
-	<section id="panel-parenting-approach" role="tabpanel" aria-labelledby="tab-parenting-approach">
+	<div id="panel-parenting-approach" role="tabpanel" aria-labelledby="tab-parenting-approach" tabindex="0">
 		<h2>Parenting Approach</h2>
 		<Cards>
 			{#each parenting_approach as a (a.id)}
@@ -590,10 +592,10 @@
 				</Card>
 			{/each}
 		</Cards>
-	</section>
+	</div>
 	{/if}
 	{#if activeTab === 'activities'}
-	<section id="panel-activities" role="tabpanel" aria-labelledby="tab-activities">
+	<div id="panel-activities" role="tabpanel" aria-labelledby="tab-activities" tabindex="0">
 		<h2>Activities</h2>
 		<Cards>
 			{#each activities as a (a.id)}
@@ -604,10 +606,10 @@
 				</Card>
 			{/each}
 		</Cards>
-	</section>
+	</div>
 	{/if}
 	{#if activeTab === 'toddler-sleep-prep'}
-	<section id="panel-toddler-sleep-prep" role="tabpanel" aria-labelledby="tab-toddler-sleep-prep">
+	<div id="panel-toddler-sleep-prep" role="tabpanel" aria-labelledby="tab-toddler-sleep-prep" tabindex="0">
 		<h2>Toddler Sleep Prep</h2>
 		<p>{toddler_sleep_prep.note}</p>
 		{#if toddler_sleep_prep.status === 'due'}
@@ -625,10 +627,10 @@
 			<h4>{i.title}</h4>
 			<p>{i.note}</p>
 		{/each}
-	</section>
+	</div>
 	{/if}
 	{#if activeTab === 'food-principles'}
-	<section id="panel-food-principles" role="tabpanel" aria-labelledby="tab-food-principles">
+	<div id="panel-food-principles" role="tabpanel" aria-labelledby="tab-food-principles" tabindex="0">
 		<h2>Food Principles</h2>
 		<p>{food_principles.core_philosophy}</p>
 		<p>{food_principles.note}</p>
@@ -642,10 +644,10 @@
 			<h4>{i.title}</h4>
 			<p>{i.detail}</p>
 		{/each}
-	</section>
+	</div>
 	{/if}
 	{#if activeTab === 'sources'}
-	<section id="panel-sources" role="tabpanel" aria-labelledby="tab-sources">
+	<div id="panel-sources" role="tabpanel" aria-labelledby="tab-sources" tabindex="0">
 		<h2>Sources</h2>
 		{#each sources as s (s.id)}
 			<h3>{s.name}</h3>
@@ -654,7 +656,7 @@
 			<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- s.url is an external reference source, not an internal route -->
 			<a href={s.url} target="_blank">{s.url.replace('https://', '')}</a>
 		{/each}
-	</section>
+	</div>
 	{/if}
 {/if}
 
@@ -716,8 +718,13 @@
 		line-height: 1.4;
 	}
 
-	section h2 {
+	div[role='tabpanel'] h2 {
 		color: var(--navy);
 		font-size: 1.5em;
+	}
+
+	div[role='tabpanel']:focus-visible {
+		outline: 2px solid var(--purple_bright);
+		outline-offset: 2px;
 	}
 </style>
