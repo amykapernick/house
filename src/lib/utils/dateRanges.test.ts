@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { getWeekRange, getPlanningRange, getDashboardMealPlanRange } from './dateRanges';
+import { getWeekRange, getPlanningRange, getDashboardMealPlanRange, getNextSaturday } from './dateRanges';
 
 describe(`getWeekRange`, () => {
 	beforeEach(() => {
@@ -38,6 +38,34 @@ describe(`getWeekRange`, () => {
 		vi.setSystemTime(new Date(`2026-12-30T12:00:00Z`));
 
 		expect(getWeekRange()).toEqual({ start: `2026-12-29`, end: `2027-01-05` });
+	});
+});
+
+describe(`getNextSaturday`, () => {
+	beforeEach(() => {
+		vi.useFakeTimers();
+	});
+
+	afterEach(() => {
+		vi.useRealTimers();
+	});
+
+	it(`on a Thursday, returns the coming Saturday`, () => {
+		vi.setSystemTime(new Date(`2026-07-09T12:00:00Z`)); // Thursday
+
+		expect(getNextSaturday()).toBe(`2026-07-11`);
+	});
+
+	it(`on a Saturday, returns today`, () => {
+		vi.setSystemTime(new Date(`2026-07-11T12:00:00Z`)); // Saturday
+
+		expect(getNextSaturday()).toBe(`2026-07-11`);
+	});
+
+	it(`handles a month boundary`, () => {
+		vi.setSystemTime(new Date(`2026-07-30T12:00:00Z`)); // Thursday
+
+		expect(getNextSaturday()).toBe(`2026-08-01`);
 	});
 });
 

@@ -2,7 +2,7 @@
 	import { isAuthenticated, getToken } from '$lib/auth';
 	import fetchClientData, { getGraphqlUrl } from '$utils/fetchClientData';
 	import { prefetchRecipes } from '$utils/prefetchRecipes';
-	import { getWeekRange, getPlanningRange } from '$utils/dateRanges';
+	import { getWeekRange, getPlanningRange, getNextSaturday } from '$utils/dateRanges';
 	import { getCurrentNoongarSeason } from '$utils/noongarSeason';
 	import { buildMealPlanSaveOps, type PlanningDay, type PlanningDndItem, type PlanningRecipe } from '$utils/mealPlanningDnd';
 	import { resolve } from '$app/paths';
@@ -205,6 +205,7 @@
 
 	function startPlanningMode() {
 		planningMode = true;
+		addToShoppingListMessage = ``;
 		fetchSeasonRecipes();
 		fetchMealPlan(true);
 	}
@@ -213,6 +214,7 @@
 		if (weeks === planningWeeks) return;
 		if (dirty && !confirm(`Discard unsaved meal plan changes?`)) return;
 		planningWeeks = weeks;
+		addToShoppingListMessage = ``;
 		fetchMealPlan(true);
 	}
 
@@ -293,25 +295,26 @@
 
 	function prevWeek() {
 		weekOffset--;
-		addToShoppingListMessage = ``;
 		fetchMealPlan();
 	}
 
 	function nextWeek() {
 		weekOffset++;
-		addToShoppingListMessage = ``;
 		fetchMealPlan();
 	}
 
 	function thisWeek() {
 		weekOffset = 0;
-		addToShoppingListMessage = ``;
 		fetchMealPlan();
 	}
 
+	// Only recipes from the coming Saturday onwards - the leading partial week
+	// (today through Friday) is already being shopped for, so it's excluded.
 	let weekRecipeIds = $derived([
 		...new Set(
-			days.flatMap((day) => day.entries.map((entry: any) => entry.recipe?.id).filter(Boolean))
+			days
+				.filter((day) => day.date >= getNextSaturday())
+				.flatMap((day) => day.entries.map((entry: any) => entry.recipe?.id).filter(Boolean))
 		),
 	]);
 
@@ -479,9 +482,18 @@
 		<button type="button" onclick={handleSaveMealPlan} disabled={planningSaving || !dirty}>
 			{planningSaving ? `Saving…` : `Save`}
 		</button>
-		<button type="button" onclick={exitPlanningMode} disabled={planningSaving}>Exit planning</button>
+		<button type="button" class="exit-planning" onclick={exitPlanningMode} disabled={planningSaving}>Exit planning</button>
+		<button
+			type="button"
+			onclick={handleAddWeekToShoppingList}
+			disabled={addingToShoppingList || weekRecipeIds.length === 0}
+		>
+			{addingToShoppingList ? `Adding…` : `Add to shopping list`}
+		</button>
 		{#if planningSaveError}<span class="error">{planningSaveError}</span>{/if}
 	</div>
+
+	{#if addToShoppingListMessage}<p class="shopping-list-message">{addToShoppingListMessage}</p>{/if}
 
 	<MealPlanningPalette recipes={seasonRecipes} loading={seasonRecipesLoading} season={currentSeason} />
 
@@ -511,16 +523,7 @@
 		<button class="today" onclick={thisWeek}>This week</button>
 		<button onclick={nextWeek}>Next →</button>
 		<button type="button" onclick={startPlanningMode}>Start meal planning</button>
-		<button
-			type="button"
-			onclick={handleAddWeekToShoppingList}
-			disabled={addingToShoppingList || weekRecipeIds.length === 0}
-		>
-			{addingToShoppingList ? `Adding…` : `Add week to shopping list`}
-		</button>
 	</nav>
-
-	{#if addToShoppingListMessage}<p class="shopping-list-message">{addToShoppingListMessage}</p>{/if}
 
 	{#if loading}
 		<p>Loading...</p>
@@ -640,7 +643,7 @@
 				cursor: default;
 			}
 
-			&:last-of-type {
+			&.exit-planning {
 				background: transparent;
 				color: var(--navy);
 			}

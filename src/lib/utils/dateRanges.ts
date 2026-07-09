@@ -13,17 +13,26 @@ export function getWeekRange(weekOffset = 0): { start: string; end: string } {
 	};
 }
 
+function nextSaturdayDate(): Date {
+	const today = new Date();
+	return addDays(today, (6 - today.getDay() + 7) % 7);
+}
+
+// The coming Saturday (today itself if today already is one) - the start of
+// the next full Sat-Fri grocery week.
+export function getNextSaturday(): string {
+	return format(nextSaturdayDate(), `yyyy-MM-dd`);
+}
+
 // Meal-planning-mode range: today through the end of the Nth Sat-Fri block
 // starting at the coming Saturday (today itself if today already is one).
 // Always a single contiguous span - a "leading partial week" before the
 // first Saturday isn't a special case, it falls out of the start/end math.
 export function getPlanningRange(weeks: number): { start: string; end: string } {
-	const today = new Date();
-	const nextSaturday = addDays(today, (6 - today.getDay() + 7) % 7);
-	const end = addDays(nextSaturday, weeks * 7 - 1);
+	const end = addDays(nextSaturdayDate(), weeks * 7 - 1);
 
 	return {
-		start: format(today, `yyyy-MM-dd`),
+		start: format(new Date(), `yyyy-MM-dd`),
 		end: format(end, `yyyy-MM-dd`),
 	};
 }
