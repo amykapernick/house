@@ -10,6 +10,21 @@ on:
       - prod
 
 jobs:
+  unit_tests:
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
+    runs-on: ubuntu-latest
+    name: Unit Tests
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Install dependencies
+        run: npm ci
+      - name: Run unit tests
+        run: npm run test:unit
+
   build_and_deploy_job:
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
     runs-on: ubuntu-latest
@@ -94,14 +109,15 @@ jobs:
           done
           echo "Preview did not come up in time" >&2
           exit 1
-      - name: Sign in and run playwright-axe accessibility checks
+      - name: Sign in and run Playwright checks (accessibility + e2e flows)
         env:
           PLAYWRIGHT_BASE_URL: ${{ needs.build_and_deploy_job.outputs.static_web_app_url }}
+          VITE_API_URL: ${{ secrets.API_URL }}
           VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
           CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
           CLERK_TEST_USER_EMAIL: ${{ secrets.CLERK_TEST_USER_EMAIL }}
           CLERK_TEST_USER_PASSWORD: ${{ secrets.CLERK_TEST_USER_PASSWORD }}
-        run: npm run test:a11y:axe
+        run: npm run test:e2e
       - name: Run pa11y accessibility checks
         if: always()
         env:
