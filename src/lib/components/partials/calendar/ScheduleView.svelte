@@ -19,6 +19,7 @@
 		tasks = [],
 		events = [],
 		icalEvents = [],
+		readOnly = false,
 		onRangeChange,
 		onSave,
 		onTaskCompleted,
@@ -28,6 +29,7 @@
 		tasks?: Task[];
 		events?: any[];
 		icalEvents?: any[];
+		readOnly?: boolean;
 		onRangeChange?: (start: Date, end: Date) => void;
 		onSave?: (payload: ScheduleSavePayload) => Promise<void>;
 		onTaskCompleted?: (taskId: string) => void;
@@ -210,6 +212,11 @@
 	}
 
 	function handleEventChange(info: any) {
+		if (readOnly) {
+			info.revert?.();
+			return;
+		}
+
 		const { id, start, end } = info.event;
 		editableBlocks = editableBlocks.map((block) =>
 			block.id === id
@@ -220,6 +227,7 @@
 	}
 
 	function handleSelect(info: any) {
+		if (readOnly) return;
 		openCreateModal(info.start, info.end);
 	}
 
@@ -244,6 +252,8 @@
 			if (link) window.open(link, `_blank`);
 			return;
 		}
+
+		if (readOnly) return;
 
 		const block = editableBlocks.find((b) => b.id === info.event.id);
 		if (block) openEditModal(block);
@@ -276,10 +286,12 @@
 		}
 	}
 
+	// svelte-ignore state_referenced_locally -- CalendarBase reads this once at mount;
+	// per-instance readOnly flips are enforced by the handler guards above instead.
 	const optionsOverride = {
 		view: 'timeGridWeek',
-		editable: true,
-		selectable: true,
+		editable: !readOnly,
+		selectable: !readOnly,
 		allDaySlot: true,
 		slotMinTime: '05:00:00',
 		slotMaxTime: '23:00:00',
@@ -313,13 +325,15 @@
 	};
 </script>
 
-<!-- TODO: Allow displaying schedule by user -->
-
 <div class="schedule_toolbar">
-	{#if hasChanges}
-		<span class="unsaved">Unsaved changes</span>
+	{#if readOnly}
+		<span class="hint">Select a family member above to edit their schedule</span>
+	{:else}
+		{#if hasChanges}
+			<span class="unsaved">Unsaved changes</span>
+		{/if}
+		<button disabled={!hasChanges} onclick={() => (saveModalOpen = true)}>Save changes</button>
 	{/if}
-	<button disabled={!hasChanges} onclick={() => (saveModalOpen = true)}>Save changes</button>
 </div>
 
 <CalendarBase plugins={[TimeGrid, Interaction]} events={calendarEvents} {optionsOverride} />
@@ -367,6 +381,11 @@
 
 	.unsaved {
 		color: var(--orange);
+	}
+
+	.hint {
+		color: var(--grey);
+		font-style: italic;
 	}
 
 	:global(.schedule-override) {

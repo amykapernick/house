@@ -16,12 +16,23 @@
 		onchange?: () => void;
 		children?: Snippet<[{ value: Value; label: string }]>;
 	} = $props();
+
+	// In some Chromium versions, clicking an option in an appearance:base-select
+	// picker inside a focus-trapped <dialog> (showModal()) doesn't fire `change`,
+	// so bind:value never updates. Forward the click manually as a safety net.
+	function handlePickerClick(event: MouseEvent) {
+		const option = (event.target as HTMLElement).closest(`option`);
+		if (!option) return;
+		const newValue = option.value as Value;
+		if (newValue === value) return;
+		value = newValue;
+		onchange?.();
+	}
 </script>
 
 <label class="sr-only" for={id}>{label}</label>
-<!-- TODO: Fix base-select dialog issue -https://share.gemini.google/zQwwapLfeqcY -->
-<select class="select" {id} bind:value {onchange}>
-	<button>
+<select class="select" {id} bind:value {onchange} onclick={handlePickerClick}>
+	<button type="button">
 		<selectedcontent></selectedcontent>
 	</button>
 	{#each options as option (option.value)}

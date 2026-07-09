@@ -2,6 +2,7 @@
 	import { isAuthenticated } from '$lib/auth';
 	import { intervalToDuration, format, startOfDay, addDays } from 'date-fns';
 	import fetchClientData from '$utils/fetchClientData';
+	import { prefetchRecipes } from '$utils/prefetchRecipes';
 	import { getWeekRange } from '$utils/dateRanges';
 	import { resolve } from '$app/paths';
 
@@ -29,6 +30,7 @@
 			function handleMeals(res: any) {
 				meals = res.mealPlans?.items ?? [];
 				loading = false;
+				prefetchRecipes(meals.map((meal) => meal.recipe?.slug));
 			}
 			fetchClientData({
 				cacheKey: 'dashboard-mealplan',

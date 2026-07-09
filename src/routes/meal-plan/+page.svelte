@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { isAuthenticated, getToken } from '$lib/auth';
 	import fetchClientData, { getGraphqlUrl } from '$utils/fetchClientData';
+	import { prefetchRecipes } from '$utils/prefetchRecipes';
 	import { getWeekRange } from '$utils/dateRanges';
 	import { resolve } from '$app/paths';
 	import { format, parseISO, isToday, isYesterday, intervalToDuration } from 'date-fns';
@@ -27,6 +28,7 @@
 		function handleMealPlan(res: any) {
 			days = res.mealPlanByDay ?? [];
 			loading = false;
+			prefetchRecipes(days.flatMap((day) => day.entries.map((entry: any) => entry.recipe?.slug)));
 		}
 
 		fetchClientData({

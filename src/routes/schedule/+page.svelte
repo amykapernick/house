@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { format, startOfWeek, endOfWeek } from 'date-fns';
 	import ScheduleView from '$partials/calendar/ScheduleView.svelte';
-	import Select from '$parts/Select.svelte';
+	import FocusTimer from '$parts/FocusTimer.svelte';
 	import { isAuthenticated, getToken } from '$lib/auth';
 	import fetchClientData, { getGraphqlUrl } from '$utils/fetchClientData';
 	import type { ScheduleBlock, ScheduleSavePayload, RoutineDays, PaletteColour } from '$types/schedule';
@@ -11,7 +11,6 @@
 
 	let blocks = $state<ScheduleBlock[]>([]);
 	let colours = $state<PaletteColour[]>([]);
-	let defaultRoutineId = $state<string | null>(null);
 	let loading = $state(true);
 	let currentRange = $state<{ from: string; to: string } | null>(null);
 
@@ -25,6 +24,12 @@
 		selectedUserSlug === EVERYONE
 			? icalEvents
 			: icalEvents.filter((event) => event.family?.some((member: any) => member.slug === selectedUserSlug))
+	);
+
+	let visibleBlocks = $derived(
+		selectedUserSlug === EVERYONE
+			? blocks
+			: blocks.filter((block) => block.family?.slug === selectedUserSlug)
 	);
 
 	function loadFamily() {
@@ -114,7 +119,14 @@
 
 	function loadColours() {
 		function handleColours(res: any) {
-			colours = res.colours ?? [];
+			// The `colours` collection has one row per theme variant of a name
+			// (base/Light/Dark, for CSS generation) - keep only the base row per
+			// name so the colour picker doesn't offer (or key on) duplicates.
+			const byName = new Map<string, PaletteColour>();
+			for (const c of res.colours ?? []) {
+				if (!byName.has(c.name) || !c.theme) byName.set(c.name, c);
+			}
+			colours = [...byName.values()];
 		}
 		fetchClientData({
 			cacheKey: `colours`,
@@ -125,6 +137,7 @@
 						name
 						hex
 						link
+						theme
 					}
 				}
 			`,
@@ -137,7 +150,6 @@
 		currentRange = { from, to };
 		function handleSchedule(res: any) {
 			blocks = res.schedule ?? [];
-			defaultRoutineId = res.defaultRoutineId ?? null;
 			loading = false;
 		}
 		fetchClientData({
@@ -153,8 +165,10 @@
 						end
 						colour
 						isOverride
+						family {
+							slug
+						}
 					}
-					defaultRoutineId
 				}
 			`,
 		}).then(handleSchedule);
@@ -191,12 +205,17 @@
 	}
 
 	async function handleSave(payload: ScheduleSavePayload) {
+		if (selectedUserSlug === EVERYONE) {
+			throw new Error(`Select a family member before saving their schedule`);
+		}
+
 		const daysArgs = gqlDaysArgs(payload.days);
+		const userArg = `user: ${gqlStr(selectedUserSlug)}`;
 
 		const mutation =
 			payload.scope === `default`
-				? `mutation { updateDefaultRoutine(id: ${gqlStr(defaultRoutineId ?? ``)}, ${daysArgs}) { success } }`
-				: `mutation { createRoutineOverride(start: ${gqlStr(payload.start)}, end: ${gqlStr(payload.end)}, ${daysArgs}) { success } }`;
+				? `mutation { updateDefaultRoutine(${userArg}, ${daysArgs}) { success } }`
+				: `mutation { createRoutineOverride(${userArg}, start: ${gqlStr(payload.start)}, end: ${gqlStr(payload.end)}, ${daysArgs}) { success } }`;
 
 		const token = await getToken();
 		const res = await fetch(getGraphqlUrl(), {
@@ -229,28 +248,57 @@
 </svelte:head>
 
 <h1>Schedule</h1>
+<FocusTimer />
 {#if loading}
 	<p>Loading...</p>
 {:else}
 	{#if familyMembers.length}
-		<Select
-			id="schedule-user-filter"
-			label="Filter by family member"
-			bind:value={selectedUserSlug}
-			options={[
-				{ value: EVERYONE, label: 'Everyone' },
-				...familyMembers.map((member) => ({ value: member.slug, label: member.name })),
-			]}
-		/>
+		<fieldset class="user_filter">
+			<legend>Filter by family member</legend>
+			<label>
+				<input type="radio" name="schedule-user-filter" value={EVERYONE} bind:group={selectedUserSlug} />
+				Everyone
+			</label>
+			{#each familyMembers as member (member.slug)}
+				<label>
+					<input type="radio" name="schedule-user-filter" value={member.slug} bind:group={selectedUserSlug} />
+					{member.name}
+				</label>
+			{/each}
+		</fieldset>
 	{/if}
 	<ScheduleView
-		{blocks}
+		blocks={visibleBlocks}
 		{colours}
 		{tasks}
 		{events}
 		icalEvents={visibleIcalEvents}
+		readOnly={selectedUserSlug === EVERYONE}
 		onRangeChange={handleRangeChange}
 		onSave={handleSave}
 		onTaskCompleted={handleTaskCompleted}
 	/>
 {/if}
+
+<style>
+	.user_filter {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 1em;
+		border: none;
+		padding: 0;
+		margin-bottom: 1em;
+
+		legend {
+			font-weight: bold;
+			padding: 0;
+		}
+
+		label {
+			display: flex;
+			align-items: center;
+			gap: 0.3em;
+		}
+	}
+</style>

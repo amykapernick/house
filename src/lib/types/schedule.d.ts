@@ -1,3 +1,5 @@
+import type { User } from './global'
+
 export type PaletteColour = {
 	name: string
 	hex: string | null
@@ -11,6 +13,7 @@ export type ScheduleBlock = {
 	end: string
 	colour: string | null
 	isOverride: boolean
+	family: Pick<User, `slug`> | null
 }
 
 export type RoutineDayBlock = {

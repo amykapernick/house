@@ -31,7 +31,6 @@
 	</label>
 	<div class="field">
 		Colour
-		<!-- TODO: Duplicate key purple_bright, don't add light/dark theme colours -->
 		<Select id="block-colour" label="Colour" bind:value={colour} options={colourOptions}>
 			{#snippet children(option)}
 				<span class="swatch" style:background={`var(--${option.value})`}></span>

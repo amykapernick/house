@@ -2,6 +2,7 @@
 	import { page } from '$app/stores';
 	import { format, parseISO, intervalToDuration } from 'date-fns';
 	import fetchClientData from '$utils/fetchClientData';
+	import { recipeQuery, RECIPE_CACHE_TTL } from '$utils/prefetchRecipes';
 	import { resolve } from '$app/paths';
 	import {
 		compatibleUnits,
@@ -112,31 +113,9 @@
 			}
 			fetchClientData({
 				cacheKey: `recipe-${slug}`,
+				ttl: RECIPE_CACHE_TTL,
 				onStale: handleRecipe,
-				gqlQuery: `
-					query {
-						recipe(slug: "${slug}") {
-							id name slug image description
-							totalTime prepTime cookTime performTime
-							servings recipeYield rating
-							orgURL dateAdded lastMade
-							tags { name slug }
-							categories { name slug }
-							ingredients {
-								referenceId display quantity food note title
-								unit { id name pluralName abbreviation pluralAbbreviation useAbbreviation fraction standardQuantity standardUnit }
-							}
-							instructions { id position title text }
-							nutrition {
-								calories carbohydrateContent fatContent
-								proteinContent fiberContent sodiumContent sugarContent
-							}
-							notes { title text }
-							tools
-						}
-						recipeUnits { id name pluralName abbreviation pluralAbbreviation useAbbreviation fraction standardQuantity standardUnit }
-					}
-				`,
+				gqlQuery: recipeQuery(slug ?? ''),
 			}).then(handleRecipe);
 		}
 	});
@@ -189,6 +168,7 @@
 				<div class="ingredients-header">
 					<h2>Ingredients</h2>
 					<div class="scale-bar">
+					<!-- TODO: Style recipe scale -->
 						<span class="label">Scale</span>
 						{#each SCALE_PRESETS as preset (preset)}
 							<button
@@ -208,6 +188,7 @@
 						/>
 					</div>
 				</div>
+				<!-- TODO: Style recipe unit selection -->
 				{#if unitFamilies.length}
 					<div class="unit-defaults-bar">
 						<span class="label">Units</span>
@@ -244,6 +225,7 @@
 								<li>
 									<span>{scaledIngredientText(ingredient, i)}</span>
 									{#if options.length}
+									<!-- TODO: Style ingredient unit selection -->
 										<select
 											class="unit-select"
 											aria-label={`Convert unit for ${ingredient.food ?? ingredient.display}`}

@@ -325,7 +325,6 @@
 	})
 
 	const tabs = [
-		{ id: 'overview', label: 'Overview' },
 		{ id: 'growth', label: 'Growth' },
 		{ id: 'teeth', label: 'Teeth' },
 		{ id: 'swimming', label: 'Swimming' },
@@ -418,10 +417,6 @@
 		</div>
 	{/if}
 
-	<Tabs {tabs} active={activeTab} onSelect={setActiveTab} />
-
-	{#if activeTab === 'overview'}
-	<div id="panel-overview" role="tabpanel" aria-labelledby="tab-overview" tabindex="0">
 	<h2>Overview</h2>
 
 	<Stats items={[
@@ -439,8 +434,8 @@
 			<p>{car_seat.next_transition}</p>
 		</Card>
 	</Cards>
-	</div>
-	{/if}
+
+	<Tabs {tabs} active={activeTab} onSelect={setActiveTab} />
 
 	{#if activeTab === 'growth'}
 	<div id="panel-growth" role="tabpanel" aria-labelledby="tab-growth" tabindex="0">

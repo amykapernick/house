@@ -557,6 +557,7 @@ export type MutationCreateRoutineOverrideArgs = {
   sunday: Array<RoutineDayBlockInput>;
   thursday: Array<RoutineDayBlockInput>;
   tuesday: Array<RoutineDayBlockInput>;
+  user: Scalars['String']['input'];
   wednesday: Array<RoutineDayBlockInput>;
 };
 
@@ -602,12 +603,12 @@ export type MutationUpdateBudgetItemArgs = {
 
 export type MutationUpdateDefaultRoutineArgs = {
   friday: Array<RoutineDayBlockInput>;
-  id: Scalars['ID']['input'];
   monday: Array<RoutineDayBlockInput>;
   saturday: Array<RoutineDayBlockInput>;
   sunday: Array<RoutineDayBlockInput>;
   thursday: Array<RoutineDayBlockInput>;
   tuesday: Array<RoutineDayBlockInput>;
+  user: Scalars['String']['input'];
   wednesday: Array<RoutineDayBlockInput>;
 };
 
@@ -708,7 +709,6 @@ export type Query = {
   calendars: Maybe<Array<Maybe<Calendar>>>;
   colour: Maybe<PaletteColour>;
   colours: Maybe<Array<Maybe<PaletteColour>>>;
-  defaultRoutineId: Maybe<Scalars['ID']['output']>;
   events: Maybe<Array<Maybe<Event>>>;
   icsEvents: Maybe<Array<Maybe<IcsEvent>>>;
   info: Maybe<Array<Maybe<Info>>>;
@@ -942,6 +942,7 @@ export type RoutineDayBlockInput = {
 export type ScheduleBlock = {
   colour: Maybe<Scalars['String']['output']>;
   end: Scalars['String']['output'];
+  family: Maybe<User>;
   id: Scalars['ID']['output'];
   isOverride: Scalars['Boolean']['output'];
   label: Scalars['String']['output'];
