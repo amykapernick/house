@@ -3,6 +3,8 @@
 	import { format, parseISO, intervalToDuration } from 'date-fns';
 	import fetchClientData from '$utils/fetchClientData';
 	import { resolve } from '$app/paths';
+	import { compatibleUnits, convertQuantity, unitLabel, unitOptionLabel } from '$lib/utils/units';
+	import type { RecipeIngredientUnit } from '$lib/types/generated';
 
 	function formatMinutes(mins: number | string | null): string {
 		if (!mins) return '';
@@ -17,6 +19,8 @@
 	let recipe = $state<any>(null);
 	let loading = $state(true);
 	let multiplier = $state(1);
+	let allUnits = $state<RecipeIngredientUnit[]>([]);
+	let selectedUnitId = $state<Record<number, string>>({});
 
 	const SCALE_PRESETS = [1, 2, 3];
 
@@ -36,9 +40,30 @@
 		return `${Math.round(value * 100) / 100}`;
 	}
 
-	function scaledIngredientText(ingredient: any): string {
-		if (multiplier === 1 || ingredient.quantity == null) return ingredient.display;
-		const parts = [formatQuantity(ingredient.quantity * multiplier), ingredient.unit, ingredient.food].filter(Boolean);
+	function ingredientUnitOptions(ingredient: any): RecipeIngredientUnit[] {
+		if (!ingredient.unit) return [];
+		return compatibleUnits(ingredient.unit, allUnits);
+	}
+
+	function selectedUnit(ingredient: any, i: number): RecipeIngredientUnit | null {
+		if (!ingredient.unit) return null;
+		const chosenId = selectedUnitId[i];
+		if (!chosenId || chosenId === ingredient.unit.id) return ingredient.unit;
+		return allUnits.find((u) => u.id === chosenId) ?? ingredient.unit;
+	}
+
+	function scaledIngredientText(ingredient: any, i: number): string {
+		const unit = selectedUnit(ingredient, i);
+		const converting = unit && ingredient.unit && unit.id !== ingredient.unit.id;
+		if (multiplier === 1 && !converting) return ingredient.display;
+		if (ingredient.quantity == null) return ingredient.display;
+
+		const baseQuantity = converting
+			? (convertQuantity(ingredient.quantity, ingredient.unit, unit!, allUnits) ?? ingredient.quantity)
+			: ingredient.quantity;
+		const quantity = baseQuantity * multiplier;
+		const unitText = unit ? unitLabel(unit, quantity) : ingredient.unit;
+		const parts = [formatQuantity(quantity), unitText, ingredient.food].filter(Boolean);
 		const text = parts.join(' ');
 		return ingredient.note ? `${text} (${ingredient.note})` : text;
 	}
@@ -49,6 +74,8 @@
 
 			function handleRecipe(res: any) {
 				recipe = res.recipe ?? null;
+				allUnits = res.recipeUnits ?? [];
+				selectedUnitId = {};
 				loading = false;
 			}
 			fetchClientData({
@@ -63,7 +90,10 @@
 							orgURL dateAdded lastMade
 							tags { name slug }
 							categories { name slug }
-							ingredients { referenceId display quantity unit food note title }
+							ingredients {
+								referenceId display quantity food note title
+								unit { id name pluralName abbreviation pluralAbbreviation useAbbreviation fraction standardQuantity standardUnit }
+							}
 							instructions { id position title text }
 							nutrition {
 								calories carbohydrateContent fatContent
@@ -72,6 +102,7 @@
 							notes { title text }
 							tools
 						}
+						recipeUnits { id name pluralName abbreviation pluralAbbreviation useAbbreviation fraction standardQuantity standardUnit }
 					}
 				`,
 			}).then(handleRecipe);
@@ -151,7 +182,23 @@
 							{#if ingredient.title}
 								<li class="section-title">{ingredient.title}</li>
 							{:else}
-								<li>{scaledIngredientText(ingredient)}</li>
+								{@const options = ingredientUnitOptions(ingredient)}
+								<li>
+									<span>{scaledIngredientText(ingredient, i)}</span>
+									{#if options.length}
+										<select
+											class="unit-select"
+											aria-label={`Convert unit for ${ingredient.food ?? ingredient.display}`}
+											value={selectedUnit(ingredient, i)?.id}
+											onchange={(e) => (selectedUnitId[i] = e.currentTarget.value)}
+										>
+											<option value={ingredient.unit.id}>{unitOptionLabel(ingredient.unit)}</option>
+											{#each options as option (option.id)}
+												<option value={option.id}>{unitOptionLabel(option)}</option>
+											{/each}
+										</select>
+									{/if}
+								</li>
 							{/if}
 						{/each}
 					</ul>
@@ -374,8 +421,21 @@
 		}
 
 		& li {
+			display: flex;
+			align-items: center;
+			flex-wrap: wrap;
+			gap: 0.5em;
 			padding: 0.4em 0;
 			border-bottom: 1px solid var(--grey_light);
+		}
+
+		& .unit-select {
+			padding: 0.1em 0.3em;
+			border: 1px solid var(--grey_light);
+			border-radius: 0.3em;
+			font-size: 0.8em;
+			color: var(--grey);
+			background: transparent;
 		}
 
 		& .section-title {
