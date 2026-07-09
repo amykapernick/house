@@ -7,6 +7,7 @@
 		MEAL_PLANNING_FLIP_MS,
 		resolveDroppedItem,
 		type PlanningDndItem,
+		type ExistingDndItem,
 	} from '$utils/mealPlanningDnd';
 
 	let {
@@ -16,6 +17,8 @@
 		isToday,
 		eveningEvents = [],
 		items = $bindable(),
+		onAddMeal,
+		onEditItem,
 	}: {
 		date: string;
 		label: string;
@@ -23,6 +26,8 @@
 		isToday: boolean;
 		eveningEvents?: { id: string; title: string; start: Date; end: Date }[];
 		items: PlanningDndItem[];
+		onAddMeal?: () => void;
+		onEditItem?: (item: ExistingDndItem) => void;
 	} = $props();
 
 	function formatMinutes(mins: string | null): string {
@@ -73,6 +78,8 @@
 						<button type="button" class="remove-btn" onclick={() => removeDraft(item.id)} aria-label="Remove {item.recipe.name}">
 							×
 						</button>
+					{:else}
+						<button type="button" class="edit-btn" onclick={() => onEditItem?.(item)} aria-label="Edit meal">✎</button>
 					{/if}
 				</div>
 				{#if item.recipe}
@@ -90,6 +97,8 @@
 			</div>
 		{/each}
 	</div>
+
+	<button type="button" class="add-meal" onclick={() => onAddMeal?.()}>+ Add meal</button>
 
 	{#if eveningEvents.length}
 		<ul class="evening-events">
@@ -171,6 +180,39 @@
 		text-transform: uppercase;
 		font-weight: 600;
 		color: var(--purple_bright);
+	}
+
+	.edit-btn {
+		margin-left: auto;
+		flex-shrink: 0;
+		border: none;
+		background: none;
+		color: var(--grey);
+		cursor: pointer;
+		font-size: 0.75em;
+		padding: 0;
+		line-height: 1;
+
+		&:hover {
+			color: var(--purple_bright);
+		}
+	}
+
+	.add-meal {
+		width: 100%;
+		margin-top: 0.3em;
+		padding: 0.4em;
+		border: 1px dashed var(--grey_light);
+		border-radius: 0.3em;
+		background: transparent;
+		color: var(--grey);
+		font-size: 0.75em;
+		cursor: pointer;
+
+		&:hover {
+			border-color: var(--purple_bright);
+			color: var(--purple_bright);
+		}
 	}
 
 	.remove-btn {

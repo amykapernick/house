@@ -15,6 +15,7 @@
 	import Cards from '$parts/Cards.svelte';
 	import Pill from '$parts/Pill.svelte';
 	import Tabs from '$parts/Tabs.svelte';
+	import Modal from '$parts/Modal.svelte';
 	import type { Alert, AlertType, MilestoneStatus, SignStatus, ValueNote } from '$types/generated';
 	import Milestone from '$parts/smallHuman/Milestone.svelte';
 	import Auslan from '$parts/smallHuman/Auslan.svelte';
@@ -195,6 +196,44 @@
 	}
 
 	let completing = new SvelteSet<string>();
+
+	let confirmingAlert = $state<Alert | null>(null);
+	let confirmDismissOpen = $state(false);
+	let dismissing = $state(false);
+
+	function askDismissAlert(alert: Alert) {
+		confirmingAlert = alert;
+		confirmDismissOpen = true;
+	}
+
+	$effect(() => {
+		if (!confirmDismissOpen) confirmingAlert = null;
+	});
+
+	async function confirmDismissAlert() {
+		if (!confirmingAlert) return;
+		const id = confirmingAlert.id;
+		dismissing = true;
+
+		const token = await getToken();
+
+		await fetch(getGraphqlUrl(), {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+			},
+			body: JSON.stringify({
+				query: `mutation { dismissAlert(id: "${id}") }`,
+			}),
+		}).then(r => r.json());
+
+		data = { ...data, alerts: data.alerts.filter((a: Alert) => a.id !== id) };
+		setCache('small-human', { smallHuman: data });
+
+		dismissing = false;
+		confirmDismissOpen = false;
+	}
 
 	async function completeAllergen(taskId: string) {
 		completing.add(taskId);
@@ -412,6 +451,7 @@
 						<h2>{alert.title}</h2>
 						<p>{alert.detail}</p>
 					</div>
+					<button type="button" class="urgent-dismiss" onclick={() => askDismissAlert(alert)} aria-label="Dismiss {alert.title}">&times;</button>
 				</div>
 			{/each}
 		</div>
@@ -425,7 +465,7 @@
 	]} />
 	<Cards>
 		{#each otherAlerts as alert (alert.id)}
-			<Card {...alert} colour={alertColours[alert.level]}>
+			<Card {...alert} colour={alertColours[alert.level]} onDismiss={() => askDismissAlert(alert)}>
 				<p>{alert.detail}</p>
 			</Card>
 		{/each}
@@ -655,11 +695,44 @@
 	{/if}
 {/if}
 
+<Modal bind:open={confirmDismissOpen} title="Dismiss alert?">
+	{#if confirmingAlert}
+		<p class="confirm-alert-title"><strong>{confirmingAlert.title}</strong></p>
+		<p>{confirmingAlert.detail}</p>
+	{/if}
+	<p class="confirm-note">This permanently removes the alert - it won't reappear.</p>
+	<div class="actions">
+		<button type="button" onclick={confirmDismissAlert} disabled={dismissing}>
+			{dismissing ? 'Dismissing…' : 'Dismiss'}
+		</button>
+		<button type="button" onclick={() => (confirmDismissOpen = false)} disabled={dismissing}>Cancel</button>
+	</div>
+</Modal>
+
 <style>
 	@import '@mixins';
 
 	h2 {
 		text-transform: capitalize;
+	}
+
+	.confirm-alert-title {
+		margin: 0 0 0.3em;
+	}
+
+	.confirm-note {
+		color: var(--grey);
+		font-size: 0.9em;
+	}
+
+	.actions {
+		display: flex;
+		gap: 0.5em;
+		margin-top: 1em;
+
+		& button:first-child {
+			color: var(--red);
+		}
 	}
 
 	.urgent-alerts {
@@ -689,6 +762,28 @@
 		font-weight: 700;
 		text-transform: uppercase;
 		letter-spacing: 0.03em;
+	}
+
+	.urgent-dismiss {
+		flex-shrink: 0;
+		margin-left: auto;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 1.6em;
+		height: 1.6em;
+		padding: 0;
+		border: none;
+		border-radius: 50%;
+		background: transparent;
+		color: var(--red);
+		font-size: 1.1em;
+		line-height: 1;
+		cursor: pointer;
+
+		&:hover {
+			background: color-mix(in srgb, var(--red) 20%, transparent);
+		}
 	}
 
 	.urgent-body {

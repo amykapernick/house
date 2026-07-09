@@ -2,7 +2,7 @@ import { Marked } from 'marked';
 
 export type TocEntry = { level: number, text: string, anchor: string };
 
-// Deliberately simple/ASCII - the possums content headings are always plain
+// Deliberately simple/ASCII - Notion content headings are always plain
 // English text, so a full unicode-aware slugifier isn't needed here.
 export function slugifyHeading(text: string): string {
 	return text
@@ -20,7 +20,7 @@ const marked = new Marked({
 	},
 });
 
-// Renders possums course markdown to HTML with heading ids matching extractToc's
+// Renders /content page markdown to HTML with heading ids matching extractToc's
 // anchors below, for the page's own table-of-contents jump links. This content
 // comes from Amy's own curated Notion data (not user input), so {@html}-ing the
 // result at the call site is safe.
@@ -28,7 +28,7 @@ export function renderMarkdown(markdown: string): string {
 	return marked.parse(markdown, { async: false }) as string;
 }
 
-// Pulls the h2 (section) / h3 (chapter) structure out of possums course markdown
+// Pulls the h2 (section) / h3 (chapter) structure out of /content page markdown
 // for the page's table of contents - matched via the same slugifyHeading used by
 // the heading renderer above, so anchors line up.
 export function extractToc(markdown: string): TocEntry[] {

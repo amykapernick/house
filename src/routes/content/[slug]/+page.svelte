@@ -1,34 +1,51 @@
 <script lang="ts">
+	import { page } from '$app/stores';
 	import { isAuthenticated } from '$lib/auth';
 	import fetchClientData from '$utils/fetchClientData';
 	import { resolve } from '$app/paths';
-	import { POSSUMS_CACHE_TTL, possumsIndexQuery } from '$utils/possums';
-	import type { PossumsGroup } from '$types/generated';
+	import { CONTENT_CACHE_TTL, contentEntriesQuery, contentIndexQuery } from '$utils/content';
+	import ContentIcon from '$components/parts/ContentIcon.svelte';
+	import type { ContentEntry, ContentGroup } from '$types/generated';
 
-	let groups = $state<PossumsGroup[]>([]);
+	let entry = $state<ContentEntry | null>(null);
+	let groups = $state<ContentGroup[]>([]);
 	let loading = $state(true);
 
 	$effect(() => {
-		if ($isAuthenticated) {
+		const slug = $page.params.slug ?? ``;
+
+		if ($isAuthenticated && slug) {
+			loading = true;
+
+			// Short-lived (default TTL) - Notion's uploaded-file icon URLs expire
+			// after about an hour, so entry metadata isn't cached alongside the
+			// long-lived course content below.
+			fetchClientData({
+				cacheKey: `content-entries`,
+				gqlQuery: contentEntriesQuery,
+			}).then((res: any) => {
+				entry = (res.contentEntries ?? []).find((e: ContentEntry) => e?.slug === slug) ?? null;
+			});
+
 			function handleIndex(res: any) {
-				groups = res.possumsIndex ?? [];
+				groups = res.contentIndex ?? [];
 				loading = false;
 			}
 			fetchClientData({
-				cacheKey: `possums-index`,
-				ttl: POSSUMS_CACHE_TTL,
+				cacheKey: `content-index-${slug}`,
+				ttl: CONTENT_CACHE_TTL,
 				onStale: handleIndex,
-				gqlQuery: possumsIndexQuery,
+				gqlQuery: contentIndexQuery(slug),
 			}).then(handleIndex);
 		}
 	});
 </script>
 
 <svelte:head>
-	<title>Possums | Kapers Crewe Household</title>
+	<title>{entry?.title ?? `Content`} | Kapers Crewe Household</title>
 </svelte:head>
 
-<h1>Possums</h1>
+<h1><ContentIcon icon={entry?.icon} iconType={entry?.iconType} />{entry?.title ?? $page.params.slug}</h1>
 {#if loading}
 	<p>Loading...</p>
 {:else}
@@ -40,9 +57,9 @@
 					<p>{group.description}</p>
 				{/if}
 				<ul class="list">
-					{#each group.courses ?? [] as course (course?.slug)}
+					{#each group.pages ?? [] as contentPage (contentPage?.slug)}
 						<li>
-							<a href={resolve(`/content/possums/[slug]`, { slug: course?.slug ?? `` })}>{course?.title}</a>
+							<a href={resolve(`/content/[slug]/[pageSlug]`, { slug: $page.params.slug ?? ``, pageSlug: contentPage?.slug ?? `` })}>{contentPage?.title}</a>
 						</li>
 					{/each}
 				</ul>
@@ -52,6 +69,12 @@
 {/if}
 
 <style>
+	h1 {
+		display: flex;
+		align-items: center;
+		gap: 0.4em;
+	}
+
 	.groups {
 		display: flex;
 		flex-wrap: wrap;

@@ -120,7 +120,6 @@
 	let addToShoppingListMessage = $state(``);
 
 	// Meal planning mode
-	let showWeekPicker = $state(false);
 	let planningMode = $state(false);
 	let planningWeeks = $state(1);
 	let seasonRecipes = $state<PlanningRecipe[]>([]);
@@ -142,9 +141,10 @@
 		const range = currentRange();
 
 		function handleMealPlan(res: any) {
-			days = res.mealPlanByDay ?? [];
+			const newDays: any[] = res.mealPlanByDay ?? [];
+			days = newDays;
 			loading = false;
-			prefetchRecipes(days.flatMap((day) => day.entries.map((entry: any) => entry.recipe?.slug)));
+			prefetchRecipes(newDays.flatMap((day) => day.entries.map((entry: any) => entry.recipe?.slug)));
 		}
 
 		fetchClientData({
@@ -203,11 +203,16 @@
 		seasonRecipesLoading = false;
 	}
 
-	function startPlanningMode(weeks: number) {
-		planningWeeks = weeks;
+	function startPlanningMode() {
 		planningMode = true;
-		showWeekPicker = false;
 		fetchSeasonRecipes();
+		fetchMealPlan(true);
+	}
+
+	function selectPlanningWeeks(weeks: number) {
+		if (weeks === planningWeeks) return;
+		if (dirty && !confirm(`Discard unsaved meal plan changes?`)) return;
+		planningWeeks = weeks;
 		fetchMealPlan(true);
 	}
 
@@ -455,7 +460,21 @@
 
 {#if planningMode}
 	<div class="planning-toolbar">
-		<span class="range-label">Planning {planningWeeks} week{planningWeeks > 1 ? `s` : ``}</span>
+		<div class="week-select" role="radiogroup" aria-label="Weeks to plan">
+			{#each [1, 2, 3, 4] as n (n)}
+				<label class="week-option">
+					<input
+						type="radio"
+						name="planningWeeks"
+						value={n}
+						checked={planningWeeks === n}
+						disabled={planningSaving}
+						onchange={() => selectPlanningWeeks(n)}
+					/>
+					{n} week{n > 1 ? `s` : ``}
+				</label>
+			{/each}
+		</div>
 		{#if dirty}<span class="unsaved">Unsaved changes</span>{/if}
 		<button type="button" onclick={handleSaveMealPlan} disabled={planningSaving || !dirty}>
 			{planningSaving ? `Saving…` : `Save`}
@@ -479,6 +498,8 @@
 					isToday={displayDay?.isToday ?? false}
 					eveningEvents={eveningEventsByDate.get(day.date) ?? []}
 					bind:items={day.items}
+					onAddMeal={() => openCreateModal(day.date)}
+					onEditItem={(item) => openEditModal(item, item.date)}
 				/>
 			{/each}
 		</div>
@@ -489,7 +510,7 @@
 		<button onclick={() => fetchMealPlan(true)} class="refresh">Refresh</button>
 		<button class="today" onclick={thisWeek}>This week</button>
 		<button onclick={nextWeek}>Next →</button>
-		<button type="button" onclick={() => (showWeekPicker = !showWeekPicker)}>Start meal planning</button>
+		<button type="button" onclick={startPlanningMode}>Start meal planning</button>
 		<button
 			type="button"
 			onclick={handleAddWeekToShoppingList}
@@ -500,14 +521,6 @@
 	</nav>
 
 	{#if addToShoppingListMessage}<p class="shopping-list-message">{addToShoppingListMessage}</p>{/if}
-
-	{#if showWeekPicker}
-		<div class="week-picker">
-			{#each [1, 2, 3, 4] as n (n)}
-				<button type="button" onclick={() => startPlanningMode(n)}>{n} week{n > 1 ? `s` : ``}</button>
-			{/each}
-		</div>
-	{/if}
 
 	{#if loading}
 		<p>Loading...</p>
@@ -527,12 +540,6 @@
 						<div class="meal">
 							<div class="meal-header">
 								<span class="meal-type">{entry.entryType}</span>
-								<button
-									type="button"
-									class="edit-btn"
-									onclick={() => openEditModal(entry, day.date)}
-									aria-label="Edit meal"
-								>✎</button>
 							</div>
 							{#if entry.recipe}
 								<a href={resolve('/recipes/[slug]', { slug: entry.recipe.slug })} class="recipe-link">
@@ -554,8 +561,6 @@
 						</div>
 					{/each}
 				{/if}
-
-				<button type="button" class="add-meal" onclick={() => openCreateModal(day.date)}>+ Add meal</button>
 
 				{#if eveningEventsByDate.get(day.date)?.length}
 					<ul class="evening-events">
@@ -659,22 +664,18 @@
 		font-size: 0.85em;
 	}
 
-	.week-picker {
+	.week-select {
 		display: flex;
-		gap: 0.5em;
-		margin-bottom: 1.5em;
+		gap: 0.8em;
+		margin-right: auto;
 
-		& button {
-			padding: 0.5em 1em;
-			border: 1px solid var(--grey_light);
-			border-radius: 0.3em;
-			background: transparent;
+		& .week-option {
+			display: flex;
+			align-items: center;
+			gap: 0.3em;
+			font-size: 0.9em;
+			color: var(--navy);
 			cursor: pointer;
-
-			&:hover {
-				border-color: var(--purple_bright);
-				color: var(--purple_bright);
-			}
 		}
 	}
 
@@ -744,38 +745,6 @@
 		font-weight: 600;
 		color: var(--grey);
 		margin-bottom: 0.2em;
-	}
-
-	.edit-btn {
-		flex-shrink: 0;
-		border: none;
-		background: none;
-		color: var(--grey);
-		cursor: pointer;
-		font-size: 0.75em;
-		padding: 0;
-		line-height: 1;
-
-		&:hover {
-			color: var(--purple_bright);
-		}
-	}
-
-	.add-meal {
-		width: 100%;
-		margin-top: 0.3em;
-		padding: 0.4em;
-		border: 1px dashed var(--grey_light);
-		border-radius: 0.3em;
-		background: transparent;
-		color: var(--grey);
-		font-size: 0.75em;
-		cursor: pointer;
-
-		&:hover {
-			border-color: var(--purple_bright);
-			color: var(--purple_bright);
-		}
 	}
 
 	.evening-events {

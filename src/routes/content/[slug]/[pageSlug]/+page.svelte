@@ -4,57 +4,61 @@
 	import { isAuthenticated } from '$lib/auth';
 	import fetchClientData from '$utils/fetchClientData';
 	import { renderMarkdown, extractToc } from '$utils/markdown';
-	import { POSSUMS_CACHE_TTL } from '$utils/possums';
-	import type { PossumsCourse } from '$types/generated';
+	import { CONTENT_CACHE_TTL, contentEntriesQuery, contentPageQuery } from '$utils/content';
+	import type { ContentEntry, ContentPage } from '$types/generated';
+
+	let entry = $state<ContentEntry | null>(null);
 
 	// This content never changes once fetched - cache it for a long time, but
 	// only once this page is actually visited (no bulk prefetch from the index
 	// page - the combined ~5.7MB of course text risks blowing localStorage's
 	// quota if every course were warmed up eagerly).
-	let course = $state<PossumsCourse | null>(null);
+	let contentPage = $state<ContentPage | null>(null);
 	let loading = $state(true);
 
 	$effect(() => {
 		const slug = $page.params.slug ?? ``;
+		const pageSlug = $page.params.pageSlug ?? ``;
 
-		if ($isAuthenticated && slug) {
+		if ($isAuthenticated && slug && pageSlug) {
 			loading = true;
 
-			function handleCourse(res: any) {
-				course = res.possumsCourse ?? null;
+			fetchClientData({
+				cacheKey: `content-entries`,
+				gqlQuery: contentEntriesQuery,
+			}).then((res: any) => {
+				entry = (res.contentEntries ?? []).find((e: ContentEntry) => e?.slug === slug) ?? null;
+			});
+
+			function handlePage(res: any) {
+				contentPage = res.contentPage ?? null;
 				loading = false;
 			}
 			fetchClientData({
-				cacheKey: `possums-course-${slug}`,
-				ttl: POSSUMS_CACHE_TTL,
-				onStale: handleCourse,
-				gqlQuery: `
-					query {
-						possumsCourse(slug: "${slug}") {
-							slug title content
-						}
-					}
-				`,
-			}).then(handleCourse);
+				cacheKey: `content-page-${slug}-${pageSlug}`,
+				ttl: CONTENT_CACHE_TTL,
+				onStale: handlePage,
+				gqlQuery: contentPageQuery(slug, pageSlug),
+			}).then(handlePage);
 		}
 	});
 
-	let toc = $derived(course?.content ? extractToc(course.content) : []);
-	let html = $derived(course?.content ? renderMarkdown(course.content) : ``);
+	let toc = $derived(contentPage?.content ? extractToc(contentPage.content) : []);
+	let html = $derived(contentPage?.content ? renderMarkdown(contentPage.content) : ``);
 </script>
 
 <svelte:head>
-	<title>{course?.title ?? `Possums`} | Kapers Crewe Household</title>
+	<title>{contentPage?.title ?? `Content`} | Kapers Crewe Household</title>
 </svelte:head>
 
-<a href={resolve(`/content/possums`)} class="back">← Possums</a>
+<a href={resolve(`/content/[slug]`, { slug: $page.params.slug ?? `` })} class="back">← {entry?.title ?? $page.params.slug}</a>
 
 {#if loading}
 	<p>Loading...</p>
-{:else if !course}
-	<p>Course not found.</p>
+{:else if !contentPage}
+	<p>Page not found.</p>
 {:else}
-	<h1>{course.title}</h1>
+	<h1>{contentPage.title}</h1>
 
 	{#if toc.length > 0}
 		<nav class="toc" aria-label="Table of contents">
@@ -68,7 +72,7 @@
 		</nav>
 	{/if}
 
-	<!-- eslint-disable-next-line svelte/no-at-html-tags -- course.content is Amy's own curated Notion data, not user input -->
+	<!-- eslint-disable-next-line svelte/no-at-html-tags -- contentPage.content is Amy's own curated Notion data, not user input -->
 	<div class="content">{@html html}</div>
 {/if}
 

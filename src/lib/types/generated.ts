@@ -224,6 +224,30 @@ export type CompleteTaskResult = {
   success: Scalars['Boolean']['output'];
 };
 
+export type ContentEntry = {
+  icon: Maybe<Scalars['String']['output']>;
+  iconType: Maybe<Scalars['String']['output']>;
+  slug: Maybe<Scalars['String']['output']>;
+  title: Maybe<Scalars['String']['output']>;
+};
+
+export type ContentGroup = {
+  description: Maybe<Scalars['String']['output']>;
+  pages: Maybe<Array<Maybe<ContentPageLink>>>;
+  title: Maybe<Scalars['String']['output']>;
+};
+
+export type ContentPage = {
+  content: Maybe<Scalars['String']['output']>;
+  slug: Maybe<Scalars['String']['output']>;
+  title: Maybe<Scalars['String']['output']>;
+};
+
+export type ContentPageLink = {
+  slug: Maybe<Scalars['String']['output']>;
+  title: Maybe<Scalars['String']['output']>;
+};
+
 export type CreateShoppingItemResult = {
   item: Maybe<ShoppingItem>;
   success: Scalars['Boolean']['output'];
@@ -521,6 +545,7 @@ export type Mutation = {
   createTask: Maybe<CreateTaskResult>;
   deleteBudgetItem: Maybe<BudgetMutationResult>;
   deleteMealPlanEntry: Maybe<MealPlanMutationResult>;
+  dismissAlert: Maybe<Scalars['Boolean']['output']>;
   markToothErupted: Maybe<Tooth>;
   updateAuslanSignStatus: Maybe<AuslanSign>;
   updateBudgetBucketPercentage: Maybe<BudgetMutationResult>;
@@ -573,6 +598,7 @@ export type MutationCreateRoutineOverrideArgs = {
   sunday: Array<RoutineDayBlockInput>;
   thursday: Array<RoutineDayBlockInput>;
   tuesday: Array<RoutineDayBlockInput>;
+  user: Scalars['String']['input'];
   wednesday: Array<RoutineDayBlockInput>;
 };
 
@@ -596,6 +622,11 @@ export type MutationDeleteBudgetItemArgs = {
 
 
 export type MutationDeleteMealPlanEntryArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDismissAlertArgs = {
   id: Scalars['ID']['input'];
 };
 
@@ -625,12 +656,12 @@ export type MutationUpdateBudgetItemArgs = {
 
 export type MutationUpdateDefaultRoutineArgs = {
   friday: Array<RoutineDayBlockInput>;
-  id: Scalars['ID']['input'];
   monday: Array<RoutineDayBlockInput>;
   saturday: Array<RoutineDayBlockInput>;
   sunday: Array<RoutineDayBlockInput>;
   thursday: Array<RoutineDayBlockInput>;
   tuesday: Array<RoutineDayBlockInput>;
+  user: Scalars['String']['input'];
   wednesday: Array<RoutineDayBlockInput>;
 };
 
@@ -731,7 +762,9 @@ export type Query = {
   calendars: Maybe<Array<Maybe<Calendar>>>;
   colour: Maybe<PaletteColour>;
   colours: Maybe<Array<Maybe<PaletteColour>>>;
-  defaultRoutineId: Maybe<Scalars['ID']['output']>;
+  contentEntries: Maybe<Array<Maybe<ContentEntry>>>;
+  contentIndex: Maybe<Array<Maybe<ContentGroup>>>;
+  contentPage: Maybe<ContentPage>;
   events: Maybe<Array<Maybe<Event>>>;
   icsEvents: Maybe<Array<Maybe<IcsEvent>>>;
   info: Maybe<Array<Maybe<Info>>>;
@@ -764,6 +797,17 @@ export type QueryColourArgs = {
 
 export type QueryColoursArgs = {
   name?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type QueryContentIndexArgs = {
+  slug: Scalars['String']['input'];
+};
+
+
+export type QueryContentPageArgs = {
+  pageSlug: Scalars['String']['input'];
+  slug: Scalars['String']['input'];
 };
 
 
@@ -965,6 +1009,7 @@ export type RoutineDayBlockInput = {
 export type ScheduleBlock = {
   colour: Maybe<Scalars['String']['output']>;
   end: Scalars['String']['output'];
+  family: Maybe<User>;
   id: Scalars['ID']['output'];
   isOverride: Scalars['Boolean']['output'];
   label: Scalars['String']['output'];

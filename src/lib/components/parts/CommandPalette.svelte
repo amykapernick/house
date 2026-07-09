@@ -5,12 +5,12 @@
 	import { SvelteMap } from 'svelte/reactivity';
 	import fetchClientData, { clearCache, getGraphqlUrl } from '$utils/fetchClientData';
 	import { getRecentPages } from '$utils/recentPages';
-	import { POSSUMS_CACHE_TTL, possumsIndexQuery } from '$utils/possums';
+	import { CONTENT_CACHE_TTL, contentEntriesQuery, contentIndexQuery } from '$utils/content';
 	import { getToken } from '$lib/auth';
 	import type { MenuItem } from '$types/global';
 	import type { Component } from 'svelte';
 	import RecipeIcon from '$img/icons/recipe-book-47.svg?component';
-	import PossumsIcon from '$img/icons/notion.svg?component';
+	import ContentIcon from './ContentIcon.svelte';
 
 	let {
 		menuItems,
@@ -26,9 +26,10 @@
 		key: string;
 		label: string;
 		sublabel?: string;
-		section: `Recent` | `Pages` | `Possums` | `Recipes`;
+		section: `Recent` | `Pages` | `Content` | `Recipes`;
 		link: string;
-		Icon: Component<Record<string, any>>;
+		Icon?: Component<Record<string, any>>;
+		contentIcon?: { icon?: string | null; iconType?: string | null };
 	};
 
 	type PlannedMeal = { date: string; entryType: string };
@@ -65,8 +66,12 @@
 	let recipesLoading = $state(false);
 	// Not in the main nav (kept out of everyday browsing), but small enough to
 	// hold client-side and filter locally rather than a live per-keystroke
-	// search like recipes get.
-	let possumsCourses = $state<{ slug: string; title: string; group: string }[]>([]);
+	// search like recipes get. Generic over every /content/{slug} entry (e.g.
+	// Possums), not any one entry in particular - a new entry in Notion's App
+	// Content database shows up here with no code change.
+	type ContentEntryResult = { slug: string; title: string; icon?: string | null; iconType?: string | null };
+	let contentEntries = $state<ContentEntryResult[]>([]);
+	let contentPages = $state<{ entrySlug: string; pageSlug: string; title: string; group: string }[]>([]);
 	let upcomingMealPlan = new SvelteMap<string, PlannedMeal>();
 	let quickAddSubmitting = $state(false);
 	let quickAddError = $state(``);
@@ -119,23 +124,32 @@
 
 	// Deliberately left out of the main nav/`pages` list - only surfaces here
 	// once you search for it, rather than an always-visible section.
-	const possumsBase = $derived<Result[]>([
-		{ key: `page:/content/possums`, label: `Possums`, section: `Possums`, link: resolve(`/content/possums`), Icon: PossumsIcon },
-		...possumsCourses.map((course) => ({
-			key: `possums:${course.slug}`,
-			label: course.title,
-			sublabel: course.group,
-			section: `Possums` as const,
-			link: resolve(`/content/possums/[slug]`, { slug: course.slug }),
-			Icon: PossumsIcon,
+	const contentBase = $derived<Result[]>([
+		...contentEntries.map((entry) => ({
+			key: `content-entry:${entry.slug}`,
+			label: entry.title,
+			section: `Content` as const,
+			link: resolve(`/content/[slug]`, { slug: entry.slug }),
+			contentIcon: { icon: entry.icon, iconType: entry.iconType },
 		})),
+		...contentPages.map((contentPage) => {
+			const entry = contentEntries.find((e) => e.slug === contentPage.entrySlug);
+			return {
+				key: `content-page:${contentPage.entrySlug}:${contentPage.pageSlug}`,
+				label: contentPage.title,
+				sublabel: contentPage.group,
+				section: `Content` as const,
+				link: resolve(`/content/[slug]/[pageSlug]`, { slug: contentPage.entrySlug, pageSlug: contentPage.pageSlug }),
+				contentIcon: { icon: entry?.icon, iconType: entry?.iconType },
+			};
+		}),
 	]);
 
-	const possumsResults = $derived(
-		term ? possumsBase.filter((result) => result.label.toLowerCase().includes(term)) : []
+	const contentResults = $derived(
+		term ? contentBase.filter((result) => result.label.toLowerCase().includes(term)) : []
 	);
 
-	const results = $derived([...recentResults, ...pageResults, ...possumsResults, ...recipeResults]);
+	const results = $derived([...recentResults, ...pageResults, ...contentResults, ...recipeResults]);
 
 	function escapeGqlString(value: string): string {
 		return value.replace(/\\/g, `\\\\`).replace(/"/g, `\\"`);
@@ -172,21 +186,32 @@
 		applyMealPlanResult(res);
 	}
 
-	function applyPossumsIndex(res: any) {
-		possumsCourses = (res.possumsIndex ?? []).flatMap((group: any) =>
-			(group.courses ?? []).map((course: any) => ({ slug: course.slug, title: course.title, group: group.title }))
-		);
-	}
-
-	async function loadPossumsIndex() {
+	async function loadContentEntries() {
 		if (!isAuthenticated) return;
+
+		// Short-lived (default TTL), shared cache key with the /content pages -
+		// Notion's uploaded-file icon URLs expire after about an hour.
 		const res = await fetchClientData({
-			cacheKey: `possums-index`,
-			ttl: POSSUMS_CACHE_TTL,
-			onStale: applyPossumsIndex,
-			gqlQuery: possumsIndexQuery,
+			cacheKey: `content-entries`,
+			gqlQuery: contentEntriesQuery,
 		});
-		applyPossumsIndex(res);
+		contentEntries = res.contentEntries ?? [];
+
+		// Small, static-ish list (currently just one entry) - cheap enough to
+		// eagerly pull every entry's own index too, so its subpages are
+		// search-able here as well. Long-lived, same cache key the /content
+		// pages use, so visiting a page and searching for it share one fetch.
+		const pagesByEntry = await Promise.all(contentEntries.map(async (entry) => {
+			const indexRes = await fetchClientData({
+				cacheKey: `content-index-${entry.slug}`,
+				ttl: CONTENT_CACHE_TTL,
+				gqlQuery: contentIndexQuery(entry.slug),
+			});
+			return (indexRes.contentIndex ?? []).flatMap((group: any) =>
+				(group.pages ?? []).map((page: any) => ({ entrySlug: entry.slug, pageSlug: page.slug, title: page.title, group: group.title }))
+			);
+		}));
+		contentPages = pagesByEntry.flat();
 	}
 
 	function formatPlannedLabel(planned: PlannedMeal): string {
@@ -265,7 +290,7 @@
 			quickAddError = ``;
 			quickAddSuccess = ``;
 			loadUpcomingMealPlan();
-			loadPossumsIndex();
+			loadContentEntries();
 			dialogEl.showModal();
 			inputEl?.focus();
 		}
@@ -377,7 +402,11 @@
 						onmouseenter={() => (activeIndex = i)}
 						onclick={() => select(result)}
 					>
-						<result.Icon />
+						{#if result.contentIcon}
+							<ContentIcon icon={result.contentIcon.icon} iconType={result.contentIcon.iconType} />
+						{:else if result.Icon}
+							<result.Icon />
+						{/if}
 						<span class="label">{result.label}</span>
 						{#if result.sublabel}<span class="sublabel">{result.sublabel}</span>{/if}
 					</button>
