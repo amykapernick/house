@@ -5,10 +5,12 @@
 	import { SvelteMap } from 'svelte/reactivity';
 	import fetchClientData, { clearCache, getGraphqlUrl } from '$utils/fetchClientData';
 	import { getRecentPages } from '$utils/recentPages';
+	import { POSSUMS_CACHE_TTL, possumsIndexQuery } from '$utils/possums';
 	import { getToken } from '$lib/auth';
 	import type { MenuItem } from '$types/global';
 	import type { Component } from 'svelte';
 	import RecipeIcon from '$img/icons/recipe-book-47.svg?component';
+	import PossumsIcon from '$img/icons/notion.svg?component';
 
 	let {
 		menuItems,
@@ -24,7 +26,7 @@
 		key: string;
 		label: string;
 		sublabel?: string;
-		section: `Recent` | `Pages` | `Recipes`;
+		section: `Recent` | `Pages` | `Possums` | `Recipes`;
 		link: string;
 		Icon: Component<Record<string, any>>;
 	};
@@ -61,6 +63,10 @@
 	let recentLinks = $state<string[]>([]);
 	let recipeResults = $state<Result[]>([]);
 	let recipesLoading = $state(false);
+	// Not in the main nav (kept out of everyday browsing), but small enough to
+	// hold client-side and filter locally rather than a live per-keystroke
+	// search like recipes get.
+	let possumsCourses = $state<{ slug: string; title: string; group: string }[]>([]);
 	let upcomingMealPlan = new SvelteMap<string, PlannedMeal>();
 	let quickAddSubmitting = $state(false);
 	let quickAddError = $state(``);
@@ -111,7 +117,25 @@
 			: pages.filter((page) => !recentLinks.includes(page.link))
 	);
 
-	const results = $derived([...recentResults, ...pageResults, ...recipeResults]);
+	// Deliberately left out of the main nav/`pages` list - only surfaces here
+	// once you search for it, rather than an always-visible section.
+	const possumsBase = $derived<Result[]>([
+		{ key: `page:/content/possums`, label: `Possums`, section: `Possums`, link: resolve(`/content/possums`), Icon: PossumsIcon },
+		...possumsCourses.map((course) => ({
+			key: `possums:${course.slug}`,
+			label: course.title,
+			sublabel: course.group,
+			section: `Possums` as const,
+			link: resolve(`/content/possums/[slug]`, { slug: course.slug }),
+			Icon: PossumsIcon,
+		})),
+	]);
+
+	const possumsResults = $derived(
+		term ? possumsBase.filter((result) => result.label.toLowerCase().includes(term)) : []
+	);
+
+	const results = $derived([...recentResults, ...pageResults, ...possumsResults, ...recipeResults]);
 
 	function escapeGqlString(value: string): string {
 		return value.replace(/\\/g, `\\\\`).replace(/"/g, `\\"`);
@@ -146,6 +170,23 @@
 			`,
 		});
 		applyMealPlanResult(res);
+	}
+
+	function applyPossumsIndex(res: any) {
+		possumsCourses = (res.possumsIndex ?? []).flatMap((group: any) =>
+			(group.courses ?? []).map((course: any) => ({ slug: course.slug, title: course.title, group: group.title }))
+		);
+	}
+
+	async function loadPossumsIndex() {
+		if (!isAuthenticated) return;
+		const res = await fetchClientData({
+			cacheKey: `possums-index`,
+			ttl: POSSUMS_CACHE_TTL,
+			onStale: applyPossumsIndex,
+			gqlQuery: possumsIndexQuery,
+		});
+		applyPossumsIndex(res);
 	}
 
 	function formatPlannedLabel(planned: PlannedMeal): string {
@@ -224,6 +265,7 @@
 			quickAddError = ``;
 			quickAddSuccess = ``;
 			loadUpcomingMealPlan();
+			loadPossumsIndex();
 			dialogEl.showModal();
 			inputEl?.focus();
 		}
