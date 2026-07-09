@@ -34,7 +34,7 @@
 
 	const QUICK_ADD_LABELS: Record<QuickAddType, { hint: string; success: string; error: string; mutation: string }> = {
 		task: {
-			hint: `Add a task to Todoist`,
+			hint: `Add a task to the Home project · optional "| due date" e.g. "tomorrow 5pm"`,
 			success: `Task added`,
 			error: `Failed to add task.`,
 			mutation: `createTask`,
@@ -69,7 +69,19 @@
 	const quickAddMatch = $derived.by(() => {
 		const match = /^\/(task|shop)\b\s*(.*)$/is.exec(query.trimStart());
 		if (!match) return null;
-		return { type: match[1].toLowerCase() as QuickAddType, content: match[2].trim() };
+		const type = match[1].toLowerCase() as QuickAddType;
+		const rest = match[2];
+
+		if (type === `task`) {
+			// "Buy milk | tomorrow 5pm" - everything after the first "|" is a
+			// natural-language due date/time, parsed server-side by Todoist.
+			const pipeIndex = rest.indexOf(`|`);
+			const content = (pipeIndex === -1 ? rest : rest.slice(0, pipeIndex)).trim();
+			const due = pipeIndex === -1 ? undefined : rest.slice(pipeIndex + 1).trim() || undefined;
+			return { type, content, due };
+		}
+
+		return { type, content: rest.trim(), due: undefined };
 	});
 
 	function flattenPages(items: MenuItem[], sublabel?: string): Result[] {
@@ -234,7 +246,7 @@
 
 		const labels = QUICK_ADD_LABELS[match.type];
 		const mutation = match.type === `task`
-			? `mutation { createTask(content: ${JSON.stringify(match.content)}) { success } }`
+			? `mutation { createTask(content: ${JSON.stringify(match.content)}${match.due ? `, due: ${JSON.stringify(match.due)}` : ``}) { success } }`
 			: `mutation { createShoppingItem(note: ${JSON.stringify(match.content)}, source: "todoist") { success } }`;
 
 		const token = await getToken();
