@@ -576,6 +576,7 @@ export type MutationCreateShoppingItemArgs = {
 
 export type MutationCreateTaskArgs = {
   content: Scalars['String']['input'];
+  due?: InputMaybe<Scalars['String']['input']>;
 };
 
 
