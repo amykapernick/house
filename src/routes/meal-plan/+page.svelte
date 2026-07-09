@@ -8,6 +8,8 @@
 	import { resolve } from '$app/paths';
 	import { beforeNavigate } from '$app/navigation';
 	import { format, parseISO, isToday, isYesterday, intervalToDuration } from 'date-fns';
+	import { SvelteMap } from 'svelte/reactivity';
+	import parseEvents from '$utils/calendar/parseEvents';
 	import MealPlanEntryModal from '$lib/components/partials/mealPlan/MealPlanEntryModal.svelte';
 	import MealPlanningPalette from '$lib/components/partials/mealPlan/MealPlanningPalette.svelte';
 	import MealPlanningDay from '$lib/components/partials/mealPlan/MealPlanningDay.svelte';
@@ -25,6 +27,97 @@
 	let days = $state<any[]>([]);
 	let loading = $state(true);
 	let weekOffset = $state(0);
+
+	// Evening (5pm-11pm) calendar events, shown under each day so meal
+	// planning accounts for what's already on that evening. `events`/`icsEvents`
+	// don't take date-range args server-side, so - matching the schedule and
+	// calendar pages - they're fetched once, unfiltered, and reuse the same
+	// `calendar`/`icsEvents` cache keys those pages already populate.
+	let calendarEvents = $state<any[]>([]);
+	let icalEvents = $state<any[]>([]);
+
+	function fetchCalendarEvents() {
+		function handleCalendar(res: any) {
+			calendarEvents = res.events ?? [];
+		}
+		fetchClientData({
+			cacheKey: `calendar`,
+			onStale: handleCalendar,
+			gqlQuery: `
+				query {
+					tasks {
+						id
+						name
+						assigned { name slug profile colour }
+						status
+						due
+						end
+						allDay
+						estimate
+						link
+						platform
+					}
+					events {
+						name
+						dates { start end }
+						status
+						id
+					}
+				}
+			`,
+		}).then(handleCalendar);
+
+		function handleIcs(res: any) {
+			icalEvents = res.icsEvents ?? [];
+		}
+		fetchClientData({
+			cacheKey: `icsEvents`,
+			onStale: handleIcs,
+			gqlQuery: `
+				query {
+					icsEvents {
+						id
+						name
+						dates { start end }
+						status
+						allDay
+						colour
+						family { slug }
+					}
+				}
+			`,
+		}).then(handleIcs);
+	}
+
+	$effect(() => {
+		if ($isAuthenticated) {
+			fetchCalendarEvents();
+		}
+	});
+
+	// Same-day events whose start time falls in [17:00, 23:00), keyed by
+	// "yyyy-MM-dd". Filtering on the computed start hour (rather than the
+	// `allDay` flag) also naturally excludes genuinely all-day/date-only
+	// events, which parse to midnight.
+	let eveningEventsByDate = $derived.by(() => {
+		const parsed = [...parseEvents(calendarEvents), ...parseEvents(icalEvents)];
+		const map = new SvelteMap<string, typeof parsed>();
+
+		for (const event of parsed) {
+			const hour = event.start.getHours();
+			if (hour < 17 || hour >= 23) continue;
+			const dateKey = format(event.start, `yyyy-MM-dd`);
+			if (!map.has(dateKey)) map.set(dateKey, []);
+			map.get(dateKey)!.push(event);
+		}
+
+		for (const list of map.values()) list.sort((a, b) => a.start.getTime() - b.start.getTime());
+
+		return map;
+	});
+
+	let addingToShoppingList = $state(false);
+	let addToShoppingListMessage = $state(``);
 
 	// Meal planning mode
 	let showWeekPicker = $state(false);
@@ -195,17 +288,44 @@
 
 	function prevWeek() {
 		weekOffset--;
+		addToShoppingListMessage = ``;
 		fetchMealPlan();
 	}
 
 	function nextWeek() {
 		weekOffset++;
+		addToShoppingListMessage = ``;
 		fetchMealPlan();
 	}
 
 	function thisWeek() {
 		weekOffset = 0;
+		addToShoppingListMessage = ``;
 		fetchMealPlan();
+	}
+
+	let weekRecipeIds = $derived([
+		...new Set(
+			days.flatMap((day) => day.entries.map((entry: any) => entry.recipe?.id).filter(Boolean))
+		),
+	]);
+
+	async function handleAddWeekToShoppingList() {
+		addingToShoppingList = true;
+		addToShoppingListMessage = ``;
+
+		const res = await postMutation(`
+			mutation {
+				addRecipesToShoppingList(recipeIds: ${JSON.stringify(weekRecipeIds)}) {
+					success
+				}
+			}
+		`);
+		addingToShoppingList = false;
+
+		addToShoppingListMessage = res?.data?.addRecipesToShoppingList?.success
+			? `Added to shopping list.`
+			: `Failed to add to shopping list.`;
 	}
 
 	// Meal entry create/edit modal
@@ -357,6 +477,7 @@
 					label={displayDay?.label ?? ``}
 					displayDate={displayDay?.displayDate ?? ``}
 					isToday={displayDay?.isToday ?? false}
+					eveningEvents={eveningEventsByDate.get(day.date) ?? []}
 					bind:items={day.items}
 				/>
 			{/each}
@@ -369,7 +490,16 @@
 		<button class="today" onclick={thisWeek}>This week</button>
 		<button onclick={nextWeek}>Next →</button>
 		<button type="button" onclick={() => (showWeekPicker = !showWeekPicker)}>Start meal planning</button>
+		<button
+			type="button"
+			onclick={handleAddWeekToShoppingList}
+			disabled={addingToShoppingList || weekRecipeIds.length === 0}
+		>
+			{addingToShoppingList ? `Adding…` : `Add week to shopping list`}
+		</button>
 	</nav>
+
+	{#if addToShoppingListMessage}<p class="shopping-list-message">{addToShoppingListMessage}</p>{/if}
 
 	{#if showWeekPicker}
 		<div class="week-picker">
@@ -426,6 +556,17 @@
 				{/if}
 
 				<button type="button" class="add-meal" onclick={() => openCreateModal(day.date)}>+ Add meal</button>
+
+				{#if eveningEventsByDate.get(day.date)?.length}
+					<ul class="evening-events">
+						{#each eveningEventsByDate.get(day.date) as event (event.id)}
+							<li>
+								<span class="event-title">{event.title}</span>
+								<span class="event-time">{format(event.start, `h:mma`)}–{format(event.end, `h:mma`)}</span>
+							</li>
+						{/each}
+					</ul>
+				{/if}
 			</div>
 		{/each}
 	</div>
@@ -499,6 +640,12 @@
 				color: var(--navy);
 			}
 		}
+	}
+
+	.shopping-list-message {
+		font-size: 0.85em;
+		color: var(--grey);
+		margin: -1em 0 1.5em;
 	}
 
 	.unsaved {
@@ -629,6 +776,30 @@
 			border-color: var(--purple_bright);
 			color: var(--purple_bright);
 		}
+	}
+
+	.evening-events {
+		margin: 0.6em 0 0;
+		padding: 0.5em 0 0;
+		border-top: 1px dashed var(--grey_light);
+		list-style: none;
+		font-size: 0.75em;
+
+		& li {
+			display: flex;
+			justify-content: space-between;
+			gap: 0.5em;
+			margin-bottom: 0.2em;
+		}
+	}
+
+	.event-title {
+		color: var(--navy);
+	}
+
+	.event-time {
+		flex-shrink: 0;
+		color: var(--grey);
 	}
 
 	.recipe-link {

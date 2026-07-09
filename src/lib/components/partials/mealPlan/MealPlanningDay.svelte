@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { dndzone } from 'svelte-dnd-action';
 	import { flip } from 'svelte/animate';
-	import { intervalToDuration } from 'date-fns';
+	import { intervalToDuration, format } from 'date-fns';
 	import {
 		MEAL_PLANNING_DND_TYPE,
 		MEAL_PLANNING_FLIP_MS,
@@ -14,12 +14,14 @@
 		label,
 		displayDate,
 		isToday,
+		eveningEvents = [],
 		items = $bindable(),
 	}: {
 		date: string;
 		label: string;
 		displayDate: string;
 		isToday: boolean;
+		eveningEvents?: { id: string; title: string; start: Date; end: Date }[];
 		items: PlanningDndItem[];
 	} = $props();
 
@@ -88,6 +90,17 @@
 			</div>
 		{/each}
 	</div>
+
+	{#if eveningEvents.length}
+		<ul class="evening-events">
+			{#each eveningEvents as event (event.id)}
+				<li>
+					<span class="event-title">{event.title}</span>
+					<span class="event-time">{format(event.start, `h:mma`)}–{format(event.end, `h:mma`)}</span>
+				</li>
+			{/each}
+		</ul>
+	{/if}
 </div>
 
 <style>
@@ -192,5 +205,29 @@
 		font-size: 0.8em;
 		color: var(--grey);
 		margin: 0.2em 0 0;
+	}
+
+	.evening-events {
+		margin: 0.6em 0 0;
+		padding: 0.5em 0 0;
+		border-top: 1px dashed var(--grey_light);
+		list-style: none;
+		font-size: 0.75em;
+
+		& li {
+			display: flex;
+			justify-content: space-between;
+			gap: 0.5em;
+			margin-bottom: 0.2em;
+		}
+	}
+
+	.event-title {
+		color: var(--navy);
+	}
+
+	.event-time {
+		flex-shrink: 0;
+		color: var(--grey);
 	}
 </style>
