@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { getWeekRange, getPlanningRange } from './dateRanges';
+import { getWeekRange, getPlanningRange, getDashboardMealPlanRange } from './dateRanges';
 
 describe(`getWeekRange`, () => {
 	beforeEach(() => {
@@ -78,5 +78,33 @@ describe(`getPlanningRange`, () => {
 		vi.setSystemTime(new Date(`2026-12-30T12:00:00Z`)); // Wednesday
 
 		expect(getPlanningRange(1)).toEqual({ start: `2026-12-30`, end: `2027-01-08` });
+	});
+});
+
+describe(`getDashboardMealPlanRange`, () => {
+	beforeEach(() => {
+		vi.useFakeTimers();
+	});
+
+	afterEach(() => {
+		vi.useRealTimers();
+	});
+
+	it(`spans 2 days back through 7 days forward from today`, () => {
+		vi.setSystemTime(new Date(`2026-07-09T12:00:00Z`));
+
+		expect(getDashboardMealPlanRange()).toEqual({ start: `2026-07-07`, end: `2026-07-16` });
+	});
+
+	it(`handles a month boundary`, () => {
+		vi.setSystemTime(new Date(`2026-07-01T12:00:00Z`));
+
+		expect(getDashboardMealPlanRange()).toEqual({ start: `2026-06-29`, end: `2026-07-08` });
+	});
+
+	it(`handles a year boundary`, () => {
+		vi.setSystemTime(new Date(`2027-01-01T12:00:00Z`));
+
+		expect(getDashboardMealPlanRange()).toEqual({ start: `2026-12-30`, end: `2027-01-08` });
 	});
 });

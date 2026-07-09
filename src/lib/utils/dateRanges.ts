@@ -27,3 +27,15 @@ export function getPlanningRange(weeks: number): { start: string; end: string } 
 		end: format(end, `yyyy-MM-dd`),
 	};
 }
+
+// Dashboard meal plan widget range: 2 days back through 7 days forward from
+// today, so a just-eaten meal stays visible for a couple of days while still
+// showing most of the week ahead.
+export function getDashboardMealPlanRange(): { start: string; end: string } {
+	const today = new Date();
+
+	return {
+		start: format(subDays(today, 2), `yyyy-MM-dd`),
+		end: format(addDays(today, 7), `yyyy-MM-dd`),
+	};
+}

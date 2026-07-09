@@ -3,7 +3,7 @@
 	import { intervalToDuration, format, startOfDay, addDays } from 'date-fns';
 	import fetchClientData from '$utils/fetchClientData';
 	import { prefetchRecipes } from '$utils/prefetchRecipes';
-	import { getWeekRange } from '$utils/dateRanges';
+	import { getDashboardMealPlanRange } from '$utils/dateRanges';
 	import { resolve } from '$app/paths';
 
 	let meals = $state<any[]>([]);
@@ -25,12 +25,13 @@
 
 	$effect(() => {
 		if ($isAuthenticated) {
-			const { start, end } = getWeekRange();
+			const { start, end } = getDashboardMealPlanRange();
 
 			function handleMeals(res: any) {
-				meals = res.mealPlans?.items ?? [];
+				const newMeals: any[] = res.mealPlans?.items ?? [];
+				meals = newMeals;
 				loading = false;
-				prefetchRecipes(meals.map((meal) => meal.recipe?.slug));
+				prefetchRecipes(newMeals.map((meal) => meal.recipe?.slug));
 			}
 			fetchClientData({
 				cacheKey: 'dashboard-mealplan',
