@@ -68,8 +68,8 @@
 <style>
 	:global(body) {
 		display: grid;
-		grid-template-rows: auto auto 1fr auto;
-		grid-template-areas: 'offline' 'header' 'main' 'footer';
+		grid-template-rows: auto 1fr auto;
+		grid-template-areas: 'header' 'main' 'footer';
 		max-width: 100vw;
 		min-height: 100vh;
 		margin: 0;
@@ -83,13 +83,17 @@
 	}
 
 	.offline_banner {
+		position: fixed;
+		bottom: 1em;
+		left: 1em;
 		margin: 0;
 		padding: 0.5em 1em;
 		background: var(--warning);
 		color: var(--warning_text);
 		font-size: 0.85em;
-		text-align: center;
-		grid-area: offline;
+		border-radius: 0.4em;
+		box-shadow: 0 0.1em 0.5em rgba(0, 0, 0, 0.25);
+		z-index: 1000;
 	}
 </style>
 
