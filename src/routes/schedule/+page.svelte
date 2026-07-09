@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { format, startOfWeek, endOfWeek } from 'date-fns';
+	import { SvelteMap } from 'svelte/reactivity';
 	import ScheduleView from '$partials/calendar/ScheduleView.svelte';
 	import FocusTimer from '$parts/FocusTimer.svelte';
 	import { isAuthenticated, getToken } from '$lib/auth';
@@ -122,7 +123,7 @@
 			// The `colours` collection has one row per theme variant of a name
 			// (base/Light/Dark, for CSS generation) - keep only the base row per
 			// name so the colour picker doesn't offer (or key on) duplicates.
-			const byName = new Map<string, PaletteColour>();
+			const byName = new SvelteMap<string, PaletteColour>();
 			for (const c of res.colours ?? []) {
 				if (!byName.has(c.name) || !c.theme) byName.set(c.name, c);
 			}

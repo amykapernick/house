@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { test, expect } from '@playwright/test';
+import type { Page } from '@playwright/test';
 
 /**
  * Captures manifest.json's "richer install UI" screenshots. The page shows
@@ -12,7 +13,7 @@ import { test, expect } from '@playwright/test';
 const OUT_DIR = path.join(import.meta.dirname, `../../static/screenshots`);
 const BLUR_CSS = `main.main { filter: blur(18px); }`;
 
-async function captureBlurred(page: import('@playwright/test').Page, filename: string) {
+async function captureBlurred(page: Page, filename: string) {
 	await page.goto(`/`);
 	await expect(page.locator(`main.main`)).toBeVisible();
 	await page.addStyleTag({ content: BLUR_CSS });

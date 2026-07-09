@@ -286,8 +286,9 @@
 		}
 	}
 
-	// svelte-ignore state_referenced_locally -- CalendarBase reads this once at mount;
-	// per-instance readOnly flips are enforced by the handler guards above instead.
+	// CalendarBase reads this once at mount; per-instance readOnly flips are
+	// enforced by the handler guards above instead.
+	// svelte-ignore state_referenced_locally
 	const optionsOverride = {
 		view: 'timeGridWeek',
 		editable: !readOnly,
