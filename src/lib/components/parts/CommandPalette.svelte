@@ -3,8 +3,9 @@
 	import { resolve } from '$app/paths';
 	import { addDays, format, isToday, isTomorrow, parseISO } from 'date-fns';
 	import { SvelteMap } from 'svelte/reactivity';
-	import fetchClientData from '$utils/fetchClientData';
+	import fetchClientData, { clearCache, getGraphqlUrl } from '$utils/fetchClientData';
 	import { getRecentPages } from '$utils/recentPages';
+	import { getToken } from '$lib/auth';
 	import type { MenuItem } from '$types/global';
 	import type { Component } from 'svelte';
 	import RecipeIcon from '$img/icons/recipe-book-47.svg?component';
@@ -29,6 +30,22 @@
 	};
 
 	type PlannedMeal = { date: string; entryType: string };
+	type QuickAddType = `task` | `shop`;
+
+	const QUICK_ADD_LABELS: Record<QuickAddType, { hint: string; success: string; error: string; mutation: string }> = {
+		task: {
+			hint: `Add a task to Todoist`,
+			success: `Task added`,
+			error: `Failed to add task.`,
+			mutation: `createTask`,
+		},
+		shop: {
+			hint: `Add an item to the shopping list`,
+			success: `Added to shopping list`,
+			error: `Failed to add item.`,
+			mutation: `createShoppingItem`,
+		},
+	};
 
 	const RECIPE_MIN_CHARS = 2;
 	const RECIPE_DEBOUNCE_MS = 250;
@@ -45,6 +62,15 @@
 	let recipeResults = $state<Result[]>([]);
 	let recipesLoading = $state(false);
 	let upcomingMealPlan = new SvelteMap<string, PlannedMeal>();
+	let quickAddSubmitting = $state(false);
+	let quickAddError = $state(``);
+	let quickAddSuccess = $state(``);
+
+	const quickAddMatch = $derived.by(() => {
+		const match = /^\/(task|shop)\b\s*(.*)$/is.exec(query.trimStart());
+		if (!match) return null;
+		return { type: match[1].toLowerCase() as QuickAddType, content: match[2].trim() };
+	});
 
 	function flattenPages(items: MenuItem[], sublabel?: string): Result[] {
 		return items.flatMap((item) => {
@@ -56,7 +82,7 @@
 
 	const pages = $derived(flattenPages(menuItems));
 
-	const term = $derived(query.trim().toLowerCase());
+	const term = $derived(quickAddMatch ? `` : query.trim().toLowerCase());
 
 	const recentResults = $derived(
 		term
@@ -182,6 +208,9 @@
 			activeIndex = 0;
 			recipeResults = [];
 			recentLinks = getRecentPages();
+			quickAddSubmitting = false;
+			quickAddError = ``;
+			quickAddSuccess = ``;
 			loadUpcomingMealPlan();
 			dialogEl.showModal();
 			inputEl?.focus();
@@ -195,7 +224,51 @@
 		goto(result.link);
 	}
 
+	async function submitQuickAdd() {
+		const match = quickAddMatch;
+		if (!match || !match.content || quickAddSubmitting) return;
+
+		quickAddSubmitting = true;
+		quickAddError = ``;
+		quickAddSuccess = ``;
+
+		const labels = QUICK_ADD_LABELS[match.type];
+		const mutation = match.type === `task`
+			? `mutation { createTask(content: ${JSON.stringify(match.content)}) { success } }`
+			: `mutation { createShoppingItem(note: ${JSON.stringify(match.content)}, source: "todoist") { success } }`;
+
+		const token = await getToken();
+		const res = await fetch(getGraphqlUrl(), {
+			method: `POST`,
+			headers: {
+				'Content-Type': `application/json`,
+				...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+			},
+			body: JSON.stringify({ query: mutation }),
+		}).then((r) => r.json());
+
+		quickAddSubmitting = false;
+
+		if (res?.errors || !res?.data?.[labels.mutation]?.success) {
+			quickAddError = labels.error;
+			return;
+		}
+
+		clearCache(match.type === `task` ? `tasks-${format(new Date(), `yyyy-MM-dd`)}` : `shopping-list`);
+
+		quickAddSuccess = labels.success;
+		query = `/${match.type} `;
+	}
+
 	function handleKeydown(event: KeyboardEvent) {
+		if (quickAddMatch) {
+			if (event.key === `Enter`) {
+				event.preventDefault();
+				submitQuickAdd();
+			}
+			return;
+		}
+
 		if (event.key === `ArrowDown`) {
 			event.preventDefault();
 			activeIndex = Math.min(activeIndex + 1, results.length - 1);
@@ -223,41 +296,59 @@
 		bind:value={query}
 		type="text"
 		class="query"
-		placeholder="Go to a page or search recipes..."
-		aria-label="Search pages and recipes"
+		placeholder="Go to a page, search recipes, or /task /shop to add..."
+		aria-label="Search pages and recipes, or /task /shop to quickly add"
 		autocomplete="off"
 		onkeydown={handleKeydown}
+		oninput={() => { quickAddError = ``; quickAddSuccess = ``; }}
 	/>
-	<ul class="results" bind:this={resultsEl}>
-		{#each results as result, i (result.key)}
-			{#if i === 0 || results[i - 1].section !== result.section}
-				<li class="heading">{result.section}</li>
+	{#if quickAddMatch}
+		{@const labels = QUICK_ADD_LABELS[quickAddMatch.type]}
+		<div class="quick-add">
+			<p class="quick-add-hint">{labels.hint}</p>
+			{#if quickAddSuccess}<p class="quick-add-status success">{quickAddSuccess}</p>{/if}
+			{#if quickAddError}<p class="quick-add-status error">{quickAddError}</p>{/if}
+		</div>
+	{:else}
+		<ul class="results" bind:this={resultsEl}>
+			{#each results as result, i (result.key)}
+				{#if i === 0 || results[i - 1].section !== result.section}
+					<li class="heading">{result.section}</li>
+				{/if}
+				<li>
+					<button
+						type="button"
+						class="result"
+						data-active={i === activeIndex}
+						onmouseenter={() => (activeIndex = i)}
+						onclick={() => select(result)}
+					>
+						<result.Icon />
+						<span class="label">{result.label}</span>
+						{#if result.sublabel}<span class="sublabel">{result.sublabel}</span>{/if}
+					</button>
+				</li>
+			{/each}
+			{#if term.length >= RECIPE_MIN_CHARS && recipesLoading && recipeResults.length === 0}
+				<li class="hint">Searching recipes...</li>
 			{/if}
-			<li>
-				<button
-					type="button"
-					class="result"
-					data-active={i === activeIndex}
-					onmouseenter={() => (activeIndex = i)}
-					onclick={() => select(result)}
-				>
-					<result.Icon />
-					<span class="label">{result.label}</span>
-					{#if result.sublabel}<span class="sublabel">{result.sublabel}</span>{/if}
-				</button>
-			</li>
-		{/each}
-		{#if term.length >= RECIPE_MIN_CHARS && recipesLoading && recipeResults.length === 0}
-			<li class="hint">Searching recipes...</li>
-		{/if}
-		{#if results.length === 0 && !recipesLoading}
-			<li class="hint">No matching pages or recipes</li>
-		{/if}
-	</ul>
+			{#if results.length === 0 && !recipesLoading}
+				<li class="hint">No matching pages or recipes</li>
+			{/if}
+		</ul>
+	{/if}
 	<footer class="footer">
-		<span><kbd>&uarr;</kbd><kbd>&darr;</kbd> navigate</span>
-		<span><kbd>&crarr;</kbd> select</span>
-		<span><kbd>esc</kbd> close</span>
+		{#if quickAddMatch}
+			<span><kbd>&crarr;</kbd> {quickAddSubmitting ? `adding…` : `add`}</span>
+			<span><kbd>esc</kbd> close</span>
+		{:else}
+			<span><kbd>&uarr;</kbd><kbd>&darr;</kbd> navigate</span>
+			<span><kbd>&crarr;</kbd> select</span>
+			<span><kbd>esc</kbd> close</span>
+			{#if !term}
+				<span class="quick-add-tip"><kbd>/task</kbd> <kbd>/shop</kbd> quick add</span>
+			{/if}
+		{/if}
 	</footer>
 </dialog>
 
@@ -312,6 +403,33 @@
 			margin: 0;
 			padding: 0;
 		}
+	}
+
+	.quick-add {
+		padding: 0.75em;
+	}
+
+	.quick-add-hint {
+		margin: 0;
+		color: var(--neutral);
+		font-size: 0.9em;
+	}
+
+	.quick-add-status {
+		margin: 0.5em 0 0;
+		font-size: 0.9em;
+
+		&.success {
+			color: var(--green);
+		}
+
+		&.error {
+			color: var(--red);
+		}
+	}
+
+	.quick-add-tip {
+		margin-left: auto;
 	}
 
 	.heading {

@@ -34,6 +34,16 @@ export function setCache(key: string, data: any) {
 	catch {}
 }
 
+// For mutations made outside the page that owns a cacheKey (e.g. a quick-add
+// command palette) - drop the stale cache entirely so that page's next visit
+// fetches fresh data instead of serving a 30-minute-old snapshot missing it.
+export function clearCache(key: string) {
+	try {
+		localStorage.removeItem(`cache:${key}`);
+	}
+	catch {}
+}
+
 // adapter-static means /api/* server routes don't exist at runtime in production -
 // mutation call sites doing their own fetch() must resolve the same way, or they
 // silently 405 against the deployed static host instead of reaching the API.
