@@ -2,10 +2,15 @@
 	import { isAuthenticated, getToken } from '$lib/auth';
 	import fetchClientData, { getGraphqlUrl } from '$utils/fetchClientData';
 	import { prefetchRecipes } from '$utils/prefetchRecipes';
-	import { getWeekRange } from '$utils/dateRanges';
+	import { getWeekRange, getPlanningRange } from '$utils/dateRanges';
+	import { getCurrentNoongarSeason } from '$utils/noongarSeason';
+	import { buildMealPlanSaveOps, type PlanningDay, type PlanningDndItem, type PlanningRecipe } from '$utils/mealPlanningDnd';
 	import { resolve } from '$app/paths';
+	import { beforeNavigate } from '$app/navigation';
 	import { format, parseISO, isToday, isYesterday, intervalToDuration } from 'date-fns';
 	import MealPlanEntryModal from '$lib/components/partials/mealPlan/MealPlanEntryModal.svelte';
+	import MealPlanningPalette from '$lib/components/partials/mealPlan/MealPlanningPalette.svelte';
+	import MealPlanningDay from '$lib/components/partials/mealPlan/MealPlanningDay.svelte';
 
 	function formatMinutes(mins: number | string | null): string {
 		if (!mins) return '';
@@ -21,9 +26,27 @@
 	let loading = $state(true);
 	let weekOffset = $state(0);
 
+	// Meal planning mode
+	let showWeekPicker = $state(false);
+	let planningMode = $state(false);
+	let planningWeeks = $state(1);
+	let seasonRecipes = $state<PlanningRecipe[]>([]);
+	let seasonRecipesLoading = $state(true);
+	let currentSeason = $derived(getCurrentNoongarSeason());
+	let planningBoard = $state<PlanningDay[]>([]);
+	let planningSaving = $state(false);
+	let planningSaveError = $state(``);
+	let dirty = $derived(
+		planningBoard.some((day) => day.items.some((item) => item.kind === `draft` || item.date !== item.originalDate))
+	);
+
+	function currentRange() {
+		return planningMode ? getPlanningRange(planningWeeks) : getWeekRange(weekOffset);
+	}
+
 	function fetchMealPlan(skipCache = false) {
 		loading = true;
-		const range = getWeekRange(weekOffset);
+		const range = currentRange();
 
 		function handleMealPlan(res: any) {
 			days = res.mealPlanByDay ?? [];
@@ -32,7 +55,7 @@
 		}
 
 		fetchClientData({
-			cacheKey: `mealplan-${range.start}`,
+			cacheKey: `mealplan-${range.start}-${range.end}`,
 			skipCache,
 			onStale: handleMealPlan,
 			gqlQuery: `
@@ -57,6 +80,117 @@
 		if ($isAuthenticated) {
 			fetchMealPlan();
 		}
+	});
+
+	async function fetchSeasonRecipes() {
+		seasonRecipesLoading = true;
+		const tagsRes = await fetchClientData({
+			cacheKey: `recipe-tags`,
+			gqlQuery: `query { recipeTags { name slug } }`,
+		});
+		const tag = (tagsRes.recipeTags ?? []).find(
+			(t: any) => t.name.toLowerCase() === currentSeason.toLowerCase()
+		);
+		if (!tag) {
+			seasonRecipes = [];
+			seasonRecipesLoading = false;
+			return;
+		}
+		const res = await fetchClientData({
+			cacheKey: `season-recipes-${tag.slug}`,
+			gqlQuery: `
+				query {
+					recipes(perPage: 200, tags: ["${tag.slug}"]) {
+						items { id name slug image totalTime servings }
+					}
+				}
+			`,
+		});
+		seasonRecipes = res.recipes?.items ?? [];
+		seasonRecipesLoading = false;
+	}
+
+	function startPlanningMode(weeks: number) {
+		planningWeeks = weeks;
+		planningMode = true;
+		showWeekPicker = false;
+		fetchSeasonRecipes();
+		fetchMealPlan(true);
+	}
+
+	function exitPlanningMode() {
+		if (dirty && !confirm(`Discard unsaved meal plan changes?`)) return;
+		planningMode = false;
+		planningBoard = [];
+		planningSaveError = ``;
+		fetchMealPlan(true);
+	}
+
+	// Rebuilds the working copy from server truth whenever `days` refreshes
+	// while in planning mode - this is what clears all drafts/moves after a
+	// successful save (fetchMealPlan(true) -> days updates -> board rebuilt).
+	$effect(() => {
+		if (!planningMode) return;
+		planningBoard = displayDays.map((day) => ({
+			date: day.date,
+			items: day.entries.map((entry: any): PlanningDndItem => ({
+				id: entry.id,
+				kind: `existing`,
+				date: day.date,
+				originalDate: day.date,
+				entryType: entry.entryType,
+				title: entry.title ?? null,
+				text: entry.text ?? null,
+				recipe: entry.recipe ?? null,
+			})),
+		}));
+	});
+
+	async function handleSaveMealPlan() {
+		const ops = buildMealPlanSaveOps(planningBoard);
+		if (!ops.length) return;
+
+		planningSaving = true;
+		planningSaveError = ``;
+
+		const mutation = ops
+			.map((op, i) => {
+				if (op.type === `create`) {
+					return `op${i}: createMealPlanEntry(date: ${gqlStr(op.date)}, entryType: ${gqlStr(op.entryType)}, recipeId: ${gqlStr(op.recipeId)}) { id }`;
+				}
+				const parts = [`date: ${gqlStr(op.date)}`, `entryType: ${gqlStr(op.entryType)}`];
+				if (op.recipeId) parts.push(`recipeId: ${gqlStr(op.recipeId)}`);
+				else {
+					parts.push(`title: ${gqlStr(op.title ?? ``)}`);
+					if (op.text) parts.push(`text: ${gqlStr(op.text)}`);
+				}
+				return `op${i}: updateMealPlanEntry(id: ${gqlStr(op.id)}, ${parts.join(`, `)}) { id }`;
+			})
+			.join(`\n`);
+
+		const res = await postMutation(`mutation {\n${mutation}\n}`);
+		planningSaving = false;
+
+		if (res?.errors) {
+			planningSaveError = `Failed to save meal plan.`;
+			return;
+		}
+
+		fetchMealPlan(true);
+	}
+
+	beforeNavigate(({ cancel }) => {
+		if (planningMode && dirty && !confirm(`Discard unsaved meal plan changes?`)) cancel();
+	});
+
+	$effect(() => {
+		if (!(planningMode && dirty)) return;
+
+		function handler(e: BeforeUnloadEvent) {
+			e.preventDefault();
+		}
+		window.addEventListener('beforeunload', handler);
+		return () => window.removeEventListener('beforeunload', handler);
 	});
 
 	function prevWeek() {
@@ -199,18 +333,57 @@
 
 <h1>Meal Plan</h1>
 
-<nav class="week-nav">
-	<button onclick={prevWeek}>← Previous</button>
-	<button onclick={() => fetchMealPlan(true)} class="refresh">Refresh</button>
-	<button class="today" onclick={thisWeek}>This week</button>
-	<button onclick={nextWeek}>Next →</button>
-</nav>
+{#if planningMode}
+	<div class="planning-toolbar">
+		<span class="range-label">Planning {planningWeeks} week{planningWeeks > 1 ? `s` : ``}</span>
+		{#if dirty}<span class="unsaved">Unsaved changes</span>{/if}
+		<button type="button" onclick={handleSaveMealPlan} disabled={planningSaving || !dirty}>
+			{planningSaving ? `Saving…` : `Save`}
+		</button>
+		<button type="button" onclick={exitPlanningMode} disabled={planningSaving}>Exit planning</button>
+		{#if planningSaveError}<span class="error">{planningSaveError}</span>{/if}
+	</div>
 
-{#if loading}
-	<p>Loading...</p>
+	<MealPlanningPalette recipes={seasonRecipes} loading={seasonRecipesLoading} season={currentSeason} />
+
+	{#if loading}
+		<p>Loading...</p>
+	{:else}
+		<div class="week">
+			{#each planningBoard as day (day.date)}
+				{@const displayDay = displayDays.find((d) => d.date === day.date)}
+				<MealPlanningDay
+					date={day.date}
+					label={displayDay?.label ?? ``}
+					displayDate={displayDay?.displayDate ?? ``}
+					isToday={displayDay?.isToday ?? false}
+					bind:items={day.items}
+				/>
+			{/each}
+		</div>
+	{/if}
 {:else}
-	<div class="week">
-		{#each displayDays as day (day.date)}
+	<nav class="week-nav">
+		<button onclick={prevWeek}>← Previous</button>
+		<button onclick={() => fetchMealPlan(true)} class="refresh">Refresh</button>
+		<button class="today" onclick={thisWeek}>This week</button>
+		<button onclick={nextWeek}>Next →</button>
+		<button type="button" onclick={() => (showWeekPicker = !showWeekPicker)}>Start meal planning</button>
+	</nav>
+
+	{#if showWeekPicker}
+		<div class="week-picker">
+			{#each [1, 2, 3, 4] as n (n)}
+				<button type="button" onclick={() => startPlanningMode(n)}>{n} week{n > 1 ? `s` : ``}</button>
+			{/each}
+		</div>
+	{/if}
+
+	{#if loading}
+		<p>Loading...</p>
+	{:else}
+		<div class="week">
+			{#each displayDays as day (day.date)}
 			<div class="day" class:today={day.isToday} class:yesterday={day.isYesterday}>
 				<h2>
 					{day.label}
@@ -256,6 +429,7 @@
 			</div>
 		{/each}
 	</div>
+	{/if}
 {/if}
 
 <MealPlanEntryModal
@@ -297,6 +471,62 @@
 
 			&.refresh {
 				margin-left: auto;
+			}
+		}
+	}
+
+	.planning-toolbar {
+		display: flex;
+		align-items: center;
+		gap: 0.8em;
+		margin-bottom: 1em;
+
+		& button {
+			padding: 0.5em 1em;
+			border: 1px solid var(--grey_light);
+			border-radius: 0.3em;
+			background: var(--purple_bright);
+			color: var(--purple_bright_text);
+			cursor: pointer;
+
+			&:disabled {
+				opacity: 0.5;
+				cursor: default;
+			}
+
+			&:last-of-type {
+				background: transparent;
+				color: var(--navy);
+			}
+		}
+	}
+
+	.unsaved {
+		font-size: 0.85em;
+		color: var(--grey);
+		font-style: italic;
+	}
+
+	.error {
+		color: var(--red);
+		font-size: 0.85em;
+	}
+
+	.week-picker {
+		display: flex;
+		gap: 0.5em;
+		margin-bottom: 1.5em;
+
+		& button {
+			padding: 0.5em 1em;
+			border: 1px solid var(--grey_light);
+			border-radius: 0.3em;
+			background: transparent;
+			cursor: pointer;
+
+			&:hover {
+				border-color: var(--purple_bright);
+				color: var(--purple_bright);
 			}
 		}
 	}
