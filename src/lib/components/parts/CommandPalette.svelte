@@ -6,7 +6,9 @@
 	import fetchClientData, { clearCache, getGraphqlUrl } from '$utils/fetchClientData';
 	import { getRecentPages } from '$utils/recentPages';
 	import { CONTENT_CACHE_TTL, contentEntriesQuery, contentIndexQuery } from '$utils/content';
+	import { getDiscoverableRoutes } from '$utils/routes';
 	import { getToken } from '$lib/auth';
+	import { routeRequiresAuth } from '$lib/navigation';
 	import type { MenuItem } from '$types/global';
 	import type { Component } from 'svelte';
 	import RecipeIcon from '$img/icons/recipe-book-47.svg?component';
@@ -103,7 +105,27 @@
 		});
 	}
 
-	const pages = $derived(flattenPages(menuItems));
+	// File-system routes never linked from the header nav (e.g. /reference/house,
+	// only reachable by following a link within /reference) - static per session,
+	// so computed once rather than re-derived on every render.
+	const discoveredRoutes = getDiscoverableRoutes();
+
+	const navPages = $derived(flattenPages(menuItems));
+
+	const orphanPages = $derived<Result[]>(
+		discoveredRoutes
+			.filter((route) => isAuthenticated || !routeRequiresAuth(route.path))
+			.filter((route) => !navPages.some((navPage) => navPage.link === route.path))
+			.map((route) => ({
+				key: `page:${route.path}`,
+				label: route.label,
+				sublabel: route.sublabel,
+				section: `Pages` as const,
+				link: route.path,
+			}))
+	);
+
+	const pages = $derived([...navPages, ...orphanPages]);
 
 	const term = $derived(quickAddMatch ? `` : query.trim().toLowerCase());
 
