@@ -99,6 +99,10 @@
 		location.reload();
 	}
 
+	function openCommandPalette() {
+		commandPaletteOpen = true;
+	}
+
 	afterNavigate(({ to }) => {
 		if (to) recordPageVisit(to.url.pathname);
 	});
@@ -142,6 +146,16 @@
 		⟳
 	</button>
 </p>
+
+<button
+	type="button"
+	class="palette_trigger"
+	onclick={openCommandPalette}
+	aria-label="Open command palette"
+	title="Open command palette (Cmd/Ctrl+K)"
+>
+	🔍
+</button>
 
 <style>
 	:global(body) {
@@ -195,6 +209,27 @@
 				cursor: not-allowed;
 			}
 		}
+	}
+
+	.palette_trigger {
+		position: fixed;
+		right: 1em;
+		bottom: 1em;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 3em;
+		height: 3em;
+		margin: 0;
+		padding: 0;
+		border: none;
+		border-radius: 50%;
+		background: var(--purple_bright);
+		color: var(--purple_bright_text);
+		font-size: 1.3em;
+		box-shadow: 0 0.1em 0.5em rgba(0, 0, 0, 0.25);
+		cursor: pointer;
+		z-index: 1000;
 	}
 </style>
 
