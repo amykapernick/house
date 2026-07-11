@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { tick } from 'svelte';
-	import { SvelteSet } from 'svelte/reactivity';
+	import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 	import { page } from '$app/stores';
 	import { resolve } from '$app/paths';
 	import { isAuthenticated } from '$lib/auth';
@@ -68,7 +68,7 @@
 	// trackable (see splitTrackableChunks) - it only reads as done once every
 	// chapter nested under it (up to the next h2) has been read.
 	let tocRead = $derived.by(() => {
-		const read = new Map<string, boolean>();
+		const read = new SvelteMap<string, boolean>();
 
 		toc.forEach((entry, i) => {
 			if (entry.level === 3) {
