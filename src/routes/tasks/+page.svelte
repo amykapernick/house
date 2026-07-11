@@ -1,40 +1,25 @@
 <script lang="ts">
-	import { format } from 'date-fns';
-	import TaskView from '$parts/tasks/TaskView.svelte';
 	import { isAuthenticated } from '$lib/auth';
-	import fetchClientData from '$utils/fetchClientData';
+	import fetchTasksData from '$utils/tasksData';
+	import { notificationPermission, requestNotificationPermission } from '$utils/notifications';
+	import TaskView from '$parts/tasks/TaskView.svelte';
 	import type { Task } from '$types/tasks';
-
 
 	let tasks = $state<Task[]>([]);
 	let loading = $state(true);
+	let permission = $state(notificationPermission());
+
+	async function enableReminders() {
+		permission = await requestNotificationPermission();
+	}
 
 	$effect(() => {
 		if ($isAuthenticated) {
-			function handleTasks(res: any) {
-				tasks = res.tasks ?? [];
+			function handleTasks(data: Task[]) {
+				tasks = data;
 				loading = false;
 			}
-			const today = format(new Date(), 'yyyy-MM-dd');
-			fetchClientData({
-				cacheKey: `tasks-${today}`,
-				onStale: handleTasks,
-				gqlQuery: `
-					query {
-						tasks {
-							id
-							name
-							assigned {
-								name
-								profile
-							}
-							status
-							due
-							dueLabel(today: "${today}")
-						}
-					}
-				`,
-			}).then(handleTasks);
+			fetchTasksData({ onStale: handleTasks }).then(handleTasks);
 		}
 	});
 </script>
@@ -45,8 +30,17 @@
 </svelte:head>
 
 <h1>Tasks</h1>
+{#if permission !== `granted` && permission !== `unsupported`}
+	<button class="enable_reminders" onclick={enableReminders}>Enable task reminders</button>
+{/if}
 {#if loading}
 	<p>Loading...</p>
 {:else}
 	<TaskView {tasks} />
 {/if}
+
+<style>
+	.enable_reminders {
+		margin-bottom: 1em;
+	}
+</style>

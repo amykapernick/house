@@ -1,4 +1,7 @@
 import { writable } from 'svelte/store';
+import { notify as notifyWithTag } from './notifications';
+
+export { notificationsSupported, notificationPermission, requestNotificationPermission } from './notifications';
 
 export type FocusPhaseType = `work` | `break`;
 
@@ -100,23 +103,8 @@ function persist(state: FocusTimerState | null) {
 export const focusTimerState = writable<FocusTimerState | null>(loadPersisted());
 focusTimerState.subscribe(persist);
 
-export function notificationsSupported(): boolean {
-	return typeof Notification !== `undefined`;
-}
-
-export function notificationPermission(): NotificationPermission | `unsupported` {
-	return notificationsSupported() ? Notification.permission : `unsupported`;
-}
-
-export async function requestNotificationPermission(): Promise<NotificationPermission | `unsupported`> {
-	if (!notificationsSupported()) return `unsupported`;
-	return Notification.requestPermission();
-}
-
 function notify(title: string, body: string) {
-	if (notificationsSupported() && Notification.permission === `granted`) {
-		new Notification(title, { body, tag: `focus-timer` });
-	}
+	notifyWithTag(title, body, `focus-timer`);
 }
 
 let audioCtx: AudioContext | null = null;

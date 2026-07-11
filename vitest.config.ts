@@ -7,6 +7,7 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
 	resolve: {
 		alias: {
+			'$lib': path.resolve(`./src/lib`),
 			'$utils': path.resolve(`./src/lib/utils`),
 			'$types': path.resolve(`./src/lib/types`),
 		},

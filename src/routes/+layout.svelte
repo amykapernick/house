@@ -13,6 +13,7 @@
 	import Footer from '$partials/Footer.svelte';
 	import Layout from '$layouts/Default.svelte';
 	import CommandPalette from '$parts/CommandPalette.svelte';
+	import TaskReminderBanner from '$parts/TaskReminderBanner.svelte';
 
 	let { children } = $props();
 
@@ -241,3 +242,4 @@
 </main>
 <Footer />
 <CommandPalette bind:open={commandPaletteOpen} {menuItems} isAuthenticated={$isAuthenticated} />
+<TaskReminderBanner />
