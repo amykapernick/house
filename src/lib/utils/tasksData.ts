@@ -28,6 +28,8 @@ export default async function fetchTasksData(props: FetchTasksDataProps = {}): P
 					status
 					due
 					allDay
+					platform
+					link
 					dueLabel(today: "${today}")
 				}
 			}

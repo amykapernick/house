@@ -78,8 +78,13 @@ export const menuItems: MenuItem[] = [
 	}] : []),
 ];
 
+// Account-level pages (e.g. profile) live in the header's account area rather
+// than the main menuItems grid, but still need to be recognised by routeRequiresAuth.
+export const authOnlyRoutes: string[] = [
+	resolve(`/profile`),
+];
+
 export function routeRequiresAuth(pathname: string): boolean {
-	return menuItems.some(
-		(item) => item.auth && item.link && (pathname === item.link || pathname.startsWith(`${item.link}/`))
-	);
+	const authRoutes = [...menuItems.filter((item) => item.auth && item.link).map((item) => item.link), ...authOnlyRoutes];
+	return authRoutes.some((link) => link && (pathname === link || pathname.startsWith(`${link}/`)));
 }

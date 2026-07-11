@@ -21,4 +21,5 @@ export const routes: A11yRoute[] = [
 	{ name: `shopping-list`, path: `/shopping-list`, auth: true },
 	{ name: `reference`, path: `/reference`, auth: true },
 	{ name: `small-human`, path: `/small-human`, auth: true },
+	{ name: `profile`, path: `/profile`, auth: true },
 ];

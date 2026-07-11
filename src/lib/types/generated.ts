@@ -561,9 +561,11 @@ export type Mutation = {
   updateBudgetBucketPercentage: Maybe<BudgetMutationResult>;
   updateBudgetItem: Maybe<BudgetMutationResult>;
   updateDefaultRoutine: Maybe<ScheduleMutationResult>;
+  updateMe: Maybe<User>;
   updateMealPlanEntry: Maybe<MealPlanEntry>;
   updateMilestoneStatus: Maybe<Milestone>;
   updateSwimSkillStatus: Maybe<SwimSkill>;
+  updateTaskStatus: Maybe<CompleteTaskResult>;
 };
 
 
@@ -676,6 +678,11 @@ export type MutationUpdateDefaultRoutineArgs = {
 };
 
 
+export type MutationUpdateMeArgs = {
+  input: UpdateUserInput;
+};
+
+
 export type MutationUpdateMealPlanEntryArgs = {
   date: Scalars['String']['input'];
   entryType: Scalars['String']['input'];
@@ -695,6 +702,12 @@ export type MutationUpdateMilestoneStatusArgs = {
 export type MutationUpdateSwimSkillStatusArgs = {
   id: Scalars['ID']['input'];
   status: MilestoneStatus;
+};
+
+
+export type MutationUpdateTaskStatusArgs = {
+  status: Scalars['String']['input'];
+  taskId: Scalars['String']['input'];
 };
 
 export type NoonarSeason = {
@@ -781,6 +794,7 @@ export type Query = {
   icsEvents: Maybe<Array<Maybe<IcsEvent>>>;
   info: Maybe<Array<Maybe<Info>>>;
   items: Maybe<Array<Maybe<Item>>>;
+  me: Maybe<User>;
   mealPlanByDay: Array<MealPlanDay>;
   mealPlans: Maybe<MealPlanList>;
   projects: Maybe<Array<Maybe<Project>>>;
@@ -1279,6 +1293,13 @@ export type TrackerData = {
 
 export type TrackerDataAlertsArgs = {
   orderBy?: InputMaybe<AlertOrderBy>;
+};
+
+export type UpdateUserInput = {
+  colour?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  notionId?: InputMaybe<Scalars['String']['input']>;
+  todoistId?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type User = {

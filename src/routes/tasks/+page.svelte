@@ -1,9 +1,11 @@
 <script lang="ts">
+	import { format } from 'date-fns';
 	import { isAuthenticated } from '$lib/auth';
 	import fetchTasksData from '$utils/tasksData';
+	import { setCache } from '$utils/fetchClientData';
 	import { notificationPermission, requestNotificationPermission } from '$utils/notifications';
 	import TaskView from '$parts/tasks/TaskView.svelte';
-	import type { Task } from '$types/tasks';
+	import type { Task, TaskStatus } from '$types/tasks';
 
 	let tasks = $state<Task[]>([]);
 	let loading = $state(true);
@@ -22,6 +24,12 @@
 			fetchTasksData({ onStale: handleTasks }).then(handleTasks);
 		}
 	});
+
+	// Keep the shared cache in sync so a revisit within the TTL doesn't show the pre-update status.
+	function handleTaskUpdate(id: string, status: TaskStatus) {
+		tasks = tasks.map((task) => (task.id === id ? { ...task, status } : task));
+		setCache(`tasks-${format(new Date(), 'yyyy-MM-dd')}`, { tasks });
+	}
 </script>
 
 <svelte:head>
@@ -36,7 +44,7 @@
 {#if loading}
 	<p>Loading...</p>
 {:else}
-	<TaskView {tasks} />
+	<TaskView {tasks} onUpdate={handleTaskUpdate} />
 {/if}
 
 <style>

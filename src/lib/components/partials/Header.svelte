@@ -21,6 +21,10 @@
 	<MainMenu {menuItems} isAuthenticated={$isAuthenticated}>
 		{#if $isAuthenticated}
 			<li>
+				<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- resolve() is used -->
+				<a href={resolve('/profile')}>Profile</a>
+			</li>
+			<li>
 				<button onclick={handleSignOut}>Sign out</button>
 			</li>
 		{:else}
