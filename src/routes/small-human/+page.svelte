@@ -19,7 +19,7 @@
 	import type { Alert, AlertType, MilestoneStatus, SignStatus, ValueNote } from '$types/generated';
 	import Milestone from '$parts/smallHuman/Milestone.svelte';
 	import Auslan from '$parts/smallHuman/Auslan.svelte';
-	import Breasts from '$img/icons/breasts.svg?component'
+	import Breasts from '$img/smallHuman/breasts.svg?component'
 	import Water from '$img/icons/glass-water.svg?component'
 	import Food from '$img/icons/soup.svg?component'
 	import type { Component } from 'svelte';

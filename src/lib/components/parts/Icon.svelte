@@ -7,7 +7,7 @@
 	import Unchecked from '$img/icons/s-unchecked.svg?component'
 	import Progress from '$img/icons/progress-indicator.svg?component'
 	import View from '$img/icons/view.svg?component'
-	import Syringe from '$img/icons/syringe.svg?component'
+	import Syringe from '$img/smallHuman/syringe.svg?component'
 
 	export type IconName = MilestoneStatus | SignStatus | 'calendar' | 'vaccine';
 
