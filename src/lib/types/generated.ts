@@ -368,6 +368,15 @@ export type GrowthMeasurement = {
   weight: Measurement;
 };
 
+export type HomeAssistantState = {
+  entityId: Scalars['ID']['output'];
+  friendlyName: Maybe<Scalars['String']['output']>;
+  lastChanged: Maybe<Scalars['String']['output']>;
+  lastUpdated: Maybe<Scalars['String']['output']>;
+  state: Scalars['String']['output'];
+  unitOfMeasurement: Maybe<Scalars['String']['output']>;
+};
+
 export type IcsEvent = {
   allDay: Maybe<Scalars['Boolean']['output']>;
   colour: Maybe<Scalars['String']['output']>;
@@ -766,6 +775,8 @@ export type Query = {
   contentIndex: Maybe<Array<Maybe<ContentGroup>>>;
   contentPage: Maybe<ContentPage>;
   events: Maybe<Array<Maybe<Event>>>;
+  homeAssistantState: Maybe<HomeAssistantState>;
+  homeAssistantStates: Array<HomeAssistantState>;
   icsEvents: Maybe<Array<Maybe<IcsEvent>>>;
   info: Maybe<Array<Maybe<Info>>>;
   items: Maybe<Array<Maybe<Item>>>;
@@ -808,6 +819,11 @@ export type QueryContentIndexArgs = {
 export type QueryContentPageArgs = {
   pageSlug: Scalars['String']['input'];
   slug: Scalars['String']['input'];
+};
+
+
+export type QueryHomeAssistantStateArgs = {
+  entityId: Scalars['ID']['input'];
 };
 
 
