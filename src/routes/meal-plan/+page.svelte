@@ -128,6 +128,7 @@
 	let planningBoard = $state<PlanningDay[]>([]);
 	let planningSaving = $state(false);
 	let planningSaveError = $state(``);
+	let meatReminderMessage = $state(``);
 	let dirty = $derived(
 		planningBoard.some((day) => day.items.some((item) => item.kind === `draft` || item.date !== item.originalDate))
 	);
@@ -206,6 +207,7 @@
 	function startPlanningMode() {
 		planningMode = true;
 		addToShoppingListMessage = ``;
+		meatReminderMessage = ``;
 		fetchSeasonRecipes();
 		fetchMealPlan(true);
 	}
@@ -215,6 +217,7 @@
 		if (dirty && !confirm(`Discard unsaved meal plan changes?`)) return;
 		planningWeeks = weeks;
 		addToShoppingListMessage = ``;
+		meatReminderMessage = ``;
 		fetchMealPlan(true);
 	}
 
@@ -252,6 +255,7 @@
 
 		planningSaving = true;
 		planningSaveError = ``;
+		meatReminderMessage = ``;
 
 		const mutation = ops
 			.map((op, i) => {
@@ -277,6 +281,20 @@
 		}
 
 		fetchMealPlan(true);
+
+		const range = currentRange();
+		const reminderRes = await postMutation(`
+			mutation {
+				createMealPlanMeatReminders(startDate: ${gqlStr(range.start)}, endDate: ${gqlStr(range.end)}) {
+					success
+					days { date }
+				}
+			}
+		`);
+		const reminderDays = reminderRes?.data?.createMealPlanMeatReminders?.days ?? [];
+		if (reminderDays.length) {
+			meatReminderMessage = `Added ${reminderDays.length} meat reminder${reminderDays.length > 1 ? `s` : ``} to Todoist.`;
+		}
 	}
 
 	beforeNavigate(({ cancel }) => {
@@ -494,6 +512,7 @@
 	</div>
 
 	{#if addToShoppingListMessage}<p class="shopping-list-message">{addToShoppingListMessage}</p>{/if}
+	{#if meatReminderMessage}<p class="shopping-list-message">{meatReminderMessage}</p>{/if}
 
 	<MealPlanningPalette recipes={seasonRecipes} loading={seasonRecipesLoading} season={currentSeason} />
 

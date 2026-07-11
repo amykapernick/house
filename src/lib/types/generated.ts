@@ -369,6 +369,17 @@ export type GrowthMeasurement = {
   weight: Measurement;
 };
 
+export type Habit = {
+  due: Maybe<Scalars['String']['output']>;
+  frequency: Maybe<Scalars['String']['output']>;
+  id: Maybe<Scalars['String']['output']>;
+  lastCompleted: Maybe<Scalars['String']['output']>;
+  link: Maybe<Scalars['String']['output']>;
+  name: Maybe<Scalars['String']['output']>;
+  recurrence: Maybe<Scalars['String']['output']>;
+  streak: Maybe<Scalars['Int']['output']>;
+};
+
 export type HomeAssistantState = {
   entityId: Scalars['ID']['output'];
   friendlyName: Maybe<Scalars['String']['output']>;
@@ -500,6 +511,17 @@ export type MealPlanList = {
   totalPages: Scalars['Int']['output'];
 };
 
+export type MealPlanMeatReminderDay = {
+  date: Scalars['String']['output'];
+  items: Array<Scalars['String']['output']>;
+  recipes: Array<Scalars['String']['output']>;
+};
+
+export type MealPlanMeatReminderResult = {
+  days: Array<MealPlanMeatReminderDay>;
+  success: Scalars['Boolean']['output'];
+};
+
 export type MealPlanMutationResult = {
   success: Scalars['Boolean']['output'];
 };
@@ -547,9 +569,11 @@ export type Milestones = {
 export type Mutation = {
   addRecipesToShoppingList: Maybe<AddRecipesToShoppingListResult>;
   checkShoppingItem: Maybe<CheckShoppingItemResult>;
+  completeHabit: Maybe<CompleteTaskResult>;
   completeTask: Maybe<CompleteTaskResult>;
   createBudgetItem: Maybe<BudgetMutationResult>;
   createMealPlanEntry: Maybe<MealPlanEntry>;
+  createMealPlanMeatReminders: Maybe<MealPlanMeatReminderResult>;
   createRoutineOverride: Maybe<ScheduleMutationResult>;
   createShoppingItem: Maybe<CreateShoppingItemResult>;
   createTask: Maybe<CreateTaskResult>;
@@ -581,6 +605,11 @@ export type MutationCheckShoppingItemArgs = {
 };
 
 
+export type MutationCompleteHabitArgs = {
+  habitId: Scalars['String']['input'];
+};
+
+
 export type MutationCompleteTaskArgs = {
   platform: Platform;
   taskId: Scalars['String']['input'];
@@ -598,6 +627,12 @@ export type MutationCreateMealPlanEntryArgs = {
   recipeId?: InputMaybe<Scalars['String']['input']>;
   text?: InputMaybe<Scalars['String']['input']>;
   title?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type MutationCreateMealPlanMeatRemindersArgs = {
+  endDate: Scalars['String']['input'];
+  startDate: Scalars['String']['input'];
 };
 
 
@@ -789,6 +824,7 @@ export type Query = {
   contentIndex: Maybe<Array<Maybe<ContentGroup>>>;
   contentPage: Maybe<ContentPage>;
   events: Maybe<Array<Maybe<Event>>>;
+  habits: Maybe<Array<Maybe<Habit>>>;
   homeAssistantState: Maybe<HomeAssistantState>;
   homeAssistantStates: Array<HomeAssistantState>;
   icsEvents: Maybe<Array<Maybe<IcsEvent>>>;

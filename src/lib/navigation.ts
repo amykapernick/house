@@ -3,6 +3,7 @@ import { resolve } from '$app/paths';
 import Dashboard from '$img/icons/layout-11.svg?component';
 import Archive from '$img/icons/archive-drawer.svg?component';
 import List from '$img/icons/list.svg?component';
+import CheckList from '$img/icons/check-list.svg?component';
 import Calendar from '$img/icons/calendar-date.svg?component';
 import Plan from '$img/icons/diet-plan.svg?component';
 import Cart from '$img/icons/cart.svg?component';
@@ -23,6 +24,12 @@ export const menuItems: MenuItem[] = [
 		link: resolve(`/tasks`),
 		auth: true,
 		Icon: List
+	},
+	{
+		label: `Habits`,
+		link: resolve(`/habits`),
+		auth: true,
+		Icon: CheckList
 	},
 	{
 		label: `Calendar`,

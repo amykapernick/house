@@ -1,7 +1,9 @@
 <script lang="ts">
+	import { SvelteMap } from 'svelte/reactivity';
 	import { clerk, clerkLoaded, isAuthenticated, getToken } from '$lib/auth';
 	import fetchClientData, { setCache, getGraphqlUrl } from '$utils/fetchClientData';
 	import Select from '$parts/Select.svelte';
+	import type { PaletteColour } from '$types/schedule';
 
 	let clerkContainer: HTMLDivElement | undefined = $state();
 
@@ -15,7 +17,32 @@
 	let notionId = $state('');
 	let todoistId = $state('');
 
-	let colourOptions = $state<{ value: string; label: string }[]>([]);
+	let colours = $state<PaletteColour[]>([]);
+	let colourOptions = $derived(colours.map((c) => ({ value: c.name, label: c.name })));
+
+	// Clerk's default UserProfile renders as its own boxed, shadowed card with its
+	// own colour scheme - overridden here so it reads as part of this page rather
+	// than a distinct embedded widget.
+	const clerkAppearance = {
+		theme: `simple` as const,
+		variables: {
+			colorPrimary: `var(--purple_bright)`,
+			colorPrimaryForeground: `var(--purple_bright_text)`,
+			colorBackground: `transparent`,
+			colorForeground: `var(--background_text)`,
+			colorNeutral: `var(--neutral)`,
+			colorInput: `var(--neutral_light)`,
+			colorInputForeground: `var(--neutral_light_text)`,
+			fontFamily: `inherit`,
+		},
+		elements: {
+			rootBox: { width: `100%` },
+			cardBox: { boxShadow: `none`, border: `none`, backgroundColor: `transparent` },
+			card: { boxShadow: `none`, border: `none`, backgroundColor: `transparent`, padding: `0` },
+			navbar: { backgroundColor: `transparent`, border: `none` },
+			footer: { display: `none` },
+		},
+	};
 
 	$effect(() => {
 		if (!$clerkLoaded || !$clerk || !clerkContainer) return;
@@ -23,20 +50,49 @@
 		const clerkInstance = $clerk;
 		const container = clerkContainer;
 
-		clerkInstance.mountUserProfile(container, {});
+		clerkInstance.mountUserProfile(container, { appearance: clerkAppearance });
 
 		return () => clerkInstance.unmountUserProfile(container);
 	});
 
+	// Shares the `colours` cache key/query with schedule/+page.svelte's loadColours -
+	// same dedup fix for the same underlying issue (the colours collection holds a
+	// themeless base row per name plus Light/Dark variants used for CSS theming,
+	// which duplicate-keys a Select bound directly to the raw list).
+	function loadColours() {
+		function handleColours(res: any) {
+			const byName = new SvelteMap<string, PaletteColour>();
+			for (const c of res.colours ?? []) {
+				if (!byName.has(c.name) || !c.theme) byName.set(c.name, c);
+			}
+			colours = [...byName.values()];
+		}
+		fetchClientData({
+			cacheKey: `colours`,
+			onStale: handleColours,
+			gqlQuery: `
+				query {
+					colours {
+						name
+						hex
+						link
+						theme
+					}
+				}
+			`,
+		}).then(handleColours);
+	}
+
 	$effect(() => {
 		if (!$isAuthenticated) return;
+
+		loadColours();
 
 		fetchClientData({
 			cacheKey: 'profile',
 			gqlQuery: `
 				query {
 					me { slug name colour ids { notion todoist } }
-					colours { name }
 				}
 			`,
 		}).then((res) => {
@@ -44,7 +100,6 @@
 			colour = res?.me?.colour ?? '';
 			notionId = res?.me?.ids?.notion ?? '';
 			todoistId = res?.me?.ids?.todoist ?? '';
-			colourOptions = (res?.colours ?? []).map((c: { name: string }) => ({ value: c.name, label: c.name }));
 			loading = false;
 		});
 	});
@@ -91,7 +146,7 @@
 		colour = updated.colour ?? '';
 		notionId = updated.ids?.notion ?? '';
 		todoistId = updated.ids?.todoist ?? '';
-		setCache('profile', { me: updated, colours: colourOptions.map((o) => ({ name: o.value })) });
+		setCache('profile', { me: updated });
 		saved = true;
 	}
 </script>
