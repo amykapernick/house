@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { isAuthenticated, getToken } from '$lib/auth';
 	import fetchClientData, { setCache, getGraphqlUrl } from '$utils/fetchClientData';
+	import { resolve } from '$app/paths';
 	import { SvelteSet } from 'svelte/reactivity';
 
 	type SubGroup = { name: string; items: any[] };
@@ -32,13 +33,14 @@
 						items {
 							id display checked quantity note
 							category labels source link
+							recipes { id name slug }
 						}
 						storeGroups {
 							name
-							items { id display checked quantity note category labels source link }
+							items { id display checked quantity note category labels source link recipes { id name slug } }
 							subGroups {
 								name
-								items { id display checked quantity note category labels source link }
+								items { id display checked quantity note category labels source link recipes { id name slug } }
 							}
 						}
 					}
@@ -216,8 +218,17 @@
 				✓
 			{/if}
 		</button>
-		<span class="item-display">
-			{item.display}
+		<span class="item-row">
+			<span class="item-display">
+				{item.display}
+			</span>
+			{#if item.recipes?.length}
+				<span class="item-recipes">
+					{#each item.recipes as recipe (recipe.id)}
+						<a href={resolve(`/recipes/[slug]`, { slug: recipe.slug })} class="recipe-tag">{recipe.name}</a>
+					{/each}
+				</span>
+			{/if}
 		</span>
 	</li>
 {/snippet}
@@ -408,7 +419,29 @@
 		}
 	}
 
-	.item-display {
+	.item-row {
 		flex: 1;
+		display: flex;
+		flex-direction: column;
+		gap: 0.3em;
+	}
+
+	.item-recipes {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.4em;
+	}
+
+	.recipe-tag {
+		padding: 0.1em 0.5em;
+		border: 1px solid currentColor;
+		border-radius: 0.2em;
+		font-size: 0.75em;
+		color: var(--purple_bright);
+		text-decoration: none;
+
+		&:hover {
+			text-decoration: underline;
+		}
 	}
 </style>

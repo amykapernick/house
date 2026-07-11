@@ -1106,7 +1106,14 @@ export type ShoppingItem = {
   note: Maybe<Scalars['String']['output']>;
   position: Maybe<Scalars['Int']['output']>;
   quantity: Maybe<Scalars['Float']['output']>;
+  recipes: Maybe<Array<ShoppingItemRecipe>>;
   source: Scalars['String']['output'];
+};
+
+export type ShoppingItemRecipe = {
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  slug: Scalars['String']['output'];
 };
 
 export type ShoppingList = {
