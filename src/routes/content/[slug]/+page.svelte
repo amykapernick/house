@@ -4,6 +4,7 @@
 	import fetchClientData from '$utils/fetchClientData';
 	import { resolve } from '$app/paths';
 	import { CONTENT_CACHE_TTL, contentEntriesQuery, contentIndexQuery } from '$utils/content';
+	import { getReadAnchors } from '$utils/readProgress';
 	import ContentIcon from '$components/parts/ContentIcon.svelte';
 	import type { ContentEntry, ContentGroup } from '$types/generated';
 
@@ -60,6 +61,14 @@
 					{#each group.pages ?? [] as contentPage (contentPage?.slug)}
 						<li>
 							<a href={resolve(`/content/[slug]/[pageSlug]`, { slug: $page.params.slug ?? ``, pageSlug: contentPage?.slug ?? `` })}>{contentPage?.title}</a>
+							{#if contentPage?.slug && contentPage.sectionCount}
+								{@const readCount = getReadAnchors($page.params.slug ?? ``, contentPage.slug).size}
+								{@const complete = readCount >= contentPage.sectionCount}
+								<span class="progress" class:complete>
+									{readCount}/{contentPage.sectionCount}
+									{#if complete}<span title="Fully read">✓</span>{/if}
+								</span>
+							{/if}
 						</li>
 					{/each}
 				</ul>
@@ -107,6 +116,17 @@
 
 			&:hover {
 				text-decoration: underline;
+			}
+		}
+
+		& .progress {
+			margin-left: 0.4em;
+			color: var(--neutral);
+			font-size: 0.85em;
+
+			&.complete {
+				color: var(--green);
+				font-weight: 600;
 			}
 		}
 	}

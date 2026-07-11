@@ -1,8 +1,27 @@
+import { writable } from 'svelte/store';
 import { getToken } from '$lib/auth';
 
 // Single source of truth for the default cache lifetime - override for the whole
 // app via VITE_CACHE_TTL_MINUTES in .env, or per-call via the `ttl` prop.
 const DEFAULT_CACHE_TTL = Number(import.meta.env.VITE_CACHE_TTL_MINUTES ?? 30) * 60 * 1000;
+
+const LAST_DATA_UPDATE_KEY = `lastDataUpdate`;
+
+function getStoredLastDataUpdate(): number | null {
+	if (typeof localStorage === `undefined`) return null;
+	try {
+		const raw = localStorage.getItem(LAST_DATA_UPDATE_KEY);
+		return raw ? Number(raw) : null;
+	}
+	catch {
+		return null;
+	}
+}
+
+// Timestamp of the most recent successful fetch that populated the cache -
+// surfaced in the online/offline status popup so a stale-offline session
+// shows when its data actually last refreshed.
+export const lastDataUpdate = writable<number | null>(getStoredLastDataUpdate());
 
 type FetchClientDataProps = {
 	gqlQuery: string
@@ -29,7 +48,10 @@ function getCached(key: string, ttl: number): any | null {
 
 export function setCache(key: string, data: any) {
 	try {
-		localStorage.setItem(`cache:${key}`, JSON.stringify({ data, timestamp: Date.now() }));
+		const timestamp = Date.now();
+		localStorage.setItem(`cache:${key}`, JSON.stringify({ data, timestamp }));
+		localStorage.setItem(LAST_DATA_UPDATE_KEY, String(timestamp));
+		lastDataUpdate.set(timestamp);
 	}
 	catch {}
 }
@@ -40,6 +62,18 @@ export function setCache(key: string, data: any) {
 export function clearCache(key: string) {
 	try {
 		localStorage.removeItem(`cache:${key}`);
+	}
+	catch {}
+}
+
+// Backs the global refresh button in the status popup - drops every page's
+// cache entry so the next reload hits the network instead of serving
+// whatever's still within its TTL.
+export function clearAllCache() {
+	try {
+		Object.keys(localStorage)
+			.filter((key) => key.startsWith(`cache:`))
+			.forEach((key) => localStorage.removeItem(key));
 	}
 	catch {}
 }

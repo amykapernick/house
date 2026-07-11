@@ -519,7 +519,6 @@
 {:else}
 	<nav class="week-nav">
 		<button onclick={prevWeek}>← Previous</button>
-		<button onclick={() => fetchMealPlan(true)} class="refresh">Refresh</button>
 		<button class="today" onclick={thisWeek}>This week</button>
 		<button onclick={nextWeek}>Next →</button>
 		<button type="button" onclick={startPlanningMode}>Start meal planning</button>
@@ -616,10 +615,6 @@
 				background: var(--purple_bright);
 				color: var(--purple_bright_text);
 				border-color: var(--purple_bright);
-			}
-
-			&.refresh {
-				margin-left: auto;
 			}
 		}
 	}

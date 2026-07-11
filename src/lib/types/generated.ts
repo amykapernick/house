@@ -244,6 +244,7 @@ export type ContentPage = {
 };
 
 export type ContentPageLink = {
+  sectionCount: Maybe<Scalars['Int']['output']>;
   slug: Maybe<Scalars['String']['output']>;
   title: Maybe<Scalars['String']['output']>;
 };

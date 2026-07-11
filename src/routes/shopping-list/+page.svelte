@@ -169,7 +169,6 @@
 {:else}
 	<div class="controls">
 		<p class="count">{uncheckedItems.length} items to get</p>
-		<button class="refresh" onclick={() => fetchList(true)}>Refresh</button>
 		<label class="toggle">
 			<input type="checkbox" bind:checked={showChecked} />
 			Show checked items ({checkedItems.length})
@@ -271,20 +270,6 @@
 		font-size: 0.9em;
 		color: var(--grey);
 		margin: 0;
-	}
-
-	.refresh {
-		padding: 0.4em 0.8em;
-		border: 1px solid var(--grey_light);
-		border-radius: 0.3em;
-		background: transparent;
-		cursor: pointer;
-		font-size: 0.85em;
-
-		&:hover {
-			border-color: var(--purple_bright);
-			color: var(--purple_bright);
-		}
 	}
 
 	.toggle {

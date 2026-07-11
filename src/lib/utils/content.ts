@@ -19,7 +19,7 @@ export function contentIndexQuery(slug: string): string {
 			contentIndex(slug: "${slug}") {
 				title
 				description
-				pages { slug title }
+				pages { slug title sectionCount }
 			}
 		}
 	`;
