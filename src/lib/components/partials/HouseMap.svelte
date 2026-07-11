@@ -1,9 +1,58 @@
 <script lang="ts">
 	import ItemDefaults from '$data/house/items';
 	import type { Area, Item } from '$types/house';
+	import Aircon from '$img/house/aircon.svg?component';
+	import Alarm from '$img/house/alarm.svg?component';
+	import Bed from '$img/house/double-bed.svg?component';
+	import Camera from '$img/house/security-camera.svg?component';
+	import Computer from '$img/house/computer.svg?component';
+	import Doorbell from '$img/house/doorbell.svg?component';
+	import Fan from '$img/house/fan.svg?component';
+	import FanLight from '$img/house/fan-light.svg?component';
+	import FanPedestol from '$img/house/fan-2.svg?component';
+	import Fire from '$img/house/fireplace.svg?component';
+	import Fridge from '$img/house/fridge.svg?component';
+	import Lamp from '$img/house/floor-lamp.svg?component';
+	import Laptop from '$img/house/laptop.svg?component';
+	import Light from '$img/house/light.svg?component';
+	import LightSwitch from '$img/house/light-control.svg?component';
+	import Monitor from '$img/house/monitor.svg?component';
+	import Oven from '$img/house/oven.svg?component';
+	import Pi from '$img/house/raspberry-pi.svg?component';
+	import RobotVacuum from '$img/house/robot-cleaner.svg?component';
+	import Speaker from '$img/house/speaker.svg?component';
+	import Tv from '$img/house/vintage-tv.svg?component';
+	import WashingMachine from '$img/house/washing-machine.svg?component';
+	import WifiRouter from '$img/house/router.svg?component';
 
 	let { areas = [], items = [] }: { areas: Area[]; items: Item[] } = $props();
 	const size = [1189, 1593];
+
+	const ItemIcons: Record<string, any> = {
+		aircon: Aircon,
+		alarm: Alarm,
+		bed: Bed,
+		camera: Camera,
+		computer: Computer,
+		doorbell: Doorbell,
+		fan: Fan,
+		fan_light: FanLight,
+		fan_pedestol: FanPedestol,
+		fire: Fire,
+		fridge: Fridge,
+		lamp: Lamp,
+		laptop: Laptop,
+		light: Light,
+		light_switch: LightSwitch,
+		monitor: Monitor,
+		oven: Oven,
+		pi: Pi,
+		robot_vacuum: RobotVacuum,
+		speaker: Speaker,
+		tv: Tv,
+		washing_machine: WashingMachine,
+		wifi_router: WifiRouter,
+	};
 </script>
 
 <div class="container" style="--width: {size[0]}; --height: {size[1]}">
@@ -30,6 +79,7 @@
 	</svg>
 	{#each items as item (item.area.id + '-' + item.type + '-' + item.start.join(','))}
 		{@const itemSize = item.size ?? ItemDefaults[item.type]?.size ?? [30, 30]}
+		{@const Icon = ItemIcons[item.type]}
 		<!-- item.link is an external smart-home control URL, not an internal route -->
 		<!-- eslint-disable svelte/no-navigation-without-resolve -->
 		<a
@@ -37,7 +87,7 @@
 			href={item.link}
 			style="--width: {(itemSize[0] / size[0]) * 100}%; --height: {(itemSize[1] / size[1]) * 100}%; --offset_x: {(item.start[0] / size[0]) * 100}%; --offset_y: {(item.start[1] / size[1]) * 100}%; --rotate: {item.rotation ? `${item.rotation}deg` : '0deg'}"
 		>
-			<span class="item-label">{item.type.replaceAll('_', ' ')}</span>
+			{#if Icon}<Icon class="item-icon" />{/if}
 			<span class="sr-only">Control {item.area.name} {item.type}</span>
 		</a>
 		<!-- eslint-enable svelte/no-navigation-without-resolve -->
@@ -144,10 +194,10 @@
 		width: var(--width);
 		height: var(--height);
 		transform: rotate(var(--rotate));
-	}
 
-	.item-label {
-		font-size: 0.6em;
-		text-transform: capitalize;
+		& :global(.item-icon) {
+			width: 100%;
+			height: 100%;
+		}
 	}
 </style>
