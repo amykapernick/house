@@ -53,7 +53,7 @@ export type AllergenUrgency =
 
 export type Area = {
   colour: Maybe<Scalars['String']['output']>;
-  id: AreaId;
+  id: Scalars['ID']['output'];
   info: Maybe<Array<Maybe<Info>>>;
   items: Maybe<Array<Maybe<Item>>>;
   link: Maybe<Scalars['String']['output']>;
@@ -61,23 +61,6 @@ export type Area = {
   size: Array<Scalars['Float']['output']>;
   start: Array<Scalars['Float']['output']>;
 };
-
-export type AreaId =
-  | 'backyard'
-  | 'bathroom'
-  | 'bedroom_main'
-  | 'dining'
-  | 'frontyard'
-  | 'kitchen'
-  | 'laundry'
-  | 'living'
-  | 'office_amy'
-  | 'office_dan'
-  | 'outside'
-  | 'porch'
-  | 'shed'
-  | 'toilet'
-  | 'virtual';
 
 export type Auslan = {
   check_frequency: Scalars['Int']['output'];
@@ -423,7 +406,9 @@ export type InfoType =
 
 export type Item = {
   area: Maybe<Area>;
+  id: Scalars['ID']['output'];
   link: Maybe<Scalars['String']['output']>;
+  linkedItem: Maybe<Item>;
   rotation: Maybe<Scalars['Float']['output']>;
   size: Maybe<Array<Maybe<Scalars['Float']['output']>>>;
   start: Array<Scalars['Float']['output']>;
