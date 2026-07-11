@@ -19,6 +19,7 @@
 			fetchClientData({
 				cacheKey: 'house',
 				onStale: handleHouse,
+				ttl: 5 * 60 * 1000,
 				gqlQuery: `
 					query {
 						areas {

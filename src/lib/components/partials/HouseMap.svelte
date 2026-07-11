@@ -80,6 +80,13 @@
 	{#each items as item (item.area.id + '-' + item.type + '-' + item.start.join(','))}
 		{@const itemSize = item.size ?? ItemDefaults[item.type]?.size ?? [30, 30]}
 		{@const Icon = ItemIcons[item.type]}
+		{@const power = !item.state?.length
+			? undefined
+			: item.state.some((s) => s.state === 'error')
+				? 'error'
+				: item.state.every((s) => s.state === 'off')
+					? 'off'
+					: 'on'}
 		<!-- item.link is an external smart-home control URL, not an internal route -->
 		<!-- eslint-disable svelte/no-navigation-without-resolve -->
 		<a
@@ -87,8 +94,8 @@
 			href={item.link}
 			style="--width: {(itemSize[0] / size[0]) * 100}%; --height: {(itemSize[1] / size[1]) * 100}%; --offset_x: {(item.start[0] / size[0]) * 100}%; --offset_y: {(item.start[1] / size[1]) * 100}%; --rotate: {item.rotation ? `${item.rotation}deg` : '0deg'}"
 		>
-			{#if Icon}<Icon class="item-icon" />{/if}
-			<span class="sr-only">Control {item.area.name} {item.type}</span>
+			{#if Icon}<Icon class="item-icon" data-power={power} />{/if}
+			<span class="sr-only">Control {item.area.name} {item.type}{power ? ` (${power})` : ''}</span>
 		</a>
 		<!-- eslint-enable svelte/no-navigation-without-resolve -->
 	{/each}
@@ -198,6 +205,16 @@
 		& :global(.item-icon) {
 			width: 100%;
 			height: 100%;
+			transition: opacity 0.2s, filter 0.2s;
+		}
+
+		& :global(.item-icon[data-power='off']) {
+			filter: grayscale(1);
+			opacity: 0.4;
+		}
+
+		& :global(.item-icon[data-power='error']) {
+			filter: drop-shadow(0 0 0.15em var(--red));
 		}
 	}
 </style>
