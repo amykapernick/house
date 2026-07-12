@@ -221,6 +221,7 @@ export type CompleteTaskResult = {
 };
 
 export type ContentEntry = {
+  brief: Maybe<Scalars['String']['output']>;
   icon: Maybe<Scalars['String']['output']>;
   iconType: Maybe<Scalars['String']['output']>;
   slug: Maybe<Scalars['String']['output']>;
@@ -382,6 +383,18 @@ export type HealthMetric = {
   key: Scalars['String']['output'];
   label: Maybe<Scalars['String']['output']>;
   unit: Maybe<Scalars['String']['output']>;
+  value: Scalars['Float']['output'];
+};
+
+export type HealthMetricHistory = {
+  key: Scalars['String']['output'];
+  label: Maybe<Scalars['String']['output']>;
+  points: Array<HealthMetricPoint>;
+  unit: Maybe<Scalars['String']['output']>;
+};
+
+export type HealthMetricPoint = {
+  date: Scalars['String']['output'];
   value: Scalars['Float']['output'];
 };
 
@@ -890,6 +903,7 @@ export type Query = {
   calendars: Maybe<Array<Maybe<Calendar>>>;
   colour: Maybe<PaletteColour>;
   colours: Maybe<Array<Maybe<PaletteColour>>>;
+  contentDigest: Maybe<ContentPage>;
   contentEntries: Maybe<Array<Maybe<ContentEntry>>>;
   contentIndex: Maybe<Array<Maybe<ContentGroup>>>;
   contentPage: Maybe<ContentPage>;
@@ -929,6 +943,11 @@ export type QueryColourArgs = {
 
 export type QueryColoursArgs = {
   name?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type QueryContentDigestArgs = {
+  slug: Scalars['String']['input'];
 };
 
 
@@ -1428,10 +1447,16 @@ export type UpdateUserInput = {
 export type User = {
   colour: Maybe<Scalars['String']['output']>;
   health: Maybe<Array<HealthMetric>>;
+  healthHistory: Maybe<Array<HealthMetricHistory>>;
   ids: Maybe<UserIds>;
   name: Maybe<Scalars['String']['output']>;
   profile: Maybe<Scalars['String']['output']>;
   slug: Maybe<Scalars['String']['output']>;
+};
+
+
+export type UserHealthHistoryArgs = {
+  days?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type UserIds = {
