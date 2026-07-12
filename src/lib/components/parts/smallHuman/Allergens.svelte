@@ -43,17 +43,18 @@
 	<ul class="list">
 		{#each allergens as allergen (allergen.id)}
 			{@const Icon = Allergens[allergen.name]}
-			<button
-				class="allergen-btn"
-				data-urgency={allergen.urgency}
-				disabled={completing.has(allergen.id)}
-				onclick={() => completeAllergen(allergen.id)}
-				style:order={allergen.daysUntilDue}
-			>
-				<span class="label">{allergen.name}</span>
-				{#if Icon}<Icon class="icon" />{/if}
-				<span class="due">{allergenDueLabel(allergen.daysUntilDue, allergen.due)}</span>
-			</button>
+			<li style:order={allergen.daysUntilDue}>
+				<button
+					class="allergen-btn"
+					data-urgency={allergen.urgency}
+					disabled={completing.has(allergen.id)}
+					onclick={() => completeAllergen(allergen.id)}
+				>
+					<span class="label">{allergen.name}</span>
+					{#if Icon}<Icon class="icon" />{/if}
+					<span class="due">{allergenDueLabel(allergen.daysUntilDue, allergen.due)}</span>
+				</button>
+			</li>
 		{/each}
 	</ul>
 {/if}
@@ -81,7 +82,7 @@
 		border: 2px solid var(--colour);
 		border-radius: 0.4em;
 		cursor: pointer;
-		color: var(--colour);
+		color: var(--black);
 		font-size: 0.9em;
 		transition: opacity 0.15s;
 		background: color-mix(in srgb, var(--colour) 15%, white);

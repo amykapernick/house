@@ -97,6 +97,7 @@ export const menuItems: MenuItem[] = [
 // TODO: fix profile menu
 export const authOnlyRoutes: string[] = [
 	resolve(`/profile`),
+	resolve(`/content`),
 ];
 
 export function routeRequiresAuth(pathname: string): boolean {

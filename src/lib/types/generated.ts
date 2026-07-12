@@ -224,8 +224,10 @@ export type ContentEntry = {
   brief: Maybe<Scalars['String']['output']>;
   icon: Maybe<Scalars['String']['output']>;
   iconType: Maybe<Scalars['String']['output']>;
+  sectionCount: Maybe<Scalars['Int']['output']>;
   slug: Maybe<Scalars['String']['output']>;
   title: Maybe<Scalars['String']['output']>;
+  updatedAt: Maybe<Scalars['String']['output']>;
 };
 
 export type ContentGroup = {
@@ -383,6 +385,18 @@ export type HealthMetric = {
   key: Scalars['String']['output'];
   label: Maybe<Scalars['String']['output']>;
   unit: Maybe<Scalars['String']['output']>;
+  value: Scalars['Float']['output'];
+};
+
+export type HealthMetricHistory = {
+  key: Scalars['String']['output'];
+  label: Maybe<Scalars['String']['output']>;
+  points: Array<HealthMetricPoint>;
+  unit: Maybe<Scalars['String']['output']>;
+};
+
+export type HealthMetricPoint = {
+  date: Scalars['String']['output'];
   value: Scalars['Float']['output'];
 };
 
@@ -1435,10 +1449,16 @@ export type UpdateUserInput = {
 export type User = {
   colour: Maybe<Scalars['String']['output']>;
   health: Maybe<Array<HealthMetric>>;
+  healthHistory: Maybe<Array<HealthMetricHistory>>;
   ids: Maybe<UserIds>;
   name: Maybe<Scalars['String']['output']>;
   profile: Maybe<Scalars['String']['output']>;
   slug: Maybe<Scalars['String']['output']>;
+};
+
+
+export type UserHealthHistoryArgs = {
+  days?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type UserIds = {

@@ -718,7 +718,7 @@
 		}
 
 		&.yesterday {
-			opacity: 0.5;
+			border-style: dashed;
 		}
 
 		& h2 {

@@ -555,15 +555,17 @@
 
 	.card-tag {
 		padding: 0.1em 0.4em;
-		border: 1px solid currentColor;
+		border: 1px solid var(--blue);
 		border-radius: 0.2em;
 		font-size: 0.7em;
-		color: var(--blue);
-		background: transparent;
+		color: var(--blue_text);
+		background: var(--blue);
 		cursor: pointer;
 
 		&:hover {
-			color: var(--purple_bright);
+			background: var(--purple_bright);
+			border-color: var(--purple_bright);
+			color: var(--purple_bright_text);
 		}
 
 		&.selected {

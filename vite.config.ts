@@ -6,13 +6,13 @@ import svg from '@poppanator/sveltekit-svg';
 import buildColoursCss from './src/lib/styles/config/buildColoursCss.js';
 import postcssConfig from './config/postcss.config.js';
 
-type ApiColour = { name: string; hex: string | null; link: string | null; theme: string | null; text: { name: string } | null };
+type ApiColour = { name: string; hex: string | null; link: string | null; theme: string | null; text: { name: string | null; hex: string | null } | null };
 
 const fetchColours = async (apiUrl: string): Promise<ApiColour[]> => {
 	const response = await fetch(`${apiUrl}/graphql`, {
 		method: `POST`,
 		headers: { 'Content-Type': `application/json` },
-		body: JSON.stringify({ query: `query { colours { name hex link theme text { name } } }` }),
+		body: JSON.stringify({ query: `query { colours { name hex link theme text { name hex } } }` }),
 	}).then((res) => res.json());
 
 	if (!response?.data?.colours) {

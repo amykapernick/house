@@ -7,7 +7,7 @@
 	import TaskList from '$parts/tasks/List.svelte';
 	import { isAuthenticated, getToken } from '$lib/auth';
 	import fetchClientData, { getGraphqlUrl, setCache } from '$utils/fetchClientData';
-	import fetchFamilyMembers, { EVERYONE, isVisibleToUser, type FamilyMember } from '$utils/fetchFamilyMembers';
+	import { EVERYONE, isVisibleToUser } from '$utils/fetchFamilyMembers';
 	import type { ScheduleBlock, ScheduleSavePayload, RoutineDays, PaletteColour } from '$types/schedule';
 	import type { Task, TaskStatus } from '$types/tasks';
 
@@ -19,7 +19,6 @@
 	let tasks = $state<Task[]>([]);
 	let events = $state<any[]>([]);
 	let icalEvents = $state<any[]>([]);
-	let familyMembers = $state<FamilyMember[]>([]);
 	let selectedUserSlug = $state(EVERYONE);
 
 	let visibleIcalEvents = $derived(icalEvents.filter((event) => isVisibleToUser(event.family, selectedUserSlug)));
@@ -37,11 +36,6 @@
 	// calendar grid itself - parseTasks in ScheduleView drops anything without a due
 	// date - so surface them in a plain list instead of hiding them entirely.
 	let undatedTasks = $derived(visibleTasks.filter((task) => !task.due));
-
-	function loadFamily() {
-		function handleFamily(members: FamilyMember[]) { familyMembers = members; }
-		fetchFamilyMembers(handleFamily).then(handleFamily);
-	}
 
 	function loadCalendarItems() {
 		function handleCalendar(res: any) {
@@ -188,7 +182,6 @@
 			);
 			loadColours();
 			loadCalendarItems();
-			loadFamily();
 		}
 	});
 
@@ -253,7 +246,7 @@
 {#if loading}
 	<p>Loading...</p>
 {:else}
-	<FamilyFilter {familyMembers} bind:selectedUserSlug />
+	<FamilyFilter bind:selectedUserSlug />
 	<ScheduleView
 		blocks={visibleBlocks}
 		{colours}

@@ -195,7 +195,7 @@
 	}
 
 	.todoist-id {
-		color: var(--grey_light);
+		color: var(--grey);
 		font-size: 0.75em;
 		font-weight: 400;
 		font-family: monospace;

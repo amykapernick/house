@@ -5,10 +5,24 @@
 // cache TTL instead, to keep icons from going stale for weeks at a time.
 export const CONTENT_CACHE_TTL = 30 * 24 * 60 * 60 * 1000;
 
+// Digest-style entries (see contentEntriesQuery's `brief`) render their one
+// page directly under /content/[slug] rather than a distinct [pageSlug]
+// subpage, but readProgress's storage key still needs a non-empty second
+// segment - this sentinel stands in for pageSlug there.
+export const DIGEST_PAGE_SLUG = `_digest`;
+
+export function contentIndexCacheKey(slug: string): string {
+	return `content-index-${slug}`;
+}
+
+export function contentDigestCacheKey(slug: string): string {
+	return `content-digest-${slug}`;
+}
+
 export const contentEntriesQuery = `
 	query {
 		contentEntries {
-			slug title icon iconType brief
+			slug title icon iconType brief sectionCount updatedAt
 		}
 	}
 `;

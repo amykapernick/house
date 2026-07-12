@@ -3,14 +3,13 @@
 	import { isAuthenticated } from '$lib/auth';
 	import fetchHabitsData from '$utils/habitsData';
 	import { setCache } from '$utils/fetchClientData';
-	import fetchFamilyMembers, { EVERYONE, isVisibleToUser, type FamilyMember } from '$utils/fetchFamilyMembers';
+	import { EVERYONE, isVisibleToUser } from '$utils/fetchFamilyMembers';
 	import HabitView from '$parts/habits/HabitView.svelte';
 	import FamilyFilter from '$parts/FamilyFilter.svelte';
 	import type { Habit } from '$types/habits';
 
 	let habits = $state<Habit[]>([]);
 	let loading = $state(true);
-	let familyMembers = $state<FamilyMember[]>([]);
 	let selectedUserSlug = $state(EVERYONE);
 
 	// The API resolves unassigned habits, or habits assigned to someone outside
@@ -25,9 +24,6 @@
 				loading = false;
 			}
 			fetchHabitsData({ onStale: handleHabits }).then(handleHabits);
-
-			function handleFamily(members: FamilyMember[]) { familyMembers = members; }
-			fetchFamilyMembers(handleFamily).then(handleFamily);
 		}
 	});
 
@@ -51,6 +47,6 @@
 {#if loading}
 	<p>Loading...</p>
 {:else}
-	<FamilyFilter {familyMembers} bind:selectedUserSlug />
+	<FamilyFilter bind:selectedUserSlug />
 	<HabitView habits={visibleHabits} onComplete={handleHabitComplete} />
 {/if}

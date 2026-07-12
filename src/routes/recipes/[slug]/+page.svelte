@@ -31,6 +31,8 @@
 	let allUnits = $state<RecipeIngredientUnit[]>([]);
 	let selectedUnitId = $state<Record<number, string>>({});
 	let defaultUnitId = $state<Record<string, string>>({});
+	let checkedIngredients = $state<Record<number, boolean>>({});
+	let checkedSteps = $state<Record<number, boolean>>({});
 
 	// Distinct unit families (mass, volume, ...) present across the recipe's ingredients,
 	// each with every configured unit that can be converted to/from it - powers the
@@ -109,6 +111,8 @@
 				allUnits = res.recipeUnits ?? [];
 				selectedUnitId = {};
 				defaultUnitId = {};
+				checkedIngredients = {};
+				checkedSteps = {};
 				loading = false;
 			}
 			fetchClientData({
@@ -222,8 +226,16 @@
 								<li class="section-title">{ingredient.title}</li>
 							{:else}
 								{@const options = ingredientUnitOptions(ingredient)}
-								<li>
-									<span>{scaledIngredientText(ingredient, i)}</span>
+								<li class:checked={checkedIngredients[i]}>
+									<label class="check-label">
+										<input
+											type="checkbox"
+											checked={checkedIngredients[i] ?? false}
+											onchange={() => (checkedIngredients[i] = !checkedIngredients[i])}
+											aria-label={`Mark ${ingredient.food ?? ingredient.display} as done`}
+										/>
+										<span>{scaledIngredientText(ingredient, i)}</span>
+									</label>
 									{#if options.length}
 									<!-- TODO: Style ingredient unit selection -->
 										<select
@@ -252,9 +264,19 @@
 				{#if recipe.instructions?.length}
 					<ol>
 						{#each recipe.instructions as step, i (i)}
-							<li>
-								{#if step.title}<strong>{step.title}</strong>{/if}
-								<p>{step.text}</p>
+							<li class:checked={checkedSteps[i]}>
+								<label class="check-label">
+									<input
+										type="checkbox"
+										checked={checkedSteps[i] ?? false}
+										onchange={() => (checkedSteps[i] = !checkedSteps[i])}
+										aria-label={`Mark step ${i + 1} as done`}
+									/>
+									<span>
+										{#if step.title}<strong>{step.title}</strong>{/if}
+										<p>{step.text}</p>
+									</span>
+								</label>
 							</li>
 						{/each}
 					</ol>
@@ -493,6 +515,30 @@
 			gap: 0.5em;
 			padding: 0.4em 0;
 			border-bottom: 1px solid var(--grey_light);
+
+			&.checked {
+				opacity: 0.6;
+
+				& .check-label span {
+					color: var(--grey);
+					text-decoration: line-through;
+				}
+			}
+		}
+
+		& .check-label {
+			display: flex;
+			align-items: center;
+			gap: 0.5em;
+			cursor: pointer;
+
+			& input {
+				display: inline-block;
+				width: auto;
+				margin: 0;
+				padding: 0;
+				flex-shrink: 0;
+			}
 		}
 
 		& .unit-select {
@@ -520,6 +566,29 @@
 
 		& li {
 			margin-bottom: 1em;
+
+			&.checked {
+				opacity: 0.6;
+
+				& span {
+					text-decoration: line-through;
+				}
+			}
+		}
+
+		& .check-label {
+			display: flex;
+			align-items: flex-start;
+			gap: 0.6em;
+			cursor: pointer;
+
+			& input {
+				display: inline-block;
+				width: auto;
+				margin: 0.3em 0 0;
+				padding: 0;
+				flex-shrink: 0;
+			}
 		}
 
 		& p {

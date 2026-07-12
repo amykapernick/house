@@ -85,12 +85,12 @@
 		font-size: 1em;
 		font-weight: 600;
 		text-transform: capitalize;
-		opacity: 0.6;
+		opacity: 0.85;
 		cursor: pointer;
 		transition: opacity 0.15s, border-color 0.15s;
 
 		&:hover {
-			opacity: 0.85;
+			opacity: 1;
 		}
 
 		&[data-active='true'] {

@@ -1,24 +1,31 @@
-import { test, expect } from '@playwright/test';
-import AxeBuilder from '@axe-core/playwright';
+import { test } from '@playwright/test';
 import { routes } from './routes';
-import { formatViolations } from './axe-helpers';
+import { runAxeScan } from './axe-helpers';
 
 for (const route of routes.filter((r) => !r.auth)) {
 	test(`${route.name} (${route.path}) has no automatically detectable accessibility violations`, async ({
 		page,
 	}) => {
 		await page.goto(route.path);
-		await expect(page.locator(`body`)).toBeVisible();
-
-		const results = await new AxeBuilder({ page })
-			.withTags([`wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa`])
-			.analyze();
-
-		await test.info().attach(`axe-results-${route.name}`, {
-			body: JSON.stringify(results, null, 2),
-			contentType: `application/json`,
-		});
-
-		expect(results.violations, formatViolations(results.violations)).toEqual([]);
+		await runAxeScan(page, route.name);
 	});
 }
+
+// Dynamic detail pages aren't in routes.ts because they need a real, live
+// item to navigate to rather than a fixed path - reached by clicking through
+// from their index page instead of a hardcoded URL.
+test(`recipe detail (via /recipes) has no automatically detectable accessibility violations`, async ({ page }) => {
+	await page.goto(`/recipes`);
+	const firstRecipe = page.locator(`a.card`).first();
+	await firstRecipe.waitFor();
+	await firstRecipe.click();
+	await runAxeScan(page, `recipe-detail`);
+});
+
+test(`recipe tag detail (via /recipes/tags) has no automatically detectable accessibility violations`, async ({ page }) => {
+	await page.goto(`/recipes/tags`);
+	const firstTag = page.locator(`a.tag-card`).first();
+	await firstTag.waitFor();
+	await firstTag.click();
+	await runAxeScan(page, `recipe-tag-detail`);
+});

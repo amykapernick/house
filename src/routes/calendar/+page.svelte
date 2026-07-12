@@ -3,7 +3,7 @@
 	import FamilyFilter from '$parts/FamilyFilter.svelte';
 	import { isAuthenticated } from '$lib/auth';
 	import fetchClientData from '$utils/fetchClientData';
-	import fetchFamilyMembers, { EVERYONE, isVisibleToUser, type FamilyMember } from '$utils/fetchFamilyMembers';
+	import { EVERYONE, isVisibleToUser } from '$utils/fetchFamilyMembers';
 	import type { Task } from '$types/tasks';
 
 	let tasks = $state<Task[]>([]);
@@ -11,7 +11,6 @@
 	let icalEvents = $state<any[]>([]);
 	let mealPlans = $state<any[]>([]);
 	let loading = $state(true);
-	let familyMembers = $state<FamilyMember[]>([]);
 	let selectedUserSlug = $state(EVERYONE);
 
 	// The API resolves unassigned tasks, or tasks assigned to someone outside
@@ -106,9 +105,6 @@
 					}
 				`,
 			}).then(handleCalMeals);
-
-			function handleFamily(members: FamilyMember[]) { familyMembers = members; }
-			fetchFamilyMembers(handleFamily).then(handleFamily);
 		}
 	});
 </script>
@@ -122,6 +118,6 @@
 {#if loading}
 	<p>Loading...</p>
 {:else}
-	<FamilyFilter {familyMembers} bind:selectedUserSlug />
+	<FamilyFilter bind:selectedUserSlug />
 	<CalendarView tasks={visibleTasks} allDayEvents={events} icalEvents={visibleIcalEvents} {mealPlans} onTaskCompleted={handleTaskCompleted} />
 {/if}

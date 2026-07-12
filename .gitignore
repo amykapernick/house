@@ -36,3 +36,4 @@ playwright-report/
 test-results/
 pa11y-report/
 blob-report/
+tests/screenshots/output/

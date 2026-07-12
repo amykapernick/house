@@ -12,7 +12,7 @@ thead {
 tbody {
 	& tr {
 		&:nth-child(2n - 1) {
-			background: color-mix(in srgb, var(--blue) 30%, transparent);
+			background: color-mix(in srgb, var(--blue) 15%, transparent);
 		}
 	}
 }

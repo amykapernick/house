@@ -74,7 +74,14 @@
 		const end = allDates[allDates.length - 1];
 		const ticks: Date[] = [];
 
-		if (rangeDays <= 60) {
+		if (rangeDays <= 14) {
+			// Daily
+			const d = new Date(start);
+			while (d <= end) {
+				ticks.push(new Date(d));
+				d.setDate(d.getDate() + 1);
+			}
+		} else if (rangeDays <= 60) {
 			// Weekly, snapped to Monday
 			const d = new Date(start);
 			d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); // Monday
@@ -153,22 +160,20 @@
 		<!-- Left Y ticks + gridlines -->
 		{#each leftTicks as tick, i (i)}
 			{@const y = yPos(tick, 'left')}
-			{@const unit = leftLines[0]?.unit ?? ''}
 			{@const dec = leftLines[0]?.decimals ?? 1}
 			<line x1={PAD_LEFT} y1={y} x2={PAD_LEFT + innerW} y2={y} class="gridline" />
 			<text x={PAD_LEFT - 6} {y} class="tick-label" text-anchor="end" dominant-baseline="middle">
-				{tick.toFixed(dec)}{unit}
+				{tick.toFixed(dec)}
 			</text>
 		{/each}
 
 		<!-- Right Y ticks -->
 		{#if hasRightAxis}
-			{@const unit = rightLines[0]?.unit ?? ''}
 			{@const dec = rightLines[0]?.decimals ?? 0}
 			{#each rightTicks as tick, i (i)}
 				{@const y = yPos(tick, 'right')}
 				<text x={PAD_LEFT + innerW + 6} {y} class="tick-label tick-label--right" text-anchor="start" dominant-baseline="middle">
-					{tick.toFixed(dec)}{unit}
+					{tick.toFixed(dec)}
 				</text>
 			{/each}
 		{/if}

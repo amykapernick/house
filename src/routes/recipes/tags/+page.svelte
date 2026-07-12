@@ -103,17 +103,18 @@
 	.tag-card {
 		display: inline-block;
 		padding: 0.4em 0.8em;
-		border: 1px solid var(--grey_light);
+		border: 1px solid var(--blue);
 		border-radius: 0.3em;
 		text-decoration: none;
-		color: var(--blue);
+		color: var(--blue_text);
+		background: var(--blue);
 		font-size: 0.9em;
 		transition: background 0.15s, border-color 0.15s;
 
 		&:hover {
-			background: color-mix(in srgb, var(--purple_bright) 8%, transparent);
+			background: var(--purple_bright);
 			border-color: var(--purple_bright);
-			color: var(--purple_bright);
+			color: var(--purple_bright_text);
 		}
 	}
 </style>

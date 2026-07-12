@@ -46,6 +46,14 @@ function getCached(key: string, ttl: number): any | null {
 	}
 }
 
+// Read-only cache lookup, for callers that want cached data if it happens to
+// already be there (e.g. computing read-progress status on an index page from
+// whatever detail pages the user has already visited) without triggering a
+// network fetch for entries that aren't cached yet.
+export function peekCache(key: string, ttl: number = DEFAULT_CACHE_TTL): any | null {
+	return getCached(key, ttl);
+}
+
 export function setCache(key: string, data: any) {
 	try {
 		const timestamp = Date.now();

@@ -1,24 +1,30 @@
 <script lang="ts">
+	import { format, parseISO } from 'date-fns';
 	import { isAuthenticated } from '$lib/auth';
 	import fetchClientData from '$utils/fetchClientData';
-	import BarChart from '$parts/BarChart.svelte';
-	import type { BarChartBar } from '$parts/BarChart.svelte';
+	import LineChart from '$parts/LineChart.svelte';
+	import type { LineChartLine } from '$parts/LineChart.svelte';
 	import type { Colour } from '$types/global';
 
-	type HealthMetric = { key: string; label: string | null; value: number; unit: string | null };
-	type HealthUser = { slug: string; name: string; colour: Colour | null; health: HealthMetric[] | null };
+	type HealthMetricPoint = { date: string; value: number };
+	type HealthMetricHistory = { key: string; label: string | null; unit: string | null; points: HealthMetricPoint[] };
+	type HealthUser = { slug: string; name: string; colour: Colour | null; healthHistory: HealthMetricHistory[] | null };
 
+	const DAY_OPTIONS = [7, 30, 90] as const;
+
+	let days = $state<number>(30);
 	let users = $state<HealthUser[]>([]);
 	let loading = $state(true);
 
 	$effect(() => {
 		if ($isAuthenticated) {
+			loading = true;
 			function handle(res: any) {
 				users = res.users ?? [];
 				loading = false;
 			}
 			fetchClientData({
-				cacheKey: 'health',
+				cacheKey: `health-history-${days}`,
 				onStale: handle,
 				gqlQuery: `
 					query {
@@ -26,7 +32,7 @@
 							slug
 							name
 							colour
-							health { key label value unit }
+							healthHistory(days: ${days}) { key label unit points { date value } }
 						}
 					}
 				`,
@@ -34,20 +40,29 @@
 		}
 	});
 
-	type MetricCard = { key: string; label: string; unit: string | null; bars: BarChartBar[] };
+	type MetricCard = { key: string; label: string; unit: string | null; lines: LineChartLine[] };
 
 	// Small multiples, one chart per metric key - metrics have wildly different
 	// scales (steps vs body fat % vs blood glucose) so they can't share an axis.
+	// Within one metric, every line shares a unit (it's the same metric for
+	// everyone), so multiple family members can safely share one axis.
 	let metricCards = $derived.by((): MetricCard[] => {
 		// eslint-disable-next-line svelte/prefer-svelte-reactivity -- built and discarded synchronously within this derivation, never read reactively
 		const byKey = new Map<string, MetricCard>();
 
 		for (const user of users) {
-			for (const metric of user.health ?? []) {
+			for (const metric of user.healthHistory ?? []) {
+				if (!metric.points.length) continue;
+
 				if (!byKey.has(metric.key)) {
-					byKey.set(metric.key, { key: metric.key, label: metric.label ?? metric.key, unit: metric.unit, bars: [] });
+					byKey.set(metric.key, { key: metric.key, label: metric.label ?? metric.key, unit: metric.unit, lines: [] });
 				}
-				byKey.get(metric.key)!.bars.push({ name: user.name, colour: user.colour ?? 'blue', value: metric.value });
+				byKey.get(metric.key)!.lines.push({
+					data: metric.points.map((p) => ({ x: parseISO(p.date), y: p.value })),
+					style: { colour: user.colour ?? 'blue' },
+					unit: metric.unit ?? '',
+					decimals: 0,
+				});
 			}
 		}
 
@@ -55,6 +70,10 @@
 			a.key === 'daily_steps' ? -1 : b.key === 'daily_steps' ? 1 : a.label.localeCompare(b.label)
 		);
 	});
+
+	// Colours are stable per-person across every chart on the page, so one shared
+	// legend suffices - LineChart (unlike BarChart) has no built-in legend.
+	let legend = $derived(users.filter((u) => (u.healthHistory ?? []).some((m) => m.points.length)));
 </script>
 
 <svelte:head>
@@ -64,15 +83,36 @@
 
 <h1>Health</h1>
 
+<fieldset class="range_filter">
+	<legend>Show</legend>
+	{#each DAY_OPTIONS as option (option)}
+		<label>
+			<input type="radio" name="days" value={option} bind:group={days} />
+			{option} days
+		</label>
+	{/each}
+</fieldset>
+
 {#if loading}
 	<p>Loading...</p>
 {:else if metricCards.length === 0}
 	<p class="empty">No Health Connect data yet — link a family member's Home Assistant id and make sure their companion app is reporting Health Connect sensors.</p>
 {:else}
+	{#if legend.length > 1}
+		<ul class="legend">
+			{#each legend as user (user.slug)}
+				<li>
+					<span class="swatch" style="background: var(--{user.colour ?? 'blue'});"></span>
+					<span>{user.name}</span>
+				</li>
+			{/each}
+		</ul>
+	{/if}
+
 	<div class="grid">
 		{#each metricCards as card (card.key)}
 			<figure class="chart-card">
-				<BarChart groups={[{ label: '', bars: card.bars }]} unit={card.unit ? ` ${card.unit}` : ''} />
+				<LineChart lines={card.lines} formatX={(x) => format(x, 'd MMM')} leftLabel={card.unit ?? undefined} />
 				<figcaption>{card.label}</figcaption>
 			</figure>
 		{/each}
@@ -83,6 +123,50 @@
 	.empty {
 		color: var(--grey);
 		font-style: italic;
+	}
+
+	.range_filter {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 1em;
+		border: none;
+		padding: 0;
+		margin-bottom: 1em;
+
+		legend {
+			font-weight: bold;
+			padding: 0;
+		}
+
+		label {
+			display: flex;
+			align-items: center;
+			gap: 0.3em;
+		}
+	}
+
+	.legend {
+		list-style: none;
+		margin: 0 0 1.5em;
+		padding: 0;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.3em 1.2em;
+		font-size: 0.9em;
+	}
+
+	.legend li {
+		display: flex;
+		align-items: center;
+		gap: 0.5em;
+	}
+
+	.swatch {
+		width: 0.8em;
+		height: 0.8em;
+		border-radius: 0.15em;
+		flex-shrink: 0;
 	}
 
 	.grid {

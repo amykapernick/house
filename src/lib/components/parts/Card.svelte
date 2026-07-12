@@ -62,7 +62,7 @@
 		border: 2px solid var(--colour);
 		width: auto;
 		padding: 0.5em 0.75em;
-		color: var(--colour);
+		color: var(--black);
 		background: color-mix(in srgb, var(--colour) 10%, white);
 		display: grid;
 		grid-template-rows: auto 1fr auto auto;
@@ -76,7 +76,7 @@
 	}
 
 	.heading {
-		color: var(--colour);
+		color: var(--black);
 		display: block;
 		margin: 0 0 0.2em;
 		padding: 0 0.2em;
@@ -100,7 +100,7 @@
 		border: none;
 		border-radius: 50%;
 		background: transparent;
-		color: var(--colour);
+		color: var(--black);
 		font-size: 1.1em;
 		line-height: 1;
 		cursor: pointer;

@@ -39,17 +39,17 @@
 	<p class="trend">{growth.trend_notes}</p>
 
 	<figure>
-		<LineChart lines={weightLines} {formatX} />
+		<LineChart lines={weightLines} {formatX} leftLabel={weightLines[0]?.unit} rightLabel={weightLines[1]?.unit} />
 		<figcaption>Weight</figcaption>
 	</figure>
 
 	<figure>
-		<LineChart lines={heightLines} {formatX} />
+		<LineChart lines={heightLines} {formatX} leftLabel={heightLines[0]?.unit} rightLabel={heightLines[1]?.unit} />
 		<figcaption>Height</figcaption>
 	</figure>
 
 	<figure>
-		<LineChart lines={headLines} {formatX} />
+		<LineChart lines={headLines} {formatX} leftLabel={headLines[0]?.unit} rightLabel={headLines[1]?.unit} />
 		<figcaption>Head Circumference</figcaption>
 	</figure>
 

@@ -17,7 +17,8 @@
     "test:e2e": "playwright test",
     "test:a11y:pa11y": "node scripts/run-pa11y.mjs",
     "test": "npm run test:unit && npm run test:e2e && npm run test:a11y:pa11y",
-    "generate:screenshots": "playwright test tests/screenshots/screenshots-authenticated.spec.ts"
+    "generate:screenshots": "playwright test tests/screenshots/screenshots-authenticated.spec.ts",
+    "generate:route-screenshots": "playwright test --config=playwright.screenshots.config.ts"
   },
   "author": "Amy Kapernick (https://amyskapers.dev/)",
   "license": "MIT",

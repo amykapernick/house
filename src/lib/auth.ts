@@ -12,6 +12,11 @@ export async function initClerk(publishableKey: string) {
 	const clerkInstance = new Clerk(publishableKey);
 	await clerkInstance.load({ ui: { ClerkUI } });
 
+	// @clerk/testing's Playwright helpers (used by tests/setup/auth.setup.ts)
+	// hard-require window.Clerk to drive sign-in in E2E/a11y tests - this app
+	// otherwise only keeps the instance in the Svelte store below.
+	window.Clerk = clerkInstance;
+
 	clerk.set(clerkInstance);
 	clerkLoaded.set(true);
 

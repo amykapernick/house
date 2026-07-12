@@ -11,10 +11,30 @@ export function slugifyHeading(text: string): string {
 		.replace(/^-+|-+$/g, ``);
 }
 
+// Notion content can have repeated headings (e.g. dated log entries like "12
+// July 2026" reused across entries), which would otherwise all slugify to the
+// same anchor - breaking keyed {#each} blocks and read-progress tracking that
+// assume anchors are unique. Every anchor-producing pass below (the heading
+// renderer, extractToc, splitTrackableChunks) walks headings in the same
+// document order and applies this same disambiguation, so ids stay consistent
+// with each other for a given document.
+function createSlugger() {
+	const counts = new Map<string, number>();
+
+	return (text: string): string => {
+		const base = slugifyHeading(text);
+		const count = counts.get(base) ?? 0;
+		counts.set(base, count + 1);
+		return count === 0 ? base : `${base}-${count + 1}`;
+	};
+}
+
+let headingSlugger = createSlugger();
+
 const marked = new Marked({
 	renderer: {
 		heading({ tokens, depth, text }) {
-			const anchor = slugifyHeading(text);
+			const anchor = headingSlugger(text);
 			return `<h${depth} id="${anchor}">${this.parser.parseInline(tokens)}</h${depth}>\n`;
 		},
 	},
@@ -25,6 +45,7 @@ const marked = new Marked({
 // comes from Amy's own curated Notion data (not user input), so {@html}-ing the
 // result at the call site is safe.
 export function renderMarkdown(markdown: string): string {
+	headingSlugger = createSlugger();
 	return marked.parse(markdown, { async: false }) as string;
 }
 
@@ -33,6 +54,7 @@ export function renderMarkdown(markdown: string): string {
 // the heading renderer above, so anchors line up.
 export function extractToc(markdown: string): TocEntry[] {
 	const entries: TocEntry[] = [];
+	const slugger = createSlugger();
 
 	for (const line of markdown.split(`\n`)) {
 		const match = /^(##|###) +(.+)$/.exec(line);
@@ -42,7 +64,7 @@ export function extractToc(markdown: string): TocEntry[] {
 		entries.push({
 			level: match[1].length,
 			text,
-			anchor: slugifyHeading(text),
+			anchor: slugger(text),
 		});
 	}
 
@@ -58,8 +80,6 @@ export type ContentChunk = {
 	markdown: string
 	/** Whether this chunk is its own read-progress unit (see splitTrackableChunks). */
 	trackable: boolean
-	/** The nearest earlier trackable chunk's anchor, if any - for the "mark previous as read" button. */
-	previousTrackableAnchor: string | null
 };
 
 function splitHeadingChunks(markdown: string): RawChunk[] {
@@ -83,27 +103,21 @@ function splitHeadingChunks(markdown: string): RawChunk[] {
 // falls back to being its own trackable unit instead. This way every page has
 // *some* trackable granularity regardless of which pattern its content uses.
 // The leading chunk (before the first heading, if any) is the page's intro
-// text - never trackable on its own.
+// text - never trackable on its own. Callers render each trackable chunk's
+// "mark as read" button immediately after that chunk's own content, rather
+// than before the next trackable chunk - non-trackable chunks (e.g. a digest's
+// synthesized "## <date>" section wrapping a single trackable chapter) can sit
+// between them, and the button needs to land at the actual reading boundary,
+// not wherever the next trackable chunk happens to start.
 export function splitTrackableChunks(markdown: string): ContentChunk[] {
 	const raw = splitHeadingChunks(markdown);
-	const result: ContentChunk[] = [];
-	let previousTrackableAnchor: string | null = null;
+	const slugger = createSlugger();
 
-	raw.forEach((chunk, i) => {
-		const anchor = chunk.heading ? slugifyHeading(chunk.heading) : null;
-		const trackable = chunk.level === 3 || (chunk.level === 2 && raw[i + 1]?.level !== 3);
-
-		result.push({
-			anchor,
-			heading: chunk.heading,
-			level: chunk.level,
-			markdown: chunk.markdown,
-			trackable,
-			previousTrackableAnchor: trackable ? previousTrackableAnchor : null,
-		});
-
-		if (trackable) previousTrackableAnchor = anchor;
-	});
-
-	return result;
+	return raw.map((chunk, i) => ({
+		anchor: chunk.heading ? slugger(chunk.heading) : null,
+		heading: chunk.heading,
+		level: chunk.level,
+		markdown: chunk.markdown,
+		trackable: chunk.level === 3 || (chunk.level === 2 && raw[i + 1]?.level !== 3),
+	}));
 }

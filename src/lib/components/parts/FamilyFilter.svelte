@@ -1,14 +1,29 @@
 <script lang="ts">
-	import { EVERYONE } from '$utils/fetchFamilyMembers';
+	import { isAuthenticated } from '$lib/auth';
+	import fetchFamilyMembers, { EVERYONE, fetchCurrentUserSlug } from '$utils/fetchFamilyMembers';
 	import type { FamilyMember } from '$utils/fetchFamilyMembers';
 
-	let {
-		familyMembers,
-		selectedUserSlug = $bindable(),
-	}: {
-		familyMembers: FamilyMember[];
-		selectedUserSlug: string;
-	} = $props();
+	let { selectedUserSlug = $bindable(EVERYONE) }: { selectedUserSlug?: string } = $props();
+
+	let familyMembers = $state<FamilyMember[]>([]);
+	let defaultApplied = false;
+
+	// Only overwrite the still-untouched EVERYONE default - if the me lookup
+	// resolves after the user has already picked someone, leave their choice alone.
+	function applyDefault(slug: string | undefined) {
+		if (defaultApplied || !slug || selectedUserSlug !== EVERYONE) return;
+		selectedUserSlug = slug;
+		defaultApplied = true;
+	}
+
+	$effect(() => {
+		if (!$isAuthenticated) return;
+
+		function handleFamily(members: FamilyMember[]) { familyMembers = members; }
+		fetchFamilyMembers(handleFamily).then(handleFamily);
+
+		fetchCurrentUserSlug(applyDefault).then(applyDefault);
+	});
 </script>
 
 {#if familyMembers.length}

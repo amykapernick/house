@@ -14,7 +14,7 @@
 			{
 				"label": "Frontend: npm start",
 				"type": "shell",
-				"command": "echo 'Waiting for API on :7071...'; for i in $(seq 1 60); do curl -s -o /dev/null http://localhost:7071/api/graphql && break; sleep 1; done; npm start",
+				"command": "echo 'Waiting for API on :7074...'; for i in $(seq 1 60); do curl -s -o /dev/null http://localhost:7074/graphql && break; sleep 1; done; npm start",
 				"isBackground": true,
 				"problemMatcher": [],
 				"options": {

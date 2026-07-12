@@ -24,6 +24,7 @@
 	// whenever the slug/pageSlug changes.
 	let readAnchors = new SvelteSet<string>();
 	let hasResumedScroll = $state(false);
+	let showToc = $state(true);
 
 	function loadReadAnchors(slug: string, pageSlug: string) {
 		readAnchors.clear();
@@ -85,12 +86,6 @@
 		return read;
 	});
 
-	// The last trackable chunk has no following chunk to hang a "mark previous
-	// section as read" button on, so it gets its own button after all the
-	// content instead - reaching the bottom of the page is this section's
-	// equivalent of the boundary the other buttons sit at.
-	let lastTrackableAnchor = $derived(chunks.findLast((chunk) => chunk.trackable)?.anchor ?? null);
-
 	// Skip straight to wherever this device last left off, but only once per
 	// page visit, and only if there's actually prior progress to resume.
 	$effect(() => {
@@ -137,52 +132,44 @@
 	<h1>{contentPage.title}</h1>
 
 	{#if toc.length > 0}
-		<nav class="toc" aria-label="Table of contents">
-			<ol>
-				{#each toc as entry (entry.anchor)}
-					<li class:chapter={entry.level === 3}>
-						<a href="#{entry.anchor}">{entry.text}</a>
-						{#if tocRead.get(entry.anchor)}
-							<span class="read-mark" title="Read">✓</span>
-						{/if}
-					</li>
-				{/each}
-			</ol>
-		</nav>
+		<button type="button" class="toc-toggle" onclick={() => showToc = !showToc}>
+			{showToc ? `Hide contents` : `Show contents`}
+		</button>
+		{#if showToc}
+			<nav class="toc" aria-label="Table of contents">
+				<ol>
+					{#each toc as entry (entry.anchor)}
+						<li class:chapter={entry.level === 3}>
+							<a href="#{entry.anchor}">{entry.text}</a>
+							{#if tocRead.get(entry.anchor)}
+								<span class="read-mark" title="Read">✓</span>
+							{/if}
+						</li>
+					{/each}
+				</ol>
+			</nav>
+		{/if}
 	{/if}
 
 	<div class="content">
 		{#each chunks as chunk (chunk.anchor ?? `intro`)}
-			{#if chunk.trackable && chunk.previousTrackableAnchor}
-				{@const previousAnchor = chunk.previousTrackableAnchor}
-				<button
-					type="button"
-					class="mark-read"
-					class:read={readAnchors.has(previousAnchor)}
-					onclick={() => handleToggleRead(previousAnchor)}
-					use:trackReadDwell={{ anchor: previousAnchor, isAlreadyRead: () => readAnchors.has(previousAnchor), onRead: handleToggleRead }}
-				>
-					{readAnchors.has(previousAnchor) ? `Marked as read - click to undo` : `Mark previous section as read`}
-				</button>
-			{/if}
 			<div id={chunk.anchor ?? undefined}>
 				<!-- eslint-disable-next-line svelte/no-at-html-tags -- chunk.markdown is Amy's own curated Notion data, not user input -->
 				{@html renderMarkdown(chunk.markdown)}
 			</div>
+			{#if chunk.trackable && chunk.anchor}
+				{@const anchor = chunk.anchor}
+				<button
+					type="button"
+					class="mark-read"
+					class:read={readAnchors.has(anchor)}
+					onclick={() => handleToggleRead(anchor)}
+					use:trackReadDwell={{ anchor, isAlreadyRead: () => readAnchors.has(anchor), onRead: handleToggleRead }}
+				>
+					{readAnchors.has(anchor) ? `Marked as read - click to undo` : `Mark this section as read`}
+				</button>
+			{/if}
 		{/each}
-
-		{#if lastTrackableAnchor}
-			{@const anchor = lastTrackableAnchor}
-			<button
-				type="button"
-				class="mark-read"
-				class:read={readAnchors.has(anchor)}
-				onclick={() => handleToggleRead(anchor)}
-				use:trackReadDwell={{ anchor, isAlreadyRead: () => readAnchors.has(anchor), onRead: handleToggleRead }}
-			>
-				{readAnchors.has(anchor) ? `Marked as read - click to undo` : `Mark final section as read`}
-			</button>
-		{/if}
 	</div>
 {/if}
 
@@ -198,8 +185,19 @@
 		}
 	}
 
+	.toc-toggle {
+		margin: 20px 0 0;
+		padding: 0.5em 1em;
+		border: 1px solid var(--navy);
+		border-radius: 0.35em;
+		background: none;
+		color: var(--navy);
+		font-size: 0.85em;
+		cursor: pointer;
+	}
+
 	.toc {
-		margin: 20px 0;
+		margin: 10px 0 20px;
 		padding: 15px 20px;
 		border-radius: 0.5em;
 		background: var(--navy);

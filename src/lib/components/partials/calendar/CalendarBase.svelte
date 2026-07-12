@@ -20,6 +20,11 @@
 		nowIndicator: true,
 		slotDuration: '00:30',
 		scrollTime: '08:00',
+		// @event-calendar/core (5.7.1) only defaults buttonText.today, leaving
+		// prev/next unset - Buttons.svelte reads those directly for the
+		// prev/next buttons' aria-label and title, so without this they render
+		// as icon-only buttons with no accessible name.
+		buttonText: { prev: 'Previous', next: 'Next' },
 		...optionsOverride,
 		events: [] as any[],
 	});

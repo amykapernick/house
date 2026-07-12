@@ -28,3 +28,20 @@ export default async function fetchFamilyMembers(onStale?: (members: FamilyMembe
 
 	return res.users ?? [];
 }
+
+// Separate cache key from the header/profile `me` queries (different shapes) -
+// resolves the signed-in user's own family slug, used by FamilyFilter to
+// default the filter to "just me" instead of "everyone".
+export async function fetchCurrentUserSlug(onStale?: (slug: string | undefined) => void): Promise<string | undefined> {
+	const res = await fetchClientData({
+		cacheKey: `family-filter-me`,
+		onStale: (data) => onStale?.(data.me?.slug),
+		gqlQuery: `
+			query {
+				me { slug }
+			}
+		`,
+	});
+
+	return res.me?.slug;
+}

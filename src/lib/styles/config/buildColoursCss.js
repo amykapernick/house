@@ -14,15 +14,18 @@ const declLine = (name, value, indent) => `${indent}--${name}: ${value};`;
 // instead of the plain var, so they resolve to the literal default rather
 // than whatever that name happens to cascade to.
 // Each colour also gets a `_text` var: colours with their own hex reference
-// the winning neutral's own var (computed API-side), while linked colours
-// reference their link's `_text` var so they follow the same chain.
-/** @param {Array<{ name: string; hex: string | null; link: string | null; theme: string | null; text: { name: string } | null }>} colours */
+// the winning neutral's own var (computed API-side) when one actually meets
+// WCAG AA contrast, or a literal pure black/white hex when none of the
+// curated neutrals do (the API guarantees one of those two always clears
+// AA - see resolveTextColour in household_api). Linked colours reference
+// their link's `_text` var so they follow the same chain.
+/** @param {Array<{ name: string; hex: string | null; link: string | null; theme: string | null; text: { name: string | null; hex: string | null } | null }>} colours */
 const buildColoursCss = (colours) => {
-	/** @type {Array<{ name: string; hex: string | null; link: string | null; text: { name: string } | null }>} */
+	/** @type {Array<{ name: string; hex: string | null; link: string | null; text: { name: string | null; hex: string | null } | null }>} */
 	const base = [];
-	/** @type {Array<{ name: string; hex: string | null; link: string | null; text: { name: string } | null }>} */
+	/** @type {Array<{ name: string; hex: string | null; link: string | null; text: { name: string | null; hex: string | null } | null }>} */
 	const light = [];
-	/** @type {Array<{ name: string; hex: string | null; link: string | null; text: { name: string } | null }>} */
+	/** @type {Array<{ name: string; hex: string | null; link: string | null; text: { name: string | null; hex: string | null } | null }>} */
 	const dark = [];
 
 	for (const colour of colours) {
@@ -32,7 +35,7 @@ const buildColoursCss = (colours) => {
 		bucket.push({ name: colour.name, hex: colour.hex, link: colour.link, text: colour.text });
 	}
 
-	/** @param {{ name: string; hex: string | null; link: string | null; text: { name: string } | null }} colour @param {string} indent @param {boolean} isThemed */
+	/** @param {{ name: string; hex: string | null; link: string | null; text: { name: string | null; hex: string | null } | null }} colour @param {string} indent @param {boolean} isThemed */
 	const linesFor = (colour, indent, isThemed) => {
 		const mainValue = colour.hex ?? `var(--${colour.link}${isThemed ? `_base` : ``})`;
 		const lines = [declLine(colour.name, mainValue, indent)];
@@ -42,7 +45,7 @@ const buildColoursCss = (colours) => {
 		const textValue = colour.hex
 			? colour.text?.name
 				? `var(--${colour.text.name})`
-				: null
+				: (colour.text?.hex ?? null)
 			: `var(--${colour.link}_text)`;
 
 		if (textValue) lines.push(declLine(`${colour.name}_text`, textValue, indent));
