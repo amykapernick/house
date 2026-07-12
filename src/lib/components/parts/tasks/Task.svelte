@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { format } from 'date-fns';
 	import Assigned from './Assigned.svelte';
+	import CheckboxButton from '$parts/CheckboxButton.svelte';
+	import type { CheckState } from '$parts/CheckboxButton.svelte';
 	import { getToken } from '$lib/auth';
 	import { getGraphqlUrl } from '$utils/fetchClientData';
 	import type { Task, TaskStatus } from '$types/tasks';
@@ -16,7 +18,7 @@
 		onUpdate,
 	}: Task & { onUpdate?: (id: string, status: TaskStatus) => void } = $props();
 
-	const StatusComplete: Record<TaskStatus, string> = {
+	const StatusComplete: Record<TaskStatus, CheckState> = {
 		'Not Started': 'incomplete',
 		'In Progress': 'partial',
 		Ongoing: 'partial',
@@ -89,15 +91,13 @@
 </script>
 
 <div class="task">
-	<button
-		type="button"
-		class="checkbox {completed}"
+	<CheckboxButton
+		class="checkbox"
+		state={completed}
 		disabled={completed === 'complete' || saving || platform === 'github'}
 		onclick={completeTask}
-		aria-label={completed === 'complete' ? 'Task complete' : 'Mark task complete'}
-	>
-		{#if completed === 'complete'}✓{:else if completed === 'partial'}◐{:else}○{/if}
-	</button>
+		label={completed === 'complete' ? 'Task complete' : 'Mark task complete'}
+	/>
 	<span class="name">{name}</span>
 	{#if platform === 'notion'}
 		<select
@@ -143,31 +143,9 @@
 		gap: 0.2em 1ch;
 	}
 
-	.checkbox {
+	:global(.checkbox) {
 		grid-area: checkbox;
 		align-self: center;
-		padding: 0;
-		border: none;
-		background: none;
-		font: inherit;
-		font-size: 1.2em;
-		cursor: pointer;
-
-		&:disabled {
-			cursor: default;
-		}
-
-		&.incomplete {
-			color: var(--grey);
-		}
-
-		&.partial {
-			color: var(--orange);
-		}
-
-		&.complete {
-			color: var(--green);
-		}
 	}
 
 	.name {

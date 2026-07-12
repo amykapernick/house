@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { add, endOfDay, format, isBefore, isToday, isTomorrow, isWithinInterval, isYesterday, startOfDay, startOfToday, subDays } from 'date-fns';
+	import CheckboxButton from '$parts/CheckboxButton.svelte';
 	import { getToken } from '$lib/auth';
 	import { getGraphqlUrl } from '$utils/fetchClientData';
-	import type { Habit } from '$types/habits';
+	import type { Habit, HabitViewRange } from '$types/habits';
 
 	let {
 		id,
@@ -12,8 +13,9 @@
 		streak,
 		completions,
 		days,
+		range,
 		onComplete,
-	}: Habit & { days: Date[]; onComplete?: (id: string) => void } = $props();
+	}: Habit & { days: Date[]; range: HabitViewRange; onComplete?: (id: string) => void } = $props();
 
 	let saving = $state(false);
 	let actionError = $state('');
@@ -105,15 +107,7 @@
 
 <tr class="habit">
 	<td class="name">
-		<button
-			type="button"
-			class="checkbox"
-			disabled={saving}
-			onclick={completeHabit}
-			aria-label="Mark {name} complete"
-		>
-			○
-		</button>
+		<CheckboxButton class="checkbox" disabled={saving} onclick={completeHabit} label="Mark {name} complete" />
 		<span class="label">
 			{#if emoji && label}
 				<span
@@ -139,20 +133,39 @@
 		{/if}
 		{#if actionError}<p class="error">{actionError}</p>{/if}
 	</td>
-	{#each days as day (day.toISOString())}
-		{@const done = isDayDone(day)}
-		{@const missed = !done && isBefore(day, startOfToday())}
-		<td class="day" title={format(day, 'EEEE d MMM')}>
-			{#if done}
-				<span class="sr-only">{name} completed on {format(day, 'EEEE d MMM')}</span>
-				<span aria-hidden="true">🟩</span>
-			{:else if missed}
-				<span class="sr-only">{name} wasn't completed on {format(day, 'EEEE d MMM')}</span>
-				<span aria-hidden="true">🟥</span>
-			{/if}
+	{#if range === 'week'}
+		{#each days as day (day.toISOString())}
+			<td class="day" title={format(day, 'EEEE d MMM')}>
+				{@render dayIcon(day)}
+			</td>
+		{/each}
+	{:else}
+		<td class="month">
+			<ul class="month-days">
+				{#each days as day (day.toISOString())}
+					<li title={format(day, 'EEEE d MMM')}>
+						{@render dayIcon(day)}
+					</li>
+				{/each}
+			</ul>
 		</td>
-	{/each}
+	{/if}
 </tr>
+
+{#snippet dayIcon(day: Date)}
+	{@const done = isDayDone(day)}
+	{@const missed = !done && isBefore(day, startOfToday())}
+	{#if done}
+		<span class="sr-only">{name} completed on {format(day, 'EEEE d MMM')}</span>
+		<span aria-hidden="true">🟩</span>
+	{:else if missed}
+		<span class="sr-only">{name} wasn't completed on {format(day, 'EEEE d MMM')}</span>
+		<span aria-hidden="true">🟥</span>
+	{:else}
+		<span class="sr-only">{name} is upcoming on {format(day, 'EEEE d MMM')}</span>
+		<span aria-hidden="true">⬜</span>
+	{/if}
+{/snippet}
 
 <style>
 	.name {
@@ -161,20 +174,6 @@
 		align-items: center;
 		padding: 0.3em 0.5em;
 		gap: 0.5ch;
-	}
-
-	.checkbox {
-		padding: 0;
-		border: none;
-		background: none;
-		font: inherit;
-		font-size: 1.2em;
-		color: var(--grey);
-		cursor: pointer;
-
-		&:disabled {
-			cursor: default;
-		}
 	}
 
 	.label {
@@ -242,6 +241,23 @@
 		width: 2.5em;
 		border-left: 1px solid var(--grey_light);
 		text-align: center;
+	}
+
+	.month {
+		border-left: 1px solid var(--grey_light);
+	}
+
+	.month-days {
+		display: flex;
+		flex-wrap: wrap;
+		margin: 0;
+		padding: 0.3em 0.5em;
+		list-style: none;
+		gap: 0.15em;
+
+		& li {
+			font-size: 0.9em;
+		}
 	}
 
 	.error {

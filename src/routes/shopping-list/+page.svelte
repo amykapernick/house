@@ -3,6 +3,7 @@
 	import fetchClientData, { setCache, getGraphqlUrl } from '$utils/fetchClientData';
 	import { resolve } from '$app/paths';
 	import { SvelteSet } from 'svelte/reactivity';
+	import CheckboxButton from '$parts/CheckboxButton.svelte';
 
 	type SubGroup = { name: string; items: any[] };
 	type StoreGroup = { name: string; items: any[]; subGroups: SubGroup[] };
@@ -205,19 +206,14 @@
 
 {#snippet itemRow(item: any)}
 	<li class:checked={item.checked}>
-		<button
+		<CheckboxButton
 			class="check-btn"
-			class:is-checked={item.checked}
-			disabled={checking.has(item.id)}
+			variant="boxed"
+			state={item.checked ? 'complete' : 'incomplete'}
+			loading={checking.has(item.id)}
 			onclick={() => toggleItem(item)}
-			aria-label={item.checked ? 'Uncheck item' : 'Check item'}
-		>
-			{#if checking.has(item.id)}
-				…
-			{:else if item.checked}
-				✓
-			{/if}
-		</button>
+			label={item.checked ? 'Uncheck item' : 'Check item'}
+		/>
 		<span class="item-row">
 			<span class="item-display">
 				{item.display}
@@ -387,36 +383,8 @@
 		}
 	}
 
-	.check-btn {
+	:global(.check-btn) {
 		flex-shrink: 0;
-		width: 1.6em;
-		height: 1.6em;
-		border: 2px solid var(--grey_light);
-		border-radius: 0.3em;
-		background: transparent;
-		cursor: pointer;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		font-size: 0.85em;
-		color: var(--grey);
-		transition: all 0.15s;
-
-		&:hover:not(:disabled) {
-			border-color: var(--purple_bright);
-			color: var(--purple_bright);
-		}
-
-		&.is-checked {
-			background: var(--green);
-			border-color: var(--green);
-			color: var(--green_text);
-		}
-
-		&:disabled {
-			opacity: 0.5;
-			cursor: wait;
-		}
 	}
 
 	.item-row {

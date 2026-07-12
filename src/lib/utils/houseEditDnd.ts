@@ -25,6 +25,7 @@ export type DraftHouseItem = {
 	originalStart?: [number, number];
 	originalSize?: [number, number] | null;
 	originalRotation?: number | null;
+	originalLinkedItem?: string | null;
 };
 
 export type HouseBoard = {
@@ -40,8 +41,8 @@ export type AreaSaveOp =
 	| { type: `delete`; id: string };
 
 export type ItemSaveOp =
-	| { type: `create`; id: string; itemType: string; area: string | null; start: [number, number]; size: [number, number] | null; rotation: number | null }
-	| { type: `update`; id: string; itemType: string; area: string | null; start: [number, number]; size: [number, number] | null; rotation: number | null }
+	| { type: `create`; id: string; itemType: string; area: string | null; start: [number, number]; size: [number, number] | null; rotation: number | null; linkedItem: string | null }
+	| { type: `update`; id: string; itemType: string; area: string | null; start: [number, number]; size: [number, number] | null; rotation: number | null; linkedItem: string | null }
 	| { type: `delete`; id: string };
 
 function pointEqual(a?: [number, number], b?: [number, number]) {
@@ -66,22 +67,41 @@ export function buildHouseSaveOps(board: HouseBoard): { areaOps: AreaSaveOp[]; i
 	}
 	for (const id of board.deletedAreaIds) areaOps.push({ type: `delete`, id });
 
-	const itemOps: ItemSaveOp[] = [];
+	// Creates before updates: an update may set linkedItem to an id that only exists as a
+	// not-yet-saved draft elsewhere in this same batch (eg. linking a brand-new item to an
+	// existing one) - Pocketbase's relation field needs that target to exist by the time the
+	// update runs, and GraphQL mutation root fields execute in the order listed.
+	const itemCreateOps: ItemSaveOp[] = [];
+	const itemUpdateOps: ItemSaveOp[] = [];
 
 	for (const item of board.items) {
 		if (item.kind === `draft`) {
-			itemOps.push({ type: `create`, id: item.id, itemType: item.type, area: item.area, start: item.start, size: item.size, rotation: item.rotation });
+			itemCreateOps.push({
+				type: `create`, id: item.id, itemType: item.type, area: item.area,
+				start: item.start, size: item.size, rotation: item.rotation, linkedItem: item.linkedItem,
+			});
 			continue;
 		}
 
 		const changed = item.area !== item.originalArea
 			|| !pointEqual(item.start, item.originalStart)
 			|| !pointEqual(item.size ?? undefined, item.originalSize ?? undefined)
-			|| item.rotation !== item.originalRotation;
+			|| item.rotation !== item.originalRotation
+			|| item.linkedItem !== item.originalLinkedItem;
 
-		if (changed) itemOps.push({ type: `update`, id: item.id, itemType: item.type, area: item.area, start: item.start, size: item.size, rotation: item.rotation });
+		if (changed) {
+			itemUpdateOps.push({
+				type: `update`, id: item.id, itemType: item.type, area: item.area,
+				start: item.start, size: item.size, rotation: item.rotation, linkedItem: item.linkedItem,
+			});
+		}
 	}
-	for (const id of board.deletedItemIds) itemOps.push({ type: `delete`, id });
+
+	const itemOps: ItemSaveOp[] = [
+		...itemCreateOps,
+		...itemUpdateOps,
+		...board.deletedItemIds.map((id): ItemSaveOp => ({ type: `delete`, id })),
+	];
 
 	return { areaOps, itemOps };
 }

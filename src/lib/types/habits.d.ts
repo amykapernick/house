@@ -1,5 +1,7 @@
 import type { User } from './global'
 
+export type HabitViewRange = `week` | `month`
+
 export type RecurrenceUnit = `day` | `week` | `month` | `year`
 
 export type RecurrenceInterval = { count: number; unit: RecurrenceUnit } | null

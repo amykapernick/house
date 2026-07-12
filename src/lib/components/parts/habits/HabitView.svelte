@@ -2,7 +2,7 @@
 	import { addDays, eachDayOfInterval, endOfMonth, format, startOfMonth, startOfWeek } from 'date-fns';
 	import { SvelteSet } from 'svelte/reactivity';
 	import HabitItem from './HabitItem.svelte';
-	import type { Habit } from '$types/habits';
+	import type { Habit, HabitViewRange } from '$types/habits';
 	import type { User } from '$types/global';
 
 	let {
@@ -10,8 +10,7 @@
 		onComplete,
 	}: { habits: Habit[]; onComplete?: (id: string) => void } = $props();
 
-	type Range = 'week' | 'month';
-	let range = $state<Range>('week');
+	let range = $state<HabitViewRange>('week');
 
 	let days = $derived.by(() => {
 		const now = new Date();
@@ -20,6 +19,10 @@
 		const weekStart = startOfWeek(now, { weekStartsOn: 1 });
 		return Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
 	});
+
+	// Month view packs every day into one icon-per-day column instead of one
+	// column per day - too many columns to read sensibly otherwise.
+	let columnCount = $derived(range === 'week' ? days.length : 1);
 
 	// A habit assigned to nobody in particular resolves to the whole family
 	// (see resolveAssignedUsers on the API), so it can appear under more than
@@ -54,15 +57,19 @@
 		<thead>
 			<tr>
 				<th></th>
-				{#each days as day (day.toISOString())}
-					<th>{range === 'week' ? format(day, 'EEE d') : format(day, 'd')}</th>
-				{/each}
+				{#if range === 'week'}
+					{#each days as day (day.toISOString())}
+						<th>{format(day, 'EEE d')}</th>
+					{/each}
+				{:else}
+					<th>{format(days[0], 'MMMM yyyy')}</th>
+				{/if}
 			</tr>
 		</thead>
 		<tbody>
 			{#each sections as { member, items } (member.slug)}
 				<tr class="member">
-					<td colspan={days.length + 1}>
+					<td colspan={columnCount + 1}>
 						<button
 							type="button"
 							class="toggle"
@@ -79,7 +86,7 @@
 				</tr>
 				{#if !collapsed.has(member.slug)}
 					{#each items as habit (habit.id)}
-						<HabitItem {...habit} {days} {onComplete} />
+						<HabitItem {...habit} {days} {range} {onComplete} />
 					{/each}
 				{/if}
 			{/each}

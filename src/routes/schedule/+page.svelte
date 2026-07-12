@@ -4,11 +4,12 @@
 	import ScheduleView from '$partials/calendar/ScheduleView.svelte';
 	import FocusTimer from '$parts/FocusTimer.svelte';
 	import FamilyFilter from '$parts/FamilyFilter.svelte';
+	import TaskList from '$parts/tasks/List.svelte';
 	import { isAuthenticated, getToken } from '$lib/auth';
-	import fetchClientData, { getGraphqlUrl } from '$utils/fetchClientData';
+	import fetchClientData, { getGraphqlUrl, setCache } from '$utils/fetchClientData';
 	import fetchFamilyMembers, { EVERYONE, isVisibleToUser, type FamilyMember } from '$utils/fetchFamilyMembers';
 	import type { ScheduleBlock, ScheduleSavePayload, RoutineDays, PaletteColour } from '$types/schedule';
-	import type { Task } from '$types/tasks';
+	import type { Task, TaskStatus } from '$types/tasks';
 
 	let blocks = $state<ScheduleBlock[]>([]);
 	let colours = $state<PaletteColour[]>([]);
@@ -31,6 +32,11 @@
 	// the family, to the whole family - so `assigned` always includes every
 	// member for an "everyone" task, and this filter needs no special case.
 	let visibleTasks = $derived(tasks.filter((task) => isVisibleToUser(task.assigned, selectedUserSlug)));
+
+	// Undated tasks (e.g. GitHub issues, which have no due date) never appear on the
+	// calendar grid itself - parseTasks in ScheduleView drops anything without a due
+	// date - so surface them in a plain list instead of hiding them entirely.
+	let undatedTasks = $derived(visibleTasks.filter((task) => !task.due));
 
 	function loadFamily() {
 		function handleFamily(members: FamilyMember[]) { familyMembers = members; }
@@ -104,6 +110,12 @@
 
 	function handleTaskCompleted(taskId: string) {
 		tasks = tasks.filter((task) => task.id !== taskId);
+	}
+
+	// Keep the shared cache in sync so a revisit within the TTL doesn't show the pre-update status.
+	function handleTaskUpdate(id: string, status: TaskStatus) {
+		tasks = tasks.map((task) => (task.id === id ? { ...task, status } : task));
+		setCache(`calendar`, { tasks, events });
 	}
 
 	function loadColours() {
@@ -253,4 +265,8 @@
 		onSave={handleSave}
 		onTaskCompleted={handleTaskCompleted}
 	/>
+	{#if undatedTasks.length}
+		<h2>Undated tasks</h2>
+		<TaskList tasks={undatedTasks} onUpdate={handleTaskUpdate} />
+	{/if}
 {/if}
