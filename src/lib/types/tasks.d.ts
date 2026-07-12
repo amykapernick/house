@@ -10,6 +10,8 @@ export type Task = {
 	allDay?: boolean | null,
 	dueLabel?: string | null,
 	status: TaskStatus,
+	// Always at least one family member - the API resolves unassigned tasks,
+	// or tasks assigned to someone outside the family, to the whole family.
 	assigned: User[]
 	subtasks: Task[],
 	parent: string[],

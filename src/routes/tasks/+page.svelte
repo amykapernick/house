@@ -3,13 +3,22 @@
 	import { isAuthenticated } from '$lib/auth';
 	import fetchTasksData from '$utils/tasksData';
 	import { setCache } from '$utils/fetchClientData';
+	import fetchFamilyMembers, { EVERYONE, isVisibleToUser, type FamilyMember } from '$utils/fetchFamilyMembers';
 	import { notificationPermission, requestNotificationPermission } from '$utils/notifications';
 	import TaskView from '$parts/tasks/TaskView.svelte';
+	import FamilyFilter from '$parts/FamilyFilter.svelte';
 	import type { Task, TaskStatus } from '$types/tasks';
 
 	let tasks = $state<Task[]>([]);
 	let loading = $state(true);
 	let permission = $state(notificationPermission());
+	let familyMembers = $state<FamilyMember[]>([]);
+	let selectedUserSlug = $state(EVERYONE);
+
+	// The API resolves unassigned tasks, or tasks assigned to someone outside
+	// the family, to the whole family - so `assigned` always includes every
+	// member for an "everyone" task, and this filter needs no special case.
+	let visibleTasks = $derived(tasks.filter((task) => isVisibleToUser(task.assigned, selectedUserSlug)));
 
 	async function enableReminders() {
 		permission = await requestNotificationPermission();
@@ -22,6 +31,9 @@
 				loading = false;
 			}
 			fetchTasksData({ onStale: handleTasks }).then(handleTasks);
+
+			function handleFamily(members: FamilyMember[]) { familyMembers = members; }
+			fetchFamilyMembers(handleFamily).then(handleFamily);
 		}
 	});
 
@@ -44,7 +56,8 @@
 {#if loading}
 	<p>Loading...</p>
 {:else}
-	<TaskView {tasks} onUpdate={handleTaskUpdate} />
+	<FamilyFilter {familyMembers} bind:selectedUserSlug />
+	<TaskView tasks={visibleTasks} onUpdate={handleTaskUpdate} />
 {/if}
 
 <style>

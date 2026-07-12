@@ -1,7 +1,9 @@
 <script lang="ts">
 	import CalendarView from '$partials/calendar/Calendar.svelte';
+	import FamilyFilter from '$parts/FamilyFilter.svelte';
 	import { isAuthenticated } from '$lib/auth';
 	import fetchClientData from '$utils/fetchClientData';
+	import fetchFamilyMembers, { EVERYONE, isVisibleToUser, type FamilyMember } from '$utils/fetchFamilyMembers';
 	import type { Task } from '$types/tasks';
 
 	let tasks = $state<Task[]>([]);
@@ -9,6 +11,15 @@
 	let icalEvents = $state<any[]>([]);
 	let mealPlans = $state<any[]>([]);
 	let loading = $state(true);
+	let familyMembers = $state<FamilyMember[]>([]);
+	let selectedUserSlug = $state(EVERYONE);
+
+	// The API resolves unassigned tasks, or tasks assigned to someone outside
+	// the family, to the whole family - so `assigned` always includes every
+	// member for an "everyone" task, and this filter needs no special case.
+	let visibleTasks = $derived(tasks.filter((task) => isVisibleToUser(task.assigned, selectedUserSlug)));
+
+	let visibleIcalEvents = $derived(icalEvents.filter((event) => isVisibleToUser(event.family, selectedUserSlug)));
 
 	function handleTaskCompleted(taskId: string) {
 		tasks = tasks.filter((task) => task.id !== taskId);
@@ -72,6 +83,9 @@
 							status
 							allDay
 							colour
+							family {
+								slug
+							}
 						}
 					}
 				`,
@@ -92,6 +106,9 @@
 					}
 				`,
 			}).then(handleCalMeals);
+
+			function handleFamily(members: FamilyMember[]) { familyMembers = members; }
+			fetchFamilyMembers(handleFamily).then(handleFamily);
 		}
 	});
 </script>
@@ -105,5 +122,6 @@
 {#if loading}
 	<p>Loading...</p>
 {:else}
-	<CalendarView {tasks} allDayEvents={events} {icalEvents} {mealPlans} onTaskCompleted={handleTaskCompleted} />
+	<FamilyFilter {familyMembers} bind:selectedUserSlug />
+	<CalendarView tasks={visibleTasks} allDayEvents={events} icalEvents={visibleIcalEvents} {mealPlans} onTaskCompleted={handleTaskCompleted} />
 {/if}

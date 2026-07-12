@@ -364,12 +364,12 @@ export type Habit = {
   assigned: Array<User>;
   completions: Array<Scalars['String']['output']>;
   due: Maybe<Scalars['String']['output']>;
-  frequency: Maybe<Scalars['String']['output']>;
   id: Maybe<Scalars['String']['output']>;
   lastCompleted: Maybe<Scalars['String']['output']>;
   link: Maybe<Scalars['String']['output']>;
   name: Maybe<Scalars['String']['output']>;
   recurrence: Maybe<Scalars['String']['output']>;
+  recurrenceInterval: Maybe<RecurrenceInterval>;
   streak: Maybe<Scalars['Int']['output']>;
 };
 
@@ -848,6 +848,7 @@ export type ParentingApproachNote = {
 };
 
 export type Platform =
+  | 'github'
   | 'notion'
   | 'todoist';
 
@@ -1114,6 +1115,11 @@ export type RecommendedSetup = {
   pj_layer: Scalars['String']['output'];
   reasoning: Scalars['String']['output'];
   sleep_sack_tog: Scalars['Float']['output'];
+};
+
+export type RecurrenceInterval = {
+  count: Scalars['Int']['output'];
+  unit: Scalars['String']['output'];
 };
 
 export type Resource = {

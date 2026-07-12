@@ -3,12 +3,12 @@
 	import { SvelteMap } from 'svelte/reactivity';
 	import ScheduleView from '$partials/calendar/ScheduleView.svelte';
 	import FocusTimer from '$parts/FocusTimer.svelte';
+	import FamilyFilter from '$parts/FamilyFilter.svelte';
 	import { isAuthenticated, getToken } from '$lib/auth';
 	import fetchClientData, { getGraphqlUrl } from '$utils/fetchClientData';
+	import fetchFamilyMembers, { EVERYONE, isVisibleToUser, type FamilyMember } from '$utils/fetchFamilyMembers';
 	import type { ScheduleBlock, ScheduleSavePayload, RoutineDays, PaletteColour } from '$types/schedule';
 	import type { Task } from '$types/tasks';
-
-	const EVERYONE = `everyone`;
 
 	let blocks = $state<ScheduleBlock[]>([]);
 	let colours = $state<PaletteColour[]>([]);
@@ -18,35 +18,23 @@
 	let tasks = $state<Task[]>([]);
 	let events = $state<any[]>([]);
 	let icalEvents = $state<any[]>([]);
-	let familyMembers = $state<{ slug: string; name: string }[]>([]);
+	let familyMembers = $state<FamilyMember[]>([]);
 	let selectedUserSlug = $state(EVERYONE);
 
-	let visibleIcalEvents = $derived(
-		selectedUserSlug === EVERYONE
-			? icalEvents
-			: icalEvents.filter((event) => event.family?.some((member: any) => member.slug === selectedUserSlug))
-	);
+	let visibleIcalEvents = $derived(icalEvents.filter((event) => isVisibleToUser(event.family, selectedUserSlug)));
 
 	let visibleBlocks = $derived(
-		selectedUserSlug === EVERYONE
-			? blocks
-			: blocks.filter((block) => block.family?.slug === selectedUserSlug)
+		blocks.filter((block) => isVisibleToUser(block.family ? [block.family] : [], selectedUserSlug))
 	);
 
+	// The API resolves unassigned tasks, or tasks assigned to someone outside
+	// the family, to the whole family - so `assigned` always includes every
+	// member for an "everyone" task, and this filter needs no special case.
+	let visibleTasks = $derived(tasks.filter((task) => isVisibleToUser(task.assigned, selectedUserSlug)));
+
 	function loadFamily() {
-		function handleFamily(res: any) { familyMembers = res.users ?? []; }
-		fetchClientData({
-			cacheKey: 'family',
-			onStale: handleFamily,
-			gqlQuery: `
-				query {
-					users {
-						slug
-						name
-					}
-				}
-			`,
-		}).then(handleFamily);
+		function handleFamily(members: FamilyMember[]) { familyMembers = members; }
+		fetchFamilyMembers(handleFamily).then(handleFamily);
 	}
 
 	function loadCalendarItems() {
@@ -253,25 +241,11 @@
 {#if loading}
 	<p>Loading...</p>
 {:else}
-	{#if familyMembers.length}
-		<fieldset class="user_filter">
-			<legend>Filter by family member</legend>
-			<label>
-				<input type="radio" name="schedule-user-filter" value={EVERYONE} bind:group={selectedUserSlug} />
-				Everyone
-			</label>
-			{#each familyMembers as member (member.slug)}
-				<label>
-					<input type="radio" name="schedule-user-filter" value={member.slug} bind:group={selectedUserSlug} />
-					{member.name}
-				</label>
-			{/each}
-		</fieldset>
-	{/if}
+	<FamilyFilter {familyMembers} bind:selectedUserSlug />
 	<ScheduleView
 		blocks={visibleBlocks}
 		{colours}
-		{tasks}
+		tasks={visibleTasks}
 		{events}
 		icalEvents={visibleIcalEvents}
 		readOnly={selectedUserSlug === EVERYONE}
@@ -280,26 +254,3 @@
 		onTaskCompleted={handleTaskCompleted}
 	/>
 {/if}
-
-<style>
-	.user_filter {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: center;
-		gap: 1em;
-		border: none;
-		padding: 0;
-		margin-bottom: 1em;
-
-		legend {
-			font-weight: bold;
-			padding: 0;
-		}
-
-		label {
-			display: flex;
-			align-items: center;
-			gap: 0.3em;
-		}
-	}
-</style>

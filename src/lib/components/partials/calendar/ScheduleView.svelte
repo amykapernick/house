@@ -138,7 +138,7 @@
 			end: new Date(event.end),
 			allDay: event.allDay ?? false,
 			editable: false,
-			backgroundColor: event.type === 'task' ? 'var(--purple_bright)' : 'var(--blue)',
+			backgroundColor: 'colour' in event && event.colour ? `var(--${event.colour})` : event.type === 'task' ? 'var(--purple_bright)' : 'var(--blue)',
 			extendedProps: {
 				type: event.type,
 				link: 'link' in event ? event.link : undefined,

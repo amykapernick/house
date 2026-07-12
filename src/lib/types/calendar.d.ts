@@ -15,6 +15,7 @@ export type EventBase = {
 	start: Date,
 	end: Date,
 	allDay?: boolean
+	colour?: string | null
 	resource?: (User | Calendar)[],
 	type: `event` | `task` | `meal`
 	editable?: boolean

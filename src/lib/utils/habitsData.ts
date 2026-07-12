@@ -21,10 +21,19 @@ export default async function fetchHabitsData(props: FetchHabitsDataProps = {}):
 					name
 					due
 					recurrence
-					frequency
+					recurrenceInterval {
+						count
+						unit
+					}
 					streak
 					lastCompleted
 					link
+					assigned {
+						slug
+						name
+						profile
+					}
+					completions
 				}
 			}
 		`,

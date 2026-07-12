@@ -57,4 +57,31 @@ describe(`parseTasks`, () => {
 
 		expect(result.type).toBe(`task`);
 	});
+
+	it(`uses the single assignee's colour when assigned to exactly one family member`, () => {
+		const [result] = parseTasks([task({ assigned: [{ slug: `amy`, name: `Amy`, colour: `pink` } as any] })]);
+
+		expect(result.colour).toBe(`pink`);
+	});
+
+	it(`uses the shared household colour when assigned to the whole family`, () => {
+		const tasks = [
+			task({
+				assigned: [
+					{ slug: `amy`, name: `Amy`, colour: `pink` } as any,
+					{ slug: `dan`, name: `Dan`, colour: `blue` } as any,
+				],
+			}),
+		];
+
+		const [result] = parseTasks(tasks);
+
+		expect(result.colour).toBe(`kapers-crewe`);
+	});
+
+	it(`uses the shared household colour when assigned is empty`, () => {
+		const [result] = parseTasks([task({ assigned: [] })]);
+
+		expect(result.colour).toBe(`kapers-crewe`);
+	});
 });

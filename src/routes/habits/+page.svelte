@@ -3,11 +3,20 @@
 	import { isAuthenticated } from '$lib/auth';
 	import fetchHabitsData from '$utils/habitsData';
 	import { setCache } from '$utils/fetchClientData';
+	import fetchFamilyMembers, { EVERYONE, isVisibleToUser, type FamilyMember } from '$utils/fetchFamilyMembers';
 	import HabitView from '$parts/habits/HabitView.svelte';
+	import FamilyFilter from '$parts/FamilyFilter.svelte';
 	import type { Habit } from '$types/habits';
 
 	let habits = $state<Habit[]>([]);
 	let loading = $state(true);
+	let familyMembers = $state<FamilyMember[]>([]);
+	let selectedUserSlug = $state(EVERYONE);
+
+	// The API resolves unassigned habits, or habits assigned to someone outside
+	// the family, to the whole family - so `assigned` always includes every
+	// member for an "everyone" habit, and this filter needs no special case.
+	let visibleHabits = $derived(habits.filter((habit) => isVisibleToUser(habit.assigned, selectedUserSlug)));
 
 	$effect(() => {
 		if ($isAuthenticated) {
@@ -16,6 +25,9 @@
 				loading = false;
 			}
 			fetchHabitsData({ onStale: handleHabits }).then(handleHabits);
+
+			function handleFamily(members: FamilyMember[]) { familyMembers = members; }
+			fetchFamilyMembers(handleFamily).then(handleFamily);
 		}
 	});
 
@@ -39,5 +51,6 @@
 {#if loading}
 	<p>Loading...</p>
 {:else}
-	<HabitView {habits} onComplete={handleHabitComplete} />
+	<FamilyFilter {familyMembers} bind:selectedUserSlug />
+	<HabitView habits={visibleHabits} onComplete={handleHabitComplete} />
 {/if}

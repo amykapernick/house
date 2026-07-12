@@ -22,6 +22,7 @@ export default async function fetchTasksData(props: FetchTasksDataProps = {}): P
 					id
 					name
 					assigned {
+						slug
 						name
 						profile
 					}

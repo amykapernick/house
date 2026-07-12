@@ -45,7 +45,7 @@
 	}
 
 	async function completeTask() {
-		if (completed === 'complete' || saving) return;
+		if (completed === 'complete' || saving || platform === 'github') return;
 		saving = true;
 		actionError = '';
 
@@ -92,7 +92,7 @@
 	<button
 		type="button"
 		class="checkbox {completed}"
-		disabled={completed === 'complete' || saving}
+		disabled={completed === 'complete' || saving || platform === 'github'}
 		onclick={completeTask}
 		aria-label={completed === 'complete' ? 'Task complete' : 'Mark task complete'}
 	>
