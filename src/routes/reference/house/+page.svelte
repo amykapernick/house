@@ -211,6 +211,11 @@
 		if (area) area.start = start;
 	}
 
+	function handleAreaResize(id: string, newSize: [number, number]) {
+		const area = houseBoard.areas.find((a) => a.id === id);
+		if (area) area.size = newSize;
+	}
+
 	function handleItemDrag(id: string, start: [number, number]) {
 		const item = houseBoard.items.find((i) => i.id === id);
 		if (item) item.start = start;
@@ -225,6 +230,7 @@
 	let areaModalOpen = $state(false);
 	let areaModalMode = $state<`create` | `edit`>(`create`);
 	let areaModalId = $state(``);
+	let areaModalEntityLabel = $state<string | null>(null);
 	let areaModalStartX = $state(0);
 	let areaModalStartY = $state(0);
 	let areaModalSizeWidth = $state(100);
@@ -232,9 +238,24 @@
 	let areaModalColour = $state(``);
 	let editingAreaId = $state<string | null>(null);
 
-	function openCreateAreaModal() {
+	let areaPickerOpen = $state(false);
+	let availableAreaEntities = $state<{ id: string; name: string }[]>([]);
+
+	async function openAreaPicker() {
+		saveError = ``;
+		const res = await fetchClientData({
+			skipCache: true,
+			gqlQuery: `query { availableHouseAreas { id name } }`,
+		});
+		availableAreaEntities = res.availableHouseAreas ?? [];
+		areaPickerOpen = true;
+	}
+
+	function pickAreaEntity(entity: (typeof availableAreaEntities)[number]) {
+		areaPickerOpen = false;
 		areaModalMode = `create`;
-		areaModalId = ``;
+		areaModalId = entity.id;
+		areaModalEntityLabel = entity.name;
 		const [x, y] = lastClickedPoint ?? [MAP_SIZE[0] / 2 - 50, MAP_SIZE[1] / 2 - 50];
 		areaModalStartX = Math.round(x);
 		areaModalStartY = Math.round(y);
@@ -250,6 +271,7 @@
 		if (!area) return;
 		areaModalMode = `edit`;
 		areaModalId = area.id;
+		areaModalEntityLabel = null;
 		areaModalStartX = Math.round(area.start[0]);
 		areaModalStartY = Math.round(area.start[1]);
 		areaModalSizeWidth = Math.round(area.size[0]);
@@ -265,7 +287,7 @@
 		const colour = areaModalColour || null;
 
 		if (areaModalMode === `create`) {
-			houseBoard.areas.push({ id: areaModalId.trim(), kind: `draft`, start, size, colour });
+			houseBoard.areas.push({ id: areaModalId, kind: `draft`, start, size, colour });
 		}
 		else if (editingAreaId) {
 			const area = houseBoard.areas.find((a) => a.id === editingAreaId);
@@ -472,7 +494,7 @@
 		{#if !editMode}
 			<button type="button" onclick={startEditMode}>Edit map</button>
 		{:else}
-			<button type="button" onclick={openCreateAreaModal}>Add area</button>
+			<button type="button" onclick={openAreaPicker}>Add area</button>
 			<button type="button" onclick={openItemPicker}>Add item</button>
 			{#if dirty}<span class="unsaved">Unsaved changes</span>{/if}
 			<button type="button" onclick={handleSaveHouse} disabled={saving || !dirty}>
@@ -492,6 +514,7 @@
 		items={editModeItems}
 		editMode
 		onAreaDrag={handleAreaDrag}
+		onAreaResize={handleAreaResize}
 		onItemDrag={handleItemDrag}
 		onAreaClick={openEditAreaModal}
 		onItemClick={openEditItemModal}
@@ -519,10 +542,26 @@
 	<button type="button" onclick={() => (pickerOpen = false)}>Cancel</button>
 </Modal>
 
+<Modal bind:open={areaPickerOpen} title="Add area">
+	{#if availableAreaEntities.length === 0}
+		<p>Nothing left to add - every configured Home Assistant area already has a house map area.</p>
+	{:else}
+		<ul class="picker_list">
+			{#each availableAreaEntities as entity (entity.id)}
+				<li>
+					<button type="button" onclick={() => pickAreaEntity(entity)}>{entity.name}</button>
+				</li>
+			{/each}
+		</ul>
+	{/if}
+	<button type="button" onclick={() => (areaPickerOpen = false)}>Cancel</button>
+</Modal>
+
 <HouseAreaModal
 	bind:open={areaModalOpen}
 	mode={areaModalMode}
-	bind:id={areaModalId}
+	id={areaModalId}
+	entityLabel={areaModalEntityLabel}
 	bind:startX={areaModalStartX}
 	bind:startY={areaModalStartY}
 	bind:sizeWidth={areaModalSizeWidth}

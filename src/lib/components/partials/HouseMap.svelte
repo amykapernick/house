@@ -30,6 +30,7 @@
 		items = [],
 		editMode = false,
 		onAreaDrag,
+		onAreaResize,
 		onItemDrag,
 		onAreaClick,
 		onItemClick,
@@ -39,12 +40,14 @@
 		items: Item[];
 		editMode?: boolean;
 		onAreaDrag?: (id: string, start: [number, number]) => void;
+		onAreaResize?: (id: string, size: [number, number]) => void;
 		onItemDrag?: (id: string, start: [number, number]) => void;
 		onAreaClick?: (id: string) => void;
 		onItemClick?: (id: string) => void;
 		onMapClick?: (point: [number, number]) => void;
 	} = $props();
 	const size = [1189, 1593];
+	const MIN_AREA_SIZE = 20;
 
 	const ItemIcons: Record<string, any> = {
 		aircon: Aircon,
@@ -76,7 +79,7 @@
 	let containerEl: HTMLDivElement | undefined = $state();
 
 	type DragState = {
-		kind: `area` | `item`;
+		kind: `area` | `area-resize` | `item`;
 		id: string;
 		offsetX: number;
 		offsetY: number;
@@ -116,9 +119,9 @@
 	}
 
 	function pointFromEvent(e: PointerEvent, state: DragState) {
-		return state.kind === `area`
-			? svgPoint(e.clientX, e.clientY)
-			: itemPoint(e.clientX, e.clientY, state.containerRect!);
+		return state.kind === `item`
+			? itemPoint(e.clientX, e.clientY, state.containerRect!)
+			: svgPoint(e.clientX, e.clientY);
 	}
 
 	function startDrag(e: PointerEvent, kind: `area` | `item`, id: string, start: number[]) {
@@ -141,6 +144,30 @@
 		(e.currentTarget as Element).setPointerCapture(e.pointerId);
 	}
 
+	// Tracks the offset from the pointer to the area's *current* bottom-right corner, then on
+	// move recomputes that corner and derives a new size from it - same offset-capture pattern
+	// as startDrag, just anchored to the opposite corner instead of the top-left.
+	function startAreaResize(e: PointerEvent, area: Area) {
+		if (!editMode) return;
+		e.preventDefault();
+
+		const point = svgPoint(e.clientX, e.clientY);
+		const cornerX = area.start[0] + area.size[0];
+		const cornerY = area.start[1] + area.size[1];
+
+		dragState = {
+			kind: `area-resize`,
+			id: area.id,
+			offsetX: point.x - cornerX,
+			offsetY: point.y - cornerY,
+			startClientX: e.clientX,
+			startClientY: e.clientY,
+			moved: false,
+			containerRect: null,
+		};
+		(e.currentTarget as Element).setPointerCapture(e.pointerId);
+	}
+
 	function handlePointerMove(e: PointerEvent) {
 		if (!dragState) return;
 
@@ -152,6 +179,16 @@
 
 		e.preventDefault();
 		const point = pointFromEvent(e, dragState);
+
+		if (dragState.kind === `area-resize`) {
+			const area = areas.find((a) => a.id === dragState!.id);
+			if (!area) return;
+			const cornerX = clamp(point.x - dragState.offsetX, area.start[0] + MIN_AREA_SIZE, size[0]);
+			const cornerY = clamp(point.y - dragState.offsetY, area.start[1] + MIN_AREA_SIZE, size[1]);
+			onAreaResize?.(dragState.id, [cornerX - area.start[0], cornerY - area.start[1]]);
+			return;
+		}
+
 		const x = clamp(point.x - dragState.offsetX, 0, size[0]);
 		const y = clamp(point.y - dragState.offsetY, 0, size[1]);
 
@@ -159,8 +196,8 @@
 		else onItemDrag?.(dragState.id, [x, y]);
 	}
 
-	function handlePointerUp(kind: `area` | `item`, id: string) {
-		if (!dragState || dragState.id !== id) {
+	function handlePointerUp(kind: `area` | `area-resize` | `item`, id: string) {
+		if (!dragState || dragState.id !== id || dragState.kind !== kind) {
 			dragState = null;
 			return;
 		}
@@ -168,7 +205,7 @@
 		const wasDrag = dragState.moved;
 		dragState = null;
 
-		if (!wasDrag) {
+		if (!wasDrag && kind !== `area-resize`) {
 			if (kind === `area`) onAreaClick?.(id);
 			else onItemClick?.(id);
 		}
@@ -217,6 +254,19 @@
 						{area.name}
 					</text>
 				</a>
+				{#if editMode}
+					<!-- svelte-ignore a11y_no_static_element_interactions -->
+					<circle
+						class="resize_handle"
+						cx={area.start[0] + area.size[0]}
+						cy={area.start[1] + area.size[1]}
+						r="10"
+						onpointerdown={(e) => startAreaResize(e, area)}
+						onpointermove={handlePointerMove}
+						onpointerup={() => handlePointerUp('area-resize', area.id)}
+						onpointercancel={() => (dragState = null)}
+					/>
+				{/if}
 			</g>
 		{/each}
 	</svg>
@@ -306,6 +356,14 @@
 			cursor: grab;
 			touch-action: none;
 		}
+	}
+
+	.resize_handle {
+		fill: var(--colour);
+		stroke: var(--background);
+		stroke-width: 2;
+		cursor: nwse-resize;
+		touch-action: none;
 	}
 
 	.label {

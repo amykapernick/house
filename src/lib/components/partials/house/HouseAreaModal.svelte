@@ -5,7 +5,8 @@
 	let {
 		open = $bindable(false),
 		mode,
-		id = $bindable(``),
+		id,
+		entityLabel = null,
 		startX = $bindable(0),
 		startY = $bindable(0),
 		sizeWidth = $bindable(100),
@@ -19,7 +20,8 @@
 	}: {
 		open?: boolean;
 		mode: `create` | `edit`;
-		id?: string;
+		id: string;
+		entityLabel?: string | null;
 		startX?: number;
 		startY?: number;
 		sizeWidth?: number;
@@ -33,7 +35,6 @@
 	} = $props();
 
 	let modalTitle = $derived(mode === `create` ? `Add area` : `Edit area`);
-	let valid = $derived(mode === `edit` || id.trim().length > 0);
 
 	let colourSelectOptions = $derived([
 		{ value: ``, label: `None` },
@@ -43,10 +44,7 @@
 
 <Modal bind:open title={modalTitle}>
 	{#if mode === `create`}
-		<label class="field">
-			Home Assistant area id
-			<input type="text" bind:value={id} placeholder="e.g. amy_s_office, or anything for a purely visual area" />
-		</label>
+		<p class="entity_label">{entityLabel ?? id}</p>
 	{/if}
 
 	<div class="field-row">
@@ -79,7 +77,7 @@
 	{#if error}<p class="error">{error}</p>{/if}
 
 	<div class="actions">
-		<button onclick={onSave} disabled={!valid || saving}>
+		<button onclick={onSave} disabled={saving}>
 			{saving ? `Saving…` : mode === `create` ? `Add` : `Save`}
 		</button>
 		<button onclick={() => (open = false)} disabled={saving}>Cancel</button>
@@ -91,6 +89,11 @@
 
 <style>
 	@import '@mixins';
+
+	.entity_label {
+		margin: 0 0 1em;
+		font-weight: 600;
+	}
 
 	.field {
 		display: flex;
