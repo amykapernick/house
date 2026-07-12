@@ -78,6 +78,11 @@ export type AuslanSign = {
   tip: Scalars['String']['output'];
 };
 
+export type AvailableHouseArea = {
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+};
+
 export type AvailableHouseEntity = {
   entityId: Scalars['String']['output'];
   friendlyName: Maybe<Scalars['String']['output']>;
@@ -871,6 +876,7 @@ export type Project = {
 export type Query = {
   allergens: Array<Allergen>;
   areas: Maybe<Array<Maybe<Area>>>;
+  availableHouseAreas: Array<AvailableHouseArea>;
   availableHouseItems: Array<AvailableHouseEntity>;
   budget: Maybe<Array<Maybe<BudgetItem>>>;
   budgetBuckets: Maybe<Array<Maybe<BudgetBucket>>>;
