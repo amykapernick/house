@@ -25,7 +25,25 @@
 	import WashingMachine from '$img/house/washing-machine.svg?component';
 	import WifiRouter from '$img/house/router.svg?component';
 
-	let { areas = [], items = [] }: { areas: Area[]; items: Item[] } = $props();
+	let {
+		areas = [],
+		items = [],
+		editMode = false,
+		onAreaDrag,
+		onItemDrag,
+		onAreaClick,
+		onItemClick,
+		onMapClick,
+	}: {
+		areas: Area[];
+		items: Item[];
+		editMode?: boolean;
+		onAreaDrag?: (id: string, start: [number, number]) => void;
+		onItemDrag?: (id: string, start: [number, number]) => void;
+		onAreaClick?: (id: string) => void;
+		onItemClick?: (id: string) => void;
+		onMapClick?: (point: [number, number]) => void;
+	} = $props();
 	const size = [1189, 1593];
 
 	const ItemIcons: Record<string, any> = {
@@ -53,22 +71,147 @@
 		washing_machine: WashingMachine,
 		wifi_router: WifiRouter,
 	};
+
+	let svgEl: SVGSVGElement | undefined = $state();
+	let containerEl: HTMLDivElement | undefined = $state();
+
+	type DragState = {
+		kind: `area` | `item`;
+		id: string;
+		offsetX: number;
+		offsetY: number;
+		startClientX: number;
+		startClientY: number;
+		moved: boolean;
+		containerRect: DOMRect | null;
+	};
+
+	let dragState = $state<DragState | null>(null);
+
+	// A pointer move under this distance is still treated as a click (opens the edit modal)
+	// rather than a drag - without this, even a stationary click would jitter start by a pixel.
+	const CLICK_THRESHOLD_PX = 4;
+
+	function clamp(n: number, min: number, max: number) {
+		return Math.min(Math.max(n, min), max);
+	}
+
+	// Areas are native SVG <rect>s, so the SVG's own screen-to-viewBox transform is exact
+	// regardless of how the container is scaled/letterboxed by its responsive CSS sizing.
+	function svgPoint(clientX: number, clientY: number) {
+		const ctm = svgEl?.getScreenCTM();
+		if (!ctm) return { x: 0, y: 0 };
+		const point = new DOMPoint(clientX, clientY).matrixTransform(ctm.inverse());
+		return { x: point.x, y: point.y };
+	}
+
+	// Items are percentage-positioned HTML siblings of the <svg>, not inside it, so there's no
+	// CTM to use - convert via the container's live rendered box instead. Read once at drag
+	// start (passed in as `rect`), not on every move, since layout can't reflow mid-drag.
+	function itemPoint(clientX: number, clientY: number, rect: DOMRect) {
+		return {
+			x: ((clientX - rect.left) / rect.width) * size[0],
+			y: ((clientY - rect.top) / rect.height) * size[1],
+		};
+	}
+
+	function pointFromEvent(e: PointerEvent, state: DragState) {
+		return state.kind === `area`
+			? svgPoint(e.clientX, e.clientY)
+			: itemPoint(e.clientX, e.clientY, state.containerRect!);
+	}
+
+	function startDrag(e: PointerEvent, kind: `area` | `item`, id: string, start: number[]) {
+		if (!editMode) return;
+		e.preventDefault();
+
+		const containerRect = kind === `item` ? (containerEl?.getBoundingClientRect() ?? null) : null;
+		const point = kind === `area` ? svgPoint(e.clientX, e.clientY) : itemPoint(e.clientX, e.clientY, containerRect!);
+
+		dragState = {
+			kind,
+			id,
+			offsetX: point.x - start[0],
+			offsetY: point.y - start[1],
+			startClientX: e.clientX,
+			startClientY: e.clientY,
+			moved: false,
+			containerRect,
+		};
+		(e.currentTarget as Element).setPointerCapture(e.pointerId);
+	}
+
+	function handlePointerMove(e: PointerEvent) {
+		if (!dragState) return;
+
+		if (!dragState.moved) {
+			const distance = Math.hypot(e.clientX - dragState.startClientX, e.clientY - dragState.startClientY);
+			if (distance <= CLICK_THRESHOLD_PX) return;
+			dragState.moved = true;
+		}
+
+		e.preventDefault();
+		const point = pointFromEvent(e, dragState);
+		const x = clamp(point.x - dragState.offsetX, 0, size[0]);
+		const y = clamp(point.y - dragState.offsetY, 0, size[1]);
+
+		if (dragState.kind === `area`) onAreaDrag?.(dragState.id, [x, y]);
+		else onItemDrag?.(dragState.id, [x, y]);
+	}
+
+	function handlePointerUp(kind: `area` | `item`, id: string) {
+		if (!dragState || dragState.id !== id) {
+			dragState = null;
+			return;
+		}
+
+		const wasDrag = dragState.moved;
+		dragState = null;
+
+		if (!wasDrag) {
+			if (kind === `area`) onAreaClick?.(id);
+			else onItemClick?.(id);
+		}
+	}
+
+	function handleMapClick(e: MouseEvent) {
+		// Only place a new item when the click lands on the map background itself, not a
+		// bubbled click from an area rect (which has its own click handling above).
+		if (!editMode || !onMapClick || e.target !== e.currentTarget) return;
+
+		const point = svgPoint(e.clientX, e.clientY);
+		onMapClick([point.x, point.y]);
+	}
 </script>
 
-<div class="container" style="--width: {size[0]}; --height: {size[1]}">
-	<svg class="map" viewBox="0 0 {size.join(' ')}" fill="none">
+<div class="container" style="--width: {size[0]}; --height: {size[1]}" bind:this={containerEl}>
+	<!-- Placing a new item/area by clicking the map background is a spatial drag-editing
+		affordance with no keyboard equivalent in this pass; the toolbar buttons remain fully
+		keyboard-operable for add/edit/delete. -->
+	<!-- svelte-ignore a11y_click_events_have_key_events -->
+	<!-- svelte-ignore a11y_no_static_element_interactions -->
+	<svg class="map" viewBox="0 0 {size.join(' ')}" fill="none" bind:this={svgEl} onclick={handleMapClick}>
 		{#each areas as area (area.id)}
 			<g class="area" style="--colour: var(--{area.colour ?? 'primary'})">
 				<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- area.link is an external smart-home control URL, not an internal route -->
-				<a href={area.link} target="_blank">
+				<a href={editMode ? undefined : area.link} target={editMode ? undefined : '_blank'}>
+					<!-- Drag-to-reposition in edit mode; the wrapping <a> (external HA link,
+						non-edit mode) and the edit modal opened by a non-drag click remain
+						keyboard-operable. -->
+					<!-- svelte-ignore a11y_no_static_element_interactions -->
 					<rect
 						class="space"
+						class:draggable={editMode}
 						rx="0"
 						ry="0"
 						x={area.start[0]}
 						y={area.start[1]}
 						width={area.size[0]}
 						height={area.size[1]}
+						onpointerdown={(e) => startDrag(e, 'area', area.id, area.start)}
+						onpointermove={handlePointerMove}
+						onpointerup={() => handlePointerUp('area', area.id)}
+						onpointercancel={() => (dragState = null)}
 					/>
 					<text class="label" x={area.start[0] + 10} y={area.start[1] + 40}>
 						{area.name}
@@ -77,7 +220,7 @@
 			</g>
 		{/each}
 	</svg>
-	{#each items as item (item.area.id + '-' + item.type + '-' + item.start.join(','))}
+	{#each items as item (item.id)}
 		{@const itemSize = item.size ?? ItemDefaults[item.type]?.size ?? [30, 30]}
 		{@const Icon = ItemIcons[item.type]}
 		{@const power = !item.state?.length
@@ -91,11 +234,16 @@
 		<!-- eslint-disable svelte/no-navigation-without-resolve -->
 		<a
 			class="item"
-			href={item.link}
+			class:draggable={editMode}
+			href={editMode ? undefined : item.link}
 			style="--width: {(itemSize[0] / size[0]) * 100}%; --height: {(itemSize[1] / size[1]) * 100}%; --offset_x: {(item.start[0] / size[0]) * 100}%; --offset_y: {(item.start[1] / size[1]) * 100}%; --rotate: {item.rotation ? `${item.rotation}deg` : '0deg'}"
+			onpointerdown={(e) => startDrag(e, 'item', item.id, item.start)}
+			onpointermove={handlePointerMove}
+			onpointerup={() => handlePointerUp('item', item.id)}
+			onpointercancel={() => (dragState = null)}
 		>
 			{#if Icon}<Icon class="item-icon" data-power={power} />{/if}
-			<span class="sr-only">Control {item.area.name} {item.type}{power ? ` (${power})` : ''}</span>
+			<span class="sr-only">Control {item.area?.name ?? 'Unassigned'} {item.type}{power ? ` (${power})` : ''}</span>
 		</a>
 		<!-- eslint-enable svelte/no-navigation-without-resolve -->
 	{/each}
@@ -153,6 +301,11 @@
 		stroke: var(--colour);
 		fill: var(--colour);
 		fill-opacity: 0.2;
+
+		&.draggable {
+			cursor: grab;
+			touch-action: none;
+		}
 	}
 
 	.label {
@@ -201,6 +354,11 @@
 		width: var(--width);
 		height: var(--height);
 		transform: rotate(var(--rotate));
+
+		&.draggable {
+			cursor: grab;
+			touch-action: none;
+		}
 
 		& :global(.item-icon) {
 			width: 100%;

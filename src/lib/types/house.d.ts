@@ -1,6 +1,6 @@
 export type Area = {
 	name: string
-	id: AreaId
+	id: string
 	start: number[]
 	size: number[]
 	link?: string
@@ -9,19 +9,19 @@ export type Area = {
 	info: Info[]
 }
 
-type AreaId = `bedroom_main` | `office_amy` | `office_dan` | `kitchen` | `living` | `dining`
-
 export type Item = {
+	id: string
 	type: ItemType
 	start: number[]
 	size?: number[]
 	link?: string
 	rotation?: number
-	area: Area
+	area?: Area | null
 	state?: ItemState[]
+	linkedItem?: Item | null
 }
 
-export type ItemType = `fan` | `aircon` | `tv` | `fan_pedestol` | `oven` | `washing_machine` | `bed` | `fridge` | `fire` | `switch_light` | `light` | `wifi_router` | `robot_vacuum` | `lamp` | `computer` | `laptop` | `pi` | `monitor` | `camera` | `alarm` | `fan_light` | `doorbell`
+export type ItemType = `fan` | `aircon` | `tv` | `fan_pedestol` | `oven` | `washing_machine` | `bed` | `fridge` | `fire` | `switch_light` | `light` | `wifi_router` | `robot_vacuum` | `lamp` | `computer` | `laptop` | `pi` | `monitor` | `camera` | `alarm` | `fan_light` | `doorbell` | `speaker`
 
 export type ItemState = {
 	type?: ItemType
