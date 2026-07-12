@@ -3,11 +3,16 @@
 	import { resolve } from '$app/paths';
 	import { addDays, format, isToday, isTomorrow, parseISO } from 'date-fns';
 	import { SvelteMap } from 'svelte/reactivity';
-	import fetchClientData from '$utils/fetchClientData';
+	import fetchClientData, { clearCache, getGraphqlUrl } from '$utils/fetchClientData';
 	import { getRecentPages } from '$utils/recentPages';
+	import { CONTENT_CACHE_TTL, contentEntriesQuery, contentIndexQuery } from '$utils/content';
+	import { getDiscoverableRoutes } from '$utils/routes';
+	import { getToken } from '$lib/auth';
+	import { routeRequiresAuth } from '$lib/navigation';
 	import type { MenuItem } from '$types/global';
 	import type { Component } from 'svelte';
 	import RecipeIcon from '$img/icons/recipe-book-47.svg?component';
+	import ContentIcon from './ContentIcon.svelte';
 
 	let {
 		menuItems,
@@ -23,12 +28,29 @@
 		key: string;
 		label: string;
 		sublabel?: string;
-		section: `Recent` | `Pages` | `Recipes`;
+		section: `Recent` | `Pages` | `Content` | `Recipes`;
 		link: string;
-		Icon: Component<Record<string, any>>;
+		Icon?: Component<Record<string, any>>;
+		contentIcon?: { icon?: string | null; iconType?: string | null };
 	};
 
 	type PlannedMeal = { date: string; entryType: string };
+	type QuickAddType = `task` | `shop`;
+
+	const QUICK_ADD_LABELS: Record<QuickAddType, { hint: string; success: string; error: string; mutation: string }> = {
+		task: {
+			hint: `Add a task to the Home project · optional "| due date" e.g. "tomorrow 5pm"`,
+			success: `Task added`,
+			error: `Failed to add task.`,
+			mutation: `createTask`,
+		},
+		shop: {
+			hint: `Add an item to the shopping list`,
+			success: `Added to shopping list`,
+			error: `Failed to add item.`,
+			mutation: `createShoppingItem`,
+		},
+	};
 
 	const RECIPE_MIN_CHARS = 2;
 	const RECIPE_DEBOUNCE_MS = 250;
@@ -44,7 +66,36 @@
 	let recentLinks = $state<string[]>([]);
 	let recipeResults = $state<Result[]>([]);
 	let recipesLoading = $state(false);
+	// Not in the main nav (kept out of everyday browsing), but small enough to
+	// hold client-side and filter locally rather than a live per-keystroke
+	// search like recipes get. Generic over every /content/{slug} entry (e.g.
+	// Possums), not any one entry in particular - a new entry in Notion's App
+	// Content database shows up here with no code change.
+	type ContentEntryResult = { slug: string; title: string; icon?: string | null; iconType?: string | null };
+	let contentEntries = $state<ContentEntryResult[]>([]);
+	let contentPages = $state<{ entrySlug: string; pageSlug: string; title: string; group: string }[]>([]);
 	let upcomingMealPlan = new SvelteMap<string, PlannedMeal>();
+	let quickAddSubmitting = $state(false);
+	let quickAddError = $state(``);
+	let quickAddSuccess = $state(``);
+
+	const quickAddMatch = $derived.by(() => {
+		const match = /^\/(task|shop)\b\s*(.*)$/is.exec(query.trimStart());
+		if (!match) return null;
+		const type = match[1].toLowerCase() as QuickAddType;
+		const rest = match[2];
+
+		if (type === `task`) {
+			// "Buy milk | tomorrow 5pm" - everything after the first "|" is a
+			// natural-language due date/time, parsed server-side by Todoist.
+			const pipeIndex = rest.indexOf(`|`);
+			const content = (pipeIndex === -1 ? rest : rest.slice(0, pipeIndex)).trim();
+			const due = pipeIndex === -1 ? undefined : rest.slice(pipeIndex + 1).trim() || undefined;
+			return { type, content, due };
+		}
+
+		return { type, content: rest.trim(), due: undefined };
+	});
 
 	function flattenPages(items: MenuItem[], sublabel?: string): Result[] {
 		return items.flatMap((item) => {
@@ -54,9 +105,29 @@
 		});
 	}
 
-	const pages = $derived(flattenPages(menuItems));
+	// File-system routes never linked from the header nav (e.g. /reference/house,
+	// only reachable by following a link within /reference) - static per session,
+	// so computed once rather than re-derived on every render.
+	const discoveredRoutes = getDiscoverableRoutes();
 
-	const term = $derived(query.trim().toLowerCase());
+	const navPages = $derived(flattenPages(menuItems));
+
+	const orphanPages = $derived<Result[]>(
+		discoveredRoutes
+			.filter((route) => isAuthenticated || !routeRequiresAuth(route.path))
+			.filter((route) => !navPages.some((navPage) => navPage.link === route.path))
+			.map((route) => ({
+				key: `page:${route.path}`,
+				label: route.label,
+				sublabel: route.sublabel,
+				section: `Pages` as const,
+				link: route.path,
+			}))
+	);
+
+	const pages = $derived([...navPages, ...orphanPages]);
+
+	const term = $derived(quickAddMatch ? `` : query.trim().toLowerCase());
 
 	const recentResults = $derived(
 		term
@@ -73,7 +144,34 @@
 			: pages.filter((page) => !recentLinks.includes(page.link))
 	);
 
-	const results = $derived([...recentResults, ...pageResults, ...recipeResults]);
+	// Deliberately left out of the main nav/`pages` list - only surfaces here
+	// once you search for it, rather than an always-visible section.
+	const contentBase = $derived<Result[]>([
+		...contentEntries.map((entry) => ({
+			key: `content-entry:${entry.slug}`,
+			label: entry.title,
+			section: `Content` as const,
+			link: resolve(`/content/[slug]`, { slug: entry.slug }),
+			contentIcon: { icon: entry.icon, iconType: entry.iconType },
+		})),
+		...contentPages.map((contentPage) => {
+			const entry = contentEntries.find((e) => e.slug === contentPage.entrySlug);
+			return {
+				key: `content-page:${contentPage.entrySlug}:${contentPage.pageSlug}`,
+				label: contentPage.title,
+				sublabel: contentPage.group,
+				section: `Content` as const,
+				link: resolve(`/content/[slug]/[pageSlug]`, { slug: contentPage.entrySlug, pageSlug: contentPage.pageSlug }),
+				contentIcon: { icon: entry?.icon, iconType: entry?.iconType },
+			};
+		}),
+	]);
+
+	const contentResults = $derived(
+		term ? contentBase.filter((result) => result.label.toLowerCase().includes(term)) : []
+	);
+
+	const results = $derived([...recentResults, ...pageResults, ...contentResults, ...recipeResults]);
 
 	function escapeGqlString(value: string): string {
 		return value.replace(/\\/g, `\\\\`).replace(/"/g, `\\"`);
@@ -108,6 +206,34 @@
 			`,
 		});
 		applyMealPlanResult(res);
+	}
+
+	async function loadContentEntries() {
+		if (!isAuthenticated) return;
+
+		// Short-lived (default TTL), shared cache key with the /content pages -
+		// Notion's uploaded-file icon URLs expire after about an hour.
+		const res = await fetchClientData({
+			cacheKey: `content-entries`,
+			gqlQuery: contentEntriesQuery,
+		});
+		contentEntries = res.contentEntries ?? [];
+
+		// Small, static-ish list (currently just one entry) - cheap enough to
+		// eagerly pull every entry's own index too, so its subpages are
+		// search-able here as well. Long-lived, same cache key the /content
+		// pages use, so visiting a page and searching for it share one fetch.
+		const pagesByEntry = await Promise.all(contentEntries.map(async (entry) => {
+			const indexRes = await fetchClientData({
+				cacheKey: `content-index-${entry.slug}`,
+				ttl: CONTENT_CACHE_TTL,
+				gqlQuery: contentIndexQuery(entry.slug),
+			});
+			return (indexRes.contentIndex ?? []).flatMap((group: any) =>
+				(group.pages ?? []).map((page: any) => ({ entrySlug: entry.slug, pageSlug: page.slug, title: page.title, group: group.title }))
+			);
+		}));
+		contentPages = pagesByEntry.flat();
 	}
 
 	function formatPlannedLabel(planned: PlannedMeal): string {
@@ -182,7 +308,11 @@
 			activeIndex = 0;
 			recipeResults = [];
 			recentLinks = getRecentPages();
+			quickAddSubmitting = false;
+			quickAddError = ``;
+			quickAddSuccess = ``;
 			loadUpcomingMealPlan();
+			loadContentEntries();
 			dialogEl.showModal();
 			inputEl?.focus();
 		}
@@ -195,7 +325,51 @@
 		goto(result.link);
 	}
 
+	async function submitQuickAdd() {
+		const match = quickAddMatch;
+		if (!match || !match.content || quickAddSubmitting) return;
+
+		quickAddSubmitting = true;
+		quickAddError = ``;
+		quickAddSuccess = ``;
+
+		const labels = QUICK_ADD_LABELS[match.type];
+		const mutation = match.type === `task`
+			? `mutation { createTask(content: ${JSON.stringify(match.content)}${match.due ? `, due: ${JSON.stringify(match.due)}` : ``}) { success } }`
+			: `mutation { createShoppingItem(note: ${JSON.stringify(match.content)}, source: "todoist") { success } }`;
+
+		const token = await getToken();
+		const res = await fetch(getGraphqlUrl(), {
+			method: `POST`,
+			headers: {
+				'Content-Type': `application/json`,
+				...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+			},
+			body: JSON.stringify({ query: mutation }),
+		}).then((r) => r.json());
+
+		quickAddSubmitting = false;
+
+		if (res?.errors || !res?.data?.[labels.mutation]?.success) {
+			quickAddError = labels.error;
+			return;
+		}
+
+		clearCache(match.type === `task` ? `tasks-${format(new Date(), `yyyy-MM-dd`)}` : `shopping-list`);
+
+		quickAddSuccess = labels.success;
+		query = `/${match.type} `;
+	}
+
 	function handleKeydown(event: KeyboardEvent) {
+		if (quickAddMatch) {
+			if (event.key === `Enter`) {
+				event.preventDefault();
+				submitQuickAdd();
+			}
+			return;
+		}
+
 		if (event.key === `ArrowDown`) {
 			event.preventDefault();
 			activeIndex = Math.min(activeIndex + 1, results.length - 1);
@@ -223,41 +397,63 @@
 		bind:value={query}
 		type="text"
 		class="query"
-		placeholder="Go to a page or search recipes..."
-		aria-label="Search pages and recipes"
+		placeholder="Go to a page, search recipes, or /task /shop to add..."
+		aria-label="Search pages and recipes, or /task /shop to quickly add"
 		autocomplete="off"
 		onkeydown={handleKeydown}
+		oninput={() => { quickAddError = ``; quickAddSuccess = ``; }}
 	/>
-	<ul class="results" bind:this={resultsEl}>
-		{#each results as result, i (result.key)}
-			{#if i === 0 || results[i - 1].section !== result.section}
-				<li class="heading">{result.section}</li>
+	{#if quickAddMatch}
+		{@const labels = QUICK_ADD_LABELS[quickAddMatch.type]}
+		<div class="quick-add">
+			<p class="quick-add-hint">{labels.hint}</p>
+			{#if quickAddSuccess}<p class="quick-add-status success">{quickAddSuccess}</p>{/if}
+			{#if quickAddError}<p class="quick-add-status error">{quickAddError}</p>{/if}
+		</div>
+	{:else}
+		<ul class="results" bind:this={resultsEl}>
+			{#each results as result, i (result.key)}
+				{#if i === 0 || results[i - 1].section !== result.section}
+					<li class="heading">{result.section}</li>
+				{/if}
+				<li>
+					<button
+						type="button"
+						class="result"
+						data-active={i === activeIndex}
+						onmouseenter={() => (activeIndex = i)}
+						onclick={() => select(result)}
+					>
+						{#if result.contentIcon}
+							<ContentIcon icon={result.contentIcon.icon} iconType={result.contentIcon.iconType} />
+						{:else if result.Icon}
+							<result.Icon />
+						{/if}
+						<span class="label">{result.label}</span>
+						{#if result.sublabel}<span class="sublabel">{result.sublabel}</span>{/if}
+					</button>
+				</li>
+			{/each}
+			{#if term.length >= RECIPE_MIN_CHARS && recipesLoading && recipeResults.length === 0}
+				<li class="hint">Searching recipes...</li>
 			{/if}
-			<li>
-				<button
-					type="button"
-					class="result"
-					data-active={i === activeIndex}
-					onmouseenter={() => (activeIndex = i)}
-					onclick={() => select(result)}
-				>
-					<result.Icon />
-					<span class="label">{result.label}</span>
-					{#if result.sublabel}<span class="sublabel">{result.sublabel}</span>{/if}
-				</button>
-			</li>
-		{/each}
-		{#if term.length >= RECIPE_MIN_CHARS && recipesLoading && recipeResults.length === 0}
-			<li class="hint">Searching recipes...</li>
-		{/if}
-		{#if results.length === 0 && !recipesLoading}
-			<li class="hint">No matching pages or recipes</li>
-		{/if}
-	</ul>
+			{#if results.length === 0 && !recipesLoading}
+				<li class="hint">No matching pages or recipes</li>
+			{/if}
+		</ul>
+	{/if}
 	<footer class="footer">
-		<span><kbd>&uarr;</kbd><kbd>&darr;</kbd> navigate</span>
-		<span><kbd>&crarr;</kbd> select</span>
-		<span><kbd>esc</kbd> close</span>
+		{#if quickAddMatch}
+			<span><kbd>&crarr;</kbd> {quickAddSubmitting ? `adding…` : `add`}</span>
+			<span><kbd>esc</kbd> close</span>
+		{:else}
+			<span><kbd>&uarr;</kbd><kbd>&darr;</kbd> navigate</span>
+			<span><kbd>&crarr;</kbd> select</span>
+			<span><kbd>esc</kbd> close</span>
+			{#if !term}
+				<span class="quick-add-tip"><kbd>/task</kbd> <kbd>/shop</kbd> quick add</span>
+			{/if}
+		{/if}
 	</footer>
 </dialog>
 
@@ -312,6 +508,33 @@
 			margin: 0;
 			padding: 0;
 		}
+	}
+
+	.quick-add {
+		padding: 0.75em;
+	}
+
+	.quick-add-hint {
+		margin: 0;
+		color: var(--neutral);
+		font-size: 0.9em;
+	}
+
+	.quick-add-status {
+		margin: 0.5em 0 0;
+		font-size: 0.9em;
+
+		&.success {
+			color: var(--green);
+		}
+
+		&.error {
+			color: var(--red);
+		}
+	}
+
+	.quick-add-tip {
+		margin-left: auto;
 	}
 
 	.heading {

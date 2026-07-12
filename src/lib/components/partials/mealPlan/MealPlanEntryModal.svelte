@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { format, parseISO } from 'date-fns';
 	import Modal from '$parts/Modal.svelte';
+	import Select from '$parts/Select.svelte';
 	import fetchClientData from '$utils/fetchClientData';
 
 	const ENTRY_TYPE_OPTIONS = [
@@ -120,14 +121,10 @@
 <Modal bind:open title={modalTitle}>
 	<p class="date_label">{dateLabel}</p>
 
-	<label class="field">
+	<div class="field">
 		Meal type
-		<select bind:value={entryType}>
-			{#each ENTRY_TYPE_OPTIONS as option (option.value)}
-				<option value={option.value}>{option.label}</option>
-			{/each}
-		</select>
-	</label>
+		<Select id="meal-entry-type" label="Meal type" bind:value={entryType} options={ENTRY_TYPE_OPTIONS} />
+	</div>
 
 	<fieldset>
 		<label>

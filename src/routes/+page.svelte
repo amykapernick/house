@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { isAuthenticated } from '$lib/auth';
-	import { intervalToDuration, format, startOfDay, addDays } from 'date-fns';
+	import { intervalToDuration, format, parseISO, startOfDay, addDays } from 'date-fns';
 	import fetchClientData from '$utils/fetchClientData';
-	import { getWeekRange } from '$utils/dateRanges';
+	import { prefetchRecipes } from '$utils/prefetchRecipes';
+	import { getDashboardMealPlanRange } from '$utils/dateRanges';
 	import { resolve } from '$app/paths';
 
 	let meals = $state<any[]>([]);
@@ -24,11 +25,13 @@
 
 	$effect(() => {
 		if ($isAuthenticated) {
-			const { start, end } = getWeekRange();
+			const { start, end } = getDashboardMealPlanRange();
 
 			function handleMeals(res: any) {
-				meals = res.mealPlans?.items ?? [];
+				const newMeals: any[] = res.mealPlans?.items ?? [];
+				meals = newMeals;
 				loading = false;
+				prefetchRecipes(newMeals.map((meal) => meal.recipe?.slug));
 			}
 			fetchClientData({
 				cacheKey: 'dashboard-mealplan',
@@ -113,14 +116,19 @@
 
 	let weekRecipes = $derived.by(() => {
 		// eslint-disable-next-line svelte/prefer-svelte-reactivity -- built and discarded synchronously within this derivation, never read reactively
-		const seen = new Set<string>();
-		const recipes: any[] = [];
+		const bySlug = new Map<string, { recipe: any; days: string[] }>();
 		for (const meal of meals) {
-			if (!meal.recipe?.slug || seen.has(meal.recipe.slug)) continue;
-			seen.add(meal.recipe.slug);
-			recipes.push(meal.recipe);
+			if (!meal.recipe?.slug) continue;
+			const day = meal.date ? format(parseISO(meal.date), 'EEEE') : null;
+			const entry = bySlug.get(meal.recipe.slug);
+			if (entry) {
+				if (day && !entry.days.includes(day)) entry.days.push(day);
+			}
+			else {
+				bySlug.set(meal.recipe.slug, { recipe: meal.recipe, days: day ? [day] : [] });
+			}
 		}
-		return recipes;
+		return [...bySlug.values()];
 	});
 </script>
 
@@ -165,7 +173,7 @@
 			<p class="empty">No meals planned this week.</p>
 		{:else}
 			<div class="grid">
-				{#each weekRecipes as recipe (recipe.slug)}
+				{#each weekRecipes as { recipe, days } (recipe.slug)}
 					<a class="card" href={resolve('/recipes/[slug]', { slug: recipe.slug })}>
 						{#if recipe.image}
 							<img src={recipe.image} alt={recipe.name} loading="lazy" />
@@ -173,6 +181,9 @@
 							<div class="no-image"></div>
 						{/if}
 						<div class="info">
+							{#if days.length}
+								<span class="day">{days.join(', ')}</span>
+							{/if}
 							<h3>{recipe.name}</h3>
 							{#if recipe.description}
 								<p class="description">{recipe.description}</p>
@@ -306,6 +317,16 @@
 			margin: 0 0 0.2em;
 			line-height: 1.3;
 		}
+	}
+
+	.day {
+		display: block;
+		font-size: 0.7em;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.03em;
+		color: var(--purple_bright);
+		margin-bottom: 0.2em;
 	}
 
 	.description {

@@ -1,0 +1,49 @@
+name: Refresh Manifest Screenshots
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_url:
+        description: 'Base URL to screenshot (e.g. prod URL or a PR preview URL)'
+        required: true
+        type: string
+
+jobs:
+  refresh-screenshots:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Generate manifest screenshots
+        env:
+          PLAYWRIGHT_BASE_URL: ${{ inputs.target_url }}
+          VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
+          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+          CLERK_TEST_USER_EMAIL: ${{ secrets.CLERK_TEST_USER_EMAIL }}
+          CLERK_TEST_USER_PASSWORD: ${{ secrets.CLERK_TEST_USER_PASSWORD }}
+        run: npm run generate:screenshots
+
+      - name: Commit refreshed screenshots
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add static/screenshots
+          if git diff --cached --quiet; then
+            echo "No screenshot changes"
+          else
+            git commit -m "chore: refresh PWA manifest screenshots"
+            git push origin HEAD:${{ github.ref_name }}
+          fi

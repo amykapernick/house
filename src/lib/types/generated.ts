@@ -17,6 +17,10 @@ export type Activity = {
   title: Scalars['String']['output'];
 };
 
+export type AddRecipesToShoppingListResult = {
+  success: Scalars['Boolean']['output'];
+};
+
 export type Alert = {
   detail: Scalars['String']['output'];
   id: Scalars['ID']['output'];
@@ -49,7 +53,7 @@ export type AllergenUrgency =
 
 export type Area = {
   colour: Maybe<Scalars['String']['output']>;
-  id: AreaId;
+  id: Scalars['ID']['output'];
   info: Maybe<Array<Maybe<Info>>>;
   items: Maybe<Array<Maybe<Item>>>;
   link: Maybe<Scalars['String']['output']>;
@@ -57,23 +61,6 @@ export type Area = {
   size: Array<Scalars['Float']['output']>;
   start: Array<Scalars['Float']['output']>;
 };
-
-export type AreaId =
-  | 'backyard'
-  | 'bathroom'
-  | 'bedroom_main'
-  | 'dining'
-  | 'frontyard'
-  | 'kitchen'
-  | 'laundry'
-  | 'living'
-  | 'office_amy'
-  | 'office_dan'
-  | 'outside'
-  | 'porch'
-  | 'shed'
-  | 'toilet'
-  | 'virtual';
 
 export type Auslan = {
   check_frequency: Scalars['Int']['output'];
@@ -89,6 +76,19 @@ export type AuslanSign = {
   reference: Maybe<SignbankWord>;
   status: SignStatus;
   tip: Scalars['String']['output'];
+};
+
+export type AvailableHouseArea = {
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+};
+
+export type AvailableHouseEntity = {
+  entityId: Scalars['String']['output'];
+  friendlyName: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  suggestedArea: Maybe<Scalars['ID']['output']>;
+  suggestedType: Maybe<ItemType>;
 };
 
 export type BedroomTempPattern = {
@@ -220,9 +220,39 @@ export type CompleteTaskResult = {
   success: Scalars['Boolean']['output'];
 };
 
+export type ContentEntry = {
+  icon: Maybe<Scalars['String']['output']>;
+  iconType: Maybe<Scalars['String']['output']>;
+  slug: Maybe<Scalars['String']['output']>;
+  title: Maybe<Scalars['String']['output']>;
+};
+
+export type ContentGroup = {
+  description: Maybe<Scalars['String']['output']>;
+  pages: Maybe<Array<Maybe<ContentPageLink>>>;
+  title: Maybe<Scalars['String']['output']>;
+};
+
+export type ContentPage = {
+  content: Maybe<Scalars['String']['output']>;
+  slug: Maybe<Scalars['String']['output']>;
+  title: Maybe<Scalars['String']['output']>;
+};
+
+export type ContentPageLink = {
+  sectionCount: Maybe<Scalars['Int']['output']>;
+  slug: Maybe<Scalars['String']['output']>;
+  title: Maybe<Scalars['String']['output']>;
+};
+
 export type CreateShoppingItemResult = {
   item: Maybe<ShoppingItem>;
   success: Scalars['Boolean']['output'];
+};
+
+export type CreateTaskResult = {
+  success: Scalars['Boolean']['output'];
+  task: Maybe<Task>;
 };
 
 export type CurrentClothingRecommendation = {
@@ -335,6 +365,57 @@ export type GrowthMeasurement = {
   weight: Measurement;
 };
 
+export type Habit = {
+  assigned: Array<User>;
+  completions: Array<Scalars['String']['output']>;
+  due: Maybe<Scalars['String']['output']>;
+  id: Maybe<Scalars['String']['output']>;
+  lastCompleted: Maybe<Scalars['String']['output']>;
+  link: Maybe<Scalars['String']['output']>;
+  name: Maybe<Scalars['String']['output']>;
+  recurrence: Maybe<Scalars['String']['output']>;
+  recurrenceInterval: Maybe<RecurrenceInterval>;
+  streak: Maybe<Scalars['Int']['output']>;
+};
+
+export type HealthMetric = {
+  key: Scalars['String']['output'];
+  label: Maybe<Scalars['String']['output']>;
+  unit: Maybe<Scalars['String']['output']>;
+  value: Scalars['Float']['output'];
+};
+
+export type HomeAssistantState = {
+  entityId: Scalars['ID']['output'];
+  friendlyName: Maybe<Scalars['String']['output']>;
+  lastChanged: Maybe<Scalars['String']['output']>;
+  lastUpdated: Maybe<Scalars['String']['output']>;
+  state: Scalars['String']['output'];
+  unitOfMeasurement: Maybe<Scalars['String']['output']>;
+};
+
+export type HouseAreaInput = {
+  colour?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['String']['input']>;
+  size?: InputMaybe<Array<Scalars['Float']['input']>>;
+  start?: InputMaybe<Array<Scalars['Float']['input']>>;
+};
+
+export type HouseItemInput = {
+  area?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['String']['input']>;
+  linkedItem?: InputMaybe<Scalars['String']['input']>;
+  rotation?: InputMaybe<Scalars['Float']['input']>;
+  size?: InputMaybe<Array<InputMaybe<Scalars['Float']['input']>>>;
+  start?: InputMaybe<Array<Scalars['Float']['input']>>;
+  type?: InputMaybe<ItemType>;
+};
+
+export type HouseMutationResult = {
+  id: Maybe<Scalars['String']['output']>;
+  success: Scalars['Boolean']['output'];
+};
+
 export type IcsEvent = {
   allDay: Maybe<Scalars['Boolean']['output']>;
   colour: Maybe<Scalars['String']['output']>;
@@ -369,7 +450,9 @@ export type InfoType =
 
 export type Item = {
   area: Maybe<Area>;
+  id: Scalars['ID']['output'];
   link: Maybe<Scalars['String']['output']>;
+  linkedItem: Maybe<Item>;
   rotation: Maybe<Scalars['Float']['output']>;
   size: Maybe<Array<Maybe<Scalars['Float']['output']>>>;
   start: Array<Scalars['Float']['output']>;
@@ -457,6 +540,17 @@ export type MealPlanList = {
   totalPages: Scalars['Int']['output'];
 };
 
+export type MealPlanMeatReminderDay = {
+  date: Scalars['String']['output'];
+  items: Array<Scalars['String']['output']>;
+  recipes: Array<Scalars['String']['output']>;
+};
+
+export type MealPlanMeatReminderResult = {
+  days: Array<MealPlanMeatReminderDay>;
+  success: Scalars['Boolean']['output'];
+};
+
 export type MealPlanMutationResult = {
   success: Scalars['Boolean']['output'];
 };
@@ -502,22 +596,40 @@ export type Milestones = {
 };
 
 export type Mutation = {
+  addRecipesToShoppingList: Maybe<AddRecipesToShoppingListResult>;
   checkShoppingItem: Maybe<CheckShoppingItemResult>;
+  completeHabit: Maybe<CompleteTaskResult>;
   completeTask: Maybe<CompleteTaskResult>;
   createBudgetItem: Maybe<BudgetMutationResult>;
+  createHouseArea: Maybe<HouseMutationResult>;
+  createHouseItem: Maybe<HouseMutationResult>;
   createMealPlanEntry: Maybe<MealPlanEntry>;
+  createMealPlanMeatReminders: Maybe<MealPlanMeatReminderResult>;
   createRoutineOverride: Maybe<ScheduleMutationResult>;
   createShoppingItem: Maybe<CreateShoppingItemResult>;
+  createTask: Maybe<CreateTaskResult>;
   deleteBudgetItem: Maybe<BudgetMutationResult>;
+  deleteHouseArea: Maybe<HouseMutationResult>;
+  deleteHouseItem: Maybe<HouseMutationResult>;
   deleteMealPlanEntry: Maybe<MealPlanMutationResult>;
+  dismissAlert: Maybe<Scalars['Boolean']['output']>;
   markToothErupted: Maybe<Tooth>;
   updateAuslanSignStatus: Maybe<AuslanSign>;
   updateBudgetBucketPercentage: Maybe<BudgetMutationResult>;
   updateBudgetItem: Maybe<BudgetMutationResult>;
   updateDefaultRoutine: Maybe<ScheduleMutationResult>;
+  updateHouseArea: Maybe<HouseMutationResult>;
+  updateHouseItem: Maybe<HouseMutationResult>;
+  updateMe: Maybe<User>;
   updateMealPlanEntry: Maybe<MealPlanEntry>;
   updateMilestoneStatus: Maybe<Milestone>;
   updateSwimSkillStatus: Maybe<SwimSkill>;
+  updateTaskStatus: Maybe<CompleteTaskResult>;
+};
+
+
+export type MutationAddRecipesToShoppingListArgs = {
+  recipeIds: Array<Scalars['String']['input']>;
 };
 
 
@@ -525,6 +637,11 @@ export type MutationCheckShoppingItemArgs = {
   checked: Scalars['Boolean']['input'];
   itemId: Scalars['String']['input'];
   source: Scalars['String']['input'];
+};
+
+
+export type MutationCompleteHabitArgs = {
+  habitId: Scalars['String']['input'];
 };
 
 
@@ -539,12 +656,28 @@ export type MutationCreateBudgetItemArgs = {
 };
 
 
+export type MutationCreateHouseAreaArgs = {
+  input: HouseAreaInput;
+};
+
+
+export type MutationCreateHouseItemArgs = {
+  input: HouseItemInput;
+};
+
+
 export type MutationCreateMealPlanEntryArgs = {
   date: Scalars['String']['input'];
   entryType: Scalars['String']['input'];
   recipeId?: InputMaybe<Scalars['String']['input']>;
   text?: InputMaybe<Scalars['String']['input']>;
   title?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type MutationCreateMealPlanMeatRemindersArgs = {
+  endDate: Scalars['String']['input'];
+  startDate: Scalars['String']['input'];
 };
 
 
@@ -557,6 +690,7 @@ export type MutationCreateRoutineOverrideArgs = {
   sunday: Array<RoutineDayBlockInput>;
   thursday: Array<RoutineDayBlockInput>;
   tuesday: Array<RoutineDayBlockInput>;
+  user: Scalars['String']['input'];
   wednesday: Array<RoutineDayBlockInput>;
 };
 
@@ -564,6 +698,13 @@ export type MutationCreateRoutineOverrideArgs = {
 export type MutationCreateShoppingItemArgs = {
   note: Scalars['String']['input'];
   quantity?: InputMaybe<Scalars['Float']['input']>;
+  source?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type MutationCreateTaskArgs = {
+  content: Scalars['String']['input'];
+  due?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -572,7 +713,22 @@ export type MutationDeleteBudgetItemArgs = {
 };
 
 
+export type MutationDeleteHouseAreaArgs = {
+  id: Scalars['String']['input'];
+};
+
+
+export type MutationDeleteHouseItemArgs = {
+  id: Scalars['String']['input'];
+};
+
+
 export type MutationDeleteMealPlanEntryArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDismissAlertArgs = {
   id: Scalars['ID']['input'];
 };
 
@@ -602,13 +758,30 @@ export type MutationUpdateBudgetItemArgs = {
 
 export type MutationUpdateDefaultRoutineArgs = {
   friday: Array<RoutineDayBlockInput>;
-  id: Scalars['ID']['input'];
   monday: Array<RoutineDayBlockInput>;
   saturday: Array<RoutineDayBlockInput>;
   sunday: Array<RoutineDayBlockInput>;
   thursday: Array<RoutineDayBlockInput>;
   tuesday: Array<RoutineDayBlockInput>;
+  user: Scalars['String']['input'];
   wednesday: Array<RoutineDayBlockInput>;
+};
+
+
+export type MutationUpdateHouseAreaArgs = {
+  id: Scalars['String']['input'];
+  input: HouseAreaInput;
+};
+
+
+export type MutationUpdateHouseItemArgs = {
+  id: Scalars['String']['input'];
+  input: HouseItemInput;
+};
+
+
+export type MutationUpdateMeArgs = {
+  input: UpdateUserInput;
 };
 
 
@@ -631,6 +804,12 @@ export type MutationUpdateMilestoneStatusArgs = {
 export type MutationUpdateSwimSkillStatusArgs = {
   id: Scalars['ID']['input'];
   status: MilestoneStatus;
+};
+
+
+export type MutationUpdateTaskStatusArgs = {
+  status: Scalars['String']['input'];
+  taskId: Scalars['String']['input'];
 };
 
 export type NoonarSeason = {
@@ -681,6 +860,7 @@ export type ParentingApproachNote = {
 };
 
 export type Platform =
+  | 'github'
   | 'notion'
   | 'todoist';
 
@@ -703,21 +883,30 @@ export type Project = {
 export type Query = {
   allergens: Array<Allergen>;
   areas: Maybe<Array<Maybe<Area>>>;
+  availableHouseAreas: Array<AvailableHouseArea>;
+  availableHouseItems: Array<AvailableHouseEntity>;
   budget: Maybe<Array<Maybe<BudgetItem>>>;
   budgetBuckets: Maybe<Array<Maybe<BudgetBucket>>>;
   calendars: Maybe<Array<Maybe<Calendar>>>;
   colour: Maybe<PaletteColour>;
   colours: Maybe<Array<Maybe<PaletteColour>>>;
-  defaultRoutineId: Maybe<Scalars['ID']['output']>;
+  contentEntries: Maybe<Array<Maybe<ContentEntry>>>;
+  contentIndex: Maybe<Array<Maybe<ContentGroup>>>;
+  contentPage: Maybe<ContentPage>;
   events: Maybe<Array<Maybe<Event>>>;
+  habits: Maybe<Array<Maybe<Habit>>>;
+  homeAssistantState: Maybe<HomeAssistantState>;
+  homeAssistantStates: Array<HomeAssistantState>;
   icsEvents: Maybe<Array<Maybe<IcsEvent>>>;
   info: Maybe<Array<Maybe<Info>>>;
   items: Maybe<Array<Maybe<Item>>>;
+  me: Maybe<User>;
   mealPlanByDay: Array<MealPlanDay>;
   mealPlans: Maybe<MealPlanList>;
   projects: Maybe<Array<Maybe<Project>>>;
   recipe: Maybe<Recipe>;
   recipeTags: Array<RecipeTag>;
+  recipeUnits: Array<RecipeIngredientUnit>;
   recipes: Maybe<RecipeList>;
   resources: Maybe<Array<Maybe<Resource>>>;
   schedule: Array<ScheduleBlock>;
@@ -740,6 +929,27 @@ export type QueryColourArgs = {
 
 export type QueryColoursArgs = {
   name?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type QueryContentIndexArgs = {
+  slug: Scalars['String']['input'];
+};
+
+
+export type QueryContentPageArgs = {
+  pageSlug: Scalars['String']['input'];
+  slug: Scalars['String']['input'];
+};
+
+
+export type QueryHomeAssistantStateArgs = {
+  entityId: Scalars['ID']['input'];
+};
+
+
+export type QueryItemsArgs = {
+  raw?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 
@@ -842,7 +1052,19 @@ export type RecipeIngredient = {
   quantity: Maybe<Scalars['Float']['output']>;
   referenceId: Maybe<Scalars['ID']['output']>;
   title: Maybe<Scalars['String']['output']>;
-  unit: Maybe<Scalars['String']['output']>;
+  unit: Maybe<RecipeIngredientUnit>;
+};
+
+export type RecipeIngredientUnit = {
+  abbreviation: Maybe<Scalars['String']['output']>;
+  fraction: Scalars['Boolean']['output'];
+  id: Maybe<Scalars['ID']['output']>;
+  name: Maybe<Scalars['String']['output']>;
+  pluralAbbreviation: Maybe<Scalars['String']['output']>;
+  pluralName: Maybe<Scalars['String']['output']>;
+  standardQuantity: Maybe<Scalars['Float']['output']>;
+  standardUnit: Maybe<Scalars['String']['output']>;
+  useAbbreviation: Scalars['Boolean']['output'];
 };
 
 export type RecipeInstruction = {
@@ -908,6 +1130,11 @@ export type RecommendedSetup = {
   sleep_sack_tog: Scalars['Float']['output'];
 };
 
+export type RecurrenceInterval = {
+  count: Scalars['Int']['output'];
+  unit: Scalars['String']['output'];
+};
+
 export type Resource = {
   category: Maybe<Scalars['String']['output']>;
   description: Maybe<Scalars['String']['output']>;
@@ -929,6 +1156,7 @@ export type RoutineDayBlockInput = {
 export type ScheduleBlock = {
   colour: Maybe<Scalars['String']['output']>;
   end: Scalars['String']['output'];
+  family: Maybe<User>;
   id: Scalars['ID']['output'];
   isOverride: Scalars['Boolean']['output'];
   label: Scalars['String']['output'];
@@ -958,7 +1186,14 @@ export type ShoppingItem = {
   note: Maybe<Scalars['String']['output']>;
   position: Maybe<Scalars['Int']['output']>;
   quantity: Maybe<Scalars['Float']['output']>;
+  recipes: Maybe<Array<ShoppingItemRecipe>>;
   source: Scalars['String']['output'];
+};
+
+export type ShoppingItemRecipe = {
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  slug: Scalars['String']['output'];
 };
 
 export type ShoppingList = {
@@ -1081,7 +1316,7 @@ export type Swimming = {
 
 export type Task = {
   allDay: Maybe<Scalars['Boolean']['output']>;
-  assigned: Maybe<Array<Maybe<User>>>;
+  assigned: Array<User>;
   due: Maybe<Scalars['String']['output']>;
   dueLabel: Maybe<Scalars['String']['output']>;
   end: Maybe<Scalars['String']['output']>;
@@ -1183,8 +1418,16 @@ export type TrackerDataAlertsArgs = {
   orderBy?: InputMaybe<AlertOrderBy>;
 };
 
+export type UpdateUserInput = {
+  colour?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  notionId?: InputMaybe<Scalars['String']['input']>;
+  todoistId?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type User = {
   colour: Maybe<Scalars['String']['output']>;
+  health: Maybe<Array<HealthMetric>>;
   ids: Maybe<UserIds>;
   name: Maybe<Scalars['String']['output']>;
   profile: Maybe<Scalars['String']['output']>;
@@ -1192,6 +1435,7 @@ export type User = {
 };
 
 export type UserIds = {
+  ha: Maybe<Scalars['String']['output']>;
   notion: Maybe<Scalars['String']['output']>;
   todoist: Maybe<Scalars['String']['output']>;
 };

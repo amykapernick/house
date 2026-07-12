@@ -3,6 +3,7 @@ import { resolve } from '$app/paths';
 import Dashboard from '$img/icons/layout-11.svg?component';
 import Archive from '$img/icons/archive-drawer.svg?component';
 import List from '$img/icons/list.svg?component';
+import CheckList from '$img/icons/check-list.svg?component';
 import Calendar from '$img/icons/calendar-date.svg?component';
 import Plan from '$img/icons/diet-plan.svg?component';
 import Cart from '$img/icons/cart.svg?component';
@@ -10,6 +11,7 @@ import Recipes from '$img/icons/recipe-book-47.svg?component';
 import Baby from '$img/icons/baby.svg?component';
 import Schedule from '$img/icons/calendar-day-view.svg?component'
 import Budget from '$img/icons/chart-bar-33.svg?component'
+import Health from '$img/icons/phone-health.svg?component'
 import Graphql from '$img/icons/graphql.svg?component'
 
 export const menuItems: MenuItem[] = [
@@ -23,6 +25,12 @@ export const menuItems: MenuItem[] = [
 		link: resolve(`/tasks`),
 		auth: true,
 		Icon: List
+	},
+	{
+		label: `Habits`,
+		link: resolve(`/habits`),
+		auth: true,
+		Icon: CheckList
 	},
 	{
 		label: `Calendar`,
@@ -71,6 +79,12 @@ export const menuItems: MenuItem[] = [
 		auth: true,
 		Icon: Baby
 	},
+	{
+		label: `Health`,
+		link: resolve(`/health`),
+		auth: true,
+		Icon: Health
+	},
 	...(import.meta.env.DEV ? [{
 		label: `GraphQL`,
 		link: resolve(`/dev/graphql`),
@@ -78,8 +92,16 @@ export const menuItems: MenuItem[] = [
 	}] : []),
 ];
 
+// Account-level pages (e.g. profile) live in the header's account area rather
+// than the main menuItems grid, but still need to be recognised by routeRequiresAuth.
+// TODO: Add icon for profile/profile image
+// TODO: fix profile menu
+// TODO: Should menu items taht require auth be split out here too?
+export const authOnlyRoutes: string[] = [
+	resolve(`/profile`),
+];
+
 export function routeRequiresAuth(pathname: string): boolean {
-	return menuItems.some(
-		(item) => item.auth && item.link && (pathname === item.link || pathname.startsWith(`${item.link}/`))
-	);
+	const authRoutes = [...menuItems.filter((item) => item.auth && item.link).map((item) => item.link), ...authOnlyRoutes];
+	return authRoutes.some((link) => link && (pathname === link || pathname.startsWith(`${link}/`)));
 }

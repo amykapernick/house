@@ -1,0 +1,41 @@
+name: Generate Auslan Sign Gifs
+
+on:
+  repository_dispatch:
+    types: [auslan-signs-updated]
+
+jobs:
+  generate-gifs:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: prod
+
+      - name: Install ffmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Generate gifs for any signs missing one
+        env:
+          AUSLAN_SIGNS_PAYLOAD: ${{ toJson(github.event.client_payload.signs) }}
+        run: node scripts/generateSignGifsFromPayload.mjs
+
+      - name: Commit generated gifs
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add static/signs
+          if git diff --cached --quiet; then
+            echo "No new gifs"
+          else
+            git commit -m "chore: generate Auslan sign gifs"
+            git push origin HEAD:prod
+          fi

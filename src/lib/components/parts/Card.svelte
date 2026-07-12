@@ -4,7 +4,7 @@
 	import Icon from "./Icon.svelte";
 	import type { IconName } from "./Icon.svelte";
 
-	const { title, heading = 3, children, colour, icon, footer, tags, order = 0, IconComponent, iconProps }: {
+	const { title, heading = 3, children, colour, icon, footer, tags, order = 0, IconComponent, iconProps, onDismiss }: {
 		title: string;
 		heading?: 2 | 3 | 4 | 5 | 6;
 		children?: Snippet;
@@ -15,13 +15,18 @@
 		footer?: string | Snippet;
 		tags?: string;
 		order?: number
+		onDismiss?: () => void;
 	} = $props();
 </script>
 
 <div
 	class="card"
+	class:has-dismiss={!!onDismiss}
 	style="--colour: var(--{colour || 'blue'}); --order: {order}"
 >
+	{#if onDismiss}
+		<button type="button" class="dismiss" onclick={onDismiss} aria-label="Dismiss {title}">&times;</button>
+	{/if}
 	<svelte:element this={`h${heading}`} class="heading">{title}</svelte:element>
 	{#if children}
 		<div class="content">{@render children()}</div>
@@ -52,6 +57,7 @@
 
 <style>
 	.card {
+		position: relative;
 		border-radius: 1em;
 		border: 2px solid var(--colour);
 		width: auto;
@@ -61,7 +67,7 @@
 		display: grid;
 		grid-template-rows: auto 1fr auto auto;
 		grid-template-columns: 1fr auto;
-		grid-template-areas: 
+		grid-template-areas:
 			'heading 	heading'
 			'content 	content'
 			'tags		.'
@@ -75,6 +81,33 @@
 		margin: 0 0 0.2em;
 		padding: 0 0.2em;
 		grid-area: heading;
+	}
+
+	.card.has-dismiss .heading {
+		padding-right: 1.6em;
+	}
+
+	.dismiss {
+		position: absolute;
+		top: 0.4em;
+		right: 0.4em;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 1.5em;
+		height: 1.5em;
+		padding: 0;
+		border: none;
+		border-radius: 50%;
+		background: transparent;
+		color: var(--colour);
+		font-size: 1.1em;
+		line-height: 1;
+		cursor: pointer;
+
+		&:hover {
+			background: color-mix(in srgb, var(--colour) 20%, transparent);
+		}
 	}
 
 	.content {

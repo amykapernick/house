@@ -29,7 +29,7 @@ export type SocialLink = MenuItem & {
 
 export type Colour = `purple_bright` | `purple` | `purple_light` | `blue_navy` | `blue_mid` | `blue` | `blue_light` | `green_teal` | `green_dark` | `green` | `green_light` | `green_lime` | `red` | `pink_dark` | `pink` | `orange_peach` | `orange_dark` | `orange` | `yellow` | `white` | `grey` | `grey_light` | `black`
 
-export type Platform = `notion` | `todoist`
+export type Platform = `notion` | `todoist` | `github`
 
 type UserIds = Record<Platform, string>
 

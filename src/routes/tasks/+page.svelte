@@ -1,42 +1,47 @@
 <script lang="ts">
 	import { format } from 'date-fns';
-	import TaskView from '$parts/tasks/TaskView.svelte';
 	import { isAuthenticated } from '$lib/auth';
-	import fetchClientData from '$utils/fetchClientData';
-	import type { Task } from '$types/tasks';
-
+	import fetchTasksData from '$utils/tasksData';
+	import { setCache } from '$utils/fetchClientData';
+	import fetchFamilyMembers, { EVERYONE, isVisibleToUser, type FamilyMember } from '$utils/fetchFamilyMembers';
+	import { notificationPermission, requestNotificationPermission } from '$utils/notifications';
+	import TaskView from '$parts/tasks/TaskView.svelte';
+	import FamilyFilter from '$parts/FamilyFilter.svelte';
+	import type { Task, TaskStatus } from '$types/tasks';
 
 	let tasks = $state<Task[]>([]);
 	let loading = $state(true);
+	let permission = $state(notificationPermission());
+	let familyMembers = $state<FamilyMember[]>([]);
+	let selectedUserSlug = $state(EVERYONE);
+
+	// The API resolves unassigned tasks, or tasks assigned to someone outside
+	// the family, to the whole family - so `assigned` always includes every
+	// member for an "everyone" task, and this filter needs no special case.
+	let visibleTasks = $derived(tasks.filter((task) => isVisibleToUser(task.assigned, selectedUserSlug)));
+
+	async function enableReminders() {
+		permission = await requestNotificationPermission();
+	}
 
 	$effect(() => {
 		if ($isAuthenticated) {
-			function handleTasks(res: any) {
-				tasks = res.tasks ?? [];
+			function handleTasks(data: Task[]) {
+				tasks = data;
 				loading = false;
 			}
-			const today = format(new Date(), 'yyyy-MM-dd');
-			fetchClientData({
-				cacheKey: `tasks-${today}`,
-				onStale: handleTasks,
-				gqlQuery: `
-					query {
-						tasks {
-							id
-							name
-							assigned {
-								name
-								profile
-							}
-							status
-							due
-							dueLabel(today: "${today}")
-						}
-					}
-				`,
-			}).then(handleTasks);
+			fetchTasksData({ onStale: handleTasks }).then(handleTasks);
+
+			function handleFamily(members: FamilyMember[]) { familyMembers = members; }
+			fetchFamilyMembers(handleFamily).then(handleFamily);
 		}
 	});
+
+	// Keep the shared cache in sync so a revisit within the TTL doesn't show the pre-update status.
+	function handleTaskUpdate(id: string, status: TaskStatus) {
+		tasks = tasks.map((task) => (task.id === id ? { ...task, status } : task));
+		setCache(`tasks-${format(new Date(), 'yyyy-MM-dd')}`, { tasks });
+	}
 </script>
 
 <svelte:head>
@@ -45,8 +50,18 @@
 </svelte:head>
 
 <h1>Tasks</h1>
+{#if permission !== `granted` && permission !== `unsupported`}
+	<button class="enable_reminders" onclick={enableReminders}>Enable task reminders</button>
+{/if}
 {#if loading}
 	<p>Loading...</p>
 {:else}
-	<TaskView {tasks} />
+	<FamilyFilter {familyMembers} bind:selectedUserSlug />
+	<TaskView tasks={visibleTasks} onUpdate={handleTaskUpdate} />
 {/if}
+
+<style>
+	.enable_reminders {
+		margin-bottom: 1em;
+	}
+</style>

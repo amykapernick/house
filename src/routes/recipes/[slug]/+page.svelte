@@ -2,7 +2,18 @@
 	import { page } from '$app/stores';
 	import { format, parseISO, intervalToDuration } from 'date-fns';
 	import fetchClientData from '$utils/fetchClientData';
+	import { recipeQuery, RECIPE_CACHE_TTL } from '$utils/prefetchRecipes';
 	import { resolve } from '$app/paths';
+	import {
+		compatibleUnits,
+		convertQuantity,
+		unitFamilyLabel,
+		unitLabel,
+		unitOptionLabel,
+		unitRoot,
+		unitsInFamily,
+	} from '$lib/utils/units';
+	import type { RecipeIngredientUnit } from '$lib/types/generated';
 
 	function formatMinutes(mins: number | string | null): string {
 		if (!mins) return '';
@@ -17,6 +28,24 @@
 	let recipe = $state<any>(null);
 	let loading = $state(true);
 	let multiplier = $state(1);
+	let allUnits = $state<RecipeIngredientUnit[]>([]);
+	let selectedUnitId = $state<Record<number, string>>({});
+	let defaultUnitId = $state<Record<string, string>>({});
+
+	// Distinct unit families (mass, volume, ...) present across the recipe's ingredients,
+	// each with every configured unit that can be converted to/from it - powers the
+	// top-of-page "default unit" pickers.
+	let unitFamilies = $derived.by(() => {
+		const families: { root: string; units: RecipeIngredientUnit[] }[] = [];
+		for (const ingredient of recipe?.ingredients ?? []) {
+			if (!ingredient.unit) continue;
+			const root = unitRoot(ingredient.unit, allUnits);
+			if (!root || families.some((f) => f.root === root)) continue;
+			const units = unitsInFamily(root, allUnits);
+			if (units.length > 1) families.push({ root, units });
+		}
+		return families;
+	});
 
 	const SCALE_PRESETS = [1, 2, 3];
 
@@ -36,9 +65,37 @@
 		return `${Math.round(value * 100) / 100}`;
 	}
 
-	function scaledIngredientText(ingredient: any): string {
-		if (multiplier === 1 || ingredient.quantity == null) return ingredient.display;
-		const parts = [formatQuantity(ingredient.quantity * multiplier), ingredient.unit, ingredient.food].filter(Boolean);
+	function ingredientUnitOptions(ingredient: any): RecipeIngredientUnit[] {
+		if (!ingredient.unit) return [];
+		return compatibleUnits(ingredient.unit, allUnits);
+	}
+
+	function selectedUnit(ingredient: any, i: number): RecipeIngredientUnit | null {
+		if (!ingredient.unit) return null;
+
+		// An explicit per-ingredient choice always wins over the family default.
+		const chosenId = selectedUnitId[i];
+		if (chosenId) return allUnits.find((u) => u.id === chosenId) ?? ingredient.unit;
+
+		const root = unitRoot(ingredient.unit, allUnits);
+		const defaultId = root ? defaultUnitId[root] : undefined;
+		if (defaultId) return allUnits.find((u) => u.id === defaultId) ?? ingredient.unit;
+
+		return ingredient.unit;
+	}
+
+	function scaledIngredientText(ingredient: any, i: number): string {
+		const unit = selectedUnit(ingredient, i);
+		const converting = unit && ingredient.unit && unit.id !== ingredient.unit.id;
+		if (multiplier === 1 && !converting) return ingredient.display;
+		if (ingredient.quantity == null) return ingredient.display;
+
+		const baseQuantity = converting
+			? (convertQuantity(ingredient.quantity, ingredient.unit, unit!, allUnits) ?? ingredient.quantity)
+			: ingredient.quantity;
+		const quantity = baseQuantity * multiplier;
+		const unitText = unit ? unitLabel(unit, quantity) : ingredient.unit;
+		const parts = [formatQuantity(quantity), unitText, ingredient.food].filter(Boolean);
 		const text = parts.join(' ');
 		return ingredient.note ? `${text} (${ingredient.note})` : text;
 	}
@@ -49,31 +106,16 @@
 
 			function handleRecipe(res: any) {
 				recipe = res.recipe ?? null;
+				allUnits = res.recipeUnits ?? [];
+				selectedUnitId = {};
+				defaultUnitId = {};
 				loading = false;
 			}
 			fetchClientData({
 				cacheKey: `recipe-${slug}`,
+				ttl: RECIPE_CACHE_TTL,
 				onStale: handleRecipe,
-				gqlQuery: `
-					query {
-						recipe(slug: "${slug}") {
-							id name slug image description
-							totalTime prepTime cookTime performTime
-							servings recipeYield rating
-							orgURL dateAdded lastMade
-							tags { name slug }
-							categories { name slug }
-							ingredients { referenceId display quantity unit food note title }
-							instructions { id position title text }
-							nutrition {
-								calories carbohydrateContent fatContent
-								proteinContent fiberContent sodiumContent sugarContent
-							}
-							notes { title text }
-							tools
-						}
-					}
-				`,
+				gqlQuery: recipeQuery(slug ?? ''),
 			}).then(handleRecipe);
 		}
 	});
@@ -126,6 +168,7 @@
 				<div class="ingredients-header">
 					<h2>Ingredients</h2>
 					<div class="scale-bar">
+					<!-- TODO: Style recipe scale -->
 						<span class="label">Scale</span>
 						{#each SCALE_PRESETS as preset (preset)}
 							<button
@@ -145,13 +188,57 @@
 						/>
 					</div>
 				</div>
+				<!-- TODO: Style recipe unit selection -->
+				{#if unitFamilies.length}
+					<div class="unit-defaults-bar">
+						<span class="label">Units</span>
+						{#each unitFamilies as family (family.root)}
+							{@const fieldId = `unit-default-${family.root}`}
+							<div class="unit-default">
+								<label for={fieldId}>{unitFamilyLabel(family.root, allUnits)}</label>
+								<select
+									id={fieldId}
+									class="unit-select"
+									value={defaultUnitId[family.root] ?? ''}
+									onchange={(e) => {
+										const value = e.currentTarget.value;
+										if (value) defaultUnitId[family.root] = value;
+										else delete defaultUnitId[family.root];
+									}}
+								>
+									<option value="">As written</option>
+									{#each family.units as unit (unit.id)}
+										<option value={unit.id}>{unitOptionLabel(unit)}</option>
+									{/each}
+								</select>
+							</div>
+						{/each}
+					</div>
+				{/if}
 				{#if recipe.ingredients?.length}
 					<ul>
 						{#each recipe.ingredients as ingredient, i (i)}
 							{#if ingredient.title}
 								<li class="section-title">{ingredient.title}</li>
 							{:else}
-								<li>{scaledIngredientText(ingredient)}</li>
+								{@const options = ingredientUnitOptions(ingredient)}
+								<li>
+									<span>{scaledIngredientText(ingredient, i)}</span>
+									{#if options.length}
+									<!-- TODO: Style ingredient unit selection -->
+										<select
+											class="unit-select"
+											aria-label={`Convert unit for ${ingredient.food ?? ingredient.display}`}
+											value={selectedUnit(ingredient, i)?.id}
+											onchange={(e) => (selectedUnitId[i] = e.currentTarget.value)}
+										>
+											<option value={ingredient.unit.id}>{unitOptionLabel(ingredient.unit)}</option>
+											{#each options as option (option.id)}
+												<option value={option.id}>{unitOptionLabel(option)}</option>
+											{/each}
+										</select>
+									{/if}
+								</li>
 							{/if}
 						{/each}
 					</ul>
@@ -367,6 +454,32 @@
 			font-size: 0.85em;
 		}
 
+		& .unit-defaults-bar {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			gap: 0.8em;
+			margin: 0.6em 0 0.8em;
+
+			& .label {
+				font-size: 0.75em;
+				text-transform: uppercase;
+				color: var(--grey);
+				font-weight: 600;
+			}
+		}
+
+		& .unit-default {
+			display: flex;
+			align-items: center;
+			gap: 0.3em;
+			font-size: 0.85em;
+
+			& label {
+				color: var(--grey);
+			}
+		}
+
 		& ul {
 			margin: 0;
 			padding: 0;
@@ -374,8 +487,21 @@
 		}
 
 		& li {
+			display: flex;
+			align-items: center;
+			flex-wrap: wrap;
+			gap: 0.5em;
 			padding: 0.4em 0;
 			border-bottom: 1px solid var(--grey_light);
+		}
+
+		& .unit-select {
+			padding: 0.1em 0.3em;
+			border: 1px solid var(--grey_light);
+			border-radius: 0.3em;
+			font-size: 0.8em;
+			color: var(--grey);
+			background: transparent;
 		}
 
 		& .section-title {

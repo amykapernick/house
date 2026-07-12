@@ -1,46 +1,46 @@
 <script lang="ts">
 	import { format, startOfWeek, endOfWeek } from 'date-fns';
+	import { SvelteMap } from 'svelte/reactivity';
 	import ScheduleView from '$partials/calendar/ScheduleView.svelte';
-	import Select from '$parts/Select.svelte';
+	import FocusTimer from '$parts/FocusTimer.svelte';
+	import FamilyFilter from '$parts/FamilyFilter.svelte';
+	import TaskList from '$parts/tasks/List.svelte';
 	import { isAuthenticated, getToken } from '$lib/auth';
-	import fetchClientData, { getGraphqlUrl } from '$utils/fetchClientData';
+	import fetchClientData, { getGraphqlUrl, setCache } from '$utils/fetchClientData';
+	import fetchFamilyMembers, { EVERYONE, isVisibleToUser, type FamilyMember } from '$utils/fetchFamilyMembers';
 	import type { ScheduleBlock, ScheduleSavePayload, RoutineDays, PaletteColour } from '$types/schedule';
-	import type { Task } from '$types/tasks';
-
-	const EVERYONE = `everyone`;
+	import type { Task, TaskStatus } from '$types/tasks';
 
 	let blocks = $state<ScheduleBlock[]>([]);
 	let colours = $state<PaletteColour[]>([]);
-	let defaultRoutineId = $state<string | null>(null);
 	let loading = $state(true);
 	let currentRange = $state<{ from: string; to: string } | null>(null);
 
 	let tasks = $state<Task[]>([]);
 	let events = $state<any[]>([]);
 	let icalEvents = $state<any[]>([]);
-	let familyMembers = $state<{ slug: string; name: string }[]>([]);
+	let familyMembers = $state<FamilyMember[]>([]);
 	let selectedUserSlug = $state(EVERYONE);
 
-	let visibleIcalEvents = $derived(
-		selectedUserSlug === EVERYONE
-			? icalEvents
-			: icalEvents.filter((event) => event.family?.some((member: any) => member.slug === selectedUserSlug))
+	let visibleIcalEvents = $derived(icalEvents.filter((event) => isVisibleToUser(event.family, selectedUserSlug)));
+
+	let visibleBlocks = $derived(
+		blocks.filter((block) => isVisibleToUser(block.family ? [block.family] : [], selectedUserSlug))
 	);
 
+	// The API resolves unassigned tasks, or tasks assigned to someone outside
+	// the family, to the whole family - so `assigned` always includes every
+	// member for an "everyone" task, and this filter needs no special case.
+	let visibleTasks = $derived(tasks.filter((task) => isVisibleToUser(task.assigned, selectedUserSlug)));
+
+	// Undated tasks (e.g. GitHub issues, which have no due date) never appear on the
+	// calendar grid itself - parseTasks in ScheduleView drops anything without a due
+	// date - so surface them in a plain list instead of hiding them entirely.
+	let undatedTasks = $derived(visibleTasks.filter((task) => !task.due));
+
 	function loadFamily() {
-		function handleFamily(res: any) { familyMembers = res.users ?? []; }
-		fetchClientData({
-			cacheKey: 'family',
-			onStale: handleFamily,
-			gqlQuery: `
-				query {
-					users {
-						slug
-						name
-					}
-				}
-			`,
-		}).then(handleFamily);
+		function handleFamily(members: FamilyMember[]) { familyMembers = members; }
+		fetchFamilyMembers(handleFamily).then(handleFamily);
 	}
 
 	function loadCalendarItems() {
@@ -112,9 +112,22 @@
 		tasks = tasks.filter((task) => task.id !== taskId);
 	}
 
+	// Keep the shared cache in sync so a revisit within the TTL doesn't show the pre-update status.
+	function handleTaskUpdate(id: string, status: TaskStatus) {
+		tasks = tasks.map((task) => (task.id === id ? { ...task, status } : task));
+		setCache(`calendar`, { tasks, events });
+	}
+
 	function loadColours() {
 		function handleColours(res: any) {
-			colours = res.colours ?? [];
+			// The `colours` collection has one row per theme variant of a name
+			// (base/Light/Dark, for CSS generation) - keep only the base row per
+			// name so the colour picker doesn't offer (or key on) duplicates.
+			const byName = new SvelteMap<string, PaletteColour>();
+			for (const c of res.colours ?? []) {
+				if (!byName.has(c.name) || !c.theme) byName.set(c.name, c);
+			}
+			colours = [...byName.values()];
 		}
 		fetchClientData({
 			cacheKey: `colours`,
@@ -125,6 +138,7 @@
 						name
 						hex
 						link
+						theme
 					}
 				}
 			`,
@@ -137,7 +151,6 @@
 		currentRange = { from, to };
 		function handleSchedule(res: any) {
 			blocks = res.schedule ?? [];
-			defaultRoutineId = res.defaultRoutineId ?? null;
 			loading = false;
 		}
 		fetchClientData({
@@ -153,8 +166,10 @@
 						end
 						colour
 						isOverride
+						family {
+							slug
+						}
 					}
-					defaultRoutineId
 				}
 			`,
 		}).then(handleSchedule);
@@ -191,12 +206,17 @@
 	}
 
 	async function handleSave(payload: ScheduleSavePayload) {
+		if (selectedUserSlug === EVERYONE) {
+			throw new Error(`Select a family member before saving their schedule`);
+		}
+
 		const daysArgs = gqlDaysArgs(payload.days);
+		const userArg = `user: ${gqlStr(selectedUserSlug)}`;
 
 		const mutation =
 			payload.scope === `default`
-				? `mutation { updateDefaultRoutine(id: ${gqlStr(defaultRoutineId ?? ``)}, ${daysArgs}) { success } }`
-				: `mutation { createRoutineOverride(start: ${gqlStr(payload.start)}, end: ${gqlStr(payload.end)}, ${daysArgs}) { success } }`;
+				? `mutation { updateDefaultRoutine(${userArg}, ${daysArgs}) { success } }`
+				: `mutation { createRoutineOverride(${userArg}, start: ${gqlStr(payload.start)}, end: ${gqlStr(payload.end)}, ${daysArgs}) { success } }`;
 
 		const token = await getToken();
 		const res = await fetch(getGraphqlUrl(), {
@@ -229,28 +249,24 @@
 </svelte:head>
 
 <h1>Schedule</h1>
+<FocusTimer />
 {#if loading}
 	<p>Loading...</p>
 {:else}
-	{#if familyMembers.length}
-		<Select
-			id="schedule-user-filter"
-			label="Filter by family member"
-			bind:value={selectedUserSlug}
-			options={[
-				{ value: EVERYONE, label: 'Everyone' },
-				...familyMembers.map((member) => ({ value: member.slug, label: member.name })),
-			]}
-		/>
-	{/if}
+	<FamilyFilter {familyMembers} bind:selectedUserSlug />
 	<ScheduleView
-		{blocks}
+		blocks={visibleBlocks}
 		{colours}
-		{tasks}
+		tasks={visibleTasks}
 		{events}
 		icalEvents={visibleIcalEvents}
+		readOnly={selectedUserSlug === EVERYONE}
 		onRangeChange={handleRangeChange}
 		onSave={handleSave}
 		onTaskCompleted={handleTaskCompleted}
 	/>
+	{#if undatedTasks.length}
+		<h2>Undated tasks</h2>
+		<TaskList tasks={undatedTasks} onUpdate={handleTaskUpdate} />
+	{/if}
 {/if}

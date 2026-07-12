@@ -15,7 +15,7 @@ setup(`authenticate with Clerk test user`, async ({ page }) => {
 	const password = process.env.CLERK_TEST_USER_PASSWORD;
 	if (!email || !password) {
 		throw new Error(
-			`CLERK_TEST_USER_EMAIL and CLERK_TEST_USER_PASSWORD must be set to run authenticated accessibility tests.`
+			`CLERK_TEST_USER_EMAIL and CLERK_TEST_USER_PASSWORD must be set to run authenticated tests.`
 		);
 	}
 

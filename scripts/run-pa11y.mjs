@@ -3,7 +3,7 @@
 // second, independently-implemented accessibility engine.
 //
 // Authenticated routes reuse the Clerk session cookies captured by the
-// Playwright `setup` project (tests/a11y/.auth/state.json) instead of logging
+// Playwright `setup` project (tests/setup/.auth/state.json) instead of logging
 // in a second time.
 
 import { readFile, mkdir, writeFile } from 'node:fs/promises';
@@ -14,7 +14,7 @@ import { routes } from '../tests/a11y/routes.ts';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? `http://localhost:4173`;
-const authStatePath = path.join(dirname, `../tests/a11y/.auth/state.json`);
+const authStatePath = path.join(dirname, `../tests/setup/.auth/state.json`);
 const reportDir = path.join(dirname, `../pa11y-report`);
 
 async function loadAuthCookies() {

@@ -2,14 +2,20 @@
 	import TaskList from './List.svelte';
 	import TaskBoard from './Kanban.svelte';
 	import TaskCalendar from './TaskCalendar.svelte';
-	import type { Task } from '$types/tasks';
+	import type { Task, TaskStatus } from '$types/tasks';
 	import type { Component } from 'svelte';
 
-	let { tasks = [] }: { tasks: Task[] } = $props();
+	let {
+		tasks = [],
+		onUpdate,
+	}: { tasks: Task[]; onUpdate?: (id: string, status: TaskStatus) => void } = $props();
 
 	type TaskViewType = 'list' | 'kanban' | 'calendar';
 
-	const views: Record<TaskViewType, { component: Component<{ tasks: Task[] }>; name: string }> = {
+	const views: Record<
+		TaskViewType,
+		{ component: Component<{ tasks: Task[]; onUpdate?: (id: string, status: TaskStatus) => void }>; name: string }
+	> = {
 		list: {
 			component: TaskList,
 			name: 'List',
@@ -36,11 +42,11 @@
 		{/each}
 	</nav>
 	{#if view === 'list'}
-		<TaskList {tasks} />
+		<TaskList {tasks} {onUpdate} />
 	{:else if view === 'kanban'}
-		<TaskBoard {tasks} />
+		<TaskBoard {tasks} {onUpdate} />
 	{:else}
-		<TaskCalendar {tasks} />
+		<TaskCalendar {tasks} {onUpdate} />
 	{/if}
 </div>
 

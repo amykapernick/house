@@ -1,7 +1,9 @@
 <script lang="ts">
 	import { isAuthenticated, getToken } from '$lib/auth';
 	import fetchClientData, { setCache, getGraphqlUrl } from '$utils/fetchClientData';
+	import { resolve } from '$app/paths';
 	import { SvelteSet } from 'svelte/reactivity';
+	import CheckboxButton from '$parts/CheckboxButton.svelte';
 
 	type SubGroup = { name: string; items: any[] };
 	type StoreGroup = { name: string; items: any[]; subGroups: SubGroup[] };
@@ -32,13 +34,14 @@
 						items {
 							id display checked quantity note
 							category labels source link
+							recipes { id name slug }
 						}
 						storeGroups {
 							name
-							items { id display checked quantity note category labels source link }
+							items { id display checked quantity note category labels source link recipes { id name slug } }
 							subGroups {
 								name
-								items { id display checked quantity note category labels source link }
+								items { id display checked quantity note category labels source link recipes { id name slug } }
 							}
 						}
 					}
@@ -169,7 +172,6 @@
 {:else}
 	<div class="controls">
 		<p class="count">{uncheckedItems.length} items to get</p>
-		<button class="refresh" onclick={() => fetchList(true)}>Refresh</button>
 		<label class="toggle">
 			<input type="checkbox" bind:checked={showChecked} />
 			Show checked items ({checkedItems.length})
@@ -204,21 +206,25 @@
 
 {#snippet itemRow(item: any)}
 	<li class:checked={item.checked}>
-		<button
+		<CheckboxButton
 			class="check-btn"
-			class:is-checked={item.checked}
-			disabled={checking.has(item.id)}
+			variant="boxed"
+			state={item.checked ? 'complete' : 'incomplete'}
+			loading={checking.has(item.id)}
 			onclick={() => toggleItem(item)}
-			aria-label={item.checked ? 'Uncheck item' : 'Check item'}
-		>
-			{#if checking.has(item.id)}
-				…
-			{:else if item.checked}
-				✓
+			label={item.checked ? 'Uncheck item' : 'Check item'}
+		/>
+		<span class="item-row">
+			<span class="item-display">
+				{item.display}
+			</span>
+			{#if item.recipes?.length}
+				<span class="item-recipes">
+					{#each item.recipes as recipe (recipe.id)}
+						<a href={resolve(`/recipes/[slug]`, { slug: recipe.slug })} class="recipe-tag">{recipe.name}</a>
+					{/each}
+				</span>
 			{/if}
-		</button>
-		<span class="item-display">
-			{item.display}
 		</span>
 	</li>
 {/snippet}
@@ -271,20 +277,6 @@
 		font-size: 0.9em;
 		color: var(--grey);
 		margin: 0;
-	}
-
-	.refresh {
-		padding: 0.4em 0.8em;
-		border: 1px solid var(--grey_light);
-		border-radius: 0.3em;
-		background: transparent;
-		cursor: pointer;
-		font-size: 0.85em;
-
-		&:hover {
-			border-color: var(--purple_bright);
-			color: var(--purple_bright);
-		}
 	}
 
 	.toggle {
@@ -391,39 +383,33 @@
 		}
 	}
 
-	.check-btn {
+	:global(.check-btn) {
 		flex-shrink: 0;
-		width: 1.6em;
-		height: 1.6em;
-		border: 2px solid var(--grey_light);
-		border-radius: 0.3em;
-		background: transparent;
-		cursor: pointer;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		font-size: 0.85em;
-		color: var(--grey);
-		transition: all 0.15s;
-
-		&:hover:not(:disabled) {
-			border-color: var(--purple_bright);
-			color: var(--purple_bright);
-		}
-
-		&.is-checked {
-			background: var(--green);
-			border-color: var(--green);
-			color: var(--green_text);
-		}
-
-		&:disabled {
-			opacity: 0.5;
-			cursor: wait;
-		}
 	}
 
-	.item-display {
+	.item-row {
 		flex: 1;
+		display: flex;
+		flex-direction: column;
+		gap: 0.3em;
+	}
+
+	.item-recipes {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.4em;
+	}
+
+	.recipe-tag {
+		padding: 0.1em 0.5em;
+		border: 1px solid currentColor;
+		border-radius: 0.2em;
+		font-size: 0.75em;
+		color: var(--purple_bright);
+		text-decoration: none;
+
+		&:hover {
+			text-decoration: underline;
+		}
 	}
 </style>
