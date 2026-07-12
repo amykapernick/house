@@ -11,6 +11,7 @@ import Recipes from '$img/icons/recipe-book-47.svg?component';
 import Baby from '$img/icons/baby.svg?component';
 import Schedule from '$img/icons/calendar-day-view.svg?component'
 import Budget from '$img/icons/chart-bar-33.svg?component'
+import Health from '$img/icons/phone-health.svg?component'
 import Graphql from '$img/icons/graphql.svg?component'
 
 export const menuItems: MenuItem[] = [
@@ -77,6 +78,12 @@ export const menuItems: MenuItem[] = [
 		link: resolve(`/small-human`),
 		auth: true,
 		Icon: Baby
+	},
+	{
+		label: `Health`,
+		link: resolve(`/health`),
+		auth: true,
+		Icon: Health
 	},
 	...(import.meta.env.DEV ? [{
 		label: `GraphQL`,

@@ -378,6 +378,13 @@ export type Habit = {
   streak: Maybe<Scalars['Int']['output']>;
 };
 
+export type HealthMetric = {
+  key: Scalars['String']['output'];
+  label: Maybe<Scalars['String']['output']>;
+  unit: Maybe<Scalars['String']['output']>;
+  value: Scalars['Float']['output'];
+};
+
 export type HomeAssistantState = {
   entityId: Scalars['ID']['output'];
   friendlyName: Maybe<Scalars['String']['output']>;
@@ -1420,6 +1427,7 @@ export type UpdateUserInput = {
 
 export type User = {
   colour: Maybe<Scalars['String']['output']>;
+  health: Maybe<Array<HealthMetric>>;
   ids: Maybe<UserIds>;
   name: Maybe<Scalars['String']['output']>;
   profile: Maybe<Scalars['String']['output']>;
@@ -1427,6 +1435,7 @@ export type User = {
 };
 
 export type UserIds = {
+  ha: Maybe<Scalars['String']['output']>;
   notion: Maybe<Scalars['String']['output']>;
   todoist: Maybe<Scalars['String']['output']>;
 };
