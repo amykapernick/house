@@ -361,13 +361,15 @@ export type GrowthMeasurement = {
 };
 
 export type Habit = {
+  assigned: Array<User>;
+  completions: Array<Scalars['String']['output']>;
   due: Maybe<Scalars['String']['output']>;
-  frequency: Maybe<Scalars['String']['output']>;
   id: Maybe<Scalars['String']['output']>;
   lastCompleted: Maybe<Scalars['String']['output']>;
   link: Maybe<Scalars['String']['output']>;
   name: Maybe<Scalars['String']['output']>;
   recurrence: Maybe<Scalars['String']['output']>;
+  recurrenceInterval: Maybe<RecurrenceInterval>;
   streak: Maybe<Scalars['Int']['output']>;
 };
 
@@ -846,6 +848,7 @@ export type ParentingApproachNote = {
 };
 
 export type Platform =
+  | 'github'
   | 'notion'
   | 'todoist';
 
@@ -1114,6 +1117,11 @@ export type RecommendedSetup = {
   sleep_sack_tog: Scalars['Float']['output'];
 };
 
+export type RecurrenceInterval = {
+  count: Scalars['Int']['output'];
+  unit: Scalars['String']['output'];
+};
+
 export type Resource = {
   category: Maybe<Scalars['String']['output']>;
   description: Maybe<Scalars['String']['output']>;
@@ -1295,7 +1303,7 @@ export type Swimming = {
 
 export type Task = {
   allDay: Maybe<Scalars['Boolean']['output']>;
-  assigned: Maybe<Array<Maybe<User>>>;
+  assigned: Array<User>;
   due: Maybe<Scalars['String']['output']>;
   dueLabel: Maybe<Scalars['String']['output']>;
   end: Maybe<Scalars['String']['output']>;
