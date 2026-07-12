@@ -95,7 +95,6 @@ export const menuItems: MenuItem[] = [
 // Account-level pages (e.g. profile) live in the header's account area rather
 // than the main menuItems grid, but still need to be recognised by routeRequiresAuth.
 // TODO: fix profile menu
-// TODO: Should menu items taht require auth be split out here too?
 export const authOnlyRoutes: string[] = [
 	resolve(`/profile`),
 ];
