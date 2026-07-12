@@ -140,8 +140,8 @@
 			</td>
 		{/each}
 	{:else}
-		<td class="month">
-			<ul class="month-days">
+		<td class="days-column">
+			<ul class="days-list">
 				{#each days as day (day.toISOString())}
 					<li title={format(day, 'EEEE d MMM')}>
 						{@render dayIcon(day)}
@@ -243,11 +243,11 @@
 		text-align: center;
 	}
 
-	.month {
+	.days-column {
 		border-left: 1px solid var(--grey_light);
 	}
 
-	.month-days {
+	.days-list {
 		display: flex;
 		flex-wrap: wrap;
 		margin: 0;

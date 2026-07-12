@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { addDays, eachDayOfInterval, endOfMonth, format, startOfMonth, startOfWeek } from 'date-fns';
+	import { addDays, eachDayOfInterval, endOfMonth, endOfYear, format, startOfMonth, startOfWeek, startOfYear } from 'date-fns';
 	import { SvelteSet } from 'svelte/reactivity';
 	import HabitItem from './HabitItem.svelte';
 	import type { Habit, HabitViewRange } from '$types/habits';
@@ -14,14 +14,15 @@
 
 	let days = $derived.by(() => {
 		const now = new Date();
+		if (range === 'year') return eachDayOfInterval({ start: startOfYear(now), end: endOfYear(now) });
 		if (range === 'month') return eachDayOfInterval({ start: startOfMonth(now), end: endOfMonth(now) });
 
 		const weekStart = startOfWeek(now, { weekStartsOn: 1 });
 		return Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
 	});
 
-	// Month view packs every day into one icon-per-day column instead of one
-	// column per day - too many columns to read sensibly otherwise.
+	// Month/year views pack every day into one icon-per-day column instead of
+	// one column per day - too many columns to read sensibly otherwise.
 	let columnCount = $derived(range === 'week' ? days.length : 1);
 
 	// A habit assigned to nobody in particular resolves to the whole family
@@ -50,6 +51,7 @@
 <nav class="switcher">
 	<button type="button" onclick={() => (range = 'week')} data-active={range === 'week'}>Week</button>
 	<button type="button" onclick={() => (range = 'month')} data-active={range === 'month'}>Month</button>
+	<button type="button" onclick={() => (range = 'year')} data-active={range === 'year'}>Year</button>
 </nav>
 
 <div class="table-scroll">
@@ -61,8 +63,10 @@
 					{#each days as day (day.toISOString())}
 						<th>{format(day, 'EEE d')}</th>
 					{/each}
-				{:else}
+				{:else if range === 'month'}
 					<th>{format(days[0], 'MMMM yyyy')}</th>
+				{:else}
+					<th>{format(days[0], 'yyyy')}</th>
 				{/if}
 			</tr>
 		</thead>

@@ -1,6 +1,6 @@
 import type { User } from './global'
 
-export type HabitViewRange = `week` | `month`
+export type HabitViewRange = `week` | `month` | `year`
 
 export type RecurrenceUnit = `day` | `week` | `month` | `year`
 
