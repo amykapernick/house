@@ -221,6 +221,7 @@ export type CompleteTaskResult = {
 };
 
 export type ContentEntry = {
+  brief: Maybe<Scalars['String']['output']>;
   icon: Maybe<Scalars['String']['output']>;
   iconType: Maybe<Scalars['String']['output']>;
   slug: Maybe<Scalars['String']['output']>;
@@ -890,6 +891,7 @@ export type Query = {
   calendars: Maybe<Array<Maybe<Calendar>>>;
   colour: Maybe<PaletteColour>;
   colours: Maybe<Array<Maybe<PaletteColour>>>;
+  contentDigest: Maybe<ContentPage>;
   contentEntries: Maybe<Array<Maybe<ContentEntry>>>;
   contentIndex: Maybe<Array<Maybe<ContentGroup>>>;
   contentPage: Maybe<ContentPage>;
@@ -929,6 +931,11 @@ export type QueryColourArgs = {
 
 export type QueryColoursArgs = {
   name?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type QueryContentDigestArgs = {
+  slug: Scalars['String']['input'];
 };
 
 

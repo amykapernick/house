@@ -8,7 +8,7 @@ export const CONTENT_CACHE_TTL = 30 * 24 * 60 * 60 * 1000;
 export const contentEntriesQuery = `
 	query {
 		contentEntries {
-			slug title icon iconType
+			slug title icon iconType brief
 		}
 	}
 `;
@@ -29,6 +29,16 @@ export function contentPageQuery(slug: string, pageSlug: string): string {
 	return `
 		query {
 			contentPage(slug: "${slug}", pageSlug: "${pageSlug}") {
+				slug title content
+			}
+		}
+	`;
+}
+
+export function contentDigestQuery(slug: string): string {
+	return `
+		query {
+			contentDigest(slug: "${slug}") {
 				slug title content
 			}
 		}

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { addDays, eachDayOfInterval, endOfMonth, endOfYear, format, startOfMonth, startOfWeek, startOfYear } from 'date-fns';
-	import { SvelteSet } from 'svelte/reactivity';
+	import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 	import HabitItem from './HabitItem.svelte';
 	import type { Habit, HabitViewRange } from '$types/habits';
 	import type { User } from '$types/global';
@@ -29,7 +29,7 @@
 	// (see resolveAssignedUsers on the API), so it can appear under more than
 	// one member's section - that's expected, not a duplication bug.
 	let sections = $derived.by(() => {
-		const members = new Map<string, User>();
+		const members = new SvelteMap<string, User>();
 		habits.forEach((habit) => habit.assigned.forEach((user) => members.set(user.slug, user)));
 
 		return Array.from(members.values()).map((member) => ({
