@@ -109,6 +109,43 @@
 
 	let areaSelectOptions = $derived(houseBoard.areas.map((a) => ({ value: a.id, label: a.id })));
 
+	// Excludes whichever item is currently being edited (edit mode only - create mode has no
+	// editingItemId yet, so a brand-new item can link to any existing one).
+	let linkOptions = $derived(
+		houseBoard.items
+			.filter((i) => i.id !== editingItemId)
+			.map((i) => ({ value: i.id, label: `${i.type} (${i.id})` }))
+	);
+
+	// Maintains a mutual linked_item pair (both sides point at each other), matching the
+	// convention scripts/migrateHouseToPocketbase.mjs originally established - mergeLinkedFanLightItems
+	// only needs one direction to find a pair, but an asymmetric link would let the same item
+	// render twice (once standalone, once folded into a merged fan_light) if the unlinked side
+	// happens to be processed first. Also unlinks whichever item is being "stolen" from its
+	// previous partner, since linked_item is a single relation, not a list.
+	function setMutualLink(itemId: string, newLinkedId: string | null) {
+		const item = houseBoard.items.find((i) => i.id === itemId);
+		if (!item) return;
+
+		if (item.linkedItem && item.linkedItem !== newLinkedId) {
+			const oldPartner = houseBoard.items.find((i) => i.id === item.linkedItem);
+			if (oldPartner?.linkedItem === itemId) oldPartner.linkedItem = null;
+		}
+
+		if (newLinkedId) {
+			const newPartner = houseBoard.items.find((i) => i.id === newLinkedId);
+			if (newPartner) {
+				if (newPartner.linkedItem && newPartner.linkedItem !== itemId) {
+					const stolenFrom = houseBoard.items.find((i) => i.id === newPartner.linkedItem);
+					if (stolenFrom?.linkedItem === newPartner.id) stolenFrom.linkedItem = null;
+				}
+				newPartner.linkedItem = itemId;
+			}
+		}
+
+		item.linkedItem = newLinkedId;
+	}
+
 	async function fetchRawHouse() {
 		const res = await fetchClientData({
 			skipCache: true,
@@ -160,6 +197,7 @@
 					originalStart: start,
 					originalSize: size,
 					originalRotation: rotation,
+					originalLinkedItem: i.linkedItem?.id ?? null,
 				};
 			}),
 			deletedAreaIds: [],
@@ -327,7 +365,7 @@
 	let itemModalStartX = $state(0);
 	let itemModalStartY = $state(0);
 	let itemModalRotation = $state(0);
-	let itemModalLinkedLabel = $state<string | null>(null);
+	let itemModalLinkedItem = $state(``);
 	let editingItemId = $state<string | null>(null);
 
 	let pickerOpen = $state(false);
@@ -356,7 +394,7 @@
 		itemModalStartX = Math.round(x);
 		itemModalStartY = Math.round(y);
 		itemModalRotation = 0;
-		itemModalLinkedLabel = null;
+		itemModalLinkedItem = ``;
 		editingItemId = null;
 		itemModalOpen = true;
 	}
@@ -372,8 +410,7 @@
 		itemModalStartX = Math.round(item.start[0]);
 		itemModalStartY = Math.round(item.start[1]);
 		itemModalRotation = item.rotation ?? 0;
-		const linked = item.linkedItem ? houseBoard.items.find((i) => i.id === item.linkedItem) : null;
-		itemModalLinkedLabel = linked ? `${linked.type} (${linked.id})` : null;
+		itemModalLinkedItem = item.linkedItem ?? ``;
 		editingItemId = id;
 		itemModalOpen = true;
 	}
@@ -381,6 +418,7 @@
 	function saveItemModal() {
 		const start: [number, number] = [itemModalStartX, itemModalStartY];
 		const area = itemModalArea || null;
+		const linkedItem = itemModalLinkedItem || null;
 
 		if (itemModalMode === `create`) {
 			houseBoard.items.push({
@@ -393,6 +431,7 @@
 				rotation: itemModalRotation || null,
 				linkedItem: null,
 			});
+			setMutualLink(itemModalId, linkedItem);
 		}
 		else if (editingItemId) {
 			const item = houseBoard.items.find((i) => i.id === editingItemId);
@@ -401,6 +440,7 @@
 				item.area = area;
 				item.start = start;
 				item.rotation = itemModalRotation || null;
+				setMutualLink(item.id, linkedItem);
 			}
 		}
 		itemModalOpen = false;
@@ -413,6 +453,11 @@
 
 		houseBoard.items = houseBoard.items.filter((i) => i.id !== id);
 		if (item?.kind === `existing`) houseBoard.deletedItemIds.push(id);
+		// Clear any other item's link to this one, matching the area-delete orphaning pattern -
+		// don't leave a dangling linkedItem reference.
+		houseBoard.items.forEach((other) => {
+			if (other.linkedItem === id) other.linkedItem = null;
+		});
 
 		itemModalOpen = false;
 	}
@@ -462,7 +507,7 @@
 				fields.push(`op${i}: deleteHouseItem(id: ${gqlStr(op.id)}) { success }`);
 			}
 			else {
-				const input = `{ id: ${gqlStr(op.id)}, type: ${op.itemType}, area: ${op.area === null ? `null` : gqlStr(op.area)}, start: ${gqlArr(op.start)}, size: ${gqlArr(op.size)}, rotation: ${gqlNum(op.rotation)} }`;
+				const input = `{ id: ${gqlStr(op.id)}, type: ${op.itemType}, area: ${op.area === null ? `null` : gqlStr(op.area)}, start: ${gqlArr(op.start)}, size: ${gqlArr(op.size)}, rotation: ${gqlNum(op.rotation)}, linkedItem: ${op.linkedItem === null ? `null` : gqlStr(op.linkedItem)} }`;
 				const call = op.type === `create` ? `createHouseItem(input: ${input})` : `updateHouseItem(id: ${gqlStr(op.id)}, input: ${input})`;
 				fields.push(`op${i}: ${call} { id }`);
 			}
@@ -478,7 +523,7 @@
 		}
 
 		clearCache(`house`);
-		await fetchRawHouse();
+		editMode = false;
 		fetchHouse(true);
 	}
 </script>
@@ -582,7 +627,8 @@
 	bind:startX={itemModalStartX}
 	bind:startY={itemModalStartY}
 	bind:rotation={itemModalRotation}
-	linkedItemLabel={itemModalLinkedLabel}
+	bind:linkedItem={itemModalLinkedItem}
+	{linkOptions}
 	areaOptions={areaSelectOptions}
 	onSave={saveItemModal}
 	onDelete={itemModalMode === `edit` ? deleteItemFromModal : undefined}

@@ -38,7 +38,8 @@
 		startX = $bindable(0),
 		startY = $bindable(0),
 		rotation = $bindable(0),
-		linkedItemLabel = null,
+		linkedItem = $bindable(``),
+		linkOptions,
 		areaOptions,
 		saving = false,
 		error = ``,
@@ -54,7 +55,8 @@
 		startX?: number;
 		startY?: number;
 		rotation?: number;
-		linkedItemLabel?: string | null;
+		linkedItem?: string;
+		linkOptions: { value: string; label: string }[];
 		areaOptions: { value: string; label: string }[];
 		saving?: boolean;
 		error?: string;
@@ -66,6 +68,7 @@
 	let valid = $derived(!!type);
 
 	let areaSelectOptions = $derived([{ value: ``, label: `Unassigned` }, ...areaOptions]);
+	let linkSelectOptions = $derived([{ value: ``, label: `None` }, ...linkOptions]);
 </script>
 
 <Modal bind:open title={modalTitle}>
@@ -99,9 +102,10 @@
 		<input type="number" bind:value={rotation} />
 	</label>
 
-	{#if linkedItemLabel}
-		<p class="linked">Linked to: {linkedItemLabel}</p>
-	{/if}
+	<div class="field">
+		Link to another item
+		<Select id="house-item-linked" label="Link to another item" bind:value={linkedItem} options={linkSelectOptions} />
+	</div>
 
 	{#if error}<p class="error">{error}</p>{/if}
 
@@ -138,12 +142,6 @@
 		& .field {
 			flex: 1;
 		}
-	}
-
-	.linked {
-		margin: 0 0 1em;
-		color: var(--grey);
-		font-size: 0.9em;
 	}
 
 	.error {
