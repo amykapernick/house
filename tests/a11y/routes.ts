@@ -15,15 +15,26 @@ export interface A11yRoute {
 	name: string;
 	path: string;
 	auth: boolean;
+	// axe-only: rules to skip on this route because the violation is baked
+	// into a third-party dependency's own markup, not our code. Not read by
+	// the pa11y runner (different engine/ruleset, and it doesn't flag these).
+	axeDisableRules?: string[];
 }
+
+// @event-calendar/core (5.7.1, and still true in the latest 5.9.0 per its
+// published source) always renders its toolbar <nav> as a direct child of
+// the calendar's own role="table"/"list" container - ARIA disallows that
+// nesting, but it's the library's own structure, not something we can fix
+// from consumer code without patching its DOM after every render.
+const CALENDAR_LIBRARY_RULES = [`aria-required-children`];
 
 export const routes: A11yRoute[] = [
 	{ name: `sign-in`, path: `/sign-in`, auth: false },
 	{ name: `home`, path: `/`, auth: true },
 	{ name: `tasks`, path: `/tasks`, auth: true },
 	{ name: `habits`, path: `/habits`, auth: true },
-	{ name: `calendar`, path: `/calendar`, auth: true },
-	{ name: `schedule`, path: `/schedule`, auth: true },
+	{ name: `calendar`, path: `/calendar`, auth: true, axeDisableRules: CALENDAR_LIBRARY_RULES },
+	{ name: `schedule`, path: `/schedule`, auth: true, axeDisableRules: CALENDAR_LIBRARY_RULES },
 	{ name: `budget`, path: `/budget`, auth: true },
 	{ name: `recipes`, path: `/recipes`, auth: false },
 	{ name: `recipe-tags`, path: `/recipes/tags`, auth: false },

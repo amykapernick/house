@@ -80,6 +80,14 @@
 		return DEFAULT_COLOUR_NAME;
 	}
 
+	// Every named palette colour has a guaranteed AA-contrast _text pairing
+	// (see resolveTextColour in household_api) - always resolving through the
+	// palette here, rather than using an arbitrary raw hex directly as the
+	// background with hardcoded white text, is what makes that guarantee apply.
+	function textColourFor(colour: string | null): string {
+		return `var(--${resolveColourName(colour)}_text)`;
+	}
+
 	const DAY_KEYS = [`sunday`, `monday`, `tuesday`, `wednesday`, `thursday`, `friday`, `saturday`] as const;
 	const LOCAL_DATETIME = `yyyy-MM-dd'T'HH:mm:ss`;
 
@@ -124,6 +132,7 @@
 			backgroundColor: block.colour
 				? (block.colour.startsWith('#') ? block.colour : `var(--${block.colour})`)
 				: 'var(--purple_bright)',
+			textColor: textColourFor(block.colour),
 			classNames: block.isOverride ? ['schedule-override'] : [],
 			extendedProps: { type: 'block', link: undefined, status: undefined, platform: undefined },
 		}));
@@ -139,6 +148,7 @@
 			allDay: event.allDay ?? false,
 			editable: false,
 			backgroundColor: 'colour' in event && event.colour ? `var(--${event.colour})` : event.type === 'task' ? 'var(--purple_bright)' : 'var(--blue)',
+			textColor: 'colour' in event && event.colour ? `var(--${event.colour}_text)` : event.type === 'task' ? 'var(--purple_bright_text)' : 'var(--blue_text)',
 			extendedProps: {
 				type: event.type,
 				link: 'link' in event ? event.link : undefined,

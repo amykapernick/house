@@ -246,7 +246,10 @@
 				...(token ? { 'Authorization': `Bearer ${token}` } : {}),
 			},
 			body: JSON.stringify({
-				query: `mutation { completeTask(taskId: "${taskId}", platform: todoist) { success } }`,
+				// completeHabit (not the generic completeTask) so the completion also
+				// gets logged to PocketBase, which is what drives this allergen's
+				// streak on the habits page (also merged in from Todoist).
+				query: `mutation { completeHabit(habitId: "${taskId}") { success } }`,
 			}),
 		}).then(r => r.json());
 

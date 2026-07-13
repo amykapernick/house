@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Modal from '$parts/Modal.svelte';
-	import Select from '$parts/Select.svelte';
+	import ColourSelect from '$parts/ColourSelect.svelte';
 	import type { PaletteColour } from '$types/schedule';
 
 	let {
@@ -21,7 +21,7 @@
 		onDelete?: () => void;
 	} = $props();
 
-	let colourOptions = $derived(colours.map((c) => ({ value: c.name, label: c.name })));
+	let colourNames = $derived(colours.map((c) => c.name));
 </script>
 
 <Modal bind:open title={mode === `create` ? `New block` : `Edit block`}>
@@ -31,12 +31,7 @@
 	</label>
 	<div class="field">
 		Colour
-		<Select id="block-colour" label="Colour" bind:value={colour} options={colourOptions}>
-			{#snippet children(option)}
-				<span class="swatch" style:background={`var(--${option.value})`}></span>
-				<span class="label">{option.label}</span>
-			{/snippet}
-		</Select>
+		<ColourSelect id="block-colour" bind:value={colour} colours={colourNames} />
 	</div>
 
 	<div class="actions">
@@ -54,14 +49,6 @@
 		flex-direction: column;
 		gap: 0.25em;
 		margin-bottom: 1em;
-	}
-
-	.swatch {
-		display: inline-block;
-		width: 0.9em;
-		height: 0.9em;
-		border-radius: 50%;
-		margin-right: 0.5em;
 	}
 
 	.actions {

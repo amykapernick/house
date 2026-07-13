@@ -246,7 +246,7 @@
 {#if loading}
 	<p>Loading...</p>
 {:else}
-	<FamilyFilter bind:selectedUserSlug />
+	<FamilyFilter bind:selectedUserSlug pageKey="schedule" />
 	<ScheduleView
 		blocks={visibleBlocks}
 		{colours}

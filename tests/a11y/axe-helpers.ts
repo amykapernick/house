@@ -9,7 +9,7 @@ export function formatViolations(violations: Result[]): string {
 		.join(`\n`);
 }
 
-export async function runAxeScan(page: Page, name: string): Promise<void> {
+export async function runAxeScan(page: Page, name: string, disableRules: string[] = []): Promise<void> {
 	await expect(page.locator(`body`)).toBeVisible();
 
 	// Pages fetch their data client-side after mount (see the Page Data
@@ -21,6 +21,7 @@ export async function runAxeScan(page: Page, name: string): Promise<void> {
 
 	const results = await new AxeBuilder({ page })
 		.withTags([`wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa`])
+		.disableRules(disableRules)
 		.analyze();
 
 	await test.info().attach(`axe-results-${name}`, {

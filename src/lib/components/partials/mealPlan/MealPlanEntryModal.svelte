@@ -127,6 +127,7 @@
 	</div>
 
 	<fieldset>
+		<legend class="sr-only">Link this meal to</legend>
 		<label>
 			<input type="radio" bind:group={linkMode} value="recipe" />
 			Recipe

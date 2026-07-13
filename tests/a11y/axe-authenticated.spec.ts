@@ -7,7 +7,7 @@ for (const route of routes.filter((r) => r.auth)) {
 		page,
 	}) => {
 		await page.goto(route.path);
-		await runAxeScan(page, route.name);
+		await runAxeScan(page, route.name, route.axeDisableRules);
 	});
 }
 

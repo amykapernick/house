@@ -2,14 +2,22 @@
 	import { isAuthenticated } from '$lib/auth';
 	import fetchFamilyMembers, { EVERYONE, fetchCurrentUserSlug } from '$utils/fetchFamilyMembers';
 	import type { FamilyMember } from '$utils/fetchFamilyMembers';
+	import { getSavedFamilyFilter, saveFamilyFilter } from '$utils/familyFilterPreference';
 
-	let { selectedUserSlug = $bindable(EVERYONE) }: { selectedUserSlug?: string } = $props();
+	let { pageKey, selectedUserSlug = $bindable(EVERYONE) }: { pageKey: string; selectedUserSlug?: string } = $props();
 
 	let familyMembers = $state<FamilyMember[]>([]);
-	let defaultApplied = false;
+
+	// A saved per-page selection always wins over the "default to me" lookup.
+	// Applying it synchronously (not in an effect) means applyDefault below sees
+	// defaultApplied already true no matter which async call resolves first.
+	const saved = getSavedFamilyFilter(pageKey);
+	let defaultApplied = !!saved;
+	if (saved) selectedUserSlug = saved;
 
 	// Only overwrite the still-untouched EVERYONE default - if the me lookup
-	// resolves after the user has already picked someone, leave their choice alone.
+	// resolves after the user has already picked someone (or a saved choice was
+	// restored above), leave it alone.
 	function applyDefault(slug: string | undefined) {
 		if (defaultApplied || !slug || selectedUserSlug !== EVERYONE) return;
 		selectedUserSlug = slug;
@@ -23,6 +31,12 @@
 		fetchFamilyMembers(handleFamily).then(handleFamily);
 
 		fetchCurrentUserSlug(applyDefault).then(applyDefault);
+	});
+
+	// Persist every change, including the resolved "default to me" value, so
+	// the next visit to this page restores it instead of resetting to Everyone.
+	$effect(() => {
+		saveFamilyFilter(pageKey, selectedUserSlug);
 	});
 </script>
 

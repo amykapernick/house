@@ -47,6 +47,6 @@
 {#if loading}
 	<p>Loading...</p>
 {:else}
-	<FamilyFilter bind:selectedUserSlug />
-	<HabitView habits={visibleHabits} onComplete={handleHabitComplete} />
+	<FamilyFilter bind:selectedUserSlug pageKey="habits" />
+	<HabitView habits={visibleHabits} {selectedUserSlug} onComplete={handleHabitComplete} />
 {/if}

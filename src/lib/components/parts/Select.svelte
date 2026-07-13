@@ -32,7 +32,7 @@
 
 <label class="sr-only" for={id}>{label}</label>
 <select class="select" {id} bind:value {onchange} onclick={handlePickerClick}>
-	<button type="button">
+	<button type="button" aria-label={label}>
 		<selectedcontent></selectedcontent>
 	</button>
 	{#each options as option (option.value)}

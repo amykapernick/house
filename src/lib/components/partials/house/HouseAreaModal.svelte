@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Modal from '$parts/Modal.svelte';
-	import Select from '$parts/Select.svelte';
+	import ColourSelect from '$parts/ColourSelect.svelte';
 
 	let {
 		open = $bindable(false),
@@ -35,11 +35,6 @@
 	} = $props();
 
 	let modalTitle = $derived(mode === `create` ? `Add area` : `Edit area`);
-
-	let colourSelectOptions = $derived([
-		{ value: ``, label: `None` },
-		...colourOptions.map((name) => ({ value: name, label: name })),
-	]);
 </script>
 
 <Modal bind:open title={modalTitle}>
@@ -71,7 +66,7 @@
 
 	<div class="field">
 		Colour
-		<Select id="house-area-colour" label="Colour" bind:value={colour} options={colourSelectOptions} />
+		<ColourSelect id="house-area-colour" bind:value={colour} colours={colourOptions} includeNone />
 	</div>
 
 	{#if error}<p class="error">{error}</p>{/if}

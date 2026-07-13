@@ -2,7 +2,7 @@
 	import { SvelteMap } from 'svelte/reactivity';
 	import { clerk, clerkLoaded, isAuthenticated, getToken } from '$lib/auth';
 	import fetchClientData, { setCache, getGraphqlUrl } from '$utils/fetchClientData';
-	import Select from '$parts/Select.svelte';
+	import ColourSelect from '$parts/ColourSelect.svelte';
 	import type { PaletteColour } from '$types/schedule';
 
 	let clerkContainer: HTMLDivElement | undefined = $state();
@@ -18,7 +18,7 @@
 	let todoistId = $state('');
 
 	let colours = $state<PaletteColour[]>([]);
-	let colourOptions = $derived(colours.map((c) => ({ value: c.name, label: c.name })));
+	let colourNames = $derived(colours.map((c) => c.name));
 
 	// Clerk's default UserProfile renders as its own boxed, shadowed card with its
 	// own colour scheme - overridden here so it reads as part of this page rather
@@ -169,13 +169,8 @@
 		<input id="name" type="text" bind:value={name} required />
 
 		<span class="field-label">Colour</span>
-		{#if colourOptions.length}
-			<Select
-				id="colour"
-				label="Colour"
-				bind:value={colour}
-				options={colourOptions}
-			/>
+		{#if colourNames.length}
+			<ColourSelect id="colour" bind:value={colour} colours={colourNames} />
 		{/if}
 
 		<label for="notion-id">Notion ID</label>

@@ -126,7 +126,6 @@
 				{name}
 			{/if}
 			{#if due}<span class="due">{formatDue(due)}</span>{/if}
-			<span class="todoist-id">#{id}</span>
 		</span>
 		{#if streak > 0}
 			<span class="streak">🔥 {streak}</span>
@@ -192,13 +191,6 @@
 		color: var(--grey);
 		font-size: 0.8em;
 		font-weight: 400;
-	}
-
-	.todoist-id {
-		color: var(--grey);
-		font-size: 0.75em;
-		font-weight: 400;
-		font-family: monospace;
 	}
 
 	.emoji {

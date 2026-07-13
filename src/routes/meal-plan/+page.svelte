@@ -628,6 +628,7 @@
 			border: 1px solid var(--grey_light);
 			border-radius: 0.3em;
 			background: transparent;
+			color: var(--black);
 			cursor: pointer;
 
 			&.today {

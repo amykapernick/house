@@ -9,11 +9,11 @@
 	import ContentIcon from '$components/parts/ContentIcon.svelte';
 	import type { ContentEntry, ContentGroup } from '$types/generated';
 
-	// `total`/`read` are null until known - course-style entries need a
-	// (cheap, structure-only) network call to find out, digest-style entries
-	// only know their exact trackable-section read count if the page has
-	// already been visited and cached locally (see statusFromDigestCache).
-	type EntryStatus = { total: number | null, read: number | null };
+	// `total` is null until known - course-style entries need a (cheap,
+	// structure-only) network call to find out. `read` defaults to 0 when
+	// nothing's been read yet or a digest-style entry hasn't been cached
+	// locally (see statusFromDigestCache).
+	type EntryStatus = { total: number | null, read: number };
 
 	let entries = $state<ContentEntry[]>([]);
 	let loading = $state(true);
@@ -29,7 +29,7 @@
 	function statusFromDigestCache(slug: string, fallbackTotal: number | null): EntryStatus {
 		const cached = peekCache(contentDigestCacheKey(slug), CONTENT_CACHE_TTL);
 		const content = cached?.contentDigest?.content;
-		if (!content) return { total: fallbackTotal, read: null };
+		if (!content) return { total: fallbackTotal, read: 0 };
 
 		const chunks = splitTrackableChunks(content).filter((chunk) => chunk.trackable);
 		const readAnchors = getReadAnchors(slug, DIGEST_PAGE_SLUG);
@@ -113,9 +113,9 @@
 							{#if entry.brief && !status?.total}
 								<span class="progress">No versions yet</span>
 							{:else if status?.total}
-								<span class="progress" class:complete={status.read != null && status.read >= status.total}>
-									{status.read ?? `?`}/{status.total} sections read
-									{#if status.read != null && status.read >= status.total}<span title="Fully read">✓</span>{/if}
+								<span class="progress" class:complete={status.read >= status.total}>
+									{status.read}/{status.total} sections read
+									{#if status.read >= status.total}<span title="Fully read">✓</span>{/if}
 								</span>
 							{/if}
 							{#if entry.updatedAt}
@@ -167,12 +167,11 @@
 		gap: 0.6em;
 		font-weight: 400;
 		font-size: 0.8em;
-		color: var(--neutral);
+		color: var(--navy_text);
 	}
 
 	.progress {
 		&.complete {
-			color: var(--green);
 			font-weight: 600;
 		}
 	}

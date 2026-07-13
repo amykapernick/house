@@ -2,13 +2,15 @@
 	import { addDays, eachDayOfInterval, endOfMonth, endOfYear, format, startOfMonth, startOfWeek, startOfYear } from 'date-fns';
 	import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 	import HabitItem from './HabitItem.svelte';
+	import { EVERYONE } from '$utils/fetchFamilyMembers';
 	import type { Habit, HabitViewRange } from '$types/habits';
 	import type { User } from '$types/global';
 
 	let {
 		habits = [],
+		selectedUserSlug = EVERYONE,
 		onComplete,
-	}: { habits: Habit[]; onComplete?: (id: string) => void } = $props();
+	}: { habits: Habit[]; selectedUserSlug?: string; onComplete?: (id: string) => void } = $props();
 
 	let range = $state<HabitViewRange>('week');
 
@@ -27,10 +29,17 @@
 
 	// A habit assigned to nobody in particular resolves to the whole family
 	// (see resolveAssignedUsers on the API), so it can appear under more than
-	// one member's section - that's expected, not a duplication bug.
+	// one member's section - that's expected, not a duplication bug. But when
+	// filtered to one member, only build that member's section - otherwise an
+	// "everyone" habit's full assigned list would still surface every other
+	// member's (empty-looking, but really just-not-relevant) section too.
 	let sections = $derived.by(() => {
 		const members = new SvelteMap<string, User>();
-		habits.forEach((habit) => habit.assigned.forEach((user) => members.set(user.slug, user)));
+		habits.forEach((habit) =>
+			habit.assigned.forEach((user) => {
+				if (selectedUserSlug === EVERYONE || user.slug === selectedUserSlug) members.set(user.slug, user);
+			})
+		);
 
 		return Array.from(members.values()).map((member) => ({
 			member,

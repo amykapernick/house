@@ -70,6 +70,7 @@
 			end: Date;
 			allDay: boolean;
 			backgroundColor: string;
+			textColor: string;
 			extendedProps: {
 				type: 'event' | 'task' | 'meal';
 				link: string | undefined;
@@ -83,6 +84,7 @@
 			end: new Date(event.end),
 			allDay: event.allDay ?? false,
 			backgroundColor: 'colour' in event && event.colour ? `var(--${event.colour})` : event.type === 'task' ? 'var(--purple_bright)' : 'var(--blue)',
+			textColor: 'colour' in event && event.colour ? `var(--${event.colour}_text)` : event.type === 'task' ? 'var(--purple_bright_text)' : 'var(--blue_text)',
 			extendedProps: {
 				type: event.type,
 				link: 'link' in event ? event.link : undefined,
@@ -103,6 +105,7 @@
 					end: setHours(day, 19),
 					allDay: false,
 					backgroundColor: 'var(--orange)',
+					textColor: 'var(--orange_text)',
 					extendedProps: {
 						type: 'meal',
 						link: meal.recipe?.slug ? `/recipes/${meal.recipe.slug}` : undefined,

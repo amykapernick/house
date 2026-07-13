@@ -177,6 +177,7 @@
 				type="text"
 				class="tag-filter"
 				placeholder="Find a tag..."
+				aria-label="Find a tag"
 				bind:value={tagSearch}
 			/>
 		</div>
@@ -212,6 +213,7 @@
 		<input
 			type="text"
 			placeholder="Search recipes..."
+			aria-label="Search recipes"
 			bind:value={searchInput}
 		/>
 		<button type="submit">Search</button>
@@ -467,6 +469,7 @@
 			border: 1px solid var(--grey_light);
 			border-radius: 0.3em;
 			background: transparent;
+			color: var(--black);
 			cursor: pointer;
 			font-size: 0.85em;
 
@@ -588,6 +591,7 @@
 			border: 1px solid var(--grey_light);
 			border-radius: 0.3em;
 			background: transparent;
+			color: var(--black);
 			cursor: pointer;
 
 			&:disabled {

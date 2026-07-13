@@ -118,6 +118,6 @@
 {#if loading}
 	<p>Loading...</p>
 {:else}
-	<FamilyFilter bind:selectedUserSlug />
+	<FamilyFilter bind:selectedUserSlug pageKey="calendar" />
 	<CalendarView tasks={visibleTasks} allDayEvents={events} icalEvents={visibleIcalEvents} {mealPlans} onTaskCompleted={handleTaskCompleted} />
 {/if}

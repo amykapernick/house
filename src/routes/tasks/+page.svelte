@@ -52,7 +52,7 @@
 {#if loading}
 	<p>Loading...</p>
 {:else}
-	<FamilyFilter bind:selectedUserSlug />
+	<FamilyFilter bind:selectedUserSlug pageKey="tasks" />
 	<TaskView tasks={visibleTasks} onUpdate={handleTaskUpdate} />
 {/if}
 

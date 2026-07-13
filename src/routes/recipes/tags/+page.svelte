@@ -49,6 +49,7 @@
 		type="text"
 		class="filter"
 		placeholder="Filter tags..."
+		aria-label="Filter tags"
 		bind:value={search}
 	/>
 
