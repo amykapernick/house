@@ -11,7 +11,11 @@
 	// A saved per-page selection always wins over the "default to me" lookup.
 	// Applying it synchronously (not in an effect) means applyDefault below sees
 	// defaultApplied already true no matter which async call resolves first.
-	const saved = getSavedFamilyFilter(pageKey);
+	function getSaved() {
+		return getSavedFamilyFilter(pageKey);
+	}
+
+	const saved = getSaved();
 	let defaultApplied = !!saved;
 	if (saved) selectedUserSlug = saved;
 
