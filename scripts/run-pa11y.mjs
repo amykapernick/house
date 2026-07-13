@@ -13,7 +13,7 @@ import pa11y from 'pa11y';
 import { routes } from '../tests/a11y/routes.ts';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
-const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? `http://localhost:4173`;
+const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? `http://localhost:5173`;
 const authStatePath = path.join(dirname, `../tests/setup/.auth/state.json`);
 const reportDir = path.join(dirname, `../pa11y-report`);
 

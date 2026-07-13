@@ -2,7 +2,7 @@ import path from 'node:path';
 import { defineConfig, devices } from '@playwright/test';
 
 const authFile = path.join(import.meta.dirname, `tests/setup/.auth/state.json`);
-const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? `http://localhost:4173`;
+const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? `http://localhost:5173`;
 
 export default defineConfig({
 	testDir: `./tests`,
