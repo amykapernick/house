@@ -6,60 +6,56 @@
 		menuItems,
 		isAuthenticated,
 		children,
+		class: className = '',
 	}: {
 		menuItems: MenuItem[];
 		isAuthenticated: boolean;
 		children?: Snippet;
+		class?: string;
 	} = $props();
 
-	let subMenu = $state<string | false>(false);
 </script>
 
-<nav>
+<nav class={className}>
 	<ul class="menu">
-		{#each menuItems.filter(({ auth }) => !auth || isAuthenticated) as { label, link, items, Icon } (label)}
+		{#each menuItems.filter(({ auth }) => !auth || isAuthenticated) as { label, link, Icon } (label)}
 			<li>
-				{#if items}
-					<button
-						onclick={() => (subMenu = subMenu === label ? false : label)}
-						aria-pressed={subMenu === label}
-						data-active={subMenu === label}
-						class="menu_section"
-					>
-						{label}
-					</button>
-					<ul class="sub" data-open={subMenu === label}>
-						{#each items.filter(({ auth }) => !auth || isAuthenticated) as item (item.link)}
-							<li>
-								<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- item.link is already resolve()d in navigation.ts -->
-								<a href={item.link}>{item.label}</a>
-							</li>
-						{/each}
-					</ul>
-				{:else}
 					<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- link is already resolve()d in navigation.ts -->
 					<a href={link}>
-						<span class="label">{label}</span>
 						<Icon />
+						<span class="label">{label}</span>
+						
 					</a>
-				{/if}
 			</li>
 		{/each}
 		{#if children}
 			{@render children()}
 		{/if}
-	</ul>
+	</ul> 
 </nav>
 
 <style>
 	@import '@mixins';
 
+	nav {
+		display: block;
+		position: fixed;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		grid-area: menu;
+		overflow-x: auto;
+		border: 1px solid var(--header_border);
+		background: var(--header_background); 
+		font-size: 1.2em;
+		font-weight: 700;
+	}
+
 	.menu {
 		display: flex;
-		flex-wrap: wrap;
-		justify-content: center;
-		margin: -10px;
-		padding: 0;
+		justify-content: start;
+		margin: 0;
+		padding: 0 0.1em;
 
 		& li {
 			position: relative;
@@ -69,55 +65,58 @@
 		& a,
 		& button {
 			padding: 10px;
-			color: inherit;
+			color: light-dark(var(--black), var(--navy));
 			font-size: inherit;
 			font-weight: inherit;
+
+			&:hover {
+				--gradient_base: var(--background);
+
+				background: light-dark(linear-gradient(rgb(242 231 212) 0%, rgb(226 208 180) 100%), linear-gradient(rgb(42 51 70) 0%, rgb(51 62 86) 100%));
+			}
 		}
-	}
-
-	.sub {
-		display: none;
-		position: absolute;
-		z-index: 50;
-		top: 100%;
-		left: 0;
-		margin: 0;
-		padding: 0;
-		background: var(--background);
-		color: var(--background_text);
-		box-shadow: 0 0 10px color-mix(in srgb, var(--neutral) 20%, transparent);
-		font-size: 0.8em;
-		list-style: none;
-
-		&[data-open='true'] {
-			display: block;
-		}
-
-		& li {
-			margin: 0;
-			padding: 0;
-		}
-
-		& a {
-			padding: 10px;
-			background: var(--background);
-			color: inherit;
-			font-size: inherit;
-			font-weight: inherit;
-		}
-	}
-
-	.menu_section {
-		@include button_text;
 	}
 
 	.label {
+
 		@include sr_only;
 	}
 
-	@media (width <= 50em) {
-		.sub {
-			width: max-content;
+	@media(width >= 50em) {
+		nav {
+			position: static;
+			overflow: hidden auto;
+			border: none;
+			font-size: 1em;
+		}
+
+		.menu {
+			display: block;
+			justify-content: start;
+			margin: 0;
+			padding: 0;
+		}
+	}
+
+	@media(width >= 60em) {
+		.label {
+
+			@include remove_sr_only;
+
+			
+		}
+
+		.menu {
+			& a,
+			& button {
+				display: flex;
+				align-items: center;
+				padding: 0.2em 0.5em;
+				border-radius: 10px;
+				font-size: inherit;
+				font-weight: inherit;
+				gap: 0.5em;
+			}
 		}
 	}
 </style>

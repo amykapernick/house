@@ -9,11 +9,13 @@
 		status,
 		labels,
 		onChange,
+		class: className = '',
 	}: {
 		id: string;
 		status: Status;
 		labels: Record<Status, string>;
 		onChange: (id: string, status: Status) => void;
+		class?: string;
 	} = $props();
 
 	let selectedValue = $derived(status);
@@ -45,7 +47,7 @@
 	});
 </script>
 
-<Select id="status-{id}" label="Change Status" bind:value={selectedValue} {options} onchange={handleChange}>
+<Select id="status-{id}" label="Change Status" bind:value={selectedValue} {options} onchange={handleChange} class={className}>
 	{#snippet children(option)}
 		<Icon name={option.value} />
 		<span class="label">{option.label}</span>

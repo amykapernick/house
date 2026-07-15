@@ -46,6 +46,8 @@ export default defineConfig(async ({ mode }) => {
 								prefixClassNames: false,
 							},
 						},
+						// Strip width/height from the root <svg> so it scales via viewBox instead.
+						`removeDimensions`,
 					]
 				}
 			}),
@@ -55,6 +57,9 @@ export default defineConfig(async ({ mode }) => {
 				'@mixins': path.resolve(`./src/lib/styles/mixins/index.css`),
 				'@styles': path.resolve(`./src/lib/styles`),
 			},
+		},
+		define: {
+			__SITE_TITLE__: JSON.stringify(env.SITE_TITLE),
 		},
 		css: {
 			postcss: postcssConfig,

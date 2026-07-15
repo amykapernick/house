@@ -4,6 +4,7 @@
    have no matching PocketBase record, they're just names this app uses.
    Must be imported before colours.generated.css so its theme-derived
    overrides for --navy take precedence over the plain default here. */
+
 :root {
 	--navy: var(--blue_navy);
 	--navy_text: var(--blue_navy_text);
@@ -16,4 +17,33 @@
 	--success: var(--green);
 	--success_text: var(--green_text);
 	--transparent: transparent;
+	--gradient_base: var(--purple_bright);
+	--gradient_background: linear-gradient(
+		155deg,
+		color-mix(in oklch, var(--gradient_base) 78%, #ffffff) 0%,
+		var(--gradient_base) 55%,
+		color-mix(in oklch, var(--gradient_base) 78%, #000000) 100%
+	);
+	--background_gradient: var(--gradient_background);
+
+	/* TODO: Replace with actual value */
+	--base_colour: light-dark(var(--white), #1f242d);
+
+	/* Falls back to the OS preference until the app.html inline script (or
+	   theme.ts, post-hydration) stamps a resolved data-theme attribute. */
+	color-scheme: light dark;
+}
+
+/* An explicit color-scheme, scoped to the resolved theme rather than the
+   bare `light dark` above, is what makes light-dark() and UA-styled controls
+   (scrollbars, form fields) follow the manual toggle instead of just
+   prefers-color-scheme - the attribute selector outweighs the plain :root
+   rule regardless of source order, so this always wins once data-theme is set. */
+
+:root[data-theme='light'] {
+	color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+	color-scheme: dark;
 }

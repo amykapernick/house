@@ -4,7 +4,7 @@
 	import type { FamilyMember } from '$utils/fetchFamilyMembers';
 	import { getSavedFamilyFilter, saveFamilyFilter } from '$utils/familyFilterPreference';
 
-	let { pageKey, selectedUserSlug = $bindable(EVERYONE) }: { pageKey: string; selectedUserSlug?: string } = $props();
+	let { pageKey, selectedUserSlug = $bindable(EVERYONE), class: className = '' }: { pageKey: string; selectedUserSlug?: string; class?: string } = $props();
 
 	let familyMembers = $state<FamilyMember[]>([]);
 
@@ -45,7 +45,7 @@
 </script>
 
 {#if familyMembers.length}
-	<fieldset class="user_filter">
+	<fieldset class="user_filter {className}">
 		<legend>Filter by family member</legend>
 		<label>
 			<input type="radio" name="family-filter" value={EVERYONE} bind:group={selectedUserSlug} />

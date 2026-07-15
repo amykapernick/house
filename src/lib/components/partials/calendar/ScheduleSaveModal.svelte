@@ -8,6 +8,7 @@
 		saving = false,
 		error = ``,
 		onConfirm,
+		class: className = '',
 	}: {
 		open?: boolean;
 		defaultStart?: string;
@@ -15,6 +16,7 @@
 		saving?: boolean;
 		error?: string;
 		onConfirm: (payload: { scope: `default` } | { scope: `range`; start: string; end: string }) => void;
+		class?: string;
 	} = $props();
 
 	let scope = $state<`default` | `range`>(`default`);
@@ -40,7 +42,7 @@
 	}
 </script>
 
-<Modal bind:open title="Save schedule changes">
+<Modal bind:open class={className} title="Save schedule changes">
 	<fieldset>
 		<label>
 			<input type="radio" bind:group={scope} value="default" />

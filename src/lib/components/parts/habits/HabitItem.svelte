@@ -15,7 +15,8 @@
 		days,
 		range,
 		onComplete,
-	}: Habit & { days: Date[]; range: HabitViewRange; onComplete?: (id: string) => void } = $props();
+		class: className = '',
+	}: Habit & { days: Date[]; range: HabitViewRange; onComplete?: (id: string) => void; class?: string } = $props();
 
 	let saving = $state(false);
 	let actionError = $state('');
@@ -105,7 +106,7 @@
 	}
 </script>
 
-<tr class="habit">
+<tr class="habit {className}">
 	<td class="name">
 		<CheckboxButton class="checkbox" disabled={saving} onclick={completeHabit} label="Mark {name} complete" />
 		<span class="label">

@@ -4,6 +4,12 @@ module.exports = {
 		`stylelint-config-property-sort-order-smacss`,
 		`stylelint-config-standard`,
 	],
+	overrides: [
+		{
+			files: [`**/*.svelte`],
+			customSyntax: `postcss-html`,
+		},
+	],
 	ignoreFiles: [
 		`**/*.tsx`,
 		`**/*.ts`,

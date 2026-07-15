@@ -2,12 +2,13 @@
 	import HouseMap from '$partials/HouseMap.svelte';
 	import HouseAreaModal from '$partials/house/HouseAreaModal.svelte';
 	import HouseItemModal from '$partials/house/HouseItemModal.svelte';
-	import Modal from '$parts/Modal.svelte';
+	import EntityPickerModal from '$components/parts/house/EntityPickerModal.svelte';
 	import { isAuthenticated, getToken } from '$lib/auth';
 	import fetchClientData, { getGraphqlUrl, clearCache } from '$utils/fetchClientData';
 	import { beforeNavigate } from '$app/navigation';
 	import { buildHouseSaveOps, type HouseBoard, type DraftHouseArea, type DraftHouseItem } from '$utils/houseEditDnd';
 	import type { Area, Item } from '$types/house';
+	import { getPageTitle } from '$utils/pageTitle';
 
 	const MAP_SIZE = [1189, 1593];
 
@@ -529,7 +530,7 @@
 </script>
 
 <svelte:head>
-	<title>House | Kapers Crewe Household</title>
+	<title>{getPageTitle(`House`)}</title>
 </svelte:head>
 
 <h1>House</h1>
@@ -569,38 +570,24 @@
 	<HouseMap {areas} {items} />
 {/if}
 
-<Modal bind:open={pickerOpen} title="Add item">
-	{#if availableEntities.length === 0}
-		<p>Nothing left to add - tag more entities with <code>house_app</code> in Home Assistant first.</p>
-	{:else}
-		<ul class="picker_list">
-			{#each availableEntities as entity (entity.id)}
-				<li>
-					<button type="button" onclick={() => pickEntity(entity)}>
-						{entity.friendlyName ?? entity.entityId}
-						<span class="entity_id">{entity.entityId}</span>
-					</button>
-				</li>
-			{/each}
-		</ul>
-	{/if}
-	<button type="button" onclick={() => (pickerOpen = false)}>Cancel</button>
-</Modal>
+<EntityPickerModal bind:open={pickerOpen} title="Add item" entities={availableEntities} onPick={pickEntity}>
+	{#snippet emptyMessage()}
+		Nothing left to add - tag more entities with <code>house_app</code> in Home Assistant first.
+	{/snippet}
+	{#snippet label(entity)}
+		{entity.friendlyName ?? entity.entityId}
+		<span class="entity_id">{entity.entityId}</span>
+	{/snippet}
+</EntityPickerModal>
 
-<Modal bind:open={areaPickerOpen} title="Add area">
-	{#if availableAreaEntities.length === 0}
-		<p>Nothing left to add - every configured Home Assistant area already has a house map area.</p>
-	{:else}
-		<ul class="picker_list">
-			{#each availableAreaEntities as entity (entity.id)}
-				<li>
-					<button type="button" onclick={() => pickAreaEntity(entity)}>{entity.name}</button>
-				</li>
-			{/each}
-		</ul>
-	{/if}
-	<button type="button" onclick={() => (areaPickerOpen = false)}>Cancel</button>
-</Modal>
+<EntityPickerModal bind:open={areaPickerOpen} title="Add area" entities={availableAreaEntities} onPick={pickAreaEntity}>
+	{#snippet emptyMessage()}
+		Nothing left to add - every configured Home Assistant area already has a house map area.
+	{/snippet}
+	{#snippet label(entity)}
+		{entity.name}
+	{/snippet}
+</EntityPickerModal>
 
 <HouseAreaModal
 	bind:open={areaModalOpen}
@@ -652,36 +639,8 @@
 		color: var(--red);
 	}
 
-	.picker_list {
-		margin: 0 0 1em;
-		padding: 0;
-		list-style: none;
-		max-height: 50vh;
-		overflow-y: auto;
-
-		& li {
-			margin: 0;
-		}
-
-		& button {
-			display: flex;
-			flex-direction: column;
-			align-items: flex-start;
-			width: 100%;
-			padding: 0.5em 0.75em;
-			border: none;
-			background: none;
-			text-align: left;
-			cursor: pointer;
-
-			&:hover {
-				background: color-mix(in srgb, var(--purple_bright) 8%, transparent);
-			}
-		}
-
-		& .entity_id {
-			color: var(--grey);
-			font-size: 0.8em;
-		}
+	.entity_id {
+		color: var(--grey);
+		font-size: 0.8em;
 	}
 </style>

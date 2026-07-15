@@ -6,6 +6,7 @@
 	import { buildClientSchema, getIntrospectionQuery, type GraphQLSchema } from 'graphql';
 	import { getToken, isAuthenticated } from '$lib/auth';
 	import { getGraphqlUrl } from '$utils/fetchClientData';
+	import { getPageTitle } from '$utils/pageTitle';
 
 	const DEFAULT_QUERY = `query {\n  \n}\n`;
 
@@ -90,7 +91,7 @@
 </script>
 
 <svelte:head>
-	<title>GraphQL Console | Kapers Crewe Household</title>
+	<title>{getPageTitle(`GraphQL Console`)}</title>
 </svelte:head>
 
 {#if !import.meta.env.DEV}

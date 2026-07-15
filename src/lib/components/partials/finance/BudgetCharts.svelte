@@ -7,7 +7,7 @@
 	import BarChart from '$parts/BarChart.svelte';
 	import Stats from '$parts/Stats.svelte';
 
-	let { budget, buckets }: { budget: BudgetItem[]; buckets: BudgetBucket[] } = $props();
+	let { budget, buckets, class: className = '' }: { budget: BudgetItem[]; buckets: BudgetBucket[]; class?: string } = $props();
 
 	const formatCurrency = (value: number) =>
 		value.toLocaleString('en-AU', { style: 'currency', currency: 'AUD', maximumFractionDigits: 0 });
@@ -80,7 +80,7 @@
 	);
 </script>
 
-<section class="charts">
+<section class="charts {className}">
 	<Stats
 		items={[
 			{ name: 'Monthly Income', value: formatCurrency(income), colour: 'blue_navy' },

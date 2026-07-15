@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { User } from '$types/global';
 
-	let { assignees = [], className = '' }: { assignees: User[]; className?: string } = $props();
+	let { assignees = [], class: className = '' }: { assignees: User[]; class?: string } = $props();
 </script>
 
 <ul class="list {className}">

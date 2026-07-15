@@ -1,10 +1,10 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 
-	let { children, fullWidth = false }: { children: Snippet; fullWidth?: boolean } = $props();
+	let { children, fullWidth = false, class: className = '' }: { children: Snippet; fullWidth?: boolean; class?: string } = $props();
 </script>
 
-<div class="layout" class:full={fullWidth}>
+<div class="layout {className}" class:full={fullWidth}>
 	{@render children()}
 </div>
 
@@ -17,6 +17,10 @@
 
 		&.full {
 			max-width: unset;
+		}
+
+		@media(width >= 50em) {
+			width: 90%
 		}
 	}
 </style>

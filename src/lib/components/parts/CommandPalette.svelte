@@ -18,10 +18,12 @@
 		menuItems,
 		isAuthenticated,
 		open = $bindable(false),
+		class: className = '',
 	}: {
 		menuItems: MenuItem[];
 		isAuthenticated: boolean;
 		open?: boolean;
+		class?: string;
 	} = $props();
 
 	type Result = {
@@ -386,7 +388,7 @@
 
 <dialog
 	bind:this={dialogEl}
-	class="palette"
+	class="palette {className}"
 	onclose={() => (open = false)}
 	onclick={(event) => {
 		if (event.target === dialogEl) open = false;

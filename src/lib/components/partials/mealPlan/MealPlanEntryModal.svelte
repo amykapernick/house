@@ -29,6 +29,7 @@
 		error = ``,
 		onSave,
 		onDelete,
+		class: className = '',
 	}: {
 		open?: boolean;
 		mode: `create` | `edit`;
@@ -43,6 +44,7 @@
 		error?: string;
 		onSave: () => void;
 		onDelete?: () => void;
+		class?: string;
 	} = $props();
 
 	let dateLabel = $derived.by(() => {
@@ -63,7 +65,7 @@
 	}
 
 	let searchQuery = $state(``);
-	let searchResults = $state<{ id: string; name: string; slug: string }[]>([]);
+	let searchResults = $state<{ id: string; name: string; slug: string; categories: { name: string }[]; tags: { name: string }[] }[]>([]);
 	let searching = $state(false);
 	let searchToken = 0;
 	let searchDebounceTimer: ReturnType<typeof setTimeout> | undefined;
@@ -74,7 +76,7 @@
 			gqlQuery: `
 				query {
 					recipes(page: 1, perPage: ${RECIPE_FETCH_COUNT}, queryFilter: "${escapeGqlString(searchTerm)}") {
-						items { id name slug }
+						items { id name slug categories { name } tags { name } }
 					}
 				}
 			`,
@@ -105,6 +107,10 @@
 		}
 	});
 
+	function recipeBadge(recipe: { categories: { name: string }[]; tags: { name: string }[] }): string | undefined {
+		return recipe.categories[0]?.name ?? recipe.tags[0]?.name;
+	}
+
 	function selectRecipe(recipe: { id: string; name: string }) {
 		recipeId = recipe.id;
 		recipeName = recipe.name;
@@ -118,7 +124,7 @@
 	}
 </script>
 
-<Modal bind:open title={modalTitle}>
+<Modal bind:open class={className} title={modalTitle}>
 	<p class="date_label">{dateLabel}</p>
 
 	<div class="field">
@@ -156,7 +162,12 @@
 					<ul class="results">
 						{#each searchResults as recipe (recipe.id)}
 							<li>
-								<button type="button" onclick={() => selectRecipe(recipe)}>{recipe.name}</button>
+								<button type="button" onclick={() => selectRecipe(recipe)}>
+									<span class="name">{recipe.name}</span>
+									{#if recipeBadge(recipe)}
+										<span class="tag">{recipeBadge(recipe)}</span>
+									{/if}
+								</button>
 							</li>
 						{/each}
 						{#if searching && searchResults.length === 0}
@@ -254,6 +265,10 @@
 		}
 
 		& button {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 0.5em;
 			width: 100%;
 			text-align: left;
 			padding: 0.5em 0.75em;
@@ -263,6 +278,22 @@
 
 			&:hover {
 				background: color-mix(in srgb, var(--purple_bright) 8%, transparent);
+			}
+
+			& .name {
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+
+			& .tag {
+				flex-shrink: 0;
+				padding: 0.15em 0.5em;
+				border-radius: 1em;
+				background: color-mix(in srgb, var(--purple_bright) 15%, transparent);
+				color: var(--purple_bright);
+				font-size: 0.75em;
+				white-space: nowrap;
 			}
 		}
 

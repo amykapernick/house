@@ -6,10 +6,12 @@
 		plugins,
 		events = [],
 		optionsOverride = {},
+		class: className = '',
 	}: {
 		plugins: any[];
 		events: any[];
 		optionsOverride?: Record<string, any>;
+		class?: string;
 	} = $props();
 
 	// optionsOverride is a static config object per caller, not a value that changes after mount
@@ -38,7 +40,7 @@
 
 <!-- TODO: Look into resource calendar options for user and calendar -->
 
-<div class="calendar-container">
+<div class="calendar-container {className}">
 	<Calendar {plugins} {options} />
 </div>
 

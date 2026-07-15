@@ -122,7 +122,7 @@
 </script>
 
 <svelte:head>
-	<title>Kapers Crewe Household</title>
+	<title>{__SITE_TITLE__}</title>
 	<meta name="description" content="Meal Planning, Tasks, Reminders, Calendars" />
 </svelte:head>
 
@@ -134,6 +134,7 @@
 	ontouchcancel={handleTouchEnd}
 />
 
+<!-- TODO: Make a smaller version, expand on hover -->
 <p class="status_banner" class:offline={!$isOnline}>
 	<span>{$isOnline ? `Online` : `Offline`}{#if lastUpdatedText} · Data updated {lastUpdatedText}{/if}</span>
 	<button
@@ -159,10 +160,12 @@
 </button>
 
 <style>
+	@import '@mixins';
+
 	:global(body) {
 		display: grid;
-		grid-template-rows: auto 1fr auto;
 		grid-template-areas: 'header' 'main' 'footer';
+		grid-template-rows: auto 1fr auto;
 		max-width: 100vw;
 		min-height: 100vh;
 		margin: 0;
@@ -173,23 +176,24 @@
 
 	.main {
 		grid-area: main;
+		margin-bottom: 5em;
 	}
 
 	.status_banner {
-		position: fixed;
-		bottom: 1em;
-		left: 1em;
 		display: flex;
+		position: fixed;
+		z-index: 1000;
+		bottom: 4.5rem;
+		left: 1em;
 		align-items: center;
-		gap: 0.5em;
 		margin: 0;
 		padding: 0.5em 1em;
-		background: var(--success);
-		color: var(--success_text);
-		font-size: 0.85em;
 		border-radius: 0.4em;
-		box-shadow: 0 0.1em 0.5em rgba(0, 0, 0, 0.25);
-		z-index: 1000;
+		background: var(--success);
+		box-shadow: 0 0.1em 0.5em rgb(0 0 0 / 25%);
+		color: var(--success_text);
+		font-size: 0.7em;
+		gap: 0.5em;
 
 		&.offline {
 			background: var(--warning);
@@ -213,24 +217,42 @@
 	}
 
 	.palette_trigger {
+
+		@include button_icon;
+		
 		position: fixed;
-		right: 1em;
-		bottom: 1em;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		width: 3em;
-		height: 3em;
-		margin: 0;
-		padding: 0;
-		border: none;
-		border-radius: 50%;
-		background: var(--purple_bright);
-		color: var(--purple_bright_text);
-		font-size: 1.3em;
-		box-shadow: 0 0.1em 0.5em rgba(0, 0, 0, 0.25);
-		cursor: pointer;
 		z-index: 1000;
+		right: 0.5em;
+		bottom: 4.5rem;
+		margin: 0;
+		box-shadow: 0 0.1em 0.5em rgb(0 0 0 / 25%);
+		font-size: 1.3em;
+	}
+
+	@media(width >= 50em) {
+		:global(body) {
+			grid-template-areas: 'header main' 'header footer';
+			grid-template-columns: auto 1fr;
+			grid-template-rows: 1fr auto;
+			max-height: 100vh;
+			overflow: hidden;
+		}
+
+		.main {
+			max-height: 100%;
+			margin-bottom: 0;
+			overflow-y: auto;
+		}
+
+		.layout {
+			width: 100%;
+		}
+
+		.status_banner {
+			right: 1rem;
+			bottom: 2rem;
+			left: auto;
+		}
 	}
 </style>
 

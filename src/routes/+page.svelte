@@ -1,10 +1,12 @@
 <script lang="ts">
 	import { isAuthenticated } from '$lib/auth';
-	import { intervalToDuration, format, parseISO, startOfDay, addDays } from 'date-fns';
+	import { format, parseISO, startOfDay, addDays } from 'date-fns';
 	import fetchClientData from '$utils/fetchClientData';
 	import { prefetchRecipes } from '$utils/prefetchRecipes';
 	import { getDashboardMealPlanRange } from '$utils/dateRanges';
 	import { resolve } from '$app/paths';
+	import RecipeCard from '$components/parts/recipes/RecipeCard.svelte';
+	import { getPageTitle } from '$utils/pageTitle';
 
 	let meals = $state<any[]>([]);
 	let loading = $state(true);
@@ -12,16 +14,6 @@
 	let upcomingTasks = $state<any[]>([]);
 	let upcomingEvents = $state<any[]>([]);
 	let upcomingLoading = $state(true);
-
-	function formatMinutes(mins: number | string | null): string {
-		if (!mins) return '';
-		const m = typeof mins === 'string' ? parseInt(mins, 10) : mins;
-		if (isNaN(m) || m <= 0) return '';
-		const { hours, minutes } = intervalToDuration({ start: 0, end: m * 60 * 1000 });
-		if (hours && minutes) return `${hours}h ${minutes}m`;
-		if (hours) return `${hours}h`;
-		return `${minutes}m`;
-	}
 
 	$effect(() => {
 		if ($isAuthenticated) {
@@ -133,7 +125,7 @@
 </script>
 
 <svelte:head>
-	<title>Dashboard | Kapers Crewe Household</title>
+	<title>{getPageTitle(`Dashboard`)}</title>
 </svelte:head>
 
 <h1>Dashboard</h1>
@@ -174,33 +166,15 @@
 		{:else}
 			<div class="grid">
 				{#each weekRecipes as { recipe, days } (recipe.slug)}
-					<a class="card" href={resolve('/recipes/[slug]', { slug: recipe.slug })}>
-						{#if recipe.image}
-							<img src={recipe.image} alt={recipe.name} loading="lazy" />
-						{:else}
-							<div class="no-image"></div>
-						{/if}
-						<div class="info">
-							{#if days.length}
-								<span class="day">{days.join(', ')}</span>
-							{/if}
-							<h3>{recipe.name}</h3>
-							{#if recipe.description}
-								<p class="description">{recipe.description}</p>
-							{/if}
-							<div class="meta">
-								{#if recipe.totalTime}<span>{formatMinutes(recipe.totalTime)}</span>{/if}
-								{#if recipe.servings}<span>{recipe.servings} servings</span>{/if}
-							</div>
-							{#if recipe.tags?.length}
-								<ul class="tags">
-									{#each recipe.tags as tag (tag.slug)}
-										<li>{tag.name}</li>
-									{/each}
-								</ul>
-							{/if}
-						</div>
-					</a>
+					<RecipeCard {recipe} size="compact" dayLabel={days.length ? days.join(', ') : undefined}>
+						{#snippet tags(recipeTags)}
+							<ul class="tags">
+								{#each recipeTags as tag (tag.slug)}
+									<li>{tag.name}</li>
+								{/each}
+							</ul>
+						{/snippet}
+					</RecipeCard>
 				{/each}
 			</div>
 		{/if}
@@ -281,70 +255,6 @@
 		display: grid;
 		grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
 		gap: 1em;
-	}
-
-	.card {
-		border: 1px solid var(--grey_light);
-		border-radius: 0.5em;
-		overflow: hidden;
-		text-decoration: none;
-		color: inherit;
-		transition: box-shadow 0.2s;
-
-		&:hover {
-			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-		}
-
-		& img {
-			width: 100%;
-			height: 140px;
-			object-fit: cover;
-			display: block;
-		}
-
-		& .no-image {
-			width: 100%;
-			height: 140px;
-			background: color-mix(in srgb, var(--purple_bright) 8%, transparent);
-		}
-	}
-
-	.info {
-		padding: 0.6em;
-
-		& h3 {
-			font-size: 0.9em;
-			margin: 0 0 0.2em;
-			line-height: 1.3;
-		}
-	}
-
-	.day {
-		display: block;
-		font-size: 0.7em;
-		font-weight: 600;
-		text-transform: uppercase;
-		letter-spacing: 0.03em;
-		color: var(--purple_bright);
-		margin-bottom: 0.2em;
-	}
-
-	.description {
-		font-size: 0.8em;
-		color: var(--grey);
-		margin: 0 0 0.3em;
-		display: -webkit-box;
-		-webkit-line-clamp: 2;
-		-webkit-box-orient: vertical;
-		overflow: hidden;
-	}
-
-	.meta {
-		display: flex;
-		gap: 0.8em;
-		font-size: 0.75em;
-		color: var(--grey);
-		margin-bottom: 0.3em;
 	}
 
 	.tags {

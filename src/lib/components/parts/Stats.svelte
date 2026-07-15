@@ -3,18 +3,20 @@
 	import type { Component } from "svelte";
 
 
-	const { items, colour }: {
+	const { items, colour, class: className = '' }: {
 		items: {
 			name: string;
 			value: string;
 			colour?: Colour;
 			Icon?: Component
 		}[]
-		colour?: Colour
+		colour?: Colour;
+		class?: string;
 	} = $props();
 </script>
 
 <dl
+	class={className}
 	style="--colour: var(--{colour || 'blue'})"
 >
 	{#each items as { name, value, colour, Icon } (name)}

@@ -9,6 +9,7 @@
 		includeNone = false,
 		noneLabel = `None`,
 		onchange,
+		class: className = '',
 	}: {
 		id: string;
 		label?: string;
@@ -17,6 +18,7 @@
 		includeNone?: boolean;
 		noneLabel?: string;
 		onchange?: () => void;
+		class?: string;
 	} = $props();
 
 	let options = $derived([
@@ -25,7 +27,7 @@
 	]);
 </script>
 
-<Select {id} {label} bind:value {options} {onchange}>
+<Select {id} {label} bind:value {options} {onchange} class={className}>
 	{#snippet children(option)}
 		{#if includeNone && option.value === ``}
 			<span class="label">{option.label}</span>

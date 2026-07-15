@@ -1,20 +1,10 @@
 <script lang="ts">
 	import { dndzone } from 'svelte-dnd-action';
 	import { flip } from 'svelte/animate';
-	import { intervalToDuration } from 'date-fns';
 	import { MEAL_PLANNING_DND_TYPE, MEAL_PLANNING_FLIP_MS, type PaletteDndItem, type PlanningRecipe } from '$utils/mealPlanningDnd';
+	import { formatMinutes } from '$utils/formatMinutes';
 
-	let { recipes, loading, season }: { recipes: PlanningRecipe[]; loading: boolean; season: string } = $props();
-
-	function formatMinutes(mins: string | null): string {
-		if (!mins) return '';
-		const m = parseInt(mins, 10);
-		if (isNaN(m) || m <= 0) return '';
-		const { hours, minutes } = intervalToDuration({ start: 0, end: m * 60 * 1000 });
-		if (hours && minutes) return `${hours}h ${minutes}m`;
-		if (hours) return `${hours}h`;
-		return `${minutes}m`;
-	}
+	let { recipes, loading, season, class: className = '' }: { recipes: PlanningRecipe[]; loading: boolean; season: string; class?: string } = $props();
 
 	function toPaletteItems(list: PlanningRecipe[]): PaletteDndItem[] {
 		return list.map((recipe) => ({ id: recipe.id, kind: `palette` as const, recipe }));
@@ -35,7 +25,7 @@
 	}
 </script>
 
-<section class="palette" aria-label="{season} recipes">
+<section class="palette {className}" aria-label="{season} recipes">
 	<h2>{season} recipes</h2>
 
 	{#if loading}

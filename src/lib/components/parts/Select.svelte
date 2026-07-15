@@ -8,6 +8,7 @@
 		options,
 		onchange,
 		children,
+		class: className = '',
 	}: {
 		id: string;
 		label: string;
@@ -15,6 +16,7 @@
 		options: { value: Value; label: string }[];
 		onchange?: () => void;
 		children?: Snippet<[{ value: Value; label: string }]>;
+		class?: string;
 	} = $props();
 
 	// In some Chromium versions, clicking an option in an appearance:base-select
@@ -31,7 +33,7 @@
 </script>
 
 <label class="sr-only" for={id}>{label}</label>
-<select class="select" {id} bind:value {onchange} onclick={handlePickerClick}>
+<select class="select {className}" {id} bind:value {onchange} onclick={handlePickerClick}>
 	<button type="button" aria-label={label}>
 		<selectedcontent></selectedcontent>
 	</button>

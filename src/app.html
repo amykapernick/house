@@ -11,6 +11,18 @@
 		<meta name="apple-mobile-web-app-capable" content="yes" />
 		<meta name="mobile-web-app-capable" content="yes" />
 		<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+		<script>
+			// Runs before CSS paints so a saved manual theme override applies
+			// immediately - otherwise the page would flash the device's
+			// prefers-color-scheme theme before hydration sets the real one.
+			(function () {
+				var stored = localStorage.getItem('theme');
+				var theme = stored === 'light' || stored === 'dark'
+					? stored
+					: (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+				document.documentElement.dataset.theme = theme;
+			})();
+		</script>
 		%sveltekit.head%
 	</head>
 	<body>

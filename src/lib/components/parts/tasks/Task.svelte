@@ -16,7 +16,8 @@
 		platform,
 		link,
 		onUpdate,
-	}: Task & { onUpdate?: (id: string, status: TaskStatus) => void } = $props();
+		class: className = '',
+	}: Task & { onUpdate?: (id: string, status: TaskStatus) => void; class?: string } = $props();
 
 	const StatusComplete: Record<TaskStatus, CheckState> = {
 		'Not Started': 'incomplete',
@@ -90,7 +91,7 @@
 	}
 </script>
 
-<div class="task">
+<div class="task {className}">
 	<CheckboxButton
 		class="checkbox"
 		state={completed}
@@ -119,7 +120,7 @@
 		<span class="due">{format(due, 'dd MMM')}</span>
 	{/if}
 	{#if assigned}
-		<Assigned className="assigned" assignees={assigned} />
+		<Assigned class="assigned" assignees={assigned} />
 	{/if}
 	{#if link}
 		<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- link is the external Notion/Todoist task page, not an internal route -->

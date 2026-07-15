@@ -19,4 +19,9 @@ export default defineConfig({
 		// pin to UTC so date-boundary tests are deterministic across CI runners.
 		env: { TZ: `UTC` },
 	},
+	define: {
+		// Mirrors vite.config.ts's build-time SITE_TITLE substitution, since this
+		// config doesn't reuse that one (see comment above).
+		__SITE_TITLE__: JSON.stringify(`Test Site`),
+	},
 });

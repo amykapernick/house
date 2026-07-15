@@ -1,10 +1,12 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import { dueReminderBanner, dismissReminder } from '$utils/taskReminders';
+
+	let { class: className = '' }: { class?: string } = $props();
 </script>
 
 {#if $dueReminderBanner.length}
-	<div class="task_reminders">
+	<div class="task_reminders {className}">
 		{#each $dueReminderBanner as task (task.id)}
 			<div class="task_reminder">
 				<a href={resolve(`/tasks`)}>{task.name}</a>

@@ -1,9 +1,11 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { format, parseISO, intervalToDuration } from 'date-fns';
+	import { format, parseISO } from 'date-fns';
 	import fetchClientData from '$utils/fetchClientData';
 	import { recipeQuery, RECIPE_CACHE_TTL } from '$utils/prefetchRecipes';
 	import { resolve } from '$app/paths';
+	import { formatMinutes } from '$utils/formatMinutes';
+	import { getPageTitle } from '$utils/pageTitle';
 	import {
 		compatibleUnits,
 		convertQuantity,
@@ -14,16 +16,6 @@
 		unitsInFamily,
 	} from '$lib/utils/units';
 	import type { RecipeIngredientUnit } from '$lib/types/generated';
-
-	function formatMinutes(mins: number | string | null): string {
-		if (!mins) return '';
-		const m = typeof mins === 'string' ? parseInt(mins, 10) : mins;
-		if (isNaN(m) || m <= 0) return '';
-		const { hours, minutes } = intervalToDuration({ start: 0, end: m * 60 * 1000 });
-		if (hours && minutes) return `${hours}h ${minutes}m`;
-		if (hours) return `${hours}h`;
-		return `${minutes}m`;
-	}
 
 	let recipe = $state<any>(null);
 	let loading = $state(true);
@@ -126,7 +118,7 @@
 </script>
 
 <svelte:head>
-	<title>{recipe?.name ?? 'Recipe'} | Kapers Crewe Household</title>
+	<title>{getPageTitle(recipe?.name ?? `Recipe`)}</title>
 </svelte:head>
 
 <a href={resolve('/recipes')} class="back">← Recipes</a>
@@ -402,7 +394,7 @@
 		border: 1px solid currentColor;
 		border-radius: 0.2em;
 		font-size: 0.8em;
-		color: var(--blue);
+		color: var(--navy);
 
 		&.category {
 			color: var(--purple_bright);

@@ -9,11 +9,13 @@
 		budget,
 		editing = false,
 		onChange,
+		class: className = '',
 	}: {
 		buckets: BudgetBucket[];
 		budget: BudgetItem[];
 		editing?: boolean;
 		onChange?: () => void;
+		class?: string;
 	} = $props();
 
 	const formatCurrency = (value: number) =>
@@ -71,7 +73,7 @@
 	</th>
 {/snippet}
 
-<table class="buckets">
+<table class="buckets {className}">
 	<thead>
 		<tr>
 			{@render sortableHeader('name', 'Bucket')}

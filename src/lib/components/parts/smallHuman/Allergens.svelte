@@ -9,14 +9,16 @@
 	import Peanut from '$img/smallHuman/peanut.svg?component';
 	import SoySauce from '$img/smallHuman/soy-sauce.svg?component';
 
-	let { 
-		allergens = [], 
+	let {
+		allergens = [],
 		completeAllergen = () => {},
-		completing = new Set()
-	}: { 
-		allergens: any[]; 
+		completing = new Set(),
+		class: className = '',
+	}: {
+		allergens: any[];
 		completeAllergen: (id: string) => void,
 		completing: Set<string>;
+		class?: string;
 	} = $props();
 
 	const Allergens: Record<string, any> = {
@@ -40,7 +42,7 @@
 </script>
 
 {#if allergens.length}
-	<ul class="list">
+	<ul class="list {className}">
 		{#each allergens as allergen (allergen.id)}
 			{@const Icon = Allergens[allergen.name]}
 			<li style:order={allergen.daysUntilDue}>

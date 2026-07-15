@@ -11,6 +11,7 @@
 		colours = [],
 		onSave,
 		onDelete,
+		class: className = '',
 	}: {
 		open?: boolean;
 		mode: `create` | `edit`;
@@ -19,12 +20,13 @@
 		colours?: PaletteColour[];
 		onSave: () => void;
 		onDelete?: () => void;
+		class?: string;
 	} = $props();
 
 	let colourNames = $derived(colours.map((c) => c.name));
 </script>
 
-<Modal bind:open title={mode === `create` ? `New block` : `Edit block`}>
+<Modal bind:open class={className} title={mode === `create` ? `New block` : `Edit block`}>
 	<label class="field">
 		Label
 		<input type="text" bind:value={label} placeholder="e.g. Admin tasks" />

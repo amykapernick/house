@@ -8,10 +8,12 @@
 		tabs,
 		active,
 		onSelect,
+		class: className = '',
 	}: {
 		tabs: Tab[];
 		active: string;
 		onSelect: (id: string) => void;
+		class?: string;
 	} = $props();
 
 	let buttons: HTMLButtonElement[] = [];
@@ -45,7 +47,7 @@
 	}
 </script>
 
-<div class="tabs" role="tablist" aria-orientation="horizontal">
+<div class="tabs {className}" role="tablist" aria-orientation="horizontal">
 	{#each tabs as tab, index (tab.id)}
 		<button
 			bind:this={buttons[index]}

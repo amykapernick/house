@@ -7,6 +7,7 @@
 	import fetchClientData, { getGraphqlUrl } from '$utils/fetchClientData';
 	import type { BudgetItem } from '$types/budget';
 	import type { BudgetBucket } from '$types/budgetBucket';
+	import { getPageTitle } from '$utils/pageTitle';
 
 	let budget = $state<BudgetItem[]>([]);
 	let buckets = $state<BudgetBucket[]>([]);
@@ -198,7 +199,7 @@
 </script>
 
 <svelte:head>
-	<title>Budget | Kapers Crewe Household</title>
+	<title>{getPageTitle(`Budget`)}</title>
 </svelte:head>
 
 <h1>Budget</h1>

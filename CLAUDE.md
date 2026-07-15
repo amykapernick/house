@@ -70,5 +70,6 @@ On PRs (not pushes to `prod`), the `Build And Deploy` step also creates an Azure
 
 ## Not Yet Migrated
 
-- Recipes, meal planning, shopping list — will integrate with Mealie API
 - SVG icon components for house map
+
+Recipes, meal planning, and shopping list are backed by Mealie (via `household_api`'s `/mealie` proxy) — that migration is complete, not pending.

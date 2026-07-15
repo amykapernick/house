@@ -5,10 +5,11 @@
 	let {
 		tasks = [],
 		onUpdate,
-	}: { tasks: Task[]; onUpdate?: (id: string, status: TaskStatus) => void } = $props();
+		class: className = '',
+	}: { tasks: Task[]; onUpdate?: (id: string, status: TaskStatus) => void; class?: string } = $props();
 </script>
 
-<ul class="list">
+<ul class="list {className}">
 	{#each tasks as task (task.id)}
 		<li class="item">
 			<TaskCard {...task} {onUpdate} />

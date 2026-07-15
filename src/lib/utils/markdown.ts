@@ -71,6 +71,29 @@ export function extractToc(markdown: string): TocEntry[] {
 	return entries;
 }
 
+// Whether each TOC entry counts as "read", for its checkmark. Chapters (h3)
+// and bare sections (h2 with no chapters) map straight onto a trackable
+// chunk's own anchor. A section (h2) *with* chapters isn't itself trackable
+// (see splitTrackableChunks) - it only reads as done once every chapter
+// nested under it (up to the next h2) has been read.
+export function computeTocRead(toc: TocEntry[], readAnchors: Set<string>): Map<string, boolean> {
+	const read = new Map<string, boolean>();
+
+	toc.forEach((entry, i) => {
+		if (entry.level === 3) {
+			read.set(entry.anchor, readAnchors.has(entry.anchor));
+			return;
+		}
+
+		const chapters = [];
+		for (let j = i + 1; j < toc.length && toc[j].level !== 2; j++) chapters.push(toc[j]);
+
+		read.set(entry.anchor, chapters.length > 0 ? chapters.every((chapter) => readAnchors.has(chapter.anchor)) : readAnchors.has(entry.anchor));
+	});
+
+	return read;
+}
+
 type RawChunk = { level: 2 | 3 | null, heading: string | null, markdown: string };
 
 export type ContentChunk = {

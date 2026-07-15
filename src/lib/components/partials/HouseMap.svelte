@@ -35,6 +35,7 @@
 		onAreaClick,
 		onItemClick,
 		onMapClick,
+		class: className = '',
 	}: {
 		areas: Area[];
 		items: Item[];
@@ -45,6 +46,7 @@
 		onAreaClick?: (id: string) => void;
 		onItemClick?: (id: string) => void;
 		onMapClick?: (point: [number, number]) => void;
+		class?: string;
 	} = $props();
 	const size = [1189, 1593];
 	const MIN_AREA_SIZE = 20;
@@ -221,7 +223,7 @@
 	}
 </script>
 
-<div class="container" style="--width: {size[0]}; --height: {size[1]}" bind:this={containerEl}>
+<div class="container {className}" style="--width: {size[0]}; --height: {size[1]}" bind:this={containerEl}>
 	<!-- Placing a new item/area by clicking the map background is a spatial drag-editing
 		affordance with no keyboard equivalent in this pass; the toolbar buttons remain fully
 		keyboard-operable for add/edit/delete. -->

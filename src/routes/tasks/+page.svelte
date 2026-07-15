@@ -8,6 +8,7 @@
 	import TaskView from '$parts/tasks/TaskView.svelte';
 	import FamilyFilter from '$parts/FamilyFilter.svelte';
 	import type { Task, TaskStatus } from '$types/tasks';
+	import { getPageTitle } from '$utils/pageTitle';
 
 	let tasks = $state<Task[]>([]);
 	let loading = $state(true);
@@ -41,7 +42,7 @@
 </script>
 
 <svelte:head>
-	<title>Tasks | Kapers Crewe Household</title>
+	<title>{getPageTitle(`Tasks`)}</title>
 	<meta name="description" content="View all upcoming and overdue tasks in various views" />
 </svelte:head>
 

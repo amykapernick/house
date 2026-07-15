@@ -1,19 +1,12 @@
 <script lang="ts">
-	import { format, parseISO } from 'date-fns';
 	import { isAuthenticated } from '$lib/auth';
 	import fetchClientData, { peekCache } from '$utils/fetchClientData';
-	import { resolve } from '$app/paths';
 	import { CONTENT_CACHE_TTL, DIGEST_PAGE_SLUG, contentEntriesQuery, contentIndexQuery, contentIndexCacheKey, contentDigestCacheKey } from '$utils/content';
 	import { getReadAnchors } from '$utils/readProgress';
 	import { splitTrackableChunks } from '$utils/markdown';
-	import ContentIcon from '$components/parts/ContentIcon.svelte';
+	import ContentEntryCard, { type EntryStatus } from '$components/parts/content/ContentEntryCard.svelte';
 	import type { ContentEntry, ContentGroup } from '$types/generated';
-
-	// `total` is null until known - course-style entries need a (cheap,
-	// structure-only) network call to find out. `read` defaults to 0 when
-	// nothing's been read yet or a digest-style entry hasn't been cached
-	// locally (see statusFromDigestCache).
-	type EntryStatus = { total: number | null, read: number };
+	import { getPageTitle } from '$utils/pageTitle';
 
 	let entries = $state<ContentEntry[]>([]);
 	let loading = $state(true);
@@ -91,7 +84,7 @@
 </script>
 
 <svelte:head>
-	<title>Content | Kapers Crewe Household</title>
+	<title>{getPageTitle(`Content`)}</title>
 </svelte:head>
 
 <h1>Content</h1>
@@ -103,76 +96,18 @@
 	<ul class="list">
 		{#each entries as entry (entry.slug)}
 			{@const slug = entry.slug ?? ``}
-			{@const status = statuses[slug]}
-			<li>
-				<a class="card" href={resolve(`/content/[slug]`, { slug })}>
-					<ContentIcon icon={entry.icon} iconType={entry.iconType} />
-					<span class="info">
-						<span class="title">{entry.title}</span>
-						<span class="meta">
-							{#if entry.brief && !status?.total}
-								<span class="progress">No versions yet</span>
-							{:else if status?.total}
-								<span class="progress" class:complete={status.read >= status.total}>
-									{status.read}/{status.total} sections read
-									{#if status.read >= status.total}<span title="Fully read">✓</span>{/if}
-								</span>
-							{/if}
-							{#if entry.updatedAt}
-								<span class="updated">Updated {format(parseISO(entry.updatedAt), `d MMM yyyy`)}</span>
-							{/if}
-						</span>
-					</span>
-				</a>
-			</li>
+			<ContentEntryCard {entry} status={statuses[slug]} />
 		{/each}
 	</ul>
 {/if}
 
 <style>
 	.list {
-		display: flex;
-		flex-wrap: wrap;
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
 		gap: 10px;
 		margin: 0;
 		padding: 0;
 		list-style: none;
-	}
-
-	.card {
-		display: flex;
-		align-items: center;
-		gap: 0.6em;
-		padding: 0.8em 1.2em;
-		border-radius: 0.5em;
-		background: var(--navy);
-		color: var(--navy_text);
-		text-decoration: none;
-		font-weight: 600;
-
-		&:hover .title {
-			text-decoration: underline;
-		}
-	}
-
-	.info {
-		display: flex;
-		flex-direction: column;
-		gap: 0.15em;
-	}
-
-	.meta {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.6em;
-		font-weight: 400;
-		font-size: 0.8em;
-		color: var(--navy_text);
-	}
-
-	.progress {
-		&.complete {
-			font-weight: 600;
-		}
 	}
 </style>

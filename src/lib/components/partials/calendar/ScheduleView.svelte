@@ -23,6 +23,7 @@
 		onRangeChange,
 		onSave,
 		onTaskCompleted,
+		class: className = '',
 	}: {
 		blocks: ScheduleBlock[];
 		colours?: PaletteColour[];
@@ -33,6 +34,7 @@
 		onRangeChange?: (start: Date, end: Date) => void;
 		onSave?: (payload: ScheduleSavePayload) => Promise<void>;
 		onTaskCompleted?: (taskId: string) => void;
+		class?: string;
 	} = $props();
 
 	let selectedTask = $state<{ id: string; title: string; due?: Date; status?: string; platform: `notion` | `todoist`; link: string } | null>(null);
@@ -336,51 +338,53 @@
 	};
 </script>
 
-<div class="schedule_toolbar">
-	{#if readOnly}
-		<span class="hint">Select a family member above to edit their schedule</span>
-	{:else}
-		{#if hasChanges}
-			<span class="unsaved">Unsaved changes</span>
+<div class="schedule_view {className}">
+	<div class="schedule_toolbar">
+		{#if readOnly}
+			<span class="hint">Select a family member above to edit their schedule</span>
+		{:else}
+			{#if hasChanges}
+				<span class="unsaved">Unsaved changes</span>
+			{/if}
+			<button disabled={!hasChanges} onclick={() => (saveModalOpen = true)}>Save changes</button>
 		{/if}
-		<button disabled={!hasChanges} onclick={() => (saveModalOpen = true)}>Save changes</button>
+	</div>
+
+	<CalendarBase plugins={[TimeGrid, Interaction]} events={calendarEvents} {optionsOverride} />
+
+	<ScheduleBlockModal
+		bind:open={blockModalOpen}
+		mode={blockModalMode}
+		bind:label={draftLabel}
+		bind:colour={draftColour}
+		{colours}
+		onSave={saveBlockDraft}
+		onDelete={blockModalMode === `edit` ? deleteBlockDraft : undefined}
+	/>
+
+	<ScheduleSaveModal
+		bind:open={saveModalOpen}
+		defaultStart={visibleRange ? format(visibleRange.start, `yyyy-MM-dd`) : ``}
+		defaultEnd={visibleRange ? format(visibleRange.end, `yyyy-MM-dd`) : ``}
+		{saving}
+		error={saveError}
+		onConfirm={confirmSave}
+	/>
+
+	{#if selectedTask}
+		<TaskEventModal
+			bind:open={taskModalOpen}
+			title={selectedTask.title}
+			due={selectedTask.due}
+			status={selectedTask.status}
+			platform={selectedTask.platform}
+			link={selectedTask.link}
+			saving={completing}
+			error={completeError}
+			onComplete={completeSelectedTask}
+		/>
 	{/if}
 </div>
-
-<CalendarBase plugins={[TimeGrid, Interaction]} events={calendarEvents} {optionsOverride} />
-
-<ScheduleBlockModal
-	bind:open={blockModalOpen}
-	mode={blockModalMode}
-	bind:label={draftLabel}
-	bind:colour={draftColour}
-	{colours}
-	onSave={saveBlockDraft}
-	onDelete={blockModalMode === `edit` ? deleteBlockDraft : undefined}
-/>
-
-<ScheduleSaveModal
-	bind:open={saveModalOpen}
-	defaultStart={visibleRange ? format(visibleRange.start, `yyyy-MM-dd`) : ``}
-	defaultEnd={visibleRange ? format(visibleRange.end, `yyyy-MM-dd`) : ``}
-	{saving}
-	error={saveError}
-	onConfirm={confirmSave}
-/>
-
-{#if selectedTask}
-	<TaskEventModal
-		bind:open={taskModalOpen}
-		title={selectedTask.title}
-		due={selectedTask.due}
-		status={selectedTask.status}
-		platform={selectedTask.platform}
-		link={selectedTask.link}
-		saving={completing}
-		error={completeError}
-		onComplete={completeSelectedTask}
-	/>
-{/if}
 
 <style>
 	.schedule_toolbar {

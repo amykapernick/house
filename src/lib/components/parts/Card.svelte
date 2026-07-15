@@ -4,7 +4,7 @@
 	import Icon from "./Icon.svelte";
 	import type { IconName } from "./Icon.svelte";
 
-	const { title, heading = 3, children, colour, icon, footer, tags, order = 0, IconComponent, iconProps, onDismiss }: {
+	const { title, heading = 3, children, colour, icon, footer, tags, order = 0, IconComponent, iconProps, onDismiss, class: className = '' }: {
 		title: string;
 		heading?: 2 | 3 | 4 | 5 | 6;
 		children?: Snippet;
@@ -16,11 +16,12 @@
 		tags?: string;
 		order?: number
 		onDismiss?: () => void;
+		class?: string;
 	} = $props();
 </script>
 
 <div
-	class="card"
+	class="card {className}"
 	class:has-dismiss={!!onDismiss}
 	style="--colour: var(--{colour || 'blue'}); --order: {order}"
 >

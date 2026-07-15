@@ -1,6 +1,8 @@
+<script lang="ts">
+	let { class: className = '' }: { class?: string } = $props();
+</script>
 
-
-<footer class="footer"></footer>
+<footer class="footer {className}"></footer>
 
 <style>
 	.footer {

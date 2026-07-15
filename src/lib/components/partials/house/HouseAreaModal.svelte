@@ -17,6 +17,7 @@
 		error = ``,
 		onSave,
 		onDelete,
+		class: className = '',
 	}: {
 		open?: boolean;
 		mode: `create` | `edit`;
@@ -32,12 +33,13 @@
 		error?: string;
 		onSave: () => void;
 		onDelete?: () => void;
+		class?: string;
 	} = $props();
 
 	let modalTitle = $derived(mode === `create` ? `Add area` : `Edit area`);
 </script>
 
-<Modal bind:open title={modalTitle}>
+<Modal bind:open class={className} title={modalTitle}>
 	{#if mode === `create`}
 		<p class="entity_label">{entityLabel ?? id}</p>
 	{/if}

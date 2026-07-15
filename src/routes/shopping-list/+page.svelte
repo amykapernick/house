@@ -4,6 +4,7 @@
 	import { resolve } from '$app/paths';
 	import { SvelteSet } from 'svelte/reactivity';
 	import CheckboxButton from '$parts/CheckboxButton.svelte';
+	import { getPageTitle } from '$utils/pageTitle';
 
 	type SubGroup = { name: string; items: any[] };
 	type StoreGroup = { name: string; items: any[]; subGroups: SubGroup[] };
@@ -148,7 +149,7 @@
 </script>
 
 <svelte:head>
-	<title>Shopping List | Kapers Crewe Household</title>
+	<title>{getPageTitle(`Shopping List`)}</title>
 </svelte:head>
 
 <h1>Shopping List</h1>

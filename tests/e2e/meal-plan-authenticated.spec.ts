@@ -1,17 +1,36 @@
-import { test, expect, type Page, type Locator } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 import '@clerk/testing/playwright'; // augments Window with a `Clerk` type
 
-// Repeatedly presses Tab until `locator` has focus, or throws. Used to drive
-// svelte-dnd-action's keyboard drag-and-drop path (Space to pick up/drop,
-// Tab to move focus - and the dragged item - between dnd-zones) since
+// Drives svelte-dnd-action's keyboard drag-and-drop path (Space to pick up/
+// drop, Tab to move focus - and the dragged item - between dnd-zones) since
 // simulated mouse-drag sequences are notoriously flaky in Playwright and the
 // library documents keyboard operation as a first-class path.
-async function tabUntilFocused(page: Page, locator: Locator, maxTabs = 40) {
+//
+// Tabs until focus lands on *any* day's meals dndzone, rather than a
+// pre-chosen one. Predicting a specific target zone up front is unreliable:
+// during an active keyboard drag, svelte-dnd-action re-syncs the dragged
+// item's tentative position as focus moves between zones (mid-flight with
+// its own flip animation), so by the time enough Tab presses have landed on
+// a zone that *used to be* the resolved target, the item can end up
+// somewhere else entirely. Since this test only cares that a recipe can be
+// dropped and later edited/deleted - not which specific day it lands on -
+// landing on the first reachable zone and locating the dropped item
+// afterwards sidesteps that race.
+async function tabUntilOnMealsZone(page: Page, maxTabs = 40) {
 	for (let i = 0; i < maxTabs; i++) {
-		if (await locator.evaluate((el) => el === document.activeElement)) return;
+		const onZone = await page.evaluate(() => {
+			const el = document.activeElement;
+			return el?.getAttribute(`role`) === `list` && /meals$/.test(el?.getAttribute(`aria-label`) ?? ``);
+		});
+		if (onZone) return;
 		await page.keyboard.press(`Tab`);
+		// svelte-dnd-action re-syncs the dragged item's tentative position and
+		// runs a flip animation (MEAL_PLANNING_FLIP_MS) on every zone change -
+		// pressing Tab faster than that settles can outrun its own focus
+		// management, so give each press a moment to land.
+		await page.waitForTimeout(50);
 	}
-	throw new Error(`Could not reach the target element via Tab within ${maxTabs} presses`);
+	throw new Error(`Could not reach a day's meals zone via Tab within ${maxTabs} presses`);
 }
 
 // The only frontend flow that gets a full mutating E2E test - see CLAUDE.md's
@@ -62,6 +81,7 @@ test.describe(`meal plan entry create + delete`, () => {
 		const marker = `[e2e-test] ${Date.now()}`;
 
 		await page.goto(`/meal-plan`);
+		await page.getByRole(`button`, { name: `Start meal planning` }).click();
 		await page.getByRole(`button`, { name: `+ Add meal` }).first().click();
 
 		const createDialog = page.getByRole(`dialog`);
@@ -133,8 +153,13 @@ test.describe(`meal planning mode`, () => {
 	test(`drags a season recipe onto a day, saves it, then deletes it via the UI`, async ({ page }) => {
 		await page.goto(`/meal-plan`);
 		await page.getByRole(`button`, { name: `Start meal planning` }).click();
-		await page.getByRole(`button`, { name: `1 week` }).click();
+		await page.getByRole(`radio`, { name: `1 week` }).check();
 		await expect(page.getByText(`Loading recipes...`)).toBeHidden();
+		// The days grid has its own separate "Loading..." state (the meal plan
+		// itself, distinct from the recipe palette above) - without waiting for
+		// it too, the empty-day detection below can catch a day mid-fetch and
+		// call it empty just before its real entries load in.
+		await expect(page.getByText(`Loading...`, { exact: true })).toBeHidden();
 
 		// Season tagging in Mealie is an ongoing effort - if the current season
 		// has no tagged recipes yet, there's nothing to drag, so skip rather
@@ -148,15 +173,15 @@ test.describe(`meal planning mode`, () => {
 		const recipeName = await firstCard.getAttribute(`aria-label`);
 		expect(recipeName, `expected the palette card to have an aria-label`).toBeTruthy();
 
-		const targetDay = page.getByRole(`list`, { name: /meals$/ }).first();
-
 		await firstCard.focus();
 		await page.keyboard.press(`Space`); // pick up
-		await tabUntilFocused(page, targetDay);
+		await page.waitForTimeout(100);
+		await tabUntilOnMealsZone(page);
 		await page.keyboard.press(`Space`); // drop
 
-		await expect(targetDay.getByText(recipeName!)).toBeVisible();
-		await expect(targetDay.getByText(`New`)).toBeVisible();
+		const droppedMeal = page.locator(`.meal`, { hasText: recipeName! });
+		await expect(droppedMeal).toBeVisible();
+		await expect(droppedMeal.getByText(`New`)).toBeVisible();
 
 		const [saveResponse] = await Promise.all([
 			page.waitForResponse(
@@ -171,14 +196,22 @@ test.describe(`meal planning mode`, () => {
 		await expect(page.getByText(`Unsaved changes`)).toBeHidden();
 
 		await page.getByRole(`button`, { name: `Exit planning` }).click();
+		// Scoped to the day grid: an unscoped getByText also matches
+		// svelte-dnd-action's aria-live announcer ("Stopped dragging item
+		// ..."), which lingers in the DOM after the drag ends.
+		await expect(page.locator(`.week`).getByText(recipeName!)).toBeVisible();
 
+		await page.getByRole(`button`, { name: `Start meal planning` }).click();
 		const mealCard = page.locator(`.meal`, { hasText: recipeName! });
 		await mealCard.getByRole(`button`, { name: `Edit meal` }).click();
 
 		const editDialog = page.getByRole(`dialog`);
 		await editDialog.getByRole(`button`, { name: `Delete` }).click();
 
-		await expect(page.getByText(recipeName!)).not.toBeVisible();
+		// Scoped to the day grid: an unscoped getByText also matches the
+		// still-visible palette card for this recipe (independent Mealie tag
+		// data, unrelated to the now-deleted meal-plan entry).
+		await expect(page.locator(`.week`).getByText(recipeName!)).not.toBeVisible();
 		createdId = null; // cleaned up via the UI - afterEach safety net is now a no-op
 	});
 });

@@ -4,6 +4,7 @@
 	import fetchClientData, { setCache, getGraphqlUrl } from '$utils/fetchClientData';
 	import ColourSelect from '$parts/ColourSelect.svelte';
 	import type { PaletteColour } from '$types/schedule';
+	import { getPageTitle } from '$utils/pageTitle';
 
 	let clerkContainer: HTMLDivElement | undefined = $state();
 
@@ -152,7 +153,7 @@
 </script>
 
 <svelte:head>
-	<title>Profile | Kapers Crewe Household</title>
+	<title>{getPageTitle(`Profile`)}</title>
 </svelte:head>
 
 <h1>Profile</h1>

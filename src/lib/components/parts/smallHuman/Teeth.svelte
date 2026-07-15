@@ -9,9 +9,11 @@
 	const {
 		teeth,
 		onMarkErupted,
+		class: className = '',
 	}: {
 		teeth: Teeth;
 		onMarkErupted?: (fdi: number) => void;
+		class?: string;
 	} = $props();
 
 	const upcoming = $derived(teeth.teeth.filter(t => t.status === 'upcoming'));
@@ -85,49 +87,51 @@
 	{@html upcomingStyleBlock}
 </svelte:head>
 
-	<!-- Event delegation wrapper - the actual interactive targets (tooth groups) have role="button"/tabindex/keydown handling set individually -->
-	<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-	<figure class="teeth" bind:this={wrapper} onclick={handleTeethClick} onkeydown={handleTeethKeydown}>
-		<TeethGraphic />
-		<figcaption>{teeth.note}</figcaption>
-	</figure>
-	{#if teeth.teething_now}
-		<Pill colour="orange">Currently Teething</Pill>
-	{/if}
-	<Stats items={[
-		{ name: 'Erupted', value: existing.length.toString() },
-		{ name: 'Upcoming', value: upcoming.length.toString() },
-		{ name: 'Remaining', value: (20 - existing.length).toString() }
-	]} />
-	<p>{teeth.teething_note}</p>
-	<div class="teeth_details">
-		{#each teeth.teeth as tooth (tooth.fdi)}
-			<p class={`t_${tooth.fdi}`}>
-				<span class="name">{tooth.fdi}: {tooth.name} - </span>
-				{#if tooth.erupted_date}
-					<span>Erupted at {tooth.erupted_age_months} months</span>
-				{:else}
-					<span>Expected at {tooth.expected_months} months</span>
-				{/if}
-			</p>
-		{/each}
+	<div class={className}>
+		<!-- Event delegation wrapper - the actual interactive targets (tooth groups) have role="button"/tabindex/keydown handling set individually -->
+		<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+		<figure class="teeth" bind:this={wrapper} onclick={handleTeethClick} onkeydown={handleTeethKeydown}>
+			<TeethGraphic />
+			<figcaption>{teeth.note}</figcaption>
+		</figure>
+		{#if teeth.teething_now}
+			<Pill colour="orange">Currently Teething</Pill>
+		{/if}
+		<Stats items={[
+			{ name: 'Erupted', value: existing.length.toString() },
+			{ name: 'Upcoming', value: upcoming.length.toString() },
+			{ name: 'Remaining', value: (20 - existing.length).toString() }
+		]} />
+		<p>{teeth.teething_note}</p>
+		<div class="teeth_details">
+			{#each teeth.teeth as tooth (tooth.fdi)}
+				<p class={`t_${tooth.fdi}`}>
+					<span class="name">{tooth.fdi}: {tooth.name} - </span>
+					{#if tooth.erupted_date}
+						<span>Erupted at {tooth.erupted_age_months} months</span>
+					{:else}
+						<span>Expected at {tooth.expected_months} months</span>
+					{/if}
+				</p>
+			{/each}
+		</div>
+		<h3>Upcoming Teeth</h3>
+		<dl>
+			{#each upcoming as tooth (tooth.fdi)}
+				<dt>{tooth.name}</dt>
+				<dd>Expected at {tooth.expected_months} months</dd>
+			{/each}
+		</dl>
+		<h3>Dental Care</h3>
+		<dl>
+			<dt>Toothbrush</dt>
+			<dd>{teeth.dental_care.toothbrush}</dd>
+			<dt>Toothpaste</dt>
+			<dd>{teeth.dental_care.toothpaste}</dd>
+			<dt>Next Dentist Appointment</dt>
+			<dd>{teeth.dental_care.todoist_task && formatDate(new Date(teeth.dental_care.todoist_task.due), 'dd MMM')}</dd>
+		</dl>
 	</div>
-	<h3>Upcoming Teeth</h3>
-	<dl>
-		{#each upcoming as tooth (tooth.fdi)}
-			<dt>{tooth.name}</dt>
-			<dd>Expected at {tooth.expected_months} months</dd>
-		{/each}
-	</dl>
-	<h3>Dental Care</h3>
-	<dl>
-		<dt>Toothbrush</dt>
-		<dd>{teeth.dental_care.toothbrush}</dd>
-		<dt>Toothpaste</dt>
-		<dd>{teeth.dental_care.toothpaste}</dd>
-		<dt>Next Dentist Appointment</dt>
-		<dd>{teeth.dental_care.todoist_task && formatDate(new Date(teeth.dental_care.todoist_task.due), 'dd MMM')}</dd>
-	</dl>
 
 <Modal bind:open={confirmOpen} title="Mark tooth as erupted?">
 	{#if confirmingTooth}

@@ -24,7 +24,7 @@
 		vaccine: Syringe,
 	};
 
-	const { name }: { name: IconName } = $props();
+	const { name, class: className = '' }: { name: IconName; class?: string } = $props();
 
 	const IconComponent = $derived(icons[name]);
 
@@ -66,7 +66,7 @@
 	});
 </script>
 
-<span bind:this={wrapper} class="icon">
+<span bind:this={wrapper} class="icon {className}">
 	<IconComponent />
 </span>
 

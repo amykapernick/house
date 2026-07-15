@@ -5,7 +5,8 @@
 	let {
 		tasks = [],
 		onUpdate,
-	}: { tasks: Task[]; onUpdate?: (id: string, status: TaskStatus) => void } = $props();
+		class: className = '',
+	}: { tasks: Task[]; onUpdate?: (id: string, status: TaskStatus) => void; class?: string } = $props();
 
 	let parsedTasks = $derived.by(() => {
 		const grouped: Record<string, Task[]> = {};
@@ -19,7 +20,7 @@
 	let columnCount = $derived(Object.keys(parsedTasks).length);
 </script>
 
-<div class="board" style="--columns: {columnCount}">
+<div class="board {className}" style="--columns: {columnCount}">
 	{#each Object.entries(parsedTasks) as [status, statusTasks] (status)}
 		<div class="column">
 			<h2>{status}</h2>

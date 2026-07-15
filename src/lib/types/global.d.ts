@@ -10,18 +10,10 @@ export type MenuItemBasics = {
 	auth?: boolean
 }
 
-export type MenuLink = MenuItemBasics & {
+export type MenuItem = MenuItemBasics & {
 	link: string
-	items?: never
 	Icon: Component<Record<string, any>>
 }
-
-export type MenuCategory = MenuItemBasics & {
-	items: MenuItem[]
-	link?: never
-}
-
-export type MenuItem = MenuLink | MenuCategory
 
 export type SocialLink = MenuItem & {
 	icon: string

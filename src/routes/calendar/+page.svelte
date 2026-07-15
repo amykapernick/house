@@ -5,6 +5,7 @@
 	import fetchClientData from '$utils/fetchClientData';
 	import { EVERYONE, isVisibleToUser } from '$utils/fetchFamilyMembers';
 	import type { Task } from '$types/tasks';
+	import { getPageTitle } from '$utils/pageTitle';
 
 	let tasks = $state<Task[]>([]);
 	let events = $state<any[]>([]);
@@ -110,7 +111,7 @@
 </script>
 
 <svelte:head>
-	<title>Calendar | Kapers Crewe Household</title>
+	<title>{getPageTitle(`Calendar`)}</title>
 	<meta name="description" content="View combined calendars and tasks for the family" />
 </svelte:head>
 

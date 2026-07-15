@@ -8,7 +8,8 @@
 	let {
 		tasks = [],
 		onUpdate,
-	}: { tasks: Task[]; onUpdate?: (id: string, status: TaskStatus) => void } = $props();
+		class: className = '',
+	}: { tasks: Task[]; onUpdate?: (id: string, status: TaskStatus) => void; class?: string } = $props();
 
 	type TaskViewType = 'list' | 'kanban' | 'calendar';
 
@@ -33,7 +34,7 @@
 	let view = $state<TaskViewType>('calendar');
 </script>
 
-<div>
+<div class={className}>
 	<nav class="switcher">
 		{#each Object.entries(views) as [viewType, { name }] (viewType)}
 			<button onclick={() => (view = viewType as TaskViewType)} data-active={view === viewType}>

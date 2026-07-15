@@ -12,6 +12,7 @@
 		saving = false,
 		error = ``,
 		onComplete,
+		class: className = '',
 	}: {
 		open?: boolean;
 		title: string;
@@ -22,13 +23,14 @@
 		saving?: boolean;
 		error?: string;
 		onComplete: () => void;
+		class?: string;
 	} = $props();
 
 	let dueLabel = $derived(due ? format(due, `EEEE, d MMM · h:mma`) : ``);
 	let alreadyDone = $derived(status === `Done`);
 </script>
 
-<Modal bind:open title={title}>
+<Modal bind:open class={className} title={title}>
 	{#if dueLabel}<p class="due_label">{dueLabel}</p>{/if}
 
 	{#if error}<p class="error">{error}</p>{/if}

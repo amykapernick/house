@@ -5,10 +5,12 @@
 		open = $bindable(false),
 		title,
 		children,
+		class: className = '',
 	}: {
 		open?: boolean;
 		title?: string;
 		children?: Snippet;
+		class?: string;
 	} = $props();
 
 	let dialogEl: HTMLDialogElement | undefined = $state();
@@ -21,6 +23,7 @@
 </script>
 
 <dialog
+	class={className}
 	bind:this={dialogEl}
 	onclose={() => (open = false)}
 	onclick={(e) => { if (e.target === dialogEl) open = false; }}

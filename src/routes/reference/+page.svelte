@@ -3,6 +3,7 @@
 	import { isAuthenticated } from '$lib/auth';
 	import fetchClientData from '$utils/fetchClientData';
 	import type { Resource } from '$types/resources';
+	import { getPageTitle } from '$utils/pageTitle';
 
 
 	let resources = $state<Resource[]>([]);
@@ -37,7 +38,7 @@
 </script>
 
 <svelte:head>
-	<title>Reference | Kapers Crewe Household</title>
+	<title>{getPageTitle(`Reference`)}</title>
 </svelte:head>
 
 <h1>Reference</h1>

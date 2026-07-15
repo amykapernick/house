@@ -15,12 +15,14 @@
 		icalEvents = [],
 		mealPlans = [],
 		onTaskCompleted,
+		class: className = '',
 	}: {
 		tasks: Task[];
 		allDayEvents: any[];
 		icalEvents: any[];
 		mealPlans: any[];
 		onTaskCompleted?: (taskId: string) => void;
+		class?: string;
 	} = $props();
 
 	let selectedTask = $state<{ id: string; title: string; due?: Date; status?: string; platform: `notion` | `todoist`; link: string } | null>(null);
@@ -173,7 +175,7 @@
 </script>
 
 <!-- TODO: Allow filtering calendar items by user -->
-<CalendarBase plugins={[TimeGrid, DayGrid, List, Interaction]} events={calendarEvents} {optionsOverride} />
+<CalendarBase class={className} plugins={[TimeGrid, DayGrid, List, Interaction]} events={calendarEvents} {optionsOverride} />
 
 {#if selectedTask}
 	<TaskEventModal

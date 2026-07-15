@@ -3,14 +3,16 @@
 	import type { Snippet } from "svelte";
 
 
-	const { children, colour }: {
-		
+	const { children, colour, class: className = '' }: {
+
 		children: Snippet;
-		colour?: Colour
+		colour?: Colour;
+		class?: string;
 	} = $props();
 </script>
 
 <div
+	class={className}
 	style="--colour: var(--{colour || 'blue'})"
 >
 	{@render children()}

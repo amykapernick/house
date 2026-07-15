@@ -19,6 +19,8 @@
 	import type { Alert, AlertType, MilestoneStatus, SignStatus, ValueNote } from '$types/generated';
 	import Milestone from '$parts/smallHuman/Milestone.svelte';
 	import Auslan from '$parts/smallHuman/Auslan.svelte';
+	import UrgentAlerts from '$parts/smallHuman/UrgentAlerts.svelte';
+	import { getPageTitle } from '$utils/pageTitle';
 	import Breasts from '$img/smallHuman/breasts.svg?component'
 	import Water from '$img/icons/glass-water.svg?component'
 	import Food from '$img/icons/soup.svg?component'
@@ -403,7 +405,7 @@
 </script>
 
 <svelte:head>
-	<title>Small Human | Kapers Crewe Household</title>
+	<title>{getPageTitle(`Small Human`)}</title>
 </svelte:head>
 
 <h1>Small Human</h1>
@@ -445,20 +447,7 @@
 	{@const urgentAlerts = alerts.filter((a: Alert) => a.level === 'urgent')}
 	{@const otherAlerts = alerts.filter((a: Alert) => a.level !== 'urgent')}
 
-	{#if urgentAlerts.length}
-		<div class="urgent-alerts">
-			{#each urgentAlerts as alert (alert.id)}
-				<div class="urgent-alert">
-					<span class="urgent-badge">Urgent</span>
-					<div class="urgent-body">
-						<h2>{alert.title}</h2>
-						<p>{alert.detail}</p>
-					</div>
-					<button type="button" class="urgent-dismiss" onclick={() => askDismissAlert(alert)} aria-label="Dismiss {alert.title}">&times;</button>
-				</div>
-			{/each}
-		</div>
-	{/if}
+	<UrgentAlerts alerts={urgentAlerts} onDismiss={askDismissAlert} />
 
 	<h2>Overview</h2>
 
@@ -735,69 +724,6 @@
 
 		& button:first-child {
 			color: var(--red);
-		}
-	}
-
-	.urgent-alerts {
-		display: flex;
-		flex-direction: column;
-		gap: 0.75em;
-		margin-bottom: 1.5em;
-	}
-
-	.urgent-alert {
-		display: flex;
-		align-items: flex-start;
-		gap: 0.75em;
-		padding: 1em;
-		border: 2px solid var(--red);
-		border-radius: 0.5em;
-		background: color-mix(in srgb, var(--red) 12%, white);
-	}
-
-	.urgent-badge {
-		flex-shrink: 0;
-		padding: 0.2em 0.6em;
-		border-radius: 1em;
-		background: var(--red);
-		color: var(--red_text);
-		font-size: 0.75em;
-		font-weight: 700;
-		text-transform: uppercase;
-		letter-spacing: 0.03em;
-	}
-
-	.urgent-dismiss {
-		flex-shrink: 0;
-		margin-left: auto;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		width: 1.6em;
-		height: 1.6em;
-		padding: 0;
-		border: none;
-		border-radius: 50%;
-		background: transparent;
-		color: var(--red);
-		font-size: 1.1em;
-		line-height: 1;
-		cursor: pointer;
-
-		&:hover {
-			background: color-mix(in srgb, var(--red) 20%, transparent);
-		}
-	}
-
-	.urgent-body {
-		& h2 {
-			margin: 0 0 0.2em;
-			font-size: 1.1em;
-			color: var(--red);
-		}
-
-		& p {
-			margin: 0;
 		}
 	}
 

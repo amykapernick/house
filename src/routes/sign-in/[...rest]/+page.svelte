@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { clerk, clerkLoaded } from '$lib/auth';
+	import { getPageTitle } from '$utils/pageTitle';
 
 	let container: HTMLDivElement | undefined = $state();
 
@@ -23,7 +24,7 @@
 </script>
 
 <svelte:head>
-	<title>Sign In | Kapers Crewe Household</title>
+	<title>{getPageTitle(`Sign In`)}</title>
 </svelte:head>
 
 <section class="sign-in">

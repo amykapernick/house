@@ -4,18 +4,20 @@
 	const {
 		icon,
 		iconType,
+		class: className = '',
 	}: {
 		icon?: string | null;
 		iconType?: string | null;
+		class?: string;
 	} = $props();
 </script>
 
 {#if iconType === `emoji` && icon}
-	<span class="content-icon emoji" aria-hidden="true">{icon}</span>
+	<span class="content-icon emoji {className}" aria-hidden="true">{icon}</span>
 {:else if icon}
-	<img class="content-icon image" src={icon} alt="" />
+	<img class="content-icon image {className}" src={icon} alt="" />
 {:else}
-	<span class="content-icon fallback" aria-hidden="true"><NotionIcon /></span>
+	<span class="content-icon fallback {className}" aria-hidden="true"><NotionIcon /></span>
 {/if}
 
 <style>

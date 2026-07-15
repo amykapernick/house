@@ -12,6 +12,7 @@
 		expected_months,
 		type,
 		onStatusChange,
+		class: className = '',
 	}: {
 		id: string;
 		title: string;
@@ -21,6 +22,7 @@
 		expected_months?: number[];
 		type?: MilestoneCategory;
 		onStatusChange?: (id: string, status: MilestoneStatus) => void;
+		class?: string;
 	} = $props();
 
 	const statusLabel: Record<MilestoneStatus, string> = {
@@ -39,6 +41,7 @@
 
 <Card
 	{title}
+	class={className}
 	footer={type && categoryLabel[type]}
 	icon={onStatusChange ? undefined : status}
 	IconComponent={onStatusChange ? StatusSelect : undefined}

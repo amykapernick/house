@@ -10,6 +10,7 @@
 	import { EVERYONE, isVisibleToUser } from '$utils/fetchFamilyMembers';
 	import type { ScheduleBlock, ScheduleSavePayload, RoutineDays, PaletteColour } from '$types/schedule';
 	import type { Task, TaskStatus } from '$types/tasks';
+	import { getPageTitle } from '$utils/pageTitle';
 
 	let blocks = $state<ScheduleBlock[]>([]);
 	let colours = $state<PaletteColour[]>([]);
@@ -237,7 +238,7 @@
 </script>
 
 <svelte:head>
-	<title>Schedule | Kapers Crewe Household</title>
+	<title>{getPageTitle(`Schedule`)}</title>
 	<meta name="description" content="Weekly routine schedule" />
 </svelte:head>
 

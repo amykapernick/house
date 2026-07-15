@@ -7,6 +7,7 @@
 	import HabitView from '$parts/habits/HabitView.svelte';
 	import FamilyFilter from '$parts/FamilyFilter.svelte';
 	import type { Habit } from '$types/habits';
+	import { getPageTitle } from '$utils/pageTitle';
 
 	let habits = $state<Habit[]>([]);
 	let loading = $state(true);
@@ -39,7 +40,7 @@
 </script>
 
 <svelte:head>
-	<title>Habits | Kapers Crewe Household</title>
+	<title>{getPageTitle(`Habits`)}</title>
 	<meta name="description" content="Track daily and weekly habits" />
 </svelte:head>
 

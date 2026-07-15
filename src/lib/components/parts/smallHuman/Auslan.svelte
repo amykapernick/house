@@ -11,7 +11,8 @@
 		tip,
 		reference,
 		onStatusChange,
-	}: AuslanSign & { onStatusChange?: (id: string, status: SignStatus) => void } = $props();
+		class: className = '',
+	}: AuslanSign & { onStatusChange?: (id: string, status: SignStatus) => void; class?: string } = $props();
 
 	const statusLabel: Record<SignStatus, string> = {
 		introduce_next: 'Introduce',
@@ -28,6 +29,7 @@
 
 <Card
 	title={name}
+	class={className}
 	icon={onStatusChange ? undefined : status}
 	IconComponent={onStatusChange ? StatusSelect : undefined}
 	iconProps={onStatusChange ? { id, status, labels: statusLabel, onChange: onStatusChange } : undefined}

@@ -11,11 +11,13 @@
 		buckets = [],
 		editing = false,
 		onChange,
+		class: className = '',
 	}: {
 		budget: BudgetItem[];
 		buckets?: BudgetBucket[];
 		editing?: boolean;
 		onChange?: () => void;
+		class?: string;
 	} = $props();
 
 	type SortKey = 'description' | 'bucket' | 'tags' | 'amount';
@@ -97,6 +99,7 @@
 	</th>
 {/snippet}
 
+<div class={className}>
 <table class="budget">
 	<thead>
 		<tr>
@@ -158,6 +161,7 @@
 {#if editing}
 	<button type="button" class="add-item" onclick={addItem}>+ Add item</button>
 {/if}
+</div>
 
 <style>
 	@import '@mixins';

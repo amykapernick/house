@@ -4,7 +4,7 @@
 	import LineChart from '$parts/LineChart.svelte';
 	import type { LineChartLine } from '$parts/LineChart.svelte';
 
-	const { growth }: { growth: Growth } = $props();
+	const { growth, class: className = '' }: { growth: Growth; class?: string } = $props();
 
 	const sorted = $derived(
 		[...growth.measurements].sort((a, b) => a.date.localeCompare(b.date))
@@ -36,22 +36,24 @@
 	const formatX = (x: Date) => format(x, 'd MMM');
 </script>
 	
-	<p class="trend">{growth.trend_notes}</p>
+	<div class={className}>
+		<p class="trend">{growth.trend_notes}</p>
 
-	<figure>
-		<LineChart lines={weightLines} {formatX} leftLabel={weightLines[0]?.unit} rightLabel={weightLines[1]?.unit} />
-		<figcaption>Weight</figcaption>
-	</figure>
+		<figure>
+			<LineChart lines={weightLines} {formatX} leftLabel={weightLines[0]?.unit} rightLabel={weightLines[1]?.unit} />
+			<figcaption>Weight</figcaption>
+		</figure>
 
-	<figure>
-		<LineChart lines={heightLines} {formatX} leftLabel={heightLines[0]?.unit} rightLabel={heightLines[1]?.unit} />
-		<figcaption>Height</figcaption>
-	</figure>
+		<figure>
+			<LineChart lines={heightLines} {formatX} leftLabel={heightLines[0]?.unit} rightLabel={heightLines[1]?.unit} />
+			<figcaption>Height</figcaption>
+		</figure>
 
-	<figure>
-		<LineChart lines={headLines} {formatX} leftLabel={headLines[0]?.unit} rightLabel={headLines[1]?.unit} />
-		<figcaption>Head Circumference</figcaption>
-	</figure>
+		<figure>
+			<LineChart lines={headLines} {formatX} leftLabel={headLines[0]?.unit} rightLabel={headLines[1]?.unit} />
+			<figcaption>Head Circumference</figcaption>
+		</figure>
+	</div>
 
 <style>
 	.trend {

@@ -12,6 +12,8 @@
 		type FocusPresetId,
 	} from '$utils/focusTimer';
 
+	let { class: className = '' }: { class?: string } = $props();
+
 	let selectedPreset = $state<FocusPresetId>(`classic`);
 	let hours = $state(2);
 	let permission = $state(notificationPermission());
@@ -37,7 +39,7 @@
 	let blocksToGo = $derived($focusTimerState ? $focusTimerState.phases.length - $focusTimerState.phaseIndex - 1 : 0);
 </script>
 
-<div class="focus_timer">
+<div class="focus_timer {className}">
 	{#if $focusTimerState && currentPhase}
 		<div class="active" class:on_break={currentPhase.type === `break`}>
 			<span class="phase_label">{currentPhase.label}</span>

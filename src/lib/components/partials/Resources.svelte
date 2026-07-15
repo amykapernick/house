@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Resource } from '$types/resources';
 
-	let { resources }: { resources: Resource[] } = $props();
+	let { resources, class: className = '' }: { resources: Resource[]; class?: string } = $props();
 
 	let grouped = $derived.by(() => {
 		const groups: Record<string, Resource[]> = {};

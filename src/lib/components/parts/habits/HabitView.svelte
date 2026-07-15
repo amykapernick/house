@@ -10,7 +10,8 @@
 		habits = [],
 		selectedUserSlug = EVERYONE,
 		onComplete,
-	}: { habits: Habit[]; selectedUserSlug?: string; onComplete?: (id: string) => void } = $props();
+		class: className = '',
+	}: { habits: Habit[]; selectedUserSlug?: string; onComplete?: (id: string) => void; class?: string } = $props();
 
 	let range = $state<HabitViewRange>('week');
 
@@ -57,54 +58,56 @@
 	}
 </script>
 
-<nav class="switcher">
-	<button type="button" onclick={() => (range = 'week')} data-active={range === 'week'}>Week</button>
-	<button type="button" onclick={() => (range = 'month')} data-active={range === 'month'}>Month</button>
-	<button type="button" onclick={() => (range = 'year')} data-active={range === 'year'}>Year</button>
-</nav>
+<div class="habit_view {className}">
+	<nav class="switcher">
+		<button type="button" onclick={() => (range = 'week')} data-active={range === 'week'}>Week</button>
+		<button type="button" onclick={() => (range = 'month')} data-active={range === 'month'}>Month</button>
+		<button type="button" onclick={() => (range = 'year')} data-active={range === 'year'}>Year</button>
+	</nav>
 
-<div class="table-scroll">
-	<table class="table">
-		<thead>
-			<tr>
-				<th></th>
-				{#if range === 'week'}
-					{#each days as day (day.toISOString())}
-						<th>{format(day, 'EEE d')}</th>
-					{/each}
-				{:else if range === 'month'}
-					<th>{format(days[0], 'MMMM yyyy')}</th>
-				{:else}
-					<th>{format(days[0], 'yyyy')}</th>
-				{/if}
-			</tr>
-		</thead>
-		<tbody>
-			{#each sections as { member, items } (member.slug)}
-				<tr class="member">
-					<td colspan={columnCount + 1}>
-						<button
-							type="button"
-							class="toggle"
-							aria-expanded={!collapsed.has(member.slug)}
-							onclick={() => toggleSection(member.slug)}
-						>
-							<span class="chevron" class:open={!collapsed.has(member.slug)}>▸</span>
-							{#if member.profile}
-								<img class="avatar" src={member.profile} alt="" />
-							{/if}
-							{member.name}
-						</button>
-					</td>
+	<div class="table-scroll">
+		<table class="table">
+			<thead>
+				<tr>
+					<th></th>
+					{#if range === 'week'}
+						{#each days as day (day.toISOString())}
+							<th>{format(day, 'EEE d')}</th>
+						{/each}
+					{:else if range === 'month'}
+						<th>{format(days[0], 'MMMM yyyy')}</th>
+					{:else}
+						<th>{format(days[0], 'yyyy')}</th>
+					{/if}
 				</tr>
-				{#if !collapsed.has(member.slug)}
-					{#each items as habit (habit.id)}
-						<HabitItem {...habit} {days} {range} {onComplete} />
-					{/each}
-				{/if}
-			{/each}
-		</tbody>
-	</table>
+			</thead>
+			<tbody>
+				{#each sections as { member, items } (member.slug)}
+					<tr class="member">
+						<td colspan={columnCount + 1}>
+							<button
+								type="button"
+								class="toggle"
+								aria-expanded={!collapsed.has(member.slug)}
+								onclick={() => toggleSection(member.slug)}
+							>
+								<span class="chevron" class:open={!collapsed.has(member.slug)}>▸</span>
+								{#if member.profile}
+									<img class="avatar" src={member.profile} alt="" />
+								{/if}
+								{member.name}
+							</button>
+						</td>
+					</tr>
+					{#if !collapsed.has(member.slug)}
+						{#each items as habit (habit.id)}
+							<HabitItem {...habit} {days} {range} {onComplete} />
+						{/each}
+					{/if}
+				{/each}
+			</tbody>
+		</table>
+	</div>
 </div>
 
 <style>

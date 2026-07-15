@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import fetchClientData from '$utils/fetchClientData';
 	import { resolve } from '$app/paths';
+	import { getPageTitle } from '$utils/pageTitle';
 
 	let tags = $state<any[]>([]);
 	let loading = $state(true);
@@ -35,7 +36,7 @@
 </script>
 
 <svelte:head>
-	<title>Recipe Tags | Kapers Crewe Household</title>
+	<title>{getPageTitle(`Recipe Tags`)}</title>
 </svelte:head>
 
 <a href={resolve('/recipes')} class="back">← Recipes</a>

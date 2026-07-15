@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { dndzone } from 'svelte-dnd-action';
 	import { flip } from 'svelte/animate';
-	import { intervalToDuration, format } from 'date-fns';
+	import { format } from 'date-fns';
 	import {
 		MEAL_PLANNING_DND_TYPE,
 		MEAL_PLANNING_FLIP_MS,
@@ -9,6 +9,7 @@
 		type PlanningDndItem,
 		type ExistingDndItem,
 	} from '$utils/mealPlanningDnd';
+	import { formatMinutes } from '$utils/formatMinutes';
 
 	let {
 		date,
@@ -19,6 +20,7 @@
 		items = $bindable(),
 		onAddMeal,
 		onEditItem,
+		class: className = '',
 	}: {
 		date: string;
 		label: string;
@@ -28,17 +30,8 @@
 		items: PlanningDndItem[];
 		onAddMeal?: () => void;
 		onEditItem?: (item: ExistingDndItem) => void;
+		class?: string;
 	} = $props();
-
-	function formatMinutes(mins: string | null): string {
-		if (!mins) return '';
-		const m = parseInt(mins, 10);
-		if (isNaN(m) || m <= 0) return '';
-		const { hours, minutes } = intervalToDuration({ start: 0, end: m * 60 * 1000 });
-		if (hours && minutes) return `${hours}h ${minutes}m`;
-		if (hours) return `${hours}h`;
-		return `${minutes}m`;
-	}
 
 	function handleConsider(e: CustomEvent<{ items: PlanningDndItem[] }>) {
 		items = e.detail.items;
@@ -53,7 +46,7 @@
 	}
 </script>
 
-<div class="day" class:today={isToday}>
+<div class="day {className}" class:today={isToday}>
 	<h2>
 		{label}
 		<span class="date">{displayDate}</span>

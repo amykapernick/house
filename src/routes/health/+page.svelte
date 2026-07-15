@@ -5,6 +5,7 @@
 	import LineChart from '$parts/LineChart.svelte';
 	import type { LineChartLine } from '$parts/LineChart.svelte';
 	import type { Colour } from '$types/global';
+	import { getPageTitle } from '$utils/pageTitle';
 
 	type HealthMetricPoint = { date: string; value: number };
 	type HealthMetricHistory = { key: string; label: string | null; unit: string | null; points: HealthMetricPoint[] };
@@ -77,7 +78,7 @@
 </script>
 
 <svelte:head>
-	<title>Health | Kapers Crewe Household</title>
+	<title>{getPageTitle(`Health`)}</title>
 	<meta name="description" content="Family Health Connect stats" />
 </svelte:head>
 
@@ -129,14 +130,14 @@
 		display: flex;
 		flex-wrap: wrap;
 		align-items: center;
-		gap: 1em;
-		border: none;
-		padding: 0;
 		margin-bottom: 1em;
+		padding: 0;
+		border: none;
+		gap: 1em;
 
 		legend {
-			font-weight: bold;
 			padding: 0;
+			font-weight: bold;
 		}
 
 		label {
@@ -147,31 +148,31 @@
 	}
 
 	.legend {
-		list-style: none;
-		margin: 0 0 1.5em;
-		padding: 0;
 		display: flex;
 		flex-wrap: wrap;
-		gap: 0.3em 1.2em;
+		margin: 0 0 1.5em;
+		padding: 0;
 		font-size: 0.9em;
-	}
+		list-style: none;
+		gap: 0.3em 1.2em;
 
-	.legend li {
+	& li {
 		display: flex;
 		align-items: center;
 		gap: 0.5em;
 	}
+	}
 
 	.swatch {
+		flex-shrink: 0;
 		width: 0.8em;
 		height: 0.8em;
 		border-radius: 0.15em;
-		flex-shrink: 0;
 	}
 
 	.grid {
 		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+		grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
 		gap: 1.5em;
 	}
 
@@ -181,8 +182,8 @@
 	}
 
 	figcaption {
-		text-align: right;
 		padding: 1em;
 		font-style: italic;
+		text-align: right;
 	}
 </style>
