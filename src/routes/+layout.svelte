@@ -244,10 +244,6 @@
 			overflow-y: auto;
 		}
 
-		.layout {
-			width: 100%;
-		}
-
 		.status_banner {
 			right: 1rem;
 			bottom: 2rem;

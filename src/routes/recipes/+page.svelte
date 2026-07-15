@@ -214,22 +214,6 @@
 <style>
 	@import '@mixins';
 
-	.sub-nav {
-		display: flex;
-		gap: 1em;
-		margin-bottom: 1.5em;
-
-		& a {
-			color: var(--purple_bright);
-			font-size: 0.9em;
-			text-decoration: none;
-
-			&:hover {
-				text-decoration: underline;
-			}
-		}
-	}
-
 	.controls {
 		display: flex;
 		flex-direction: column;

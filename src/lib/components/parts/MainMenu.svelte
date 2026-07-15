@@ -62,8 +62,7 @@
 			margin: 10px;
 		}
 
-		& a,
-		& button {
+		& a {
 			padding: 10px;
 			color: light-dark(var(--black), var(--navy));
 			font-size: inherit;
@@ -107,8 +106,7 @@
 		}
 
 		.menu {
-			& a,
-			& button {
+			& a {
 				display: flex;
 				align-items: center;
 				padding: 0.2em 0.5em;

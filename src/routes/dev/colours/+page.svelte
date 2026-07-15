@@ -49,7 +49,7 @@
 
 	{#snippet colourList(list: PaletteColour[], prefix: string)}
 		<ul class="colours">
-			{#each list as colour}
+			{#each list as colour (colour.name)}
 				<li style={
 					`--colour_background_text: var(--${prefix}${colour.name}_text); --colour_background: var(--${prefix}${colour.name});`
 				}>

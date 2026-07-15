@@ -18,7 +18,7 @@
 				"isBackground": true,
 				"problemMatcher": [],
 				"options": {
-					"cwd": "${workspaceFolder:household}"
+					"cwd": "${workspaceFolder:house}"
 				},
 				"runOptions": {
 					"runOn": "folderOpen"
