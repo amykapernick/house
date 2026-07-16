@@ -89,20 +89,20 @@
 	</div>
 
 	<div class="field-row">
-		<label class="field">
-			X
-			<input type="number" bind:value={startX} />
-		</label>
-		<label class="field">
-			Y
-			<input type="number" bind:value={startY} />
-		</label>
+		<div class="field">
+			<label for="house-item-x">X</label>
+			<input type="number" id="house-item-x" bind:value={startX} />
+		</div>
+		<div class="field">
+			<label for="house-item-y">Y</label>
+			<input type="number" id="house-item-y" bind:value={startY} />
+		</div>
 	</div>
 
-	<label class="field">
-		Rotation
-		<input type="number" bind:value={rotation} />
-	</label>
+	<div class="field">
+		<label for="house-item-rotation">Rotation</label>
+		<input type="number" id="house-item-rotation" bind:value={rotation} />
+	</div>
 
 	<div class="field">
 		Link to another item

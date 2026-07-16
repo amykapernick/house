@@ -2,7 +2,10 @@
 	import { format, parseISO } from 'date-fns';
 	import Modal from '$parts/Modal.svelte';
 	import Select from '$parts/Select.svelte';
+	import Autocomplete from '$parts/Autocomplete.svelte';
 	import fetchClientData from '$utils/fetchClientData';
+
+	type Recipe = { id: string; name: string; slug: string; categories: { name: string }[]; tags: { name: string }[] };
 
 	const ENTRY_TYPE_OPTIONS = [
 		{ value: `breakfast`, label: `Breakfast` },
@@ -12,7 +15,6 @@
 	];
 
 	const RECIPE_MIN_CHARS = 2;
-	const RECIPE_DEBOUNCE_MS = 250;
 	const RECIPE_FETCH_COUNT = 8;
 
 	let {
@@ -65,13 +67,8 @@
 	}
 
 	let searchQuery = $state(``);
-	let searchResults = $state<{ id: string; name: string; slug: string; categories: { name: string }[]; tags: { name: string }[] }[]>([]);
-	let searching = $state(false);
-	let searchToken = 0;
-	let searchDebounceTimer: ReturnType<typeof setTimeout> | undefined;
 
-	async function searchRecipes(searchTerm: string, token: number) {
-		searching = true;
+	async function searchRecipes(searchTerm: string): Promise<Recipe[]> {
 		const res = await fetchClientData({
 			gqlQuery: `
 				query {
@@ -81,41 +78,21 @@
 				}
 			`,
 		});
-		if (token !== searchToken) return; // a newer search superseded this one
-		searchResults = res.recipes?.items ?? [];
-		searching = false;
+		return res.recipes?.items ?? [];
 	}
 
 	$effect(() => {
-		const term = searchQuery.trim();
-		clearTimeout(searchDebounceTimer);
-		searchToken += 1;
-		if (linkMode !== `recipe` || term.length < RECIPE_MIN_CHARS) {
-			searchResults = [];
-			searching = false;
-			return;
-		}
-		const token = searchToken;
-		searchDebounceTimer = setTimeout(() => searchRecipes(term, token), RECIPE_DEBOUNCE_MS);
-		return () => clearTimeout(searchDebounceTimer);
+		if (open) searchQuery = ``;
 	});
 
-	$effect(() => {
-		if (open) {
-			searchQuery = ``;
-			searchResults = [];
-		}
-	});
-
-	function recipeBadge(recipe: { categories: { name: string }[]; tags: { name: string }[] }): string | undefined {
+	function recipeBadge(recipe: Recipe): string | undefined {
 		return recipe.categories[0]?.name ?? recipe.tags[0]?.name;
 	}
 
-	function selectRecipe(recipe: { id: string; name: string }) {
+	function selectRecipe(recipe: Recipe) {
 		recipeId = recipe.id;
 		recipeName = recipe.name;
 		searchQuery = ``;
-		searchResults = [];
 	}
 
 	function clearRecipe() {
@@ -134,14 +111,14 @@
 
 	<fieldset>
 		<legend class="sr-only">Link this meal to</legend>
-		<label>
-			<input type="radio" bind:group={linkMode} value="recipe" />
-			Recipe
-		</label>
-		<label>
-			<input type="radio" bind:group={linkMode} value="custom" />
-			Custom
-		</label>
+		<div class="link_mode_option">
+			<input type="radio" id="meal-entry-link-recipe" bind:group={linkMode} value="recipe" />
+			<label for="meal-entry-link-recipe">Recipe</label>
+		</div>
+		<div class="link_mode_option">
+			<input type="radio" id="meal-entry-link-custom" bind:group={linkMode} value="custom" />
+			<label for="meal-entry-link-custom">Custom</label>
+		</div>
 	</fieldset>
 
 	{#if linkMode === `recipe`}
@@ -152,43 +129,31 @@
 			</div>
 		{:else}
 			<div class="field">
-				<input
-					type="text"
-					placeholder="Search recipes..."
+				<Autocomplete
+					id="meal-entry-recipe-search"
+					label="Search recipes"
+					hiddenLabel
 					bind:value={searchQuery}
-					aria-label="Search recipes"
+					placeholder="Search recipes..."
+					minChars={RECIPE_MIN_CHARS}
+					onSearch={searchRecipes}
+					onSelect={selectRecipe}
+					getKey={(recipe) => recipe.id}
+					getLabel={(recipe) => recipe.name}
+					getBadge={recipeBadge}
+					noResultsText="No matching recipes"
 				/>
-				{#if searchQuery.trim().length >= RECIPE_MIN_CHARS}
-					<ul class="results">
-						{#each searchResults as recipe (recipe.id)}
-							<li>
-								<button type="button" onclick={() => selectRecipe(recipe)}>
-									<span class="name">{recipe.name}</span>
-									{#if recipeBadge(recipe)}
-										<span class="tag">{recipeBadge(recipe)}</span>
-									{/if}
-								</button>
-							</li>
-						{/each}
-						{#if searching && searchResults.length === 0}
-							<li class="hint">Searching...</li>
-						{/if}
-						{#if !searching && searchResults.length === 0}
-							<li class="hint">No matching recipes</li>
-						{/if}
-					</ul>
-				{/if}
 			</div>
 		{/if}
 	{:else}
-		<label class="field">
-			Title
-			<input type="text" bind:value={title} placeholder="e.g. Leftovers" />
-		</label>
-		<label class="field">
-			Notes
-			<textarea bind:value={text} rows="3"></textarea>
-		</label>
+		<div class="field">
+			<label for="meal-entry-title">Title</label>
+			<input type="text" id="meal-entry-title" bind:value={title} placeholder="e.g. Leftovers" />
+		</div>
+		<div class="field">
+			<label for="meal-entry-notes">Notes</label>
+			<textarea id="meal-entry-notes" bind:value={text} rows="3"></textarea>
+		</div>
 	{/if}
 
 	{#if error}<p class="error">{error}</p>{/if}
@@ -228,6 +193,12 @@
 		margin: 0 0 1em;
 	}
 
+	.link_mode_option {
+		display: flex;
+		align-items: center;
+		gap: 0.3em;
+	}
+
 	.selected_recipe {
 		display: flex;
 		align-items: center;
@@ -248,59 +219,6 @@
 			color: var(--purple_bright);
 			cursor: pointer;
 			padding: 0;
-		}
-	}
-
-	.results {
-		margin: 0.3em 0 0;
-		padding: 0;
-		list-style: none;
-		border: 1px solid var(--grey_light);
-		border-radius: 0.3em;
-		max-height: 200px;
-		overflow-y: auto;
-
-		& li {
-			margin: 0;
-		}
-
-		& button {
-			display: flex;
-			align-items: center;
-			justify-content: space-between;
-			gap: 0.5em;
-			width: 100%;
-			text-align: left;
-			padding: 0.5em 0.75em;
-			border: none;
-			background: none;
-			cursor: pointer;
-
-			&:hover {
-				background: color-mix(in srgb, var(--purple_bright) 8%, transparent);
-			}
-
-			& .name {
-				overflow: hidden;
-				text-overflow: ellipsis;
-				white-space: nowrap;
-			}
-
-			& .tag {
-				flex-shrink: 0;
-				padding: 0.15em 0.5em;
-				border-radius: 1em;
-				background: color-mix(in srgb, var(--purple_bright) 15%, transparent);
-				color: var(--purple_bright);
-				font-size: 0.75em;
-				white-space: nowrap;
-			}
-		}
-
-		& .hint {
-			padding: 0.5em 0.75em;
-			color: var(--grey);
-			font-style: italic;
 		}
 	}
 

@@ -37,16 +37,9 @@ input:not([type="radio"], [type="checkbox"]), select, textarea {
 	width: 100%;
 	margin: 0.1em 0 1em;
 	padding: 0.5em 1em;
-	border: 1px solid 
-		light-dark(
-			color-mix(in oklch, var(--background) 78%, var(--black)),
-			color-mix(in oklch, var(--dark_background) 78%, var(--white))
-		);
+	border: 1px solid var(--input_border);
 	border-radius: 0.5em;
-	background: light-dark(
-		color-mix(in oklch, var(--white) 70%, var(--background)), 
-		color-mix(in oklch, var(--dark_background) 82%, var(--white))
-	);
+	background: var(--input_bg);
 	box-shadow: none;
 	color: light-dark(
 		var(--black), 
@@ -54,6 +47,9 @@ input:not([type="radio"], [type="checkbox"]), select, textarea {
 	);
 	line-height: 1.5;
 	
+	&:focus {
+		border-color: var(--purple_bright);
+	}
 }
 
 fieldset {

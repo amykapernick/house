@@ -112,6 +112,7 @@
 		border-color: var(--header_border);
 		background: var(--header_background);
 		gap: 0.5em;
+		z-index: 50;
 	}
 
 	.title {

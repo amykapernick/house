@@ -22,7 +22,7 @@
 }  
 
 @mixin button_secondary {
-	--button_background: transparent;
+	--button_background: var(--transparent);
 	--button_text: var(--navy);
 	--button_border: var(--navy);
 
@@ -35,7 +35,7 @@
 }
 
 @mixin button_text {
-	--button_background: transparent;
+	--button_background: var(--transparent);
 	--button_text: var(--purple_bright);
 
 	display: inline-flex;
@@ -43,17 +43,14 @@
 	border-width: 0;
 
 	&:hover {
-		--button_background: transparent;
+		--button_background: var(--transparent);
 		--button_text: var(--purple_bright);
 
 		text-decoration: underline;
 	}
 }
 
-@mixin button_icon {
-
-	@include button;
-	
+@mixin button_icon {	
 	display: flex;
 	align-items: center;
 	justify-content: center;

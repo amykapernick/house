@@ -219,13 +219,14 @@
 							{:else}
 								{@const options = ingredientUnitOptions(ingredient)}
 								<li class:checked={checkedIngredients[i]}>
-									<label class="check-label">
-										<input
-											type="checkbox"
-											checked={checkedIngredients[i] ?? false}
-											onchange={() => (checkedIngredients[i] = !checkedIngredients[i])}
-											aria-label={`Mark ${ingredient.food ?? ingredient.display} as done`}
-										/>
+									<input
+										type="checkbox"
+										id="ingredient-{i}"
+										checked={checkedIngredients[i] ?? false}
+										onchange={() => (checkedIngredients[i] = !checkedIngredients[i])}
+										aria-label={`Mark ${ingredient.food ?? ingredient.display} as done`}
+									/>
+									<label class="check-label" for="ingredient-{i}">
 										<span>{scaledIngredientText(ingredient, i)}</span>
 									</label>
 									{#if options.length}
@@ -257,13 +258,14 @@
 					<ol>
 						{#each recipe.instructions as step, i (i)}
 							<li class:checked={checkedSteps[i]}>
-								<label class="check-label">
-									<input
-										type="checkbox"
-										checked={checkedSteps[i] ?? false}
-										onchange={() => (checkedSteps[i] = !checkedSteps[i])}
-										aria-label={`Mark step ${i + 1} as done`}
-									/>
+								<input
+									type="checkbox"
+									id="step-{i}"
+									checked={checkedSteps[i] ?? false}
+									onchange={() => (checkedSteps[i] = !checkedSteps[i])}
+									aria-label={`Mark step ${i + 1} as done`}
+								/>
+								<label class="check-label" for="step-{i}">
 									<span>
 										{#if step.title}<strong>{step.title}</strong>{/if}
 										<p>{step.text}</p>
@@ -516,13 +518,6 @@
 					text-decoration: line-through;
 				}
 			}
-		}
-
-		& .check-label {
-			display: flex;
-			align-items: center;
-			gap: 0.5em;
-			cursor: pointer;
 
 			& input {
 				display: inline-block;
@@ -531,6 +526,13 @@
 				padding: 0;
 				flex-shrink: 0;
 			}
+		}
+
+		& .check-label {
+			display: flex;
+			align-items: center;
+			gap: 0.5em;
+			cursor: pointer;
 		}
 
 		& .unit-select {
@@ -557,6 +559,9 @@
 		}
 
 		& li {
+			display: flex;
+			align-items: flex-start;
+			gap: 0.6em;
 			margin-bottom: 1em;
 
 			&.checked {
@@ -566,13 +571,6 @@
 					text-decoration: line-through;
 				}
 			}
-		}
-
-		& .check-label {
-			display: flex;
-			align-items: flex-start;
-			gap: 0.6em;
-			cursor: pointer;
 
 			& input {
 				display: inline-block;
@@ -581,6 +579,10 @@
 				padding: 0;
 				flex-shrink: 0;
 			}
+		}
+
+		& .check-label {
+			cursor: pointer;
 		}
 
 		& p {

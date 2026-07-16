@@ -87,10 +87,10 @@
 <fieldset class="range_filter">
 	<legend>Show</legend>
 	{#each DAY_OPTIONS as option (option)}
-		<label>
-			<input type="radio" name="days" value={option} bind:group={days} />
-			{option} days
-		</label>
+		<div class="option">
+			<input type="radio" id="days-{option}" name="days" value={option} bind:group={days} />
+			<label for="days-{option}">{option} days</label>
+		</div>
 	{/each}
 </fieldset>
 
@@ -140,7 +140,7 @@
 			font-weight: bold;
 		}
 
-		label {
+		.option {
 			display: flex;
 			align-items: center;
 			gap: 0.3em;

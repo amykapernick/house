@@ -54,8 +54,8 @@
 	.select {
 		cursor: pointer;
 		padding: 0;
-		background: color-mix(in oklch, rgb(255, 255, 255) 65%, rgb(247, 240, 235));
-		border: 1px solid color-mix(in oklch, rgb(247, 240, 235) 78%, rgb(13, 13, 13));
+		background: var(--input_bg);
+		border: 1px solid var(--input_border);
 
 		&, &::picker(select) {
 			appearance: base-select;
@@ -66,7 +66,7 @@
 			align-items: center;
 			margin-top: 0.2em;
 			border-radius: 0.5em;
-			border: 1px solid color-mix(in oklch, rgb(247, 240, 235) 78%, rgb(13, 13, 13));
+			border: 1px solid var(--input_border);
 			box-shadow: rgba(13, 13, 13, 0.04) 0px 1px 2px, rgba(95, 65, 50, 0.09) 0px 8px 20px;
 			background: rgb(255, 255, 255);
 		}
@@ -86,7 +86,7 @@
 		& > option {
 			grid-column: 1 / -1;
 			cursor: pointer;
-			padding: 0.4em 0.8em;
+			padding: 0.5em 1em;
 			line-height: 1;
 			
 			&:hover {
@@ -115,7 +115,7 @@
 		height: 100%;
 		background: none;
 		border: none;
-		font-size: inherit;
+		font-size: 1em;
 		color: rgb(13, 13, 13);
 	}
 </style>

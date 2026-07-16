@@ -72,49 +72,37 @@
 	.tabs {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 0.25em;
+		gap: 1em 1.5em;
 		margin: 1.5em 0 1em;
-		border-bottom: 2px solid var(--grey_light);
+		padding-bottom: 0.8em;
+		border-bottom: 1px solid color-mix(in oklch, rgb(247, 240, 235) 78%, rgb(13, 13, 13));
 	}
 
 	button {
-		margin-bottom: -2px;
-		padding: 0.6em 1em;
+		margin: 0;
+		padding: 0;
 		border: none;
-		border-bottom: 2px solid transparent;
 		background: none;
-		color: var(--navy);
+		color: color-mix(in oklch, rgb(96, 96, 96) 84%, rgb(13, 13, 13));
 		font-size: 1em;
 		font-weight: 600;
 		text-transform: capitalize;
-		opacity: 0.85;
 		cursor: pointer;
-		transition: opacity 0.15s, border-color 0.15s;
+		border-radius: 0.2em;
+		flex-shrink: 0;
 
 		&:hover {
-			opacity: 1;
+			text-decoration: underline;
 		}
 
 		&[data-active='true'] {
-			border-color: var(--purple_bright);
+			color: var(--navy);
 			opacity: 1;
 		}
 
 		&:focus-visible {
 			outline: 2px solid var(--purple_bright);
 			outline-offset: 2px;
-		}
-	}
-
-	@media (width <= 50em) {
-		.tabs {
-			flex-wrap: nowrap;
-			overflow-x: auto;
-			-webkit-overflow-scrolling: touch;
-		}
-
-		button {
-			flex-shrink: 0;
 		}
 	}
 </style>

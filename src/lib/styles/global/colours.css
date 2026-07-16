@@ -3,6 +3,7 @@
 	--navy_text: var(--blue_navy_text);
 	--neutral_light: var(--white);
 	--neutral_light_text: var(--white_text);
+	--white_true: #ffffff;
 	--error_text: var(--red_text);
 	--warning_text: var(--orange_text);
 	--success_text: var(--green_text);
@@ -36,6 +37,10 @@
 	--error_bg: color-mix(in srgb, var(--light_red) 12%, var(--white));
 	--error: color-mix(in srgb, var(--light_red) 92%, var(--black));
 	--warning: color-mix(in srgb, var(--orange_dark) 74%, var(--black));
+	--warning_bg: color-mix(in srgb, var(--orange_dark) 12%, var(--white));
+	--info_bg: color-mix(in srgb, var(--navy) 12%, var(--white));
+	--info: color-mix(in srgb, var(--navy) 92%, var(--black));
+	--purple_bright_bg: color-mix(in srgb, var(--purple_bright) 12%, var(--white));
 	--stripe_a: color-mix(in srgb, var(--background) 90%, var(--black));
 	--stripe_b: var(--background);
 	--photo_label_bg: color-mix(in srgb, var(--white) 80%, transparent);

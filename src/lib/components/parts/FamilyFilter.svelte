@@ -47,15 +47,15 @@
 {#if familyMembers.length}
 	<fieldset class="user_filter {className}">
 		<legend>Filter by family member</legend>
-		<label>
-			<input type="radio" name="family-filter" value={EVERYONE} bind:group={selectedUserSlug} />
-			Everyone
-		</label>
+		<div class="option">
+			<input type="radio" id="family-filter-{pageKey}-everyone" name="family-filter" value={EVERYONE} bind:group={selectedUserSlug} />
+			<label for="family-filter-{pageKey}-everyone">Everyone</label>
+		</div>
 		{#each familyMembers as member (member.slug)}
-			<label>
-				<input type="radio" name="family-filter" value={member.slug} bind:group={selectedUserSlug} />
-				{member.name}
-			</label>
+			<div class="option">
+				<input type="radio" id="family-filter-{pageKey}-{member.slug}" name="family-filter" value={member.slug} bind:group={selectedUserSlug} />
+				<label for="family-filter-{pageKey}-{member.slug}">{member.name}</label>
+			</div>
 		{/each}
 	</fieldset>
 {/if}
@@ -75,7 +75,7 @@
 			padding: 0;
 		}
 
-		label {
+		.option {
 			display: flex;
 			align-items: center;
 			gap: 0.3em;

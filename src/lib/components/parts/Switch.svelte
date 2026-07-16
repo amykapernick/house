@@ -51,6 +51,7 @@
 		align-self: center;
 		height: 1em;
 		font-size: 1.5em;
+		width: 2em;
 
 		& .switch::before, & :global(label svg) {
 			transition: all 5s ease-in-out;
@@ -87,6 +88,9 @@
 	}
 
 	label {
+		font-size: 1em;
+		z-index: 10;
+
 		& :global(svg) {
 			display: none;
 			position: absolute;
@@ -95,6 +99,7 @@
 			width: auto;
 			height: var(--toggle);
 			padding: var(--gap);
+			
 		}
 
 		&::before {
@@ -113,6 +118,7 @@
 		height: 1em;
 		border-radius: 1em;
 		background: light-dark(#ded0bd, var(--purple_bright));
+		z-index: 5;
 
 		&::before {
 			content: '';

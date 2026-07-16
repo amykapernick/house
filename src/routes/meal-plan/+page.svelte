@@ -474,17 +474,18 @@
 	<div class="planning-toolbar">
 		<div class="week-select" role="radiogroup" aria-label="Weeks to plan">
 			{#each [1, 2, 3, 4] as n (n)}
-				<label class="week-option">
+				<div class="week-option">
 					<input
 						type="radio"
+						id="planning-weeks-{n}"
 						name="planningWeeks"
 						value={n}
 						checked={planningWeeks === n}
 						disabled={planningSaving}
 						onchange={() => selectPlanningWeeks(n)}
 					/>
-					{n} week{n > 1 ? `s` : ``}
-				</label>
+					<label for="planning-weeks-{n}">{n} week{n > 1 ? `s` : ``}</label>
+				</div>
 			{/each}
 		</div>
 		{#if dirty}<span class="unsaved">Unsaved changes</span>{/if}

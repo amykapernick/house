@@ -27,10 +27,10 @@
 </script>
 
 <Modal bind:open class={className} title={mode === `create` ? `New block` : `Edit block`}>
-	<label class="field">
-		Label
-		<input type="text" bind:value={label} placeholder="e.g. Admin tasks" />
-	</label>
+	<div class="field">
+		<label for="block-label">Label</label>
+		<input type="text" id="block-label" bind:value={label} placeholder="e.g. Admin tasks" />
+	</div>
 	<div class="field">
 		Colour
 		<ColourSelect id="block-colour" bind:value={colour} colours={colourNames} />

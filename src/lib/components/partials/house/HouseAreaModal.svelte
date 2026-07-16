@@ -45,25 +45,25 @@
 	{/if}
 
 	<div class="field-row">
-		<label class="field">
-			X
-			<input type="number" bind:value={startX} />
-		</label>
-		<label class="field">
-			Y
-			<input type="number" bind:value={startY} />
-		</label>
+		<div class="field">
+			<label for="house-area-x">X</label>
+			<input type="number" id="house-area-x" bind:value={startX} />
+		</div>
+		<div class="field">
+			<label for="house-area-y">Y</label>
+			<input type="number" id="house-area-y" bind:value={startY} />
+		</div>
 	</div>
 
 	<div class="field-row">
-		<label class="field">
-			Width
-			<input type="number" bind:value={sizeWidth} min="1" />
-		</label>
-		<label class="field">
-			Height
-			<input type="number" bind:value={sizeHeight} min="1" />
-		</label>
+		<div class="field">
+			<label for="house-area-width">Width</label>
+			<input type="number" id="house-area-width" bind:value={sizeWidth} min="1" />
+		</div>
+		<div class="field">
+			<label for="house-area-height">Height</label>
+			<input type="number" id="house-area-height" bind:value={sizeHeight} min="1" />
+		</div>
 	</div>
 
 	<div class="field">

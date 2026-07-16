@@ -137,10 +137,10 @@
 						<select value={period ?? 'Month'} onchange={(e) => updateAmount(id, amount ?? 0, e.currentTarget.value)}>
 							{#each PERIODS as p (p)}<option value={p}>{p}ly</option>{/each}
 						</select>
-						<label class="income-toggle">
-							<input type="checkbox" checked={income} onchange={(e) => updateField(id, 'income', e.currentTarget.checked)} />
-							Income
-						</label>
+						<span class="income-toggle">
+							<input type="checkbox" id="income-toggle-{id}" checked={income} onchange={(e) => updateField(id, 'income', e.currentTarget.checked)} />
+							<label for="income-toggle-{id}">Income</label>
+						</span>
 					</td>
 					<td class="actions">
 						<button type="button" onclick={() => removeItem(id)} aria-label="Remove {description || 'item'}">✕</button>

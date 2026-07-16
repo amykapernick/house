@@ -66,19 +66,19 @@
 		<fieldset>
 			<div>
 				<legend>Radio button</legend>
-				<input type="radio" name="dev-radio" value="one" checked />
-				<label> Option one</label>
-				<input type="radio" name="dev-radio" value="two" />
-				<label> Option two</label>
-			
+				<input type="radio" id="dev-radio-one" name="dev-radio" value="one" checked />
+				<label for="dev-radio-one">Option one</label>
+				<input type="radio" id="dev-radio-two" name="dev-radio" value="two" />
+				<label for="dev-radio-two">Option two</label>
+
 			</div>
 		</fieldset>
 
-		<input type="checkbox" checked />
-		<label> Checked</label>
-		<input type="checkbox" />
-		<label> Unchecked</label>
-		
+		<input type="checkbox" id="dev-checkbox-checked" checked />
+		<label for="dev-checkbox-checked">Checked</label>
+		<input type="checkbox" id="dev-checkbox-unchecked" />
+		<label for="dev-checkbox-unchecked">Unchecked</label>
+
 
 		<Slider id="dev-slider" label="Slider input" bind:value={sliderValue} unit="%" />
 

@@ -173,10 +173,10 @@
 {:else}
 	<div class="controls">
 		<p class="count">{uncheckedItems.length} items to get</p>
-		<label class="toggle">
-			<input type="checkbox" bind:checked={showChecked} />
-			Show checked items ({checkedItems.length})
-		</label>
+		<div class="toggle">
+			<input type="checkbox" id="show-checked-items" bind:checked={showChecked} />
+			<label for="show-checked-items">Show checked items ({checkedItems.length})</label>
+		</div>
 	</div>
 
 	{#each visibleStoreGroups as store (store.name)}

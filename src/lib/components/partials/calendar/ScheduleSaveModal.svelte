@@ -44,26 +44,26 @@
 
 <Modal bind:open class={className} title="Save schedule changes">
 	<fieldset>
-		<label>
-			<input type="radio" bind:group={scope} value="default" />
-			Save as default routine
-		</label>
-		<label>
-			<input type="radio" bind:group={scope} value="range" />
-			Save for a date range
-		</label>
+		<div class="scope_option">
+			<input type="radio" id="schedule-save-default" bind:group={scope} value="default" />
+			<label for="schedule-save-default">Save as default routine</label>
+		</div>
+		<div class="scope_option">
+			<input type="radio" id="schedule-save-range" bind:group={scope} value="range" />
+			<label for="schedule-save-range">Save for a date range</label>
+		</div>
 	</fieldset>
 
 	{#if scope === `range`}
 		<div class="date_range">
-			<label>
-				From
-				<input type="date" bind:value={start} />
-			</label>
-			<label>
-				To
-				<input type="date" bind:value={end} />
-			</label>
+			<div class="field">
+				<label for="schedule-save-start">From</label>
+				<input type="date" id="schedule-save-start" bind:value={start} />
+			</div>
+			<div class="field">
+				<label for="schedule-save-end">To</label>
+				<input type="date" id="schedule-save-end" bind:value={end} />
+			</div>
 		</div>
 	{/if}
 
@@ -85,12 +85,18 @@
 		margin: 0 0 1em;
 	}
 
+	.scope_option {
+		display: flex;
+		align-items: center;
+		gap: 0.4em;
+	}
+
 	.date_range {
 		display: flex;
 		gap: 1em;
 		margin-bottom: 1em;
 
-		label {
+		.field {
 			display: flex;
 			flex-direction: column;
 			gap: 0.25em;

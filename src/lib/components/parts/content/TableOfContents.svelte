@@ -59,12 +59,11 @@
 		position: absolute;
 		right: 0;
 		width: 80vw;
-		max-width: max-content;
+		max-width: 400px;
 		margin: 10px 0 20px;
 		padding: 15px 20px;
 		border-radius: 0.5em;
-		background: linear-gradient(
-155deg, rgb(53 71 140) 0%, rgb(34 47 94) 55%, rgb(26 36 71) 100%);
+		background: linear-gradient(155deg, rgb(53, 71, 140), rgb(26, 36, 71));
 		color: var(--navy_text);
 		font-weight: 600;
 
@@ -97,6 +96,13 @@
 		& :global(svg) {
 			width: auto;
 			height: 1em;
+		}
+	}
+
+	@media(min-width: 50em) {
+		.toc {
+			width: max-content;
+			max-width: 500px;
 		}
 	}
 </style>

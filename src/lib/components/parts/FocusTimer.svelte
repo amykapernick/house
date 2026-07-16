@@ -66,18 +66,20 @@
 				<fieldset class="presets">
 					<legend>Preset</legend>
 					{#each FOCUS_PRESETS as preset (preset.id)}
-						<label>
-							<input type="radio" name="focus-preset" value={preset.id} bind:group={selectedPreset} />
-							<span class="preset_name">{preset.name}</span>
-							<span class="preset_description">{preset.description}</span>
-						</label>
+						<div class="preset_option">
+							<input type="radio" id="focus-preset-{preset.id}" name="focus-preset" value={preset.id} bind:group={selectedPreset} />
+							<label for="focus-preset-{preset.id}">
+								<span class="preset_name">{preset.name}</span>
+								<span class="preset_description">{preset.description}</span>
+							</label>
+						</div>
 					{/each}
 				</fieldset>
 				{#if selectedPreset === `classic`}
-					<label class="hours_field">
-						Hours
-						<input type="number" min="0.5" max="12" step="0.5" bind:value={hours} />
-					</label>
+					<div class="hours_field">
+						<label for="focus-hours">Hours</label>
+						<input type="number" id="focus-hours" min="0.5" max="12" step="0.5" bind:value={hours} />
+					</div>
 				{/if}
 				<button onclick={handleStart}>Start</button>
 			</div>
@@ -114,6 +116,13 @@
 		legend {
 			padding: 0;
 			margin: 0 0 0.25em;
+		}
+
+		.preset_option {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: baseline;
+			gap: 0 0.5em;
 		}
 
 		label {
