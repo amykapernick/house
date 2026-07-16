@@ -28,6 +28,14 @@ label, legend {
 	font-weight: 700;
 }
 
+legend {
+	margin-bottom: 1.5em;
+	color: color-mix(in oklch, var(--grey) 84%, var(--black));
+	font-size: 0.7em;
+	font-weight: 800;
+	text-transform: uppercase;
+}
+
 input {
 	accent-color: var(--purple_bright);
 }
