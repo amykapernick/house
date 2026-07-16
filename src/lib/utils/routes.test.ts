@@ -34,9 +34,9 @@ describe(`getDiscoverableRoutes`, () => {
 		expect(routes.map((route) => route.path)).toEqual([`/recipes/tags`]);
 	});
 
-	it(`excludes dev-only tooling routes`, () => {
+	it(`includes dev-only tooling routes in dev mode`, () => {
 		const routes = getDiscoverableRoutes(modules([`/src/routes/dev/graphql/+page.svelte`]));
 
-		expect(routes).toEqual([]);
+		expect(routes).toEqual([{ path: `/dev/graphql`, label: `Graphql`, sublabel: `Dev` }]);
 	});
 });

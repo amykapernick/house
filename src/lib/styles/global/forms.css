@@ -22,21 +22,71 @@ form {
 
 label, legend {
 	display: block;
-	margin: 0.5em 0 0.1em;
+	margin: 1em 0 0.2em;
 	color: var(--neutral);
-	font-weight: 600;
+	font-size: 0.75em;
+	font-weight: 700;
 }
 
-input, select, textarea {
+input {
+	accent-color: var(--purple_bright);
+}
+
+input:not([type="radio"], [type="checkbox"]), select, textarea {
 	display: block;
 	width: 100%;
-	margin: 0.1em 0 0.5em;
+	margin: 0.1em 0 1em;
 	padding: 0.5em 1em;
-	border: 1px solid var(--neutral);
-	border-radius: none;
-	background: var(--neutral_light);
-	color: var(--neutral_light_text);
+	border: 1px solid 
+		light-dark(
+			color-mix(in oklch, var(--background) 78%, var(--black)),
+			color-mix(in oklch, var(--dark_background) 78%, var(--white))
+		);
+	border-radius: 0.5em;
+	background: light-dark(
+		color-mix(in oklch, var(--white) 70%, var(--background)), 
+		color-mix(in oklch, var(--dark_background) 82%, var(--white))
+	);
 	box-shadow: none;
+	color: light-dark(
+		var(--black), 
+		color-mix(in oklch, var(--white) 92%, var(--black))
+	);
 	line-height: 1.5;
-	accent-color: var(--purple_bright);
+	
+}
+
+fieldset {
+	padding: 0;
+	border: none;
+	
+	& > div {
+		display: grid;
+		grid-gap: 0.5em 1ch;
+		grid-template-areas: 'legend legend' 'radio label';
+		grid-template-columns: auto 1fr;
+		align-content: center;
+		align-items: center;
+	}
+
+	& legend {
+		grid-area: legend;
+		margin: 0;
+	}
+
+	& label {
+		grid-column: 2;
+		margin: 0;
+		color: color-mix(in oklch, var(--grey) 84%, var(--black));
+	}
+
+	& input {
+		grid-column: 1;
+		margin: 0;
+		cursor: pointer;
+
+		&:checked + label {
+			color: var(--black);
+		}
+	}
 }

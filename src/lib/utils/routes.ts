@@ -4,9 +4,10 @@ export type DiscoveredRoute = {
 	sublabel?: string;
 };
 
-// Not real search destinations - a debug tool that's already reachable via
-// the nav in dev, and never meant to surface at all in prod.
-const EXCLUDED_PREFIXES = [`/dev`];
+// /dev/* pages are dev-only tools (some reachable via nav, some only by
+// direct URL) - discoverable in the command palette in dev, but never meant
+// to surface at all in prod.
+const EXCLUDED_PREFIXES = import.meta.env.DEV ? [] : [`/dev`];
 
 function isDynamicSegment(segment: string): boolean {
 	return segment.startsWith(`[`) && segment.endsWith(`]`);

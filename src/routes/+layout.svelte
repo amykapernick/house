@@ -170,8 +170,6 @@
 		min-height: 100vh;
 		margin: 0;
 		overflow-x: hidden;
-		background: var(--background);
-		color: var(--background_text);
 	}
 
 	.main {
@@ -239,8 +237,9 @@
 		}
 
 		.main {
-			max-height: 100%;
-			margin-bottom: 0;
+			max-height: 100vh;
+			margin-bottom: 50px;
+			padding-bottom: 50px;
 			overflow-y: auto;
 		}
 

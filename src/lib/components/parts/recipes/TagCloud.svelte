@@ -68,7 +68,7 @@
 		padding: 1em;
 		border: 1px solid light-dark(#ded0bd, #2c323d);
 		border-radius: 0.5em;
-		background: light-dark(var(--white), #1f242d);
+		background: light-dark(var(--white), var(--base_colour));
 		box-shadow: rgb(0 0 0 / 30%) 0 1px 2px, rgb(0 0 0 / 25%) 0 3px 10px;
 	}
 
@@ -128,7 +128,7 @@
 		transition: all 0.15s;
 		border: 1px solid var(--purple_bright);
 		border-radius: 1em;
-		background: transparent;
+		background: var(--transparent);
 		color: var(--purple_bright);
 		font-size: 0.8em;
 		cursor: pointer;

@@ -12,8 +12,7 @@
 	.layout {
 		width: 90vw;
 		max-width: 1200px;
-		height: 100%;
-		margin: 0 auto 20px;
+		margin: 0 auto;
 
 		&.full {
 			max-width: unset;

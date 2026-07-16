@@ -1,7 +1,7 @@
 body {
-	color: light-dark(#4a4440, #a8b0bd);
+	color: var(--textPrimary);
 	font-family: $font_main;
-	font-size: 1.1em;
+	font-size: 1em;
 	line-height: 1.5;
 }
 
@@ -25,7 +25,7 @@ h1 {
 }
 
 h2 {
-	font-size: 1.5em;
+	font-size: 1.3em;
 	font-weight: 700;
 }
 
@@ -72,6 +72,10 @@ button, .btn, input[type="submit"] {
 
 a {
 	color: var(--purple_bright);
+
+	&:hover {
+		text-decoration: none;
+	}
 }
 
 a, button {
