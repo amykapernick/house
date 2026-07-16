@@ -53,5 +53,14 @@
 			"form_factor": "narrow",
 			"label": "Household dashboard"
 		}
-	]
+	],
+	"share_target": {
+		"action": "/content/save",
+		"method": "GET",
+		"params": {
+			"title": "title",
+			"text": "text",
+			"url": "url"
+		}
+	}
 }

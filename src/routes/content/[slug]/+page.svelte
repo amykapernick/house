@@ -2,9 +2,10 @@
 	import { tick } from 'svelte';
 	import { SvelteSet } from 'svelte/reactivity';
 	import { page } from '$app/stores';
+	import { resolve } from '$app/paths';
 	import { isAuthenticated } from '$lib/auth';
 	import fetchClientData from '$utils/fetchClientData';
-	import { CONTENT_CACHE_TTL, DIGEST_PAGE_SLUG, contentEntriesQuery, contentIndexQuery, contentDigestQuery, contentIndexCacheKey, contentDigestCacheKey } from '$utils/content';
+	import { CONTENT_CACHE_TTL, DIGEST_PAGE_SLUG, ARTICLE_PAGE_SLUG, contentEntriesQuery, contentIndexQuery, contentDigestQuery, contentArticleQuery, contentIndexCacheKey, contentDigestCacheKey, contentArticleCacheKey } from '$utils/content';
 	import { getReadAnchors, markAnchorRead, unmarkAnchorRead } from '$utils/readProgress';
 	import { extractToc, splitTrackableChunks } from '$utils/markdown';
 	import ContentIcon from '$components/parts/ContentIcon.svelte';
@@ -20,6 +21,13 @@
 	let loading = $state(true);
 	let showToc = $state(false);
 
+	// Course-style entries (no Brief) normally list linked subpages via
+	// contentIndex - but a flat saved article has no subpages, so an empty
+	// index result falls back to reading the entry's own page content
+	// directly instead. No stored flag needed: this is just what "no Brief,
+	// no subpages" looks like structurally.
+	let flatArticle = $state(false);
+
 	// Which Chapter (h3), or bare Section (h2 with no chapters), anchors this
 	// device has already read - per-device (localStorage), reset/reloaded
 	// whenever the slug changes. Only meaningful for digest-style content.
@@ -33,15 +41,16 @@
 			loading = true;
 			groups = [];
 			digest = null;
+			flatArticle = false;
 			readAnchors.clear();
-			for (const anchor of getReadAnchors(slug, DIGEST_PAGE_SLUG)) readAnchors.add(anchor);
 			hasResumedScroll = false;
 
 			// Short-lived (default TTL) - Notion's uploaded-file icon URLs expire
 			// after about an hour, so entry metadata isn't cached alongside the
-			// long-lived course/digest content below. Entry decides which content
-			// query to run - a digest-style entry (has a Brief) combines its
-			// versions into one page, a course-style entry lists linked subpages.
+			// long-lived course/digest/article content below. Entry decides which
+			// content query to run - a digest-style entry (has a Brief) combines
+			// its versions into one page, a flat saved-article entry reads its own
+			// page directly, a course-style entry lists linked subpages.
 			fetchClientData({
 				cacheKey: `content-entries`,
 				gqlQuery: contentEntriesQuery,
@@ -49,6 +58,8 @@
 				entry = (res.contentEntries ?? []).find((e: ContentEntry) => e?.slug === slug) ?? null;
 
 				if (entry?.brief) {
+					for (const anchor of getReadAnchors(slug, DIGEST_PAGE_SLUG)) readAnchors.add(anchor);
+
 					function handleDigest(res: any) {
 						digest = res.contentDigest ?? null;
 						loading = false;
@@ -62,8 +73,29 @@
 				}
 				else {
 					function handleIndex(res: any) {
-						groups = res.contentIndex ?? [];
-						loading = false;
+						const fetchedGroups = res.contentIndex ?? [];
+
+						if (fetchedGroups.length > 0) {
+							groups = fetchedGroups;
+							loading = false;
+							return;
+						}
+
+						// No subpages - a flat saved article, so fall back to reading
+						// its own page content directly instead of an empty course list.
+						flatArticle = true;
+						for (const anchor of getReadAnchors(slug, ARTICLE_PAGE_SLUG)) readAnchors.add(anchor);
+
+						function handleArticle(res: any) {
+							digest = res.contentArticle ?? null;
+							loading = false;
+						}
+						fetchClientData({
+							cacheKey: contentArticleCacheKey(slug),
+							ttl: CONTENT_CACHE_TTL,
+							onStale: handleArticle,
+							gqlQuery: contentArticleQuery(slug),
+						}).then(handleArticle);
 					}
 					fetchClientData({
 						cacheKey: contentIndexCacheKey(slug),
@@ -104,13 +136,15 @@
 		const slug = $page.params.slug ?? ``;
 		if (!slug) return;
 
+		const pageSlug = entry?.brief ? DIGEST_PAGE_SLUG : ARTICLE_PAGE_SLUG;
+
 		if (readAnchors.has(anchor)) {
-			unmarkAnchorRead(slug, DIGEST_PAGE_SLUG, anchor);
+			unmarkAnchorRead(slug, pageSlug, anchor);
 			readAnchors.delete(anchor);
 			return;
 		}
 
-		markAnchorRead(slug, DIGEST_PAGE_SLUG, anchor);
+		markAnchorRead(slug, pageSlug, anchor);
 		readAnchors.add(anchor);
 	}
 </script>
@@ -123,8 +157,18 @@
 {#if loading}
 	<p>Loading...</p>
 {:else if entry?.brief}
+	{#if (entry.archivedCount ?? 0) > 0}
+		<a href={resolve(`/content/archive/[slug]`, { slug: $page.params.slug ?? `` })} class="archive-link">View archive ({entry.archivedCount} {entry.archivedCount === 1 ? `version` : `versions`})</a>
+	{/if}
 	{#if !digest?.content}
 		<p>No versions yet.</p>
+	{:else}
+		<TableOfContents {toc} {readAnchors} bind:showToc />
+		<TrackableContent {chunks} {readAnchors} onToggleRead={handleToggleRead} />
+	{/if}
+{:else if flatArticle}
+	{#if !digest?.content}
+		<p>Not found.</p>
 	{:else}
 		<TableOfContents {toc} {readAnchors} bind:showToc />
 		<TrackableContent {chunks} {readAnchors} onToggleRead={handleToggleRead} />
@@ -143,5 +187,16 @@
 	.read-mark {
 		margin-left: 0.4em;
 		color: var(--green);
+	}
+
+	.archive-link {
+		display: inline-block;
+		margin-bottom: 10px;
+		color: var(--purple_bright);
+		text-decoration: none;
+
+		&:hover {
+			text-decoration: underline;
+		}
 	}
 </style>

@@ -4,8 +4,8 @@
 </script>
 
 <svelte:head>
-	<title>{getPageTitle(`Content`)}</title>
+	<title>{getPageTitle(`Content Archive`)}</title>
 </svelte:head>
 
-<h1>Content</h1>
-<ContentEntries />
+<h1>Archive</h1>
+<ContentEntries archived />

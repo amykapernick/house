@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { addDays, format, isToday, isTomorrow, parseISO } from 'date-fns';
 	import { SvelteMap } from 'svelte/reactivity';
@@ -7,6 +6,8 @@
 	import { getRecentPages } from '$utils/recentPages';
 	import { CONTENT_CACHE_TTL, contentEntriesQuery, contentIndexQuery } from '$utils/content';
 	import { getDiscoverableRoutes } from '$utils/routes';
+	import fetchTasksData from '$utils/tasksData';
+	import { parseDeepSearch, type SearchSection } from '$utils/commandPaletteSearch';
 	import { getToken } from '$lib/auth';
 	import { routeRequiresAuth } from '$lib/navigation';
 	import type { MenuItem } from '$types/global';
@@ -30,7 +31,7 @@
 		key: string;
 		label: string;
 		sublabel?: string;
-		section: `Recent` | `Pages` | `Content` | `Recipes`;
+		section: `Recent` | SearchSection;
 		link: string;
 		Icon?: Component<Record<string, any>>;
 		contentIcon?: { icon?: string | null; iconType?: string | null };
@@ -59,6 +60,7 @@
 	const RECIPE_FETCH_COUNT = 15; // fetched so upcoming meal-plan matches outside the top few can still surface
 	const RECIPE_DISPLAY_LIMIT = 5;
 	const MEAL_PLAN_LOOKAHEAD_DAYS = 7;
+	const SECTION_DISPLAY_LIMIT = 5;
 
 	let dialogEl: HTMLDialogElement | undefined = $state();
 	let inputEl: HTMLInputElement | undefined = $state();
@@ -77,6 +79,16 @@
 	let contentEntries = $state<ContentEntryResult[]>([]);
 	let contentPages = $state<{ entrySlug: string; pageSlug: string; title: string; group: string }[]>([]);
 	let upcomingMealPlan = new SvelteMap<string, PlannedMeal>();
+	// Raw data for the `/s`-gated sections - each fetched/cached under the exact
+	// same cacheKey + query its own page uses, so the cache is shared rather than
+	// a second, differently-shaped entry fighting over the same key.
+	let resources = $state<any[]>([]);
+	let smallHuman = $state<any>(null);
+	let searchTasks = $state<any[]>([]);
+	let shoppingListItems = $state<any[]>([]);
+	let budgetItems = $state<any[]>([]);
+	let scheduleEvents = $state<any[]>([]);
+	let icsEvents = $state<any[]>([]);
 	let quickAddSubmitting = $state(false);
 	let quickAddError = $state(``);
 	let quickAddSuccess = $state(``);
@@ -129,10 +141,25 @@
 
 	const pages = $derived([...navPages, ...orphanPages]);
 
-	const term = $derived(quickAddMatch ? `` : query.trim().toLowerCase());
+	// `/s query` or `/s /token query` - see SCOPE_TOKENS above. Only recognised
+	// when it's the very start of the query, so it never shadows the plain
+	// `/task`/`/shop` quick-add commands (those match position 0 directly).
+	const deepSearchMatch = $derived(parseDeepSearch(query));
+
+	const term = $derived(quickAddMatch || deepSearchMatch ? `` : query.trim().toLowerCase());
+
+	// The search term a given section should filter by right now, or null if it
+	// shouldn't be searched at all. Pages/Recipes/Content search on plain typing
+	// (legacy behaviour, unchanged); every other section only searches under `/s`.
+	function sectionTerm(section: Result[`section`]): string | null {
+		if (deepSearchMatch) {
+			return !deepSearchMatch.scope || deepSearchMatch.scope === section ? deepSearchMatch.term : null;
+		}
+		return section === `Pages` || section === `Recipes` || section === `Content` ? (term || null) : null;
+	}
 
 	const recentResults = $derived(
-		term
+		term || deepSearchMatch
 			? []
 			: recentLinks
 				.map((link) => pages.find((page) => page.link === link))
@@ -140,11 +167,11 @@
 				.map((page) => ({ ...page, key: `recent:${page.link}`, section: `Recent` as const }))
 	);
 
-	const pageResults = $derived(
-		term
-			? pages.filter((page) => page.label.toLowerCase().includes(term))
-			: pages.filter((page) => !recentLinks.includes(page.link))
-	);
+	const pageResults = $derived.by(() => {
+		const t = sectionTerm(`Pages`);
+		if (t) return pages.filter((page) => page.label.toLowerCase().includes(t));
+		return deepSearchMatch ? [] : pages.filter((page) => !recentLinks.includes(page.link));
+	});
 
 	// Deliberately left out of the main nav/`pages` list - only surfaces here
 	// once you search for it, rather than an always-visible section.
@@ -169,11 +196,101 @@
 		}),
 	]);
 
-	const contentResults = $derived(
-		term ? contentBase.filter((result) => result.label.toLowerCase().includes(term)) : []
-	);
+	const contentResults = $derived.by(() => {
+		const t = sectionTerm(`Content`);
+		return t ? contentBase.filter((result) => result.label.toLowerCase().includes(t)) : [];
+	});
 
-	const results = $derived([...recentResults, ...pageResults, ...contentResults, ...recipeResults]);
+	// `/s`-gated sections below - raw data is fetched once when the palette opens
+	// (see loadDeepSearchData) and filtered here the same way Content is above.
+	function matchSection<T>(section: Result[`section`], list: T[], toResult: (item: T) => Result): Result[] {
+		const t = sectionTerm(section);
+		if (!t) return [];
+		return list
+			.map(toResult)
+			.filter((result) => result.label.toLowerCase().includes(t))
+			.slice(0, SECTION_DISPLAY_LIMIT);
+	}
+
+	const referenceResults = $derived(matchSection(`References`, resources, (resource) => ({
+		key: `resource:${resource.id}`,
+		label: resource.name,
+		sublabel: resource.category,
+		section: `References` as const,
+		link: resource.url || resolve(`/reference`),
+	})));
+
+	// Flattens the named/titled sub-items of each smallHuman tab - not raw
+	// measurements or narrative blocks - into individual results tagged with
+	// the tab id the page's own hash-routing already understands (small-human's
+	// activeTab reads page.url.hash, so #<tabId> lands directly on the right tab).
+	const smallHumanResults = $derived.by(() => {
+		if (!smallHuman) return [];
+		const items: { id: string; label: string; tab: string }[] = [
+			...(smallHuman.teeth?.teeth ?? []).map((t: any) => ({ id: `tooth:${t.fdi}`, label: t.name, tab: `teeth` })),
+			...(smallHuman.milestones?.items ?? []).map((m: any) => ({ id: `milestone:${m.id}`, label: m.title, tab: `milestones` })),
+			...(smallHuman.auslan?.signs ?? []).map((s: any) => ({ id: `sign:${s.id}`, label: s.name, tab: `auslan` })),
+			...(smallHuman.swimming?.skills ?? []).map((s: any) => ({ id: `swim:${s.id}`, label: s.title, tab: `swimming` })),
+			...(smallHuman.sleep?.items ?? []).map((s: any) => ({ id: `sleep:${s.id}`, label: s.title, tab: `sleep` })),
+			...(smallHuman.vaccinations?.items ?? []).map((v: any) => ({ id: `vax:${v.id}`, label: v.title, tab: `vaccinations` })),
+			...(smallHuman.activities ?? []).map((a: any) => ({ id: `activity:${a.id}`, label: a.title, tab: `activities` })),
+			...(smallHuman.clothing?.seasonal?.alerts ?? []).map((a: any) => ({ id: `clothing:${a.id}`, label: a.title, tab: `clothing-seasonal` })),
+			...(smallHuman.notes ?? []).flatMap((note: any) => {
+				if (note.__typename === `CarSeat`) return [{ id: `note:car-seat`, label: note.name, tab: `parenting-approach` }];
+				if (note.__typename === `ParentingApproachNote`) return (note.parentingApproachItems ?? []).map((i: any) => ({ id: `note:parenting:${i.id}`, label: i.title, tab: `parenting-approach` }));
+				if (note.__typename === `ToddlerSleepPrepNote`) return [{ id: `note:toddler-sleep-prep`, label: note.name, tab: `toddler-sleep-prep` }];
+				return [];
+			}),
+		];
+		return matchSection(`Small Human`, items, (item) => ({
+			key: item.id,
+			label: item.label,
+			section: `Small Human` as const,
+			link: `${resolve(`/small-human`)}#${item.tab}`,
+		}));
+	});
+
+	const taskResults = $derived(matchSection(`Tasks`, searchTasks, (task) => ({
+		key: `task:${task.id}`,
+		label: task.name,
+		sublabel: task.dueLabel,
+		section: `Tasks` as const,
+		link: task.link || resolve(`/tasks`),
+	})));
+
+	const shoppingListResults = $derived(matchSection(`Shopping List`, shoppingListItems, (item) => ({
+		key: `shopping:${item.id}`,
+		label: item.display,
+		sublabel: item.category,
+		section: `Shopping List` as const,
+		link: resolve(`/shopping-list`),
+	})));
+
+	const budgetResults = $derived(matchSection(`Budget`, budgetItems, (item) => ({
+		key: `budget:${item.id}`,
+		label: item.description,
+		sublabel: item.bucket?.name,
+		section: `Budget` as const,
+		link: resolve(`/budget`),
+	})));
+
+	const scheduleResults = $derived.by(() => {
+		const combined = [
+			...scheduleEvents.map((event) => ({ id: `event:${event.id}`, label: event.name })),
+			...icsEvents.map((event) => ({ id: `ics:${event.id}`, label: event.name })),
+		];
+		return matchSection(`Schedule`, combined, (event) => ({
+			key: event.id,
+			label: event.label,
+			section: `Schedule` as const,
+			link: resolve(`/schedule`),
+		}));
+	});
+
+	const results = $derived([
+		...recentResults, ...pageResults, ...contentResults, ...recipeResults,
+		...referenceResults, ...smallHumanResults, ...taskResults, ...shoppingListResults, ...budgetResults, ...scheduleResults,
+	]);
 
 	function escapeGqlString(value: string): string {
 		return value.replace(/\\/g, `\\\\`).replace(/"/g, `\\"`);
@@ -238,6 +355,169 @@
 		contentPages = pagesByEntry.flat();
 	}
 
+	// `/s`-gated sections (see deepSearchMatch/sectionTerm) - each fetch reuses
+	// the *exact* cacheKey and query its own page runs, so the shared localStorage
+	// cache entry stays one consistent shape rather than two calls racing to
+	// overwrite it with different field sets.
+	async function loadDeepSearchData() {
+		if (!isAuthenticated) return;
+
+		fetchClientData({
+			cacheKey: `resources`,
+			onStale: (res) => { resources = res.resources ?? []; },
+			gqlQuery: `
+				query {
+					resources { name id category description image login url icon }
+				}
+			`,
+		}).then((res) => { resources = res.resources ?? []; });
+
+		fetchClientData({
+			cacheKey: `small-human`,
+			onStale: (res) => { smallHuman = res.smallHuman ?? null; },
+			gqlQuery: `
+				query {
+					smallHuman {
+						overview { last_updated age_weeks age_months birth_month }
+						alerts(orderBy: urgency) { id level title detail }
+						growth {
+							last_updated check_frequency note trend_notes
+							measurements { date height { value percentile unit } weight { value percentile unit } head { value percentile unit } }
+						}
+						feeding {
+							last_updated check_frequency
+							details { label value }
+							schedule {
+								source note
+								stages { id title expected_age breastfeeds { value unit note } solid_meals { value unit note } water { value unit note } upcoming }
+								upcoming
+							}
+							sources
+							principles {
+								note core_philosophy
+								current_and_ongoing { id title detail sources }
+								toddler_forward_look { id title detail sources }
+								sources
+							}
+						}
+						teeth {
+							last_updated check_frequency note possums_note teething_now teething_note
+							teeth { fdi name status erupted_date erupted_age_months expected_months sources }
+							dental_care { toothbrush toothpaste note todoist_task { id name status due link } sources }
+						}
+						swimming { last_updated check_frequency skills { id title status detail } note sources }
+						milestones { last_updated check_frequency note items { id category title status detail achieved_date expected_weeks expected_months sources } }
+						auslan { last_updated check_frequency note sources signs { id name status tip reference { url video note } } }
+						sleep {
+							last_updated check_frequency framework
+							current_pattern {
+								naps nap_transition nap_duration_range_min nap_duration_range_max
+								nap_duration_typical total_daytime_sleep_approx nap_cap nap_cutoff bedtime typical_wake
+								night_waking_pattern suspected_cause note
+							}
+							items { id title status detail tag sources }
+							environment {
+								note
+								bedroom_temp_pattern { bedtime_temp_c early_morning_temp_c swing_note }
+								tog_reference { temp_range_c tog layer }
+								current_recommendation { challenge strategy recommended_setup { sleep_sack_tog pj_layer reasoning } sources }
+								current_sizes sleep_sacks_on_hand { tog sizes material note } size_watch
+							}
+						}
+						clothing {
+							seasonal {
+								note current_sizes current_sizes_note
+								noongar_season { current current_period current_description next next_period next_description weeks_until_next }
+								alerts { id type title detail action weeks_ahead }
+							}
+							daytime {
+								note layer_rule feet_rule
+								sun_safety { uv_threshold_for_coverage note sources }
+								indoor_reference { indoor_temp_c_min indoor_temp_c_max recommendation layers }
+								outdoor_reference { feels_like_c_min feels_like_c_max recommendation layers extras }
+								rain_suit { recommended trigger note }
+								current_recommendation {
+									generated_from_temp_c generated_from_feels_like_c last_updated
+									indoor { summary layers { position type sleeve weight material } feet extras { hat hat_reason beanie mittens sunscreen sunscreen_reason } rain_suit }
+									outdoor { summary layers { position type sleeve weight material } feet extras { hat hat_reason beanie mittens sunscreen sunscreen_reason } rain_suit }
+								}
+								forecast {
+									date day_label temp_high_c temp_low_c feels_like_high_c feels_like_low_c
+									conditions rain_expected uv_index
+									indoor { summary layers { position type sleeve weight material } feet extras { hat hat_reason beanie mittens sunscreen sunscreen_reason } rain_suit }
+									outdoor { summary layers { position type sleeve weight material } feet extras { hat hat_reason beanie mittens sunscreen sunscreen_reason } rain_suit }
+								}
+							}
+						}
+						vaccinations { note items(orderBy: due_date) { id title status detail date next_due todoist_task { id name status due link } } sources }
+						notes {
+							__typename
+							... on CarSeat { name last_updated check_frequency current_stage facing facing_note next_transition sources }
+							... on ParentingApproachNote { name parentingApproachItems: items { id title detail sources } }
+							... on ToddlerSleepPrepNote {
+								name
+								toddlerSleepPrepDetail: items { note trigger_age_weeks status alert_when_due { id level title detail } reading { id title note sources } sources }
+							}
+						}
+						activities { id title status detail sources }
+						sources { id name badge url detail priority approved note }
+					}
+				}
+			`,
+		}).then((res) => { smallHuman = res.smallHuman ?? null; });
+
+		fetchTasksData().then((tasks) => { searchTasks = tasks; });
+
+		fetchClientData({
+			cacheKey: `shopping-list`,
+			onStale: (res) => { shoppingListItems = res.shoppingList?.items ?? []; },
+			gqlQuery: `
+				query {
+					shoppingList {
+						items { id display checked quantity note category labels source link recipes { id name slug } }
+						storeGroups {
+							name
+							items { id display checked quantity note category labels source link recipes { id name slug } }
+							subGroups { name items { id display checked quantity note category labels source link recipes { id name slug } } }
+						}
+					}
+				}
+			`,
+		}).then((res) => { shoppingListItems = res.shoppingList?.items ?? []; });
+
+		fetchClientData({
+			cacheKey: `budget`,
+			onStale: (res) => { budgetItems = res.budget ?? []; },
+			gqlQuery: `
+				query {
+					budget { id description amount period monthlyAmount income bucket { id name } tags note }
+					budgetBuckets { id name percentage percentageGoal items { id monthlyAmount income } }
+				}
+			`,
+		}).then((res) => { budgetItems = res.budget ?? []; });
+
+		fetchClientData({
+			cacheKey: `calendar`,
+			onStale: (res) => { scheduleEvents = res.events ?? []; },
+			gqlQuery: `
+				query {
+					tasks { id name assigned { name slug profile colour } status due end allDay estimate link platform }
+					events { name dates { start end } status id }
+				}
+			`,
+		}).then((res) => { scheduleEvents = res.events ?? []; });
+
+		fetchClientData({
+			cacheKey: `icsEvents`,
+			onStale: (res) => { icsEvents = res.icsEvents ?? []; },
+			gqlQuery: `
+				query {
+					icsEvents { id name dates { start end } status allDay colour family { slug } }
+				}
+			`,
+		}).then((res) => { icsEvents = res.icsEvents ?? []; });
+	}
+
 	function formatPlannedLabel(planned: PlannedMeal): string {
 		const date = parseISO(planned.date);
 		const when = isToday(date) ? `Today` : isTomorrow(date) ? `Tomorrow` : format(date, `EEE`);
@@ -280,8 +560,10 @@
 	let recipeSearchToken = 0;
 	let recipeDebounceTimer: ReturnType<typeof setTimeout> | undefined;
 
+	const recipeSearchTerm = $derived(sectionTerm(`Recipes`) ?? ``);
+
 	$effect(() => {
-		const searchTerm = term;
+		const searchTerm = recipeSearchTerm;
 		clearTimeout(recipeDebounceTimer);
 		recipeSearchToken += 1;
 		if (searchTerm.length < RECIPE_MIN_CHARS) {
@@ -315,17 +597,26 @@
 			quickAddSuccess = ``;
 			loadUpcomingMealPlan();
 			loadContentEntries();
+			deepSearchDataLoaded = false;
 			dialogEl.showModal();
 			inputEl?.focus();
 		}
 		if (!open && dialogEl.open) dialogEl.close();
 	});
 
-	function select(result: Result) {
-		open = false;
-		// eslint-disable-next-line svelte/no-navigation-without-resolve -- result.link is already resolve()d above
-		goto(result.link);
-	}
+	// Deliberately lazy, unlike loadUpcomingMealPlan/loadContentEntries above -
+	// these 6 queries (one of them the full smallHuman tree) are only worth
+	// their network/backend cost once someone actually types `/s`, not on every
+	// Cmd+K open. Fires once per dialog session, the first time deepSearchMatch
+	// goes truthy.
+	let deepSearchDataLoaded = false;
+
+	$effect(() => {
+		if (deepSearchMatch && !deepSearchDataLoaded) {
+			deepSearchDataLoaded = true;
+			loadDeepSearchData();
+		}
+	});
 
 	async function submitQuickAdd() {
 		const match = quickAddMatch;
@@ -380,8 +671,10 @@
 			activeIndex = Math.max(activeIndex - 1, 0);
 		} else if (event.key === `Enter`) {
 			event.preventDefault();
-			const result = results[activeIndex];
-			if (result) select(result);
+			// Delegates to the active <a>'s own click rather than duplicating
+			// navigation logic - handles internal SvelteKit routing and external
+			// target="_blank" links identically to an actual mouse click.
+			resultsEl?.querySelector<HTMLAnchorElement>(`[data-active='true']`)?.click();
 		}
 	}
 </script>
@@ -399,8 +692,8 @@
 		bind:value={query}
 		type="text"
 		class="query"
-		placeholder="Go to a page, search recipes, or /task /shop to add..."
-		aria-label="Search pages and recipes, or /task /shop to quickly add"
+		placeholder="Go to a page, search recipes, /task /shop to add, or /s to search everything..."
+		aria-label="Search pages and recipes, /task or /shop to quickly add, or /s to search everything"
 		autocomplete="off"
 		onkeydown={handleKeydown}
 		oninput={() => { quickAddError = ``; quickAddSuccess = ``; }}
@@ -419,12 +712,16 @@
 					<li class="heading">{result.section}</li>
 				{/if}
 				<li>
-					<button
-						type="button"
+					<!-- result.link is already resolve()d (internal) or a raw external URL (References/Tasks) above -->
+					<!-- eslint-disable svelte/no-navigation-without-resolve -->
+					<a
 						class="result"
+						href={result.link}
+						target={result.link.startsWith(`http`) ? `_blank` : undefined}
+						rel={result.link.startsWith(`http`) ? `noreferrer` : undefined}
 						data-active={i === activeIndex}
 						onmouseenter={() => (activeIndex = i)}
-						onclick={() => select(result)}
+						onclick={() => (open = false)}
 					>
 						{#if result.contentIcon}
 							<ContentIcon icon={result.contentIcon.icon} iconType={result.contentIcon.iconType} />
@@ -433,14 +730,21 @@
 						{/if}
 						<span class="label">{result.label}</span>
 						{#if result.sublabel}<span class="sublabel">{result.sublabel}</span>{/if}
-					</button>
+					</a>
+					<!-- eslint-enable svelte/no-navigation-without-resolve -->
 				</li>
 			{/each}
-			{#if term.length >= RECIPE_MIN_CHARS && recipesLoading && recipeResults.length === 0}
+			{#if recipeSearchTerm.length >= RECIPE_MIN_CHARS && recipesLoading && recipeResults.length === 0}
 				<li class="hint">Searching recipes...</li>
 			{/if}
 			{#if results.length === 0 && !recipesLoading}
-				<li class="hint">No matching pages or recipes</li>
+				<li class="hint">
+					{#if deepSearchMatch}
+						No matches{deepSearchMatch.scope ? ` in ${deepSearchMatch.scope}` : ``}
+					{:else}
+						No matching pages or recipes
+					{/if}
+				</li>
 			{/if}
 		</ul>
 	{/if}
@@ -452,8 +756,10 @@
 			<span><kbd>&uarr;</kbd><kbd>&darr;</kbd> navigate</span>
 			<span><kbd>&crarr;</kbd> select</span>
 			<span><kbd>esc</kbd> close</span>
-			{#if !term}
-				<span class="quick-add-tip"><kbd>/task</kbd> <kbd>/shop</kbd> quick add</span>
+			{#if !term && !deepSearchMatch}
+				<span class="quick-add-tip"><kbd>/task</kbd> <kbd>/shop</kbd> quick add · <kbd>/s</kbd> search everything</span>
+			{:else if deepSearchMatch?.scope}
+				<span class="quick-add-tip">searching {deepSearchMatch.scope}</span>
 			{/if}
 		{/if}
 	</footer>
@@ -562,6 +868,7 @@
 		font-size: 1em;
 		font-weight: inherit;
 		text-align: left;
+		text-decoration: none;
 		cursor: pointer;
 
 		&[data-active='true'] {

@@ -7,19 +7,31 @@
 
 	export type EntryStatus = { total: number | null, read: number };
 
-	let { entry, status }: { entry: ContentEntry; status?: EntryStatus } = $props();
+	// `archived` links to /content/archive/[slug] instead of /content/[slug],
+	// and shows the archived-version count in place of read progress (which
+	// has no meaning for a slug's archived versions) - the only difference
+	// between how a card looks on /content vs /content/archive.
+	let { entry, status, archived = false }: { entry: ContentEntry; status?: EntryStatus; archived?: boolean } = $props();
 </script>
 
 <li class="card">
 	<ContentIcon icon={entry.icon} iconType={entry.iconType} />
-		<a class="title" href={resolve(`/content/[slug]`, { slug: entry.slug ?? `` })}>{entry.title}</a>
-		{#if entry.brief && !status?.total}
-			<span class="progress">No versions yet</span>
-		{:else if status?.total}
-			<span class="progress" class:complete={status.read >= status.total}>
-				<span class="count">{status.read}/{status.total} <span class="sr-only">sections read</span></span>
-				{#if status.read >= status.total}<Completed />{/if}
-			</span>
+		{#if archived}
+			<a class="title" href={resolve(`/content/archive/[slug]`, { slug: entry.slug ?? `` })}>{entry.title}</a>
+			<span class="progress">{entry.archivedCount} archived {entry.archivedCount === 1 ? `version` : `versions`}</span>
+		{:else}
+			<a class="title" href={resolve(`/content/[slug]`, { slug: entry.slug ?? `` })}>{entry.title}</a>
+			{#if entry.summary}
+				<p class="desc">{entry.summary}</p>
+			{/if}
+			{#if entry.brief && !status?.total}
+				<span class="progress">No versions yet</span>
+			{:else if status?.total}
+				<span class="progress" class:complete={status.read >= status.total}>
+					<span class="count">{status.read}/{status.total} <span class="sr-only">sections read</span></span>
+					{#if status.read >= status.total}<Completed />{/if}
+				</span>
+			{/if}
 		{/if}
 		{#if entry.updatedAt}
 			<span class="updated"><span class="sr-only">Updated</span> {format(parseISO(entry.updatedAt), `d MMM yyyy`)}</span>
@@ -64,6 +76,13 @@
 				inset: 0;
 			}
 		}
+
+	.desc {
+		grid-area: desc;
+		margin: 0;
+		font-size: 0.85em;
+		font-weight: 400;
+	}
 
 	.updated, .progress {
 		margin: 0;

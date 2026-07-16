@@ -45,5 +45,7 @@ export const routes: A11yRoute[] = [
 	{ name: `small-human`, path: `/small-human`, auth: true },
 	{ name: `health`, path: `/health`, auth: true },
 	{ name: `content`, path: `/content`, auth: true },
+	{ name: `content-archive`, path: `/content/archive`, auth: true },
+	{ name: `content-save`, path: `/content/save`, auth: true },
 	{ name: `profile`, path: `/profile`, auth: true },
 ];
