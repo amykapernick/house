@@ -8,6 +8,13 @@
 // Only meant to run on direct pushes to prod/dev - PRs already get fast-fail
 // feedback from the plain `lint:ci` step and shouldn't spawn permanent issues
 // for in-progress work.
+//
+// NON_BLOCKING_RULES get an issue filed like anything else, but don't fail
+// this step / block deploy - reserved for rules that can never be
+// auto-fixed and flag pre-existing debt rather than a broken change (right
+// now: house/no-repeated-value, which would otherwise block every future
+// push to prod for as long as any repeated value exists anywhere in `src`).
+const NON_BLOCKING_RULES = new Set([`house/no-repeated-value`]);
 
 import { ESLint } from 'eslint';
 import stylelint from 'stylelint';
@@ -121,6 +128,10 @@ const fileProblems = [
 ];
 
 const errorCount = fileProblems.reduce((total, { problems }) => total + problems.length, 0);
+const blockingErrorCount = fileProblems.reduce(
+	(total, { problems }) => total + problems.filter((problem) => !NON_BLOCKING_RULES.has(problem.ruleId)).length,
+	0
+);
 
 if (token && repoSlug) {
 	const [owner, repo] = repoSlug.split(`/`);
@@ -138,7 +149,11 @@ else {
 	console.log(`GITHUB_TOKEN/GITHUB_REPOSITORY not set - skipping issue creation (local run?)`);
 }
 
-if (errorCount > 0) {
-	console.error(`${errorCount} lint error(s) remain after auto-fix.`);
+if (errorCount > blockingErrorCount) {
+	console.log(`${errorCount - blockingErrorCount} non-blocking lint error(s) filed as issues but not blocking deploy.`);
+}
+
+if (blockingErrorCount > 0) {
+	console.error(`${blockingErrorCount} lint error(s) remain after auto-fix.`);
 	process.exit(1);
 }
