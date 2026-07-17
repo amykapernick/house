@@ -64,7 +64,7 @@
 	background: var($gradient_base);
 	background: linear-gradient(
 		155deg,
-		color-mix(in oklch, var($gradient_base) 78%, #ffffff) 0%,
+		color-mix(in oklch, var($gradient_base) 78%, var(--white_true)) 0%,
 		var($gradient_base) 55%,
 		color-mix(in oklch, var($gradient_base) 78%, #000000) 100%
 	)

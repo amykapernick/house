@@ -7,6 +7,7 @@
 	import { notificationPermission, requestNotificationPermission } from '$utils/notifications';
 	import TaskView from '$parts/tasks/TaskView.svelte';
 	import FamilyFilter from '$parts/FamilyFilter.svelte';
+	import Skeleton from '$parts/Skeleton.svelte';
 	import type { Task, TaskStatus } from '$types/tasks';
 	import { getPageTitle } from '$utils/pageTitle';
 
@@ -51,7 +52,7 @@
 	<button class="enable_reminders" onclick={enableReminders}>Enable task reminders</button>
 {/if}
 {#if loading}
-	<p>Loading...</p>
+	<Skeleton rows={3} />
 {:else}
 	<FamilyFilter bind:selectedUserSlug pageKey="tasks" />
 	<TaskView tasks={visibleTasks} onUpdate={handleTaskUpdate} />

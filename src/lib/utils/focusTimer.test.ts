@@ -33,6 +33,47 @@ describe(`buildClassicSequence`, () => {
 	});
 });
 
+describe(`buildFlexibleSequence`, () => {
+	it(`returns an empty sequence for zero, negative, or too-short durations`, async () => {
+		const { buildFlexibleSequence } = await importFresh();
+		expect(buildFlexibleSequence(0)).toEqual([]);
+		expect(buildFlexibleSequence(-1)).toEqual([]);
+		expect(buildFlexibleSequence(10 / 60)).toEqual([]); // 10 minutes, below the 20 min minimum block
+	});
+
+	it(`only ever uses 20, 25 or 30 min work blocks and 5 min breaks, ending on work`, async () => {
+		const { buildFlexibleSequence } = await importFresh();
+
+		for (const hours of [1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5]) {
+			const phases = buildFlexibleSequence(hours);
+			expect(phases.length).toBeGreaterThan(0);
+			expect(phases[phases.length - 1].type).toBe(`work`);
+			phases.forEach((phase, i) => {
+				expect(phase.type).toBe(i % 2 === 0 ? `work` : `break`);
+				if (phase.type === `work`) expect([20, 25, 30]).toContain(phase.seconds / 60);
+				else expect(phase.seconds).toBe(5 * 60);
+			});
+		}
+	});
+
+	it(`makes work blocks the same length except for a smaller uneven block at the end`, async () => {
+		const { buildFlexibleSequence } = await importFresh();
+		const phases = buildFlexibleSequence(1.5); // 90 minutes -> 30, 30, 20
+
+		const workBlocks = phases.filter((p) => p.type === `work`).map((p) => p.seconds / 60);
+		expect(workBlocks.slice(0, -1).every((minutes) => minutes === workBlocks[0])).toBe(true);
+		expect(workBlocks[workBlocks.length - 1]).toBeLessThanOrEqual(workBlocks[0]);
+	});
+
+	it(`fits entirely within the requested duration`, async () => {
+		const { buildFlexibleSequence } = await importFresh();
+		const hours = 2;
+		const phases = buildFlexibleSequence(hours);
+		const totalMinutes = phases.reduce((sum, p) => sum + p.seconds / 60, 0);
+		expect(totalMinutes).toBeLessThanOrEqual(hours * 60);
+	});
+});
+
 describe(`buildTaperSequence`, () => {
 	it(`builds the fixed 50/40/30/20/10 work blocks with 10 min breaks and no trailing break`, async () => {
 		const { buildTaperSequence } = await importFresh();

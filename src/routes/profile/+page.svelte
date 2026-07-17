@@ -3,6 +3,7 @@
 	import { clerk, clerkLoaded, isAuthenticated, getToken } from '$lib/auth';
 	import fetchClientData, { setCache, getGraphqlUrl } from '$utils/fetchClientData';
 	import ColourSelect from '$parts/ColourSelect.svelte';
+	import Skeleton from '$parts/Skeleton.svelte';
 	import type { PaletteColour } from '$types/schedule';
 	import { getPageTitle } from '$utils/pageTitle';
 
@@ -163,7 +164,7 @@
 <h2>Household details</h2>
 
 {#if loading}
-	<p>Loading...</p>
+	<Skeleton rows={3} />
 {:else}
 	<form onsubmit={handleSubmit}>
 		<label for="name">Name</label>

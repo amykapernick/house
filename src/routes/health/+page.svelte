@@ -4,6 +4,8 @@
 	import fetchClientData from '$utils/fetchClientData';
 	import LineChart from '$parts/LineChart.svelte';
 	import type { LineChartLine } from '$parts/LineChart.svelte';
+	import Skeleton from '$parts/Skeleton.svelte';
+	import EmptyState from '$parts/EmptyState.svelte';
 	import type { Colour } from '$types/global';
 	import { getPageTitle } from '$utils/pageTitle';
 
@@ -95,9 +97,9 @@
 </fieldset>
 
 {#if loading}
-	<p>Loading...</p>
+	<Skeleton rows={3} />
 {:else if metricCards.length === 0}
-	<p class="empty">No Health Connect data yet — link a family member's Home Assistant id and make sure their companion app is reporting Health Connect sensors.</p>
+	<EmptyState title="No Health Connect data yet" message="Link a family member's Home Assistant id and make sure their companion app is reporting Health Connect sensors." />
 {:else}
 	{#if legend.length > 1}
 		<ul class="legend">
@@ -121,11 +123,6 @@
 {/if}
 
 <style>
-	.empty {
-		color: var(--grey);
-		font-style: italic;
-	}
-
 	.range_filter {
 		display: flex;
 		flex-wrap: wrap;

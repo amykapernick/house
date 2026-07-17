@@ -25,7 +25,7 @@
 <style>
 	.icon-chip {
 		border: 1.5px solid currentColor;
-		color: color-mix(in oklch, var(--orange) 74%, rgb(13, 13, 13));
+		color: color-mix(in oklch, var(--orange) 74%, var(--black));
 		display: inline-block;
 		text-align: center;
 		border-radius: 0.7em;

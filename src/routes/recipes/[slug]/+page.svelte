@@ -6,6 +6,7 @@
 	import { resolve } from '$app/paths';
 	import { formatMinutes } from '$utils/formatMinutes';
 	import { getPageTitle } from '$utils/pageTitle';
+	import Skeleton from '$components/parts/Skeleton.svelte';
 	import {
 		compatibleUnits,
 		convertQuantity,
@@ -124,7 +125,7 @@
 <a href={resolve('/recipes')} class="back">← Recipes</a>
 
 {#if loading}
-	<p>Loading...</p>
+	<Skeleton rows={3} />
 {:else if !recipe}
 	<p>Recipe not found.</p>
 {:else}
@@ -368,7 +369,7 @@
 		gap: 1.5em;
 		margin-bottom: 1em;
 		padding: 0.8em;
-		background: color-mix(in srgb, var(--blue) 8%, transparent);
+		background: color-mix(in srgb, var(--blue) 8%, var(--transparent));
 		border-radius: 0.3em;
 	}
 
@@ -446,7 +447,7 @@
 			padding: 0.2em 0.6em;
 			border: 1px solid var(--grey_light);
 			border-radius: 0.3em;
-			background: transparent;
+			background: var(--transparent);
 			cursor: pointer;
 			font-size: 0.85em;
 
@@ -541,7 +542,7 @@
 			border-radius: 0.3em;
 			font-size: 0.8em;
 			color: var(--grey);
-			background: transparent;
+			background: var(--transparent);
 		}
 
 		& .section-title {
@@ -600,7 +601,7 @@
 
 		& div {
 			padding: 0.5em;
-			background: color-mix(in srgb, var(--blue) 8%, transparent);
+			background: color-mix(in srgb, var(--blue) 8%, var(--transparent));
 			border-radius: 0.3em;
 		}
 
@@ -619,7 +620,7 @@
 	.note {
 		padding: 0.5em;
 		margin: 0.3em 0;
-		background: color-mix(in srgb, var(--orange) 8%, transparent);
+		background: color-mix(in srgb, var(--orange) 8%, var(--transparent));
 		border-radius: 0.3em;
 
 		& p {
@@ -636,7 +637,7 @@
 
 		& li {
 			padding: 0.3em 0.7em;
-			background: color-mix(in srgb, var(--blue) 8%, transparent);
+			background: color-mix(in srgb, var(--blue) 8%, var(--transparent));
 			border-radius: 0.3em;
 			font-size: 0.9em;
 		}

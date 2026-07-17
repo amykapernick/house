@@ -68,6 +68,13 @@ On PRs (not pushes to `prod`), the `Build And Deploy` step also creates an Azure
 - **Manual/backfill:** `household_api`'s `npm run generate:sign-gifs` script pulls signs straight from PocketBase and writes gifs into this repo's `static/signs/` via the sibling checkout (skips signs that already have one).
 - **Automatic:** `household_api`'s scheduled small-human tracker function dispatches an `auslan-signs-updated` `repository_dispatch` event (with `{id, video}` for every sign) after each update. `.github/workflows/auslan-signs-updated.yml` receives it, runs `scripts/generateSignGifsFromPayload.mjs` (ffmpeg, skips signs with an existing gif) and pushes any new gifs straight to `prod` — which triggers the normal build-and-deploy workflow. No secret lives in this (public) repo for this; the dispatch token is held by `household_api`.
 
+## Colours
+
+`/design/colours` is an authenticated, editable view over the PocketBase `colours` collection — the source data `vite.config.ts` fetches at build time to generate `src/lib/styles/global/colours.generated.css` (every `--{name}` CSS custom property the app uses). Editing follows the same edit-mode pattern as `/budget` (working-copy clone, diffed batched save via `createColour`/`updateColour`/`deleteColour`), with two things specific to colours:
+
+- **Live preview while editing:** since the real CSS is only baked at build time, the page reuses `buildColoursCss` client-side against the in-progress working copy on every change, injecting the result into a `<style id="live-colours-preview">` element so edits are visible immediately without waiting for a rebuild.
+- **Rebuild on save:** saving writes straight to PocketBase, which has no effect on the live site by itself. Each mutation resolver in `household_api` fires a `colours-updated` `repository_dispatch` (same mechanism as the schema/Auslan flows below). `.github/workflows/colours-updated.yml` receives it and pushes an empty commit to `prod` to trigger the normal build-and-deploy workflow — there's no file to regenerate/commit here, since `colours.generated.css` is gitignored and always fetched fresh from the API at build time.
+
 ## Not Yet Migrated
 
 - SVG icon components for house map

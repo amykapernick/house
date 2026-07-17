@@ -175,7 +175,7 @@
 		& p {
 			visibility: hidden;
 			grid-area: details;
-			background: color-mix(in srgb, var(--navy) 10%, white);
+			background: color-mix(in srgb, var(--navy) 10%, var(--white_true));
 			padding: 0.2em 0.5em;
 			border: 2px solid var(--navy);
 			border-radius: 0.4em;

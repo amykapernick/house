@@ -33,6 +33,7 @@ export const routes: A11yRoute[] = [
 	{ name: `home`, path: `/`, auth: true },
 	{ name: `tasks`, path: `/tasks`, auth: true },
 	{ name: `habits`, path: `/habits`, auth: true },
+	{ name: `chores`, path: `/chores`, auth: true },
 	{ name: `calendar`, path: `/calendar`, auth: true, axeDisableRules: CALENDAR_LIBRARY_RULES },
 	{ name: `schedule`, path: `/schedule`, auth: true, axeDisableRules: CALENDAR_LIBRARY_RULES },
 	{ name: `budget`, path: `/budget`, auth: true },
@@ -48,4 +49,5 @@ export const routes: A11yRoute[] = [
 	{ name: `content-archive`, path: `/content/archive`, auth: true },
 	{ name: `content-save`, path: `/content/save`, auth: true },
 	{ name: `profile`, path: `/profile`, auth: true },
+	{ name: `design-colours`, path: `/design/colours`, auth: true },
 ];

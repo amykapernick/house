@@ -116,7 +116,7 @@
 
 		&.today {
 			border-color: var(--purple_bright);
-			background: color-mix(in srgb, var(--purple_bright) 4%, transparent);
+			background: color-mix(in srgb, var(--purple_bright) 4%, var(--transparent));
 		}
 
 		& h2 {
@@ -146,7 +146,7 @@
 	.meal {
 		margin-bottom: 0.5em;
 		padding: 0.4em;
-		background: color-mix(in srgb, var(--blue) 6%, transparent);
+		background: color-mix(in srgb, var(--blue) 6%, var(--transparent));
 		border-radius: 0.3em;
 		cursor: grab;
 
@@ -197,7 +197,7 @@
 		padding: 0.4em;
 		border: 1px dashed var(--grey_light);
 		border-radius: 0.3em;
-		background: transparent;
+		background: var(--transparent);
 		color: var(--grey);
 		font-size: 0.75em;
 		cursor: pointer;

@@ -75,7 +75,7 @@
 
 		&.today {
 			border-color: var(--purple_bright);
-			background: color-mix(in srgb, var(--purple_bright) 4%, transparent);
+			background: color-mix(in srgb, var(--purple_bright) 4%, var(--transparent));
 		}
 
 		&.yesterday {
@@ -105,7 +105,7 @@
 	.meal {
 		margin-bottom: 0.5em;
 		padding: 0.4em;
-		background: color-mix(in srgb, var(--blue) 6%, transparent);
+		background: color-mix(in srgb, var(--blue) 6%, var(--transparent));
 		border-radius: 0.3em;
 	}
 

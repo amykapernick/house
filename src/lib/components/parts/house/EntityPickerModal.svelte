@@ -60,7 +60,7 @@
 			cursor: pointer;
 
 			&:hover {
-				background: color-mix(in srgb, var(--purple_bright) 8%, transparent);
+				background: color-mix(in srgb, var(--purple_bright) 8%, var(--transparent));
 			}
 		}
 	}

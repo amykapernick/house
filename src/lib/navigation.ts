@@ -4,6 +4,7 @@ import Dashboard from '$img/icons/layout-11.svg?component';
 import Archive from '$img/icons/archive-drawer.svg?component';
 import List from '$img/icons/list.svg?component';
 import CheckList from '$img/icons/check-list.svg?component';
+import Chores from '$img/icons/checkbox.svg?component';
 import Calendar from '$img/icons/calendar-date.svg?component';
 import Plan from '$img/icons/diet-plan.svg?component';
 import Cart from '$img/icons/cart.svg?component';
@@ -31,6 +32,12 @@ export const menuItems: MenuItem[] = [
 		link: resolve(`/habits`),
 		auth: true,
 		Icon: CheckList
+	},
+	{
+		label: `Chores`,
+		link: resolve(`/chores`),
+		auth: true,
+		Icon: Chores
 	},
 	{
 		label: `Calendar`,
@@ -98,6 +105,7 @@ export const menuItems: MenuItem[] = [
 export const authOnlyRoutes: string[] = [
 	resolve(`/profile`),
 	resolve(`/content`),
+	resolve(`/design/colours`),
 ];
 
 export function routeRequiresAuth(pathname: string): boolean {

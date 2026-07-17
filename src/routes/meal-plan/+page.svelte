@@ -14,6 +14,7 @@
 	import MealPlanningDay from '$lib/components/partials/mealPlan/MealPlanningDay.svelte';
 	import DayColumn from '$lib/components/partials/mealPlan/DayColumn.svelte';
 	import { getPageTitle } from '$utils/pageTitle';
+	import Skeleton from '$parts/Skeleton.svelte';
 
 	let days = $state<any[]>([]);
 	let loading = $state(true);
@@ -509,7 +510,7 @@
 	<MealPlanningPalette recipes={seasonRecipes} loading={seasonRecipesLoading} season={currentSeason} />
 
 	{#if loading}
-		<p>Loading...</p>
+		<Skeleton rows={3} />
 	{:else}
 		<div class="week">
 			{#each planningBoard as day (day.date)}
@@ -536,7 +537,7 @@
 	</nav>
 
 	{#if loading}
-		<p>Loading...</p>
+		<Skeleton rows={3} />
 	{:else}
 		<div class="week">
 			{#each displayDays as day (day.date)}
@@ -574,7 +575,7 @@
 			padding: 0.5em 1em;
 			border: 1px solid var(--grey_light);
 			border-radius: 0.3em;
-			background: transparent;
+			background: var(--transparent);
 			color: var(--black);
 			cursor: pointer;
 
@@ -606,7 +607,7 @@
 			}
 
 			&.exit-planning {
-				background: transparent;
+				background: var(--transparent);
 				color: var(--navy);
 			}
 		}

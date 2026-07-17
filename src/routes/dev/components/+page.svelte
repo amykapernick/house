@@ -4,6 +4,7 @@
 	import { theme, setTheme } from '$utils/theme';
 	import type { TocEntry } from '$utils/markdown';
 	import type { Habit } from '$types/habits';
+	import type { Chore } from '$types/chores';
 	import type { User } from '$types/global';
 	import type { MilestoneStatus } from '$types/generated';
 	import { getPageTitle } from '$utils/pageTitle';
@@ -22,6 +23,7 @@
 	import CommandPalette from '$parts/CommandPalette.svelte';
 	import ColourSelect from '$parts/ColourSelect.svelte';
 	import HabitView from '$parts/habits/HabitView.svelte';
+	import ChoreList from '$parts/chores/ChoreList.svelte';
 	import IconChip from '$parts/IconChip.svelte';
 	import Toast from '$parts/Toast.svelte';
 	import EmptyState from '$parts/EmptyState.svelte';
@@ -30,7 +32,6 @@
 	import Tooltip from '$parts/Tooltip.svelte';
 	import DataTable from '$parts/DataTable.svelte';
 	import Stepper from '$parts/Stepper.svelte';
-	import OnlineStatus from '$parts/OnlineStatus.svelte';
 	import FamilyFilter from '$parts/FamilyFilter.svelte';
 	import PieChart from '$parts/PieChart.svelte';
 	import BarChart from '$parts/BarChart.svelte';
@@ -107,6 +108,13 @@
 			assigned: [devUser],
 			completions: [],
 		},
+	];
+
+	const devChores: Chore[] = [
+		{ id: 'dev-chore-1a', name: 'Do dishes', labels: ['kitchen'] },
+		{ id: 'dev-chore-1b', name: 'Clear bench', labels: ['kitchen'] },
+		{ id: 'dev-chore-1c', name: 'Wipe stove', labels: ['kitchen'] },
+		{ id: 'dev-chore-2', name: 'Take out bins', labels: [] },
 	];
 
 	const devMilestoneStatuses: Record<MilestoneStatus, string> = {
@@ -240,6 +248,11 @@
 	</section>
 
 	<section>
+		<h2>Chore checklist</h2>
+		<ChoreList chores={devChores} />
+	</section>
+
+	<section>
 		<h2>Icon chip/tag</h2>
 		<IconChip icon="calendar" label="Urgent" colour="red" />
 	</section>
@@ -304,16 +317,6 @@
 	<section>
 		<h2>Progress/stepper</h2>
 		<Stepper steps={['Details', 'Payment', 'Confirmation']} currentIndex={1} />
-	</section>
-
-	<section>
-		<h2>Online status</h2>
-		<OnlineStatus status="online" />
-	</section>
-
-	<section>
-		<h2>Offline status</h2>
-		<OnlineStatus status="offline" />
 	</section>
 
 	<section>

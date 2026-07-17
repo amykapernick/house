@@ -1,19 +1,60 @@
 <script lang="ts">
 	import { isAuthenticated } from '$lib/auth';
-	import { format, parseISO, startOfDay, addDays } from 'date-fns';
+	import { format, parseISO, startOfDay, endOfDay } from 'date-fns';
+	import { SvelteMap } from 'svelte/reactivity';
 	import fetchClientData from '$utils/fetchClientData';
+	import fetchHabitsData from '$utils/habitsData';
 	import { prefetchRecipes } from '$utils/prefetchRecipes';
 	import { getDashboardMealPlanRange } from '$utils/dateRanges';
 	import { resolve } from '$app/paths';
 	import RecipeCard from '$components/parts/recipes/RecipeCard.svelte';
+	import Skeleton from '$components/parts/Skeleton.svelte';
+	import EmptyState from '$components/parts/EmptyState.svelte';
+	import Switch from '$parts/Switch.svelte';
+	import DayView from '$partials/calendar/DayView.svelte';
 	import { getPageTitle } from '$utils/pageTitle';
+	import { EVERYONE, isVisibleToUser, fetchCurrentUserSlug } from '$utils/fetchFamilyMembers';
+	import type { Habit } from '$types/habits';
+	import type { Task } from '$types/tasks';
+	import type { ScheduleBlock, PaletteColour } from '$types/schedule';
 
 	let meals = $state<any[]>([]);
 	let loading = $state(true);
 
-	let upcomingTasks = $state<any[]>([]);
-	let upcomingEvents = $state<any[]>([]);
+	// Starts at EVERYONE (so filtering falls through harmlessly) until the
+	// current-user lookup resolves - the dashboard always shows the signed-in
+	// user's own items, with no picker to switch to anyone else's.
+	let currentUserSlug = $state(EVERYONE);
+
+	let upcomingTasks = $state<Task[]>([]);
 	let upcomingLoading = $state(true);
+
+	let dayEvents = $state<any[]>([]);
+	let icalEvents = $state<any[]>([]);
+	let scheduleBlocks = $state<ScheduleBlock[]>([]);
+	let colours = $state<PaletteColour[]>([]);
+	let showSchedule = $state(true);
+	let dayLoading = $state(true);
+
+	let habits = $state<Habit[]>([]);
+	let habitsLoading = $state(true);
+
+	let visibleTasks = $derived(upcomingTasks.filter((task) => isVisibleToUser(task.assigned, currentUserSlug)));
+	let visibleIcalEvents = $derived(icalEvents.filter((event) => isVisibleToUser(event.family, currentUserSlug)));
+	let visibleScheduleBlocks = $derived(
+		scheduleBlocks.filter((block) => isVisibleToUser(block.family ? [block.family] : [], currentUserSlug))
+	);
+	let visibleHabits = $derived(habits.filter((habit) => isVisibleToUser(habit.assigned, currentUserSlug)));
+
+	let dueTodayOrOverdueHabits = $derived.by(() => {
+		const todayStart = startOfDay(new Date());
+		const todayEnd = endOfDay(new Date());
+
+		return visibleHabits
+			.filter((habit): habit is Habit & { due: string } => !!habit.due && new Date(habit.due) <= todayEnd)
+			.map((habit) => ({ id: habit.id, name: habit.name, date: new Date(habit.due), overdue: new Date(habit.due) < todayStart }))
+			.sort((a, b) => a.date.getTime() - b.date.getTime());
+	});
 
 	$effect(() => {
 		if ($isAuthenticated) {
@@ -51,17 +92,12 @@
 	$effect(() => {
 		if ($isAuthenticated) {
 			const today = format(new Date(), 'yyyy-MM-dd');
-			const startOfToday = startOfDay(new Date());
-			const in7Days = addDays(startOfToday, 7);
 
 			function handleUpcoming(res: any) {
 				upcomingTasks = res.tasks ?? [];
-				upcomingEvents = (res.events ?? []).filter((event: any) => {
-					if (!event.dates?.start) return false;
-					const start = new Date(event.dates.start);
-					return start >= startOfToday && start <= in7Days;
-				});
+				dayEvents = res.events ?? [];
 				upcomingLoading = false;
+				dayLoading = false;
 			}
 			fetchClientData({
 				cacheKey: 'dashboard-upcoming',
@@ -73,7 +109,17 @@
 							name
 							status
 							due
+							end
+							allDay
 							dueLabel(today: "${today}")
+							link
+							platform
+							assigned {
+								name
+								slug
+								profile
+								colour
+							}
 						}
 						events {
 							id
@@ -83,6 +129,89 @@
 					}
 				`,
 			}).then(handleUpcoming);
+
+			function handleIcs(res: any) { icalEvents = res.icsEvents ?? []; }
+			fetchClientData({
+				cacheKey: 'icsEvents',
+				onStale: handleIcs,
+				gqlQuery: `
+					query {
+						icsEvents {
+							id
+							name
+							dates { start end }
+							status
+							allDay
+							colour
+							family { slug }
+						}
+					}
+				`,
+			}).then(handleIcs);
+
+			// The `colours` collection has one row per theme variant of a name
+			// (base/Light/Dark) - keep only the base row per name, matching the
+			// schedule page's own resolveColourName/textColourFor pairing.
+			function handleColours(res: any) {
+				const byName = new SvelteMap<string, PaletteColour>();
+				for (const c of res.colours ?? []) {
+					if (!byName.has(c.name) || !c.theme) byName.set(c.name, c);
+				}
+				colours = [...byName.values()];
+			}
+			fetchClientData({
+				cacheKey: 'colours',
+				onStale: handleColours,
+				gqlQuery: `
+					query {
+						colours {
+							name
+							hex
+							link
+							theme
+						}
+					}
+				`,
+			}).then(handleColours);
+
+			const todayStr = format(new Date(), 'yyyy-MM-dd');
+			function handleSchedule(res: any) { scheduleBlocks = res.schedule ?? []; }
+			fetchClientData({
+				cacheKey: `schedule-${todayStr}-${todayStr}`,
+				onStale: handleSchedule,
+				gqlQuery: `
+					query {
+						schedule(from: "${todayStr}", to: "${todayStr}") {
+							id
+							label
+							start
+							end
+							colour
+							isOverride
+							family { slug }
+						}
+					}
+				`,
+			}).then(handleSchedule);
+		}
+	});
+
+	$effect(() => {
+		if ($isAuthenticated) {
+			function handleHabits(data: Habit[]) {
+				habits = data;
+				habitsLoading = false;
+			}
+			fetchHabitsData({ onStale: handleHabits }).then(handleHabits);
+		}
+	});
+
+	$effect(() => {
+		if ($isAuthenticated) {
+			function handleCurrentUser(slug: string | undefined) {
+				if (slug) currentUserSlug = slug;
+			}
+			fetchCurrentUserSlug(handleCurrentUser).then(handleCurrentUser);
 		}
 	});
 
@@ -92,15 +221,6 @@
 		for (const task of upcomingTasks) {
 			if (task.status === 'Done' || !task.dueLabel || !task.due) continue;
 			items.push({ id: `task-${task.id}`, label: task.name, date: new Date(task.due), meta: task.dueLabel });
-		}
-
-		for (const event of upcomingEvents) {
-			items.push({
-				id: `event-${event.id}`,
-				label: event.name,
-				date: new Date(event.dates.start),
-				meta: format(new Date(event.dates.start), 'dd MMM'),
-			});
 		}
 
 		return items.sort((a, b) => a.date.getTime() - b.date.getTime()).slice(0, 6);
@@ -138,9 +258,9 @@
 		</div>
 
 		{#if upcomingLoading}
-			<p>Loading...</p>
+			<Skeleton rows={3} />
 		{:else if upcomingItems.length === 0}
-			<p class="empty">Nothing due in the next week.</p>
+			<EmptyState title="Nothing due in the next week" />
 		{:else}
 			<ul class="agenda">
 				{#each upcomingItems as item (item.id)}
@@ -155,14 +275,60 @@
 
 	<section class="widget">
 		<div class="widget-header">
+			<h2>Today</h2>
+			<div class="widget-header-controls">
+				<span class="schedule-toggle">
+					<span>Schedule</span>
+					<Switch
+						name="Schedule visibility"
+						value={showSchedule ? 1 : 0}
+						toggleFunction={(index) => (showSchedule = index === 1)}
+						options={[{ label: 'Hide schedule' }, { label: 'Show schedule' }]}
+					/>
+				</span>
+				<a href={resolve('/calendar')}>View calendar</a>
+			</div>
+		</div>
+
+		{#if dayLoading}
+			<Skeleton rows={3} />
+		{:else}
+			<DayView tasks={visibleTasks} events={dayEvents} icalEvents={visibleIcalEvents} scheduleBlocks={visibleScheduleBlocks} {colours} {showSchedule} />
+		{/if}
+	</section>
+
+	<section class="widget">
+		<div class="widget-header">
+			<h2>Habits</h2>
+			<a href={resolve('/habits')}>View all</a>
+		</div>
+
+		{#if habitsLoading}
+			<Skeleton rows={3} />
+		{:else if dueTodayOrOverdueHabits.length === 0}
+			<EmptyState title="No habits due today" />
+		{:else}
+			<ul class="agenda">
+				{#each dueTodayOrOverdueHabits as habit (habit.id)}
+					<li class="agenda-item">
+						<span class="agenda-label">{habit.name}</span>
+						<span class="agenda-meta" class:overdue={habit.overdue}>{habit.overdue ? 'Overdue' : 'Today'}</span>
+					</li>
+				{/each}
+			</ul>
+		{/if}
+	</section>
+
+	<section class="widget">
+		<div class="widget-header">
 			<h2>This week's meals</h2>
 			<a href={resolve('/meal-plan')}>View all</a>
 		</div>
 
 		{#if loading}
-			<p>Loading...</p>
+			<Skeleton rows={3} />
 		{:else if weekRecipes.length === 0}
-			<p class="empty">No meals planned this week.</p>
+			<EmptyState title="No meals planned this week" />
 		{:else}
 			<div class="grid">
 				{#each weekRecipes as { recipe, days } (recipe.slug)}
@@ -180,7 +346,7 @@
 		{/if}
 	</section>
 {:else}
-	<p class="empty">Sign in to see your upcoming tasks and this week's meals.</p>
+	<EmptyState title="Sign in to continue" message="See your upcoming tasks and this week's meals once you're signed in." />
 {/if}
 
 <style>
@@ -192,8 +358,10 @@
 
 	.widget-header {
 		display: flex;
+		flex-wrap: wrap;
 		justify-content: space-between;
 		align-items: baseline;
+		gap: 0.5em 1em;
 		margin-bottom: 0.5em;
 
 		& h2 {
@@ -212,9 +380,18 @@
 		}
 	}
 
-	.empty {
-		color: var(--grey);
-		font-style: italic;
+	.widget-header-controls {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		gap: 1em;
+	}
+
+	.schedule-toggle {
+		display: flex;
+		align-items: center;
+		gap: 0.4em;
+		font-size: 0.85em;
 	}
 
 	.agenda {

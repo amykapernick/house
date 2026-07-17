@@ -1,5 +1,7 @@
 <script lang="ts" generics="T extends { slug?: string | null }">
 	import type { Snippet } from 'svelte';
+	import Skeleton from '$parts/Skeleton.svelte';
+	import EmptyState from '$parts/EmptyState.svelte';
 
 	let {
 		entries,
@@ -15,9 +17,9 @@
 </script>
 
 {#if loading}
-	<p>Loading...</p>
+	<Skeleton rows={3} />
 {:else if entries.length === 0}
-	<p>{emptyMessage}</p>
+	<EmptyState title={emptyMessage} />
 {:else}
 	<ul class="list">
 		{#each entries as entry (entry.slug)}

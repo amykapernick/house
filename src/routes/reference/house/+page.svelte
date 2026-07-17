@@ -3,6 +3,7 @@
 	import HouseAreaModal from '$partials/house/HouseAreaModal.svelte';
 	import HouseItemModal from '$partials/house/HouseItemModal.svelte';
 	import EntityPickerModal from '$components/parts/house/EntityPickerModal.svelte';
+	import Skeleton from '$components/parts/Skeleton.svelte';
 	import { isAuthenticated, getToken } from '$lib/auth';
 	import fetchClientData, { getGraphqlUrl, clearCache } from '$utils/fetchClientData';
 	import { beforeNavigate } from '$app/navigation';
@@ -553,7 +554,7 @@
 {/if}
 
 {#if loading}
-	<p>Loading...</p>
+	<Skeleton rows={3} />
 {:else if editMode}
 	<HouseMap
 		areas={editModeAreas}

@@ -75,7 +75,7 @@
 		height: 1.6em;
 		border: 2px solid var(--grey_light);
 		border-radius: 0.3em;
-		background: transparent;
+		background: var(--transparent);
 		color: var(--grey);
 		font-size: 0.85em;
 		transition: all 0.15s;

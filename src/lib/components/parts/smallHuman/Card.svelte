@@ -64,7 +64,7 @@
 		width: auto;
 		padding: 0.5em 0.75em;
 		color: var(--black);
-		background: color-mix(in srgb, var(--colour) 10%, white);
+		background: color-mix(in srgb, var(--colour) 10%, var(--white_true));
 		display: grid;
 		grid-template-rows: auto 1fr auto auto;
 		grid-template-columns: 1fr auto;
@@ -100,14 +100,14 @@
 		padding: 0;
 		border: none;
 		border-radius: 50%;
-		background: transparent;
+		background: var(--transparent);
 		color: var(--black);
 		font-size: 1.1em;
 		line-height: 1;
 		cursor: pointer;
 
 		&:hover {
-			background: color-mix(in srgb, var(--colour) 20%, transparent);
+			background: color-mix(in srgb, var(--colour) 20%, var(--transparent));
 		}
 	}
 

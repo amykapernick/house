@@ -19,12 +19,12 @@
 	.card {
 		position: relative;
 		border-radius: 0.5em;
-		border: 1px solid color-mix(in oklch, rgb(247, 240, 235) 78%, rgb(13, 13, 13));
+		border: 1px solid color-mix(in oklch, var(--background) 78%, var(--black));
 		width: auto;
 		padding: 0.5em 0.75em;
 		background: light-dark(
-			linear-gradient(rgb(255, 255, 255), color-mix(in oklch, rgb(247, 240, 235) 55%, rgb(255, 255, 255))),
-			linear-gradient(color-mix(in oklch, rgb(20, 23, 29) 85%, rgb(245, 240, 240)), color-mix(in oklch, rgb(20, 23, 29) 90%, rgb(245, 240, 240)))
+			linear-gradient(var(--white_true), color-mix(in oklch, var(--background) 55%, var(--white_true))),
+			linear-gradient(color-mix(in oklch, var(--dark_background) 85%, var(--white)), color-mix(in oklch, var(--dark_background) 90%, var(--white)))
 		);
 
 		&.dark {

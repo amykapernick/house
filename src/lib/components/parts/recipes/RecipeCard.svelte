@@ -79,7 +79,7 @@
 		& .no-image {
 			width: 100%;
 			height: 180px;
-			background: color-mix(in srgb, var(--purple_bright) 8%, transparent);
+			background: color-mix(in srgb, var(--purple_bright) 8%, var(--transparent));
 		}
 
 		&.compact {

@@ -5,6 +5,8 @@
 	import RecipeCard from '$components/parts/recipes/RecipeCard.svelte';
 	import Pagination from '$components/parts/Pagination.svelte';
 	import TagCloud from '$components/parts/recipes/TagCloud.svelte';
+	import Skeleton from '$components/parts/Skeleton.svelte';
+	import EmptyState from '$components/parts/EmptyState.svelte';
 	import { getPageTitle } from '$utils/pageTitle';
 
 	let recipes = $state<any[]>([]);
@@ -180,9 +182,9 @@
 </div>
 
 {#if loading}
-	<p>Loading...</p>
+	<Skeleton rows={3} />
 {:else if recipes.length === 0}
-	<p>No recipes found.</p>
+	<EmptyState title="No recipes found" />
 {:else}
 	<p class="count">{total} recipes</p>
 
@@ -270,7 +272,7 @@
 			padding: 0.3em 0.7em;
 			border: 1px solid var(--grey_light);
 			border-radius: 0.3em;
-			background: transparent;
+			background: var(--transparent);
 			color: var(--black);
 			font-size: 0.85em;
 			cursor: pointer;

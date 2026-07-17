@@ -53,7 +53,7 @@
 			margin-left: auto;
 			padding: 0;
 			border: none;
-			background: transparent;
+			background: var(--transparent);
 			color: inherit;
 			font-size: 1em;
 			line-height: 1;

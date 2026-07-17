@@ -174,7 +174,7 @@
 		& kbd {
 			padding: 0.1em 0.4em;
 			margin-left: 0.3em;
-			border: 1px solid color-mix(in srgb, currentColor 40%, transparent);
+			border: 1px solid color-mix(in srgb, currentColor 40%, var(--transparent));
 			border-radius: 0.25em;
 			font-family: inherit;
 			font-size: 0.85em;

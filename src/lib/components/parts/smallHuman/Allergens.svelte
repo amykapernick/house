@@ -87,7 +87,7 @@
 		color: var(--black);
 		font-size: 0.9em;
 		transition: opacity 0.15s;
-		background: color-mix(in srgb, var(--colour) 15%, white);
+		background: color-mix(in srgb, var(--colour) 15%, var(--white_true));
 
 		&:disabled {
 			opacity: 0.4;

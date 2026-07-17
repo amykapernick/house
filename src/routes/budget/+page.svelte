@@ -3,6 +3,7 @@
 	import Budget from '$partials/finance/Budget.svelte';
 	import BudgetBuckets from '$partials/finance/BudgetBuckets.svelte';
 	import BudgetCharts from '$partials/finance/BudgetCharts.svelte';
+	import Skeleton from '$parts/Skeleton.svelte';
 	import { isAuthenticated, getToken } from '$lib/auth';
 	import fetchClientData, { getGraphqlUrl } from '$utils/fetchClientData';
 	import type { BudgetItem } from '$types/budget';
@@ -204,7 +205,7 @@
 
 <h1>Budget</h1>
 {#if loading}
-	<p>Loading...</p>
+	<Skeleton rows={3} />
 {:else}
 	<div class="budget-toolbar">
 		{#if editing}

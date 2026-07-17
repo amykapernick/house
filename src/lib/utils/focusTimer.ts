@@ -11,7 +11,7 @@ export type FocusPhase = {
 	seconds: number;
 };
 
-export type FocusPresetId = `classic` | `taper`;
+export type FocusPresetId = `classic` | `taper` | `flexible`;
 
 export const FOCUS_PRESETS: { id: FocusPresetId; name: string; description: string; needsHours: boolean }[] = [
 	{
@@ -25,6 +25,12 @@ export const FOCUS_PRESETS: { id: FocusPresetId; name: string; description: stri
 		name: `Taper (50→10)`,
 		description: `50/40/30/20/10 min focus blocks with 10 min breaks between, shrinking as the session goes on`,
 		needsHours: false,
+	},
+	{
+		id: `flexible`,
+		name: `Flexible`,
+		description: `Blocks of 20-30 min focus time with 5 min breaks, adjusting for your desired working time`,
+		needsHours: true
 	},
 ];
 
@@ -61,8 +67,54 @@ export function buildTaperSequence(): FocusPhase[] {
 	return phases;
 }
 
+const FLEXIBLE_BLOCK_MINUTES = [20, 25, 30] as const;
+
+export function buildFlexibleSequence(hours: number): FocusPhase[] {
+	if (!Number.isFinite(hours) || hours <= 0) return [];
+
+	const breakMinutes = 5;
+	const totalMinutes = Math.round(hours * 60);
+
+	if (totalMinutes < FLEXIBLE_BLOCK_MINUTES[0]) return [];
+
+	// For each candidate uniform block length (20/25/30), fit as many blocks of
+	// that length as possible, then see if a single smaller allowed length can
+	// absorb whatever's left over - so every block stays snapped to 20/25/30
+	// min and at most one (the last) differs from the rest. Keep whichever
+	// candidate uses the most of the requested time; ties favour fewer, larger
+	// blocks over more, smaller ones.
+	let best: { blockMinutes: number; count: number; lastBlockMinutes: number | null; totalUsed: number } | null = null;
+
+	for (const blockMinutes of FLEXIBLE_BLOCK_MINUTES) {
+		const count = Math.floor((totalMinutes + breakMinutes) / (blockMinutes + breakMinutes));
+		if (count < 1) continue;
+
+		const usedTime = count * blockMinutes + (count - 1) * breakMinutes;
+		const availableForLastBlock = totalMinutes - usedTime - breakMinutes;
+		const lastBlockMinutes = [...FLEXIBLE_BLOCK_MINUTES].reverse().find((minutes) => minutes <= availableForLastBlock) ?? null;
+		const totalUsed = usedTime + (lastBlockMinutes ? breakMinutes + lastBlockMinutes : 0);
+
+		if (!best || totalUsed > best.totalUsed || (totalUsed === best.totalUsed && blockMinutes > best.blockMinutes)) {
+			best = { blockMinutes, count, lastBlockMinutes, totalUsed };
+		}
+	}
+
+	if (!best) return [];
+
+	const phases: FocusPhase[] = [];
+	for (let i = 0; i < best.count; i++) {
+		phases.push({ type: `work`, label: `Focus`, seconds: best.blockMinutes * MINUTE });
+		if (i < best.count - 1 || best.lastBlockMinutes) phases.push({ type: `break`, label: `Break`, seconds: breakMinutes * MINUTE });
+	}
+	if (best.lastBlockMinutes) phases.push({ type: `work`, label: `Focus`, seconds: best.lastBlockMinutes * MINUTE });
+
+	return phases;
+}
+
 export function buildSequence(presetId: FocusPresetId, hours: number): FocusPhase[] {
-	return presetId === `classic` ? buildClassicSequence(hours) : buildTaperSequence();
+	if (presetId === `classic`) return buildClassicSequence(hours);
+	if (presetId === `flexible`) return buildFlexibleSequence(hours);
+	return buildTaperSequence();
 }
 
 export function formatRemaining(ms: number): string {

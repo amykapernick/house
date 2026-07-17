@@ -8,7 +8,7 @@
 		name,
 		class: className = ''
 	}: {
-		options: { label: string; Icon: Component<Record<string, any>> }[];
+		options: { label: string; Icon?: Component<Record<string, any>> }[];
 		value: number;
 		toggleFunction: (index: number) => void;
 		name: string;
@@ -32,7 +32,9 @@
 		/>
 		<label for={`${switchId}_${label.replace(' ', '')}`}>
 			<span class="label">{label}</span>
-			<Icon class="icon" />
+			{#if Icon}
+				<Icon class="icon" />
+			{/if}
 		</label>
 	{/each}
 	<span class="switch"></span>

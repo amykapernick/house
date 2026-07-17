@@ -75,7 +75,7 @@
 		gap: 1em 1.5em;
 		margin: 1.5em 0 1em;
 		padding-bottom: 0.8em;
-		border-bottom: 1px solid color-mix(in oklch, rgb(247, 240, 235) 78%, rgb(13, 13, 13));
+		border-bottom: 1px solid color-mix(in oklch, var(--background) 78%, var(--black));
 	}
 
 	button {
@@ -83,7 +83,7 @@
 		padding: 0;
 		border: none;
 		background: none;
-		color: color-mix(in oklch, rgb(96, 96, 96) 84%, rgb(13, 13, 13));
+		color: color-mix(in oklch, var(--grey) 84%, var(--black));
 		font-size: 1em;
 		font-weight: 600;
 		text-transform: capitalize;

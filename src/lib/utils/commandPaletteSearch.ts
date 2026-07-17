@@ -3,6 +3,8 @@ export type SearchSection =
 	| `Recipes`
 	| `Content`
 	| `References`
+	| `Suppliers`
+	| `Assets`
 	| `Small Human`
 	| `Tasks`
 	| `Shopping List`
@@ -16,6 +18,7 @@ export type SearchSection =
 export const SCOPE_TOKENS: Record<string, SearchSection> = {
 	page: `Pages`, recipe: `Recipes`, content: `Content`,
 	task: `Tasks`, shop: `Shopping List`, ref: `References`,
+	supplier: `Suppliers`, asset: `Assets`,
 	human: `Small Human`, budget: `Budget`, schedule: `Schedule`,
 };
 

@@ -13,7 +13,11 @@
 	"eslint.options": {
 		"overrideConfigFile": "./config/eslint.config.mjs"
 	},
-	"editor.formatOnSave": false,
+	"editor.formatOnSave": true,
+	"editor.defaultFormatter": "esbenp.prettier-vscode",
+	"[svelte]": {
+		"editor.defaultFormatter": "svelte.svelte-vscode"
+	},
 	"editor.codeActionsOnSave": {
 		"source.fixAll.eslint": "explicit",
 		"source.fixAll.stylelint": "explicit"

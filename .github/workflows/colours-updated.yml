@@ -1,0 +1,32 @@
+name: Rebuild for Colours Update
+
+on:
+  repository_dispatch:
+    types: [colours-updated]
+
+concurrency:
+  group: colours-updated-rebuild
+  cancel-in-progress: true
+
+jobs:
+  trigger-rebuild:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: prod
+
+      # colours.generated.css is fetched fresh from the API on every build (see
+      # vite.config.ts) and deliberately gitignored - so there's nothing to
+      # regenerate/commit here. An empty commit is enough to push to prod and
+      # trigger the normal deploy workflow, whose own build step will pick up
+      # the PocketBase change.
+      - name: Push empty commit to trigger a rebuild
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git commit --allow-empty -m "chore: rebuild for PocketBase colours update"
+          git push origin HEAD:prod

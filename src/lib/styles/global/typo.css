@@ -1,5 +1,6 @@
 body {
-	color: var(--textPrimary);
+	background: var(--page_bg);
+	color: var(--text_primary);
 	font-family: $font_main;
 	font-size: 1em;
 	line-height: 1.5;

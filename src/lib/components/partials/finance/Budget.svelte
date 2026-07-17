@@ -217,7 +217,7 @@
 		cursor: pointer;
 
 		&:hover {
-			background: color-mix(in srgb, var(--navy) 80%, white);
+			background: color-mix(in srgb, var(--navy) 80%, var(--white_true));
 		}
 	}
 

@@ -3,6 +3,7 @@
 	import fetchClientData from '$utils/fetchClientData';
 	import { resolve } from '$app/paths';
 	import { getPageTitle } from '$utils/pageTitle';
+	import Skeleton from '$parts/Skeleton.svelte';
 
 	let tags = $state<any[]>([]);
 	let loading = $state(true);
@@ -44,7 +45,7 @@
 <h1>Tags</h1>
 
 {#if loading}
-	<p>Loading...</p>
+	<Skeleton rows={3} />
 {:else}
 	<input
 		type="text"

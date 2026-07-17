@@ -6,6 +6,7 @@
 	import { EVERYONE, isVisibleToUser } from '$utils/fetchFamilyMembers';
 	import HabitView from '$parts/habits/HabitView.svelte';
 	import FamilyFilter from '$parts/FamilyFilter.svelte';
+	import Skeleton from '$parts/Skeleton.svelte';
 	import type { Habit } from '$types/habits';
 	import { getPageTitle } from '$utils/pageTitle';
 
@@ -46,7 +47,7 @@
 
 <h1>Habits</h1>
 {#if loading}
-	<p>Loading...</p>
+	<Skeleton rows={3} />
 {:else}
 	<FamilyFilter bind:selectedUserSlug pageKey="habits" />
 	<HabitView habits={visibleHabits} {selectedUserSlug} onComplete={handleHabitComplete} />

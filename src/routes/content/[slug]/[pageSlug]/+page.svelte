@@ -10,6 +10,7 @@
 	import { getReadAnchors, markAnchorRead, unmarkAnchorRead } from '$utils/readProgress';
 	import TableOfContents from '$components/parts/content/TableOfContents.svelte';
 	import TrackableContent from '$components/parts/content/TrackableContent.svelte';
+	import Skeleton from '$components/parts/Skeleton.svelte';
 	import type { ContentEntry, ContentPage } from '$types/generated';
 	import { getPageTitle } from '$utils/pageTitle';
 
@@ -105,7 +106,7 @@
 <a href={resolve(`/content/[slug]`, { slug: $page.params.slug ?? `` })} class="back">← {entry?.title ?? $page.params.slug}</a>
 
 {#if loading}
-	<p>Loading...</p>
+	<Skeleton rows={3} />
 {:else if !contentPage}
 	<p>Page not found.</p>
 {:else}

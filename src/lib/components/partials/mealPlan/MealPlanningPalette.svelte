@@ -3,6 +3,8 @@
 	import { flip } from 'svelte/animate';
 	import { MEAL_PLANNING_DND_TYPE, MEAL_PLANNING_FLIP_MS, type PaletteDndItem, type PlanningRecipe } from '$utils/mealPlanningDnd';
 	import { formatMinutes } from '$utils/formatMinutes';
+	import Skeleton from '$parts/Skeleton.svelte';
+	import EmptyState from '$parts/EmptyState.svelte';
 
 	let { recipes, loading, season, class: className = '' }: { recipes: PlanningRecipe[]; loading: boolean; season: string; class?: string } = $props();
 
@@ -29,9 +31,9 @@
 	<h2>{season} recipes</h2>
 
 	{#if loading}
-		<p class="hint">Loading recipes...</p>
+		<Skeleton rows={3} />
 	{:else if recipes.length === 0}
-		<p class="hint">No recipes tagged {season} yet.</p>
+		<EmptyState title="No recipes tagged {season} yet" />
 	{:else}
 		<div
 			class="cards"
@@ -70,7 +72,7 @@
 	.palette {
 		margin-bottom: 1.5em;
 		padding: 1em;
-		background: color-mix(in srgb, var(--purple_bright) 4%, transparent);
+		background: color-mix(in srgb, var(--purple_bright) 4%, var(--transparent));
 		border-radius: 0.5em;
 		border: 1px solid var(--grey_light);
 
@@ -78,13 +80,6 @@
 			font-size: 0.95em;
 			margin: 0 0 0.8em;
 		}
-	}
-
-	.hint {
-		font-size: 0.85em;
-		color: var(--grey);
-		font-style: italic;
-		margin: 0;
 	}
 
 	.cards {
@@ -97,7 +92,7 @@
 	.card {
 		width: 140px;
 		padding: 0.5em;
-		background: white;
+		background: var(--white_true);
 		border: 1px solid var(--grey_light);
 		border-radius: 0.3em;
 		cursor: grab;

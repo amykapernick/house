@@ -35,6 +35,9 @@
 		link: string;
 		Icon?: Component<Record<string, any>>;
 		contentIcon?: { icon?: string | null; iconType?: string | null };
+		// Extra fields (description, tags, etc.) a result should also match
+		// against besides its label - see matchSection below.
+		searchText?: string;
 	};
 
 	type PlannedMeal = { date: string; entryType: string };
@@ -83,6 +86,8 @@
 	// same cacheKey + query its own page uses, so the cache is shared rather than
 	// a second, differently-shaped entry fighting over the same key.
 	let resources = $state<any[]>([]);
+	let suppliers = $state<any[]>([]);
+	let assets = $state<any[]>([]);
 	let smallHuman = $state<any>(null);
 	let searchTasks = $state<any[]>([]);
 	let shoppingListItems = $state<any[]>([]);
@@ -208,7 +213,7 @@
 		if (!t) return [];
 		return list
 			.map(toResult)
-			.filter((result) => result.label.toLowerCase().includes(t))
+			.filter((result) => result.label.toLowerCase().includes(t) || result.searchText?.toLowerCase().includes(t))
 			.slice(0, SECTION_DISPLAY_LIMIT);
 	}
 
@@ -218,6 +223,37 @@
 		sublabel: resource.category,
 		section: `References` as const,
 		link: resource.url || resolve(`/reference`),
+		searchText: [resource.category, resource.description].filter(Boolean).join(` `),
+	})));
+
+	// Each supplier can surface up to three results under its own name: the
+	// supplier itself (opens their website), plus a "call"/"email" action if a
+	// phone/email is on file - flattened first so matchSection's per-item label
+	// filter naturally keeps or drops all of a matching supplier's actions together.
+	const supplierResults = $derived.by(() => {
+		const items: { id: string; name: string; sublabel?: string; link: string; searchText: string }[] = [];
+		for (const supplier of suppliers) {
+			const searchText = (supplier.category ?? []).join(` `);
+			items.push({ id: `supplier:${supplier.id}`, name: supplier.name, link: supplier.url || resolve(`/reference`), searchText });
+			if (supplier.email) items.push({ id: `supplier-email:${supplier.id}`, name: supplier.name, sublabel: `Email ${supplier.email}`, link: `mailto:${supplier.email}`, searchText });
+			if (supplier.phone) items.push({ id: `supplier-call:${supplier.id}`, name: supplier.name, sublabel: `Call ${supplier.phone}`, link: `tel:${supplier.phone}`, searchText });
+		}
+		return matchSection(`Suppliers`, items, (item) => ({
+			key: item.id,
+			label: item.name,
+			sublabel: item.sublabel,
+			section: `Suppliers` as const,
+			link: item.link,
+			searchText: item.searchText,
+		}));
+	});
+
+	const assetResults = $derived(matchSection(`Assets`, assets, (asset) => ({
+		key: `asset:${asset.id}`,
+		label: asset.name,
+		section: `Assets` as const,
+		link: asset.external || resolve(`/reference`),
+		searchText: [asset.brand, asset.model, asset.status, ...(asset.category ?? []), asset.content].filter(Boolean).join(` `),
 	})));
 
 	// Flattens the named/titled sub-items of each smallHuman tab - not raw
@@ -289,7 +325,8 @@
 
 	const results = $derived([
 		...recentResults, ...pageResults, ...contentResults, ...recipeResults,
-		...referenceResults, ...smallHumanResults, ...taskResults, ...shoppingListResults, ...budgetResults, ...scheduleResults,
+		...referenceResults, ...supplierResults, ...assetResults,
+		...smallHumanResults, ...taskResults, ...shoppingListResults, ...budgetResults, ...scheduleResults,
 	]);
 
 	function escapeGqlString(value: string): string {
@@ -367,10 +404,30 @@
 			onStale: (res) => { resources = res.resources ?? []; },
 			gqlQuery: `
 				query {
-					resources { name id category description image login url icon }
+					resources { name id category description image login url icon archived }
 				}
 			`,
 		}).then((res) => { resources = res.resources ?? []; });
+
+		fetchClientData({
+			cacheKey: `suppliers`,
+			onStale: (res) => { suppliers = res.suppliers ?? []; },
+			gqlQuery: `
+				query {
+					suppliers { name id category archived url lastUsed email phone }
+				}
+			`,
+		}).then((res) => { suppliers = res.suppliers ?? []; });
+
+		fetchClientData({
+			cacheKey: `assets`,
+			onStale: (res) => { assets = res.assets ?? []; },
+			gqlQuery: `
+				query {
+					assets { name id icon content external category brand cost receipt dateOfPurchase ipAddress image macAddress model ramStorage status }
+				}
+			`,
+		}).then((res) => { assets = res.assets ?? []; });
 
 		fetchClientData({
 			cacheKey: `small-human`,
@@ -712,7 +769,7 @@
 					<li class="heading">{result.section}</li>
 				{/if}
 				<li>
-					<!-- result.link is already resolve()d (internal) or a raw external URL (References/Tasks) above -->
+					<!-- result.link is already resolve()d (internal) or a raw external/mailto/tel URL (References/Suppliers/Assets/Tasks) above -->
 					<!-- eslint-disable svelte/no-navigation-without-resolve -->
 					<a
 						class="result"
@@ -782,10 +839,10 @@
 		overflow: hidden;
 		background: var(--background);
 		color: var(--background_text);
-		box-shadow: 0 5px 30px color-mix(in srgb, var(--neutral) 30%, transparent);
+		box-shadow: 0 5px 30px color-mix(in srgb, var(--neutral) 30%, var(--transparent));
 
 		&::backdrop {
-			background: color-mix(in srgb, var(--neutral) 60%, transparent);
+			background: color-mix(in srgb, var(--neutral) 60%, var(--transparent));
 		}
 	}
 

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { add, endOfDay, format, isBefore, isToday, isTomorrow, isWithinInterval, isYesterday, startOfDay, startOfToday, subDays } from 'date-fns';
+	import { SvelteSet } from 'svelte/reactivity';
 	import CheckboxButton from '$parts/CheckboxButton.svelte';
 	import { getToken } from '$lib/auth';
 	import { getGraphqlUrl } from '$utils/fetchClientData';
@@ -44,10 +45,18 @@
 		return add(date, { years: count });
 	}
 
+	// Marked the instant a day's complete button is clicked, so the square
+	// flips to done straight away instead of waiting on the mutation + a
+	// habits refetch. Only cleared on failure - a confirmed completion stays
+	// shown as done even before `completions` itself catches up.
+	let pendingCompletions = new SvelteSet<string>();
+
 	// A completion covers every day up to (not including) when the next
 	// occurrence is due, so the grid doesn't falsely show gaps between
 	// completions on their actual cadence.
 	function isDayDone(day: Date) {
+		if (pendingCompletions.has(format(day, 'yyyy-MM-dd'))) return true;
+
 		return completions.some((completion) => {
 			const completedAt = new Date(completion);
 			const coversUntil = subDays(nextOccurrenceAfter(completedAt), 1);
@@ -80,35 +89,46 @@
 		showTooltip = false;
 	}
 
-	async function completeHabit() {
+	async function completeHabit(completedAt?: string) {
 		if (saving) return;
 		saving = true;
 		actionError = '';
 
+		const dateKey = completedAt ?? format(new Date(), 'yyyy-MM-dd');
+		pendingCompletions.add(dateKey);
+
 		const token = await getToken();
+		const args = completedAt ? `habitId: "${id}", completedAt: "${completedAt}"` : `habitId: "${id}"`;
 		const res = await fetch(getGraphqlUrl(), {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
 				...(token ? { 'Authorization': `Bearer ${token}` } : {}),
 			},
-			body: JSON.stringify({ query: `mutation { completeHabit(habitId: "${id}") { success } }` }),
+			body: JSON.stringify({ query: `mutation { completeHabit(${args}) { success } }` }),
 		}).then((r) => r.json());
 
 		saving = false;
 
 		if (!res?.data?.completeHabit?.success) {
+			pendingCompletions.delete(dateKey);
 			actionError = "Couldn't mark this habit complete. Try again.";
 			return;
 		}
 
 		onComplete?.(id);
 	}
+
+	// Matches the API's own backdate limit (completeHabit rejects anything
+	// older) - only today's and the last 2 days' squares get a complete button.
+	function isBackdateable(day: Date) {
+		return isWithinInterval(day, { start: subDays(startOfToday(), 2), end: startOfToday() });
+	}
 </script>
 
 <tr class="habit {className}">
 	<td class="name">
-		<CheckboxButton class="checkbox" disabled={saving} onclick={completeHabit} label="Mark {name} complete" />
+		<CheckboxButton class="checkbox" disabled={saving} onclick={() => completeHabit()} label="Mark {name} complete" />
 		<span class="label">
 			{#if emoji && label}
 				<span
@@ -155,7 +175,17 @@
 {#snippet dayIcon(day: Date)}
 	{@const done = isDayDone(day)}
 	{@const missed = !done && isBefore(day, startOfToday())}
-	{#if done}
+	{#if !done && isBackdateable(day)}
+		<button
+			type="button"
+			class="day-complete"
+			disabled={saving}
+			onclick={() => completeHabit(format(day, 'yyyy-MM-dd'))}
+			aria-label="Mark {name} complete for {format(day, 'EEEE d MMM')}"
+		>
+			<span aria-hidden="true">{missed ? '🟥' : '⬜'}</span>
+		</button>
+	{:else if done}
 		<span class="sr-only">{name} completed on {format(day, 'EEEE d MMM')}</span>
 		<span aria-hidden="true">🟩</span>
 	{:else if missed}
@@ -234,6 +264,27 @@
 		width: 2.5em;
 		border-left: 1px solid var(--grey_light);
 		text-align: center;
+	}
+
+	.day-complete {
+		padding: 0;
+		border: none;
+		background: none;
+		font: inherit;
+		font-size: 1em;
+		line-height: 1;
+		cursor: pointer;
+
+		&:hover:not(:disabled),
+		&:focus-visible {
+			border-radius: 0.2em;
+			outline: 2px solid var(--purple_bright);
+			outline-offset: 2px;
+		}
+
+		&:disabled {
+			cursor: wait;
+		}
 	}
 
 	.days-column {

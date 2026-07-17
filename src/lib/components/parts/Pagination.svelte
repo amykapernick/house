@@ -31,7 +31,7 @@
 			padding: 0.5em 1em;
 			border: 1px solid var(--grey_light);
 			border-radius: 0.3em;
-			background: transparent;
+			background: var(--transparent);
 			color: var(--black);
 			cursor: pointer;
 

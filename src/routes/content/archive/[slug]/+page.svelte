@@ -11,6 +11,8 @@
 	import ContentIcon from '$components/parts/ContentIcon.svelte';
 	import TableOfContents from '$components/parts/content/TableOfContents.svelte';
 	import TrackableContent from '$components/parts/content/TrackableContent.svelte';
+	import Skeleton from '$components/parts/Skeleton.svelte';
+	import EmptyState from '$components/parts/EmptyState.svelte';
 	import type { ContentEntry, ContentPage } from '$types/generated';
 	import { getPageTitle } from '$utils/pageTitle';
 
@@ -102,9 +104,9 @@
 
 <h1><ContentIcon icon={entry?.icon} iconType={entry?.iconType} />{entry?.title ?? $page.params.slug} Archive{#if allRead}<span class="read-mark" title="Fully read">✓</span>{/if}</h1>
 {#if loading}
-	<p>Loading...</p>
+	<Skeleton rows={3} />
 {:else if !archive?.content}
-	<p>No archived versions yet.</p>
+	<EmptyState title="No archived versions yet" />
 {:else}
 	<TableOfContents {toc} {readAnchors} bind:showToc />
 	<TrackableContent {chunks} {readAnchors} onToggleRead={handleToggleRead} />

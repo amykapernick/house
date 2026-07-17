@@ -1,6 +1,7 @@
 <script lang="ts">
 	import CalendarView from '$partials/calendar/Calendar.svelte';
 	import FamilyFilter from '$parts/FamilyFilter.svelte';
+	import Skeleton from '$parts/Skeleton.svelte';
 	import { isAuthenticated } from '$lib/auth';
 	import fetchClientData from '$utils/fetchClientData';
 	import { EVERYONE, isVisibleToUser } from '$utils/fetchFamilyMembers';
@@ -117,7 +118,7 @@
 
 <h1>Calendar</h1>
 {#if loading}
-	<p>Loading...</p>
+	<Skeleton rows={3} />
 {:else}
 	<FamilyFilter bind:selectedUserSlug pageKey="calendar" />
 	<CalendarView tasks={visibleTasks} allDayEvents={events} icalEvents={visibleIcalEvents} {mealPlans} onTaskCompleted={handleTaskCompleted} />

@@ -20,6 +20,8 @@
 	import Milestone from '$parts/smallHuman/Milestone.svelte';
 	import Auslan from '$parts/smallHuman/Auslan.svelte';
 	import UrgentAlerts from '$parts/smallHuman/UrgentAlerts.svelte';
+	import Skeleton from '$parts/Skeleton.svelte';
+	import EmptyState from '$parts/EmptyState.svelte';
 	import { getPageTitle } from '$utils/pageTitle';
 	import Breasts from '$img/smallHuman/breasts.svg?component'
 	import Water from '$img/icons/glass-water.svg?component'
@@ -417,9 +419,9 @@
 />
 
 {#if loading}
-	<p>Loading...</p>
+	<Skeleton rows={3} />
 {:else if !data}
-	<p>No data available</p>
+	<EmptyState title="No data available" />
 {:else}
 	{@const {
 		overview,

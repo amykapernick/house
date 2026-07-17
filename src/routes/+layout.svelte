@@ -7,17 +7,19 @@
 	import { initClerk, isAuthenticated, clerkLoaded } from '$lib/auth';
 	import { routeRequiresAuth, menuItems } from '$lib/navigation';
 	import { recordPageVisit } from '$utils/recentPages';
-	import { isOnline } from '$utils/online';
-	import { lastDataUpdate, clearAllCache } from '$utils/fetchClientData';
 	import Header from '$partials/Header.svelte';
 	import Footer from '$partials/Footer.svelte';
 	import Layout from '$layouts/Default.svelte';
 	import CommandPalette from '$parts/CommandPalette.svelte';
 	import TaskReminderBanner from '$parts/TaskReminderBanner.svelte';
+	import FocusTimer from '$parts/FocusTimer.svelte';
+	import OnlineStatus from '$parts/OnlineStatus.svelte';
+	import { focusTimerState } from '$utils/focusTimer';
 
 	let { children } = $props();
 
 	let commandPaletteOpen = $state(false);
+	let focusTimerOpen = $state(false);
 
 	// Mobile has no Cmd/Ctrl+K, so a swipe-down from the very top of the page opens
 	// the palette instead - mirrors a pull-to-refresh gesture, which it also
@@ -29,12 +31,6 @@
 	let touchStartY = 0;
 	let touchTracking = false;
 	let swipeIsVertical: boolean | null = null;
-
-	const lastUpdatedText = $derived(
-		$lastDataUpdate
-			? new Date($lastDataUpdate).toLocaleTimeString([], { hour: `2-digit`, minute: `2-digit` })
-			: null,
-	);
 
 	onMount(async () => {
 		const clerkPublishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
@@ -95,11 +91,6 @@
 		swipeIsVertical = null;
 	}
 
-	function handleRefresh() {
-		clearAllCache();
-		location.reload();
-	}
-
 	function openCommandPalette() {
 		commandPaletteOpen = true;
 	}
@@ -109,12 +100,7 @@
 	});
 
 	$effect(() => {
-		if (
-			$clerkLoaded &&
-			!$isAuthenticated &&
-			!page.url.pathname.startsWith('/sign-in') &&
-			routeRequiresAuth(page.url.pathname)
-		) {
+		if ($clerkLoaded && !$isAuthenticated && !page.url.pathname.startsWith('/sign-in') && routeRequiresAuth(page.url.pathname)) {
 			// eslint-disable-next-line svelte/no-navigation-without-resolve -- resolve() is used; the rule can't trace it through template-literal concatenation with the query string
 			goto(`${resolve('/sign-in')}?redirect=${encodeURIComponent(page.url.pathname)}`);
 		}
@@ -123,7 +109,10 @@
 
 <svelte:head>
 	<title>{__SITE_TITLE__}</title>
-	<meta name="description" content="Meal Planning, Tasks, Reminders, Calendars" />
+	<meta
+		name="description"
+		content="Meal Planning, Tasks, Reminders, Calendars"
+	/>
 </svelte:head>
 
 <svelte:window
@@ -134,20 +123,7 @@
 	ontouchcancel={handleTouchEnd}
 />
 
-<!-- TODO: Make a smaller version, expand on hover -->
-<p class="status_banner" class:offline={!$isOnline}>
-	<span>{$isOnline ? `Online` : `Offline`}{#if lastUpdatedText} · Data updated {lastUpdatedText}{/if}</span>
-	<button
-		type="button"
-		class="refresh"
-		onclick={handleRefresh}
-		disabled={!$isOnline}
-		aria-label="Refresh data"
-		title="Refresh data"
-	>
-		⟳
-	</button>
-</p>
+<OnlineStatus />
 
 <button
 	type="button"
@@ -158,6 +134,35 @@
 >
 	🔍
 </button>
+
+<!-- TODO: Add a controls section -->
+{#if !$focusTimerState}
+	<button
+		type="button"
+		class="focus_timer_trigger"
+		onclick={() => (focusTimerOpen = !focusTimerOpen)}
+		aria-label="Toggle focus timer"
+		aria-expanded={focusTimerOpen}
+		title="Toggle focus timer"
+	>
+		⏱️
+	</button>
+{/if}
+
+<Header />
+<main class="main">
+	<Layout>
+		{@render children()}
+	</Layout>
+</main>
+<Footer />
+<CommandPalette
+	bind:open={commandPaletteOpen}
+	{menuItems}
+	isAuthenticated={$isAuthenticated}
+/>
+<FocusTimer bind:open={focusTimerOpen} />
+<TaskReminderBanner />
 
 <style>
 	@import '@mixins';
@@ -177,47 +182,9 @@
 		margin-bottom: 5em;
 	}
 
-	.status_banner {
-		display: flex;
-		position: fixed;
-		z-index: 1000;
-		bottom: 4.5rem;
-		left: 1em;
-		align-items: center;
-		margin: 0;
-		padding: 0.5em 1em;
-		border-radius: 0.4em;
-		background: var(--success);
-		box-shadow: 0 0.1em 0.5em rgb(0 0 0 / 25%);
-		color: var(--success_text);
-		font-size: 0.7em;
-		gap: 0.5em;
-
-		&.offline {
-			background: var(--warning);
-			color: var(--warning_text);
-		}
-
-		& .refresh {
-			padding: 0;
-			border: none;
-			background: transparent;
-			color: inherit;
-			font-size: 1.1em;
-			line-height: 1;
-			cursor: pointer;
-
-			&:disabled {
-				opacity: 0.5;
-				cursor: not-allowed;
-			}
-		}
-	}
-
 	.palette_trigger {
-
 		@include button_icon;
-		
+
 		position: fixed;
 		z-index: 1000;
 		right: 0.5em;
@@ -227,7 +194,19 @@
 		font-size: 1.3em;
 	}
 
-	@media(width >= 50em) {
+	.focus_timer_trigger {
+		@include button_icon;
+
+		position: fixed;
+		z-index: 1000;
+		right: 3.5em;
+		bottom: 4.5rem;
+		margin: 0;
+		box-shadow: 0 0.1em 0.5em rgb(0 0 0 / 25%);
+		font-size: 1.3em;
+	}
+
+	@media (width >= 50em) {
 		:global(body) {
 			grid-template-areas: 'header main' 'header footer';
 			grid-template-columns: auto 1fr;
@@ -242,21 +221,5 @@
 			padding-bottom: 50px;
 			overflow-y: auto;
 		}
-
-		.status_banner {
-			right: 1rem;
-			bottom: 2rem;
-			left: auto;
-		}
 	}
 </style>
-
-<Header />
-<main class="main">
-	<Layout>
-		{@render children()}
-	</Layout>
-</main>
-<Footer />
-<CommandPalette bind:open={commandPaletteOpen} {menuItems} isAuthenticated={$isAuthenticated} />
-<TaskReminderBanner />

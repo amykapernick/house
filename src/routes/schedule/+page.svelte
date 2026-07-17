@@ -2,9 +2,9 @@
 	import { format, startOfWeek, endOfWeek } from 'date-fns';
 	import { SvelteMap } from 'svelte/reactivity';
 	import ScheduleView from '$partials/calendar/ScheduleView.svelte';
-	import FocusTimer from '$parts/FocusTimer.svelte';
 	import FamilyFilter from '$parts/FamilyFilter.svelte';
 	import TaskList from '$parts/tasks/List.svelte';
+	import Skeleton from '$parts/Skeleton.svelte';
 	import { isAuthenticated, getToken } from '$lib/auth';
 	import fetchClientData, { getGraphqlUrl, setCache } from '$utils/fetchClientData';
 	import { EVERYONE, isVisibleToUser } from '$utils/fetchFamilyMembers';
@@ -243,9 +243,8 @@
 </svelte:head>
 
 <h1>Schedule</h1>
-<FocusTimer />
 {#if loading}
-	<p>Loading...</p>
+	<Skeleton rows={3} />
 {:else}
 	<FamilyFilter bind:selectedUserSlug pageKey="schedule" />
 	<ScheduleView

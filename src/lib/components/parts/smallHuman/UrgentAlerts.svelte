@@ -40,7 +40,7 @@
 		padding: 1em;
 		border: 2px solid var(--red);
 		border-radius: 0.5em;
-		background: color-mix(in srgb, var(--red) 12%, white);
+		background: color-mix(in srgb, var(--red) 12%, var(--white_true));
 	}
 
 	.urgent-badge {
@@ -66,14 +66,14 @@
 		padding: 0;
 		border: none;
 		border-radius: 50%;
-		background: transparent;
+		background: var(--transparent);
 		color: var(--red);
 		font-size: 1.1em;
 		line-height: 1;
 		cursor: pointer;
 
 		&:hover {
-			background: color-mix(in srgb, var(--red) 20%, transparent);
+			background: color-mix(in srgb, var(--red) 20%, var(--transparent));
 		}
 	}
 

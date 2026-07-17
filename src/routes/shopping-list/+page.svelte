@@ -4,6 +4,8 @@
 	import { resolve } from '$app/paths';
 	import { SvelteSet } from 'svelte/reactivity';
 	import CheckboxButton from '$parts/CheckboxButton.svelte';
+	import Skeleton from '$parts/Skeleton.svelte';
+	import EmptyState from '$parts/EmptyState.svelte';
 	import { getPageTitle } from '$utils/pageTitle';
 
 	type SubGroup = { name: string; items: any[] };
@@ -167,9 +169,9 @@
 {#if addError}<p class="error">{addError}</p>{/if}
 
 {#if loading}
-	<p>Loading...</p>
+	<Skeleton rows={3} />
 {:else if items.length === 0}
-	<p>Shopping list is empty.</p>
+	<EmptyState title="Shopping list is empty" />
 {:else}
 	<div class="controls">
 		<p class="count">{uncheckedItems.length} items to get</p>
@@ -373,7 +375,7 @@
 		align-items: center;
 		gap: 0.5em;
 		padding: 0.5em 0.3em;
-		border-bottom: 1px solid color-mix(in srgb, var(--grey_light) 50%, transparent);
+		border-bottom: 1px solid color-mix(in srgb, var(--grey_light) 50%, var(--transparent));
 
 		&.checked {
 			opacity: 0.4;
