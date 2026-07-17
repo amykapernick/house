@@ -143,7 +143,7 @@
 			border-top-left-radius: 0;
 			border-bottom-left-radius: 0;
 
-			& svg {
+			& :global(svg) {
 				width: 1em;
 				height: auto;
 			}
@@ -189,7 +189,7 @@
 			white-space: nowrap;
 		}
 
-		& .tag {
+		& :global(.tag) {
 			font-size: 0.7em;
 		}
 

@@ -22,8 +22,7 @@
 </script>
 
 <Card
-	class="card {className}"
-	class:has-dismiss={!!onDismiss}
+	class="card {className} {onDismiss ? 'has-dismiss' : ''}"
 	style="--order: {order}"
 >
 	{#if onDismiss}
@@ -58,7 +57,7 @@
 </Card>
 
 <style>
-	.card {
+	:global(.card) {
 		position: relative;
 		border-radius: 1em;
 		border: 2px solid var(--colour);
@@ -85,7 +84,7 @@
 		grid-area: heading;
 	}
 
-	.card.has-dismiss .heading {
+	:global(.card.has-dismiss) .heading {
 		padding-right: 1.6em;
 	}
 
