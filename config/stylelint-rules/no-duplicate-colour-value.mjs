@@ -231,7 +231,9 @@ const ruleFunction = (enabled) => {
 					node: decl,
 					result,
 					ruleName,
-					fix: () => { decl.value = `var(--${preferred})`; },
+					fix: () => {
+						decl.value = `var(--${preferred})`; 
+					},
 				});
 				return;
 			}

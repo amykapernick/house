@@ -214,14 +214,14 @@
 		& th,
 		& td {
 			padding: 10px;
-			text-align: left;
 			border-bottom: 1px solid var(--grey_light);
+			text-align: left;
 		}
 
 		& th {
-			color: var(--navy_text);
-			background: var(--navy);
 			padding: 0;
+			background: var(--navy);
+			color: var(--navy_text);
 
 			&.amount button {
 				justify-content: flex-end;
@@ -263,8 +263,8 @@
 	}
 
 	.sort-icon {
-		font-size: 0.75em;
 		opacity: 0.5;
+		font-size: 0.75em;
 
 		&.active {
 			opacity: 1;
@@ -307,12 +307,12 @@
 		text-align: center;
 
 		& button {
+			padding: 0.2em 0.5em;
 			border: none;
 			background: none;
 			color: var(--red);
 			font-size: 1.1em;
 			cursor: pointer;
-			padding: 0.2em 0.5em;
 		}
 	}
 

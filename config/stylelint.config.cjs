@@ -62,7 +62,7 @@ module.exports = {
 		'function-calc-no-unspaced-operator': true,
 		'function-url-no-scheme-relative': true,
 		'house/no-duplicate-colour-value': true,
-		'house/no-repeated-value': true,
+		'house/no-repeated-value': [true, { threshold: 3 }],
 		'import-notation': null,
 		'length-zero-no-unit': true,
 		'no-descending-specificity': null,

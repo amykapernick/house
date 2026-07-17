@@ -166,29 +166,28 @@
 		grid-auto-flow: row dense;
 		grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
 		gap: 20px;
-		background: chartreuse;
 
-		:global(& > *:has(ul li:nth-child(4))) {
+		&:global(& > *:has(ul li:nth-child(4))) {
 			grid-row-start: span 2;
 		}
 
-		:global(& > *:has(ul li:nth-child(7))) {
+		&:global(& > *:has(ul li:nth-child(7))) {
 			grid-row-start: span 3;
 		}
 
-		:global(& > *:has(ul li:nth-child(12))) {
+		&:global(& > *:has(ul li:nth-child(12))) {
 			grid-row-start: span 4;
 		}
 
-		:global(& > *:has(ul li:nth-child(16))) {
+		&:global(& > *:has(ul li:nth-child(16))) {
 			grid-row-start: span 4;
 		}
 
-		:global(& > *:has(ul li:nth-child(20))) {
+		&:global(& > *:has(ul li:nth-child(20))) {
 			grid-row-start: span 5;
 		}
 
-		:global(& > *:has(ul li:nth-child(24))) {
+		&:global(& > *:has(ul li:nth-child(24))) {
 			grid-row-start: span 6;
 		}
 	}

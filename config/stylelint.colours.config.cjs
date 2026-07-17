@@ -24,6 +24,6 @@ module.exports = {
 	],
 	rules: {
 		'house/no-duplicate-colour-value': true,
-		'house/no-repeated-value': true,
+		'house/no-repeated-value': [true, { threshold: 3 }],
 	},
 };

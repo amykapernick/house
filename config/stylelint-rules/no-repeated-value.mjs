@@ -120,7 +120,7 @@ const ruleFunction = (enabled, options) => {
 				actual: options,
 				possible: { threshold: [(value) => Number.isInteger(value) && value > 1] },
 				optional: true,
-			},
+			}
 		);
 
 		if (!validOptions || !enabled) return;
