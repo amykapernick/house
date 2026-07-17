@@ -39,3 +39,5 @@ export function parseDeepSearch(query: string): DeepSearchMatch | null {
 	if (scope) return { scope, term: scopeMatch![2].trim().toLowerCase() };
 	return { scope: null, term: rest.toLowerCase() };
 }
+
+// TODO: Add actual search page to allow viewing all results in more depth

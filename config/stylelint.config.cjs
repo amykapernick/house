@@ -1,5 +1,10 @@
 module.exports = {
-	plugins: [`stylelint-order`, `stylelint-use-nesting`, `./stylelint-rules/no-duplicate-colour-value.mjs`],
+	plugins: [
+		`stylelint-order`,
+		`stylelint-use-nesting`,
+		`./stylelint-rules/no-duplicate-colour-value.mjs`,
+		`./stylelint-rules/no-repeated-value.mjs`,
+	],
 	extends: [
 		`stylelint-config-property-sort-order-smacss`,
 		`stylelint-config-standard`,
@@ -57,6 +62,7 @@ module.exports = {
 		'function-calc-no-unspaced-operator': true,
 		'function-url-no-scheme-relative': true,
 		'house/no-duplicate-colour-value': true,
+		'house/no-repeated-value': true,
 		'import-notation': null,
 		'length-zero-no-unit': true,
 		'no-descending-specificity': null,

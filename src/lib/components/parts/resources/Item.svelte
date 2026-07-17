@@ -2,7 +2,7 @@
 	import type { Resource } from '$types/resources';
 	import OP from '$img/icons/1password.svg?component';
 
-	let { name, url, icon, login, description, archived, image, brand, model, external, ipAddress, ramStorage, content, email, phone, lastUsed }: Omit<Resource, 'id' | 'category'> = $props();
+	let { id, name, url, icon, login, description, archived, image, brand, model, external, ipAddress, ramStorage, content, email, phone, lastUsed }: Omit<Resource, 'category'> = $props();
 
 	// TODO: Date parsing, formatting and functions should always use date-fns and will be based on standard format of dates
 	// TODO: Write date format lookup
@@ -13,7 +13,7 @@
 </script>
 
 <li data-archived={archived}>
-	<h3>
+	<h3 {id}>
 		{#if url}
 			<!-- url is an external resource link, not an internal route -->
 			<!-- eslint-disable svelte/no-navigation-without-resolve -->

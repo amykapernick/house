@@ -1,11 +1,23 @@
 <script lang="ts">
-	import type { Colour } from "$types/global";
-	import type { Component, Snippet } from "svelte";
-	import Icon from "./Icon.svelte";
-	import type { IconName } from "./Icon.svelte";
-	import Card from '$parts/Card.svelte'
+	import type { Colour } from '$types/global';
+	import type { Component, Snippet } from 'svelte';
+	import Icon from './Icon.svelte';
+	import type { IconName } from './Icon.svelte';
+	import Card from '$parts/Card.svelte';
 
-	const { title, heading = 3, children, icon, footer, tags, order = 0, IconComponent, iconProps, onDismiss, class: className = '' }: {
+	const {
+		title,
+		heading = 3,
+		children,
+		icon,
+		footer,
+		tags,
+		order = 0,
+		IconComponent,
+		iconProps,
+		onDismiss,
+		class: className = '',
+	}: {
 		title: string;
 		heading?: 2 | 3 | 4 | 5 | 6;
 		children?: Snippet;
@@ -15,7 +27,7 @@
 		iconProps?: Record<string, any>;
 		footer?: string | Snippet;
 		tags?: string;
-		order?: number
+		order?: number;
 		onDismiss?: () => void;
 		class?: string;
 	} = $props();
@@ -26,9 +38,17 @@
 	style="--order: {order}"
 >
 	{#if onDismiss}
-		<button type="button" class="dismiss" onclick={onDismiss} aria-label="Dismiss {title}">&times;</button>
+		<button
+			type="button"
+			class="dismiss"
+			onclick={onDismiss}
+			aria-label="Dismiss {title}">&times;</button
+		>
 	{/if}
-	<svelte:element this={`h${heading}`} class="heading">{title}</svelte:element>
+	<svelte:element
+		this={`h${heading}`}
+		class="heading">{title}</svelte:element
+	>
 	{#if children}
 		<div class="content">{@render children()}</div>
 	{/if}
@@ -64,7 +84,7 @@
 		width: auto;
 		padding: 0.5em 0.75em;
 		color: var(--black);
-		background: color-mix(in srgb, var(--colour) 10%, var(--white_true));
+		background: color-mix(in oklch, var(--colour) 10%, var(--white_true));
 		display: grid;
 		grid-template-rows: auto 1fr auto auto;
 		grid-template-columns: 1fr auto;
@@ -107,7 +127,7 @@
 		cursor: pointer;
 
 		&:hover {
-			background: color-mix(in srgb, var(--colour) 20%, var(--transparent));
+			background: color-mix(in oklch, var(--colour) 20%, var(--transparent));
 		}
 	}
 
@@ -136,7 +156,8 @@
 		font-weight: bolder;
 	}
 
-	.footer, .icon {
+	.footer,
+	.icon {
 		align-self: end;
 	}
 </style>

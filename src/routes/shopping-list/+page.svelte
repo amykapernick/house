@@ -71,12 +71,12 @@
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
-				...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+				...(token ? { Authorization: `Bearer ${token}` } : {}),
 			},
 			body: JSON.stringify({
 				query: `mutation { createShoppingItem(note: ${JSON.stringify(note)}) { success } }`,
 			}),
-		}).then(r => r.json());
+		}).then((r) => r.json());
 
 		adding = false;
 
@@ -98,20 +98,18 @@
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
-				...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+				...(token ? { Authorization: `Bearer ${token}` } : {}),
 			},
 			body: JSON.stringify({
 				query: `mutation { checkShoppingItem(itemId: "${item.id}", source: "${item.source}", checked: ${newChecked}) { success } }`,
 			}),
-		}).then(r => r.json());
+		}).then((r) => r.json());
 
 		checking.delete(item.id);
 
 		if (res?.errors || !res?.data?.checkShoppingItem?.success) return;
 
-		items = items.map(i =>
-			i.id === item.id ? { ...i, checked: newChecked } : i
-		);
+		items = items.map((i) => (i.id === item.id ? { ...i, checked: newChecked } : i));
 		storeGroups = storeGroups.map((store) => ({
 			...store,
 			items: store.items.map((i) => (i.id === item.id ? { ...i, checked: newChecked } : i)),
@@ -126,8 +124,8 @@
 		setCache('shopping-list', { shoppingList: { items, storeGroups } });
 	}
 
-	let uncheckedItems = $derived(items.filter(i => !i.checked));
-	let checkedItems = $derived(items.filter(i => i.checked));
+	let uncheckedItems = $derived(items.filter((i) => !i.checked));
+	let checkedItems = $derived(items.filter((i) => i.checked));
 
 	function sentenceCase(str: string) {
 		return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
@@ -142,9 +140,7 @@
 			.map((store) => ({
 				name: store.name,
 				items: filterItems(store.items),
-				subGroups: store.subGroups
-					.map((sub) => ({ name: sub.name, items: filterItems(sub.items) }))
-					.filter((sub) => sub.items.length > 0),
+				subGroups: store.subGroups.map((sub) => ({ name: sub.name, items: filterItems(sub.items) })).filter((sub) => sub.items.length > 0),
 			}))
 			.filter((store) => store.items.length > 0 || store.subGroups.length > 0);
 	});
@@ -156,7 +152,13 @@
 
 <h1>Shopping List</h1>
 
-<form class="quick-add" onsubmit={(e) => { e.preventDefault(); addItem(); }}>
+<form
+	class="quick-add"
+	onsubmit={(e) => {
+		e.preventDefault();
+		addItem();
+	}}
+>
 	<input
 		type="text"
 		placeholder="Add an item..."
@@ -164,7 +166,10 @@
 		disabled={adding}
 		aria-label="Add an item to the shopping list"
 	/>
-	<button type="submit" disabled={adding || !newItemText.trim()}>{adding ? 'Adding…' : 'Add'}</button>
+	<button
+		type="submit"
+		disabled={adding || !newItemText.trim()}>{adding ? 'Adding…' : 'Add'}</button
+	>
 </form>
 {#if addError}<p class="error">{addError}</p>{/if}
 
@@ -176,13 +181,20 @@
 	<div class="controls">
 		<p class="count">{uncheckedItems.length} items to get</p>
 		<div class="toggle">
-			<input type="checkbox" id="show-checked-items" bind:checked={showChecked} />
+			<input
+				type="checkbox"
+				id="show-checked-items"
+				bind:checked={showChecked}
+			/>
 			<label for="show-checked-items">Show checked items ({checkedItems.length})</label>
 		</div>
 	</div>
 
 	{#each visibleStoreGroups as store (store.name)}
-		<details class="store" open>
+		<details
+			class="store"
+			open
+		>
 			<summary><h2>{sentenceCase(store.name)}</h2></summary>
 
 			{#if store.items.length}
@@ -194,7 +206,10 @@
 			{/if}
 
 			{#each store.subGroups as sub (sub.name)}
-				<details class="sub-group" open>
+				<details
+					class="sub-group"
+					open
+				>
 					<summary><h3>{sub.name}</h3></summary>
 					<ul>
 						{#each sub.items as item (item.id)}
@@ -224,7 +239,10 @@
 			{#if item.recipes?.length}
 				<span class="item-recipes">
 					{#each item.recipes as recipe (recipe.id)}
-						<a href={resolve(`/recipes/[slug]`, { slug: recipe.slug })} class="recipe-tag">{recipe.name}</a>
+						<a
+							href={resolve(`/recipes/[slug]`, { slug: recipe.slug })}
+							class="recipe-tag">{recipe.name}</a
+						>
 					{/each}
 				</span>
 			{/if}
@@ -375,7 +393,7 @@
 		align-items: center;
 		gap: 0.5em;
 		padding: 0.5em 0.3em;
-		border-bottom: 1px solid color-mix(in srgb, var(--grey_light) 50%, var(--transparent));
+		border-bottom: 1px solid color-mix(in oklch, var(--grey_light) 50%, var(--transparent));
 
 		&.checked {
 			opacity: 0.4;

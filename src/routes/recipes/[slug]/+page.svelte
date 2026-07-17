@@ -7,15 +7,7 @@
 	import { formatMinutes } from '$utils/formatMinutes';
 	import { getPageTitle } from '$utils/pageTitle';
 	import Skeleton from '$components/parts/Skeleton.svelte';
-	import {
-		compatibleUnits,
-		convertQuantity,
-		unitFamilyLabel,
-		unitLabel,
-		unitOptionLabel,
-		unitRoot,
-		unitsInFamily,
-	} from '$lib/utils/units';
+	import { compatibleUnits, convertQuantity, unitFamilyLabel, unitLabel, unitOptionLabel, unitRoot, unitsInFamily } from '$lib/utils/units';
 	import type { RecipeIngredientUnit } from '$lib/types/generated';
 
 	let recipe = $state<any>(null);
@@ -46,8 +38,15 @@
 
 	// Common cooking fractions, checked in descending order so eg. 0.75 matches ¾ before ½.
 	const FRACTIONS: [number, string][] = [
-		[7 / 8, '⅞'], [3 / 4, '¾'], [5 / 8, '⅝'], [2 / 3, '⅔'], [1 / 2, '½'],
-		[3 / 8, '⅜'], [1 / 3, '⅓'], [1 / 4, '¼'], [1 / 8, '⅛'],
+		[7 / 8, '⅞'],
+		[3 / 4, '¾'],
+		[5 / 8, '⅝'],
+		[2 / 3, '⅔'],
+		[1 / 2, '½'],
+		[3 / 8, '⅜'],
+		[1 / 3, '⅓'],
+		[1 / 4, '¼'],
+		[1 / 8, '⅛'],
 	];
 
 	function formatQuantity(value: number): string {
@@ -85,9 +84,7 @@
 		if (multiplier === 1 && !converting) return ingredient.display;
 		if (ingredient.quantity == null) return ingredient.display;
 
-		const baseQuantity = converting
-			? (convertQuantity(ingredient.quantity, ingredient.unit, unit!, allUnits) ?? ingredient.quantity)
-			: ingredient.quantity;
+		const baseQuantity = converting ? (convertQuantity(ingredient.quantity, ingredient.unit, unit!, allUnits) ?? ingredient.quantity) : ingredient.quantity;
 		const quantity = baseQuantity * multiplier;
 		const unitText = unit ? unitLabel(unit, quantity) : ingredient.unit;
 		const parts = [formatQuantity(quantity), unitText, ingredient.food].filter(Boolean);
@@ -122,7 +119,10 @@
 	<title>{getPageTitle(recipe?.name ?? `Recipe`)}</title>
 </svelte:head>
 
-<a href={resolve('/recipes')} class="back">← Recipes</a>
+<a
+	href={resolve('/recipes')}
+	class="back">← Recipes</a
+>
 
 {#if loading}
 	<Skeleton rows={3} />
@@ -131,7 +131,11 @@
 {:else}
 	<article>
 		{#if recipe.image}
-			<img class="hero" src={recipe.image} alt={recipe.name} />
+			<img
+				class="hero"
+				src={recipe.image}
+				alt={recipe.name}
+			/>
 		{/if}
 
 		<h1>{recipe.name}</h1>
@@ -165,15 +169,15 @@
 				<div class="ingredients-header">
 					<h2>Ingredients</h2>
 					<div class="scale-bar">
-					<!-- TODO: Style recipe scale -->
+						<!-- TODO: Style recipe scale -->
 						<span class="label">Scale</span>
 						{#each SCALE_PRESETS as preset (preset)}
 							<button
 								type="button"
 								class="scale-btn"
 								class:active={multiplier === preset}
-								onclick={() => (multiplier = preset)}
-							>×{preset}</button>
+								onclick={() => (multiplier = preset)}>×{preset}</button
+							>
 						{/each}
 						<input
 							type="number"
@@ -227,11 +231,14 @@
 										onchange={() => (checkedIngredients[i] = !checkedIngredients[i])}
 										aria-label={`Mark ${ingredient.food ?? ingredient.display} as done`}
 									/>
-									<label class="check-label" for="ingredient-{i}">
+									<label
+										class="check-label"
+										for="ingredient-{i}"
+									>
 										<span>{scaledIngredientText(ingredient, i)}</span>
 									</label>
 									{#if options.length}
-									<!-- TODO: Style ingredient unit selection -->
+										<!-- TODO: Style ingredient unit selection -->
 										<select
 											class="unit-select"
 											aria-label={`Convert unit for ${ingredient.food ?? ingredient.display}`}
@@ -266,7 +273,10 @@
 									onchange={() => (checkedSteps[i] = !checkedSteps[i])}
 									aria-label={`Mark step ${i + 1} as done`}
 								/>
-								<label class="check-label" for="step-{i}">
+								<label
+									class="check-label"
+									for="step-{i}"
+								>
 									<span>
 										{#if step.title}<strong>{step.title}</strong>{/if}
 										<p>{step.text}</p>
@@ -281,17 +291,38 @@
 			</section>
 		</div>
 
-		{#if recipe.nutrition && Object.values(recipe.nutrition).some(v => v != null)}
+		{#if recipe.nutrition && Object.values(recipe.nutrition).some((v) => v != null)}
 			<section class="nutrition">
 				<h2>Nutrition</h2>
 				<dl>
-					{#if recipe.nutrition.calories}<div><dt>Calories</dt><dd>{recipe.nutrition.calories}</dd></div>{/if}
-					{#if recipe.nutrition.proteinContent}<div><dt>Protein</dt><dd>{recipe.nutrition.proteinContent}</dd></div>{/if}
-					{#if recipe.nutrition.carbohydrateContent}<div><dt>Carbs</dt><dd>{recipe.nutrition.carbohydrateContent}</dd></div>{/if}
-					{#if recipe.nutrition.fatContent}<div><dt>Fat</dt><dd>{recipe.nutrition.fatContent}</dd></div>{/if}
-					{#if recipe.nutrition.fiberContent}<div><dt>Fiber</dt><dd>{recipe.nutrition.fiberContent}</dd></div>{/if}
-					{#if recipe.nutrition.sugarContent}<div><dt>Sugar</dt><dd>{recipe.nutrition.sugarContent}</dd></div>{/if}
-					{#if recipe.nutrition.sodiumContent}<div><dt>Sodium</dt><dd>{recipe.nutrition.sodiumContent}</dd></div>{/if}
+					{#if recipe.nutrition.calories}<div>
+							<dt>Calories</dt>
+							<dd>{recipe.nutrition.calories}</dd>
+						</div>{/if}
+					{#if recipe.nutrition.proteinContent}<div>
+							<dt>Protein</dt>
+							<dd>{recipe.nutrition.proteinContent}</dd>
+						</div>{/if}
+					{#if recipe.nutrition.carbohydrateContent}<div>
+							<dt>Carbs</dt>
+							<dd>{recipe.nutrition.carbohydrateContent}</dd>
+						</div>{/if}
+					{#if recipe.nutrition.fatContent}<div>
+							<dt>Fat</dt>
+							<dd>{recipe.nutrition.fatContent}</dd>
+						</div>{/if}
+					{#if recipe.nutrition.fiberContent}<div>
+							<dt>Fiber</dt>
+							<dd>{recipe.nutrition.fiberContent}</dd>
+						</div>{/if}
+					{#if recipe.nutrition.sugarContent}<div>
+							<dt>Sugar</dt>
+							<dd>{recipe.nutrition.sugarContent}</dd>
+						</div>{/if}
+					{#if recipe.nutrition.sodiumContent}<div>
+							<dt>Sodium</dt>
+							<dd>{recipe.nutrition.sodiumContent}</dd>
+						</div>{/if}
 				</dl>
 			</section>
 		{/if}
@@ -322,7 +353,11 @@
 		<div class="footer-meta">
 			{#if recipe.orgURL}
 				<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- orgURL is the external source recipe page, not an internal route -->
-				<a href={recipe.orgURL} target="_blank" rel="noreferrer">Original recipe</a>
+				<a
+					href={recipe.orgURL}
+					target="_blank"
+					rel="noreferrer">Original recipe</a
+				>
 			{/if}
 			{#if recipe.dateAdded}<span>Added: {format(parseISO(recipe.dateAdded), 'd MMM yyyy')}</span>{/if}
 			{#if recipe.lastMade}<span>Last made: {format(parseISO(recipe.lastMade), 'd MMM yyyy')}</span>{/if}
@@ -369,7 +404,7 @@
 		gap: 1.5em;
 		margin-bottom: 1em;
 		padding: 0.8em;
-		background: color-mix(in srgb, var(--blue) 8%, var(--transparent));
+		background: color-mix(in oklch, var(--blue) 8%, var(--transparent));
 		border-radius: 0.3em;
 	}
 
@@ -601,7 +636,7 @@
 
 		& div {
 			padding: 0.5em;
-			background: color-mix(in srgb, var(--blue) 8%, var(--transparent));
+			background: color-mix(in oklch, var(--blue) 8%, var(--transparent));
 			border-radius: 0.3em;
 		}
 
@@ -620,7 +655,7 @@
 	.note {
 		padding: 0.5em;
 		margin: 0.3em 0;
-		background: color-mix(in srgb, var(--orange) 8%, var(--transparent));
+		background: color-mix(in oklch, var(--orange) 8%, var(--transparent));
 		border-radius: 0.3em;
 
 		& p {
@@ -637,7 +672,7 @@
 
 		& li {
 			padding: 0.3em 0.7em;
-			background: color-mix(in srgb, var(--blue) 8%, var(--transparent));
+			background: color-mix(in oklch, var(--blue) 8%, var(--transparent));
 			border-radius: 0.3em;
 			font-size: 0.9em;
 		}

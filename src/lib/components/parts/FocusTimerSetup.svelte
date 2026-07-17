@@ -98,7 +98,7 @@
 
 			&:has(input[type='radio']:checked) {
 				background: color-mix(in oklch, color-mix(in oklch, var(--light_purple_bright) 91%, var(--black)) 10%, var(--transparent));
-				border-color: color-mix(in oklch, var(--light_purple_bright) 91%, var(--black));
+				border-color: var(--purple_solid_flat);
 			}
 
 			&:focus-within {
@@ -126,7 +126,7 @@
 
 		.preset_description {
 			font-size: 0.85em;
-			color: color-mix(in oklch, var(--grey) 84%, var(--black));
+			color: var(--text_secondary);
 			font-weight: 400;
 			grid-column: 2;
 		}

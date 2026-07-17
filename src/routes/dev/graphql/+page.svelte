@@ -37,13 +37,8 @@
 		try {
 			const res = await runOperation(view.state.doc.toString());
 			result = JSON.stringify(res, null, 2);
-		}
-		catch (err) {
-			result = JSON.stringify(
-				{ errors: [{ message: err instanceof Error ? err.message : `Request failed` }] },
-				null,
-				2
-			);
+		} catch (err) {
+			result = JSON.stringify({ errors: [{ message: err instanceof Error ? err.message : `Request failed` }] }, null, 2);
 		}
 		running = false;
 	}
@@ -100,17 +95,31 @@
 	<div class="console">
 		<header class="toolbar">
 			<h1>GraphQL Console</h1>
-			<span class="status" data-ok={$isAuthenticated}>
+			<span
+				class="status"
+				data-ok={$isAuthenticated}
+			>
 				{$isAuthenticated ? `Authenticated` : `Not signed in`}
 			</span>
 			{#if schemaLoading}
 				<span class="status">Loading schema...</span>
 			{:else if schemaError}
-				<span class="status" data-ok={false}>Schema unavailable: {schemaError}</span>
+				<span
+					class="status"
+					data-ok={false}>Schema unavailable: {schemaError}</span
+				>
 			{:else}
-				<span class="status" data-ok={true}>Schema loaded</span>
+				<span
+					class="status"
+					data-ok={true}>Schema loaded</span
+				>
 			{/if}
-			<button type="button" class="run" onclick={execute} disabled={running}>
+			<button
+				type="button"
+				class="run"
+				onclick={execute}
+				disabled={running}
+			>
 				{#if running}
 					Running...
 				{:else}
@@ -119,7 +128,10 @@
 			</button>
 		</header>
 		<div class="panes">
-			<div class="editor" bind:this={editorEl}></div>
+			<div
+				class="editor"
+				bind:this={editorEl}
+			></div>
 			<pre class="result">{result || `Results will appear here.`}</pre>
 		</div>
 	</div>
@@ -174,7 +186,7 @@
 		& kbd {
 			padding: 0.1em 0.4em;
 			margin-left: 0.3em;
-			border: 1px solid color-mix(in srgb, currentColor 40%, var(--transparent));
+			border: 1px solid color-mix(in oklch, currentColor 40%, var(--transparent));
 			border-radius: 0.25em;
 			font-family: inherit;
 			font-size: 0.85em;

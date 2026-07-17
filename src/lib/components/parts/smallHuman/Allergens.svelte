@@ -16,21 +16,21 @@
 		class: className = '',
 	}: {
 		allergens: any[];
-		completeAllergen: (id: string) => void,
+		completeAllergen: (id: string) => void;
 		completing: Set<string>;
 		class?: string;
 	} = $props();
 
 	const Allergens: Record<string, any> = {
-		'Gluten': Wheat,
-		'Dairy': Cow,
-		'Sesame': Sesame,
-		'Shellfish': Prawn,
-		'Fish': Fish,
-		'Egg': Egg,
-		'Nuts': Peanut,
-		'Soy': SoySauce
-	}
+		Gluten: Wheat,
+		Dairy: Cow,
+		Sesame: Sesame,
+		Shellfish: Prawn,
+		Fish: Fish,
+		Egg: Egg,
+		Nuts: Peanut,
+		Soy: SoySauce,
+	};
 
 	function allergenDueLabel(daysUntilDue: number | null, due: string | null): string {
 		if (daysUntilDue == null || !due) return '';
@@ -62,7 +62,7 @@
 {/if}
 
 <style>
-@import '@mixins';
+	@import '@mixins';
 
 	.list {
 		display: flex;
@@ -87,7 +87,7 @@
 		color: var(--black);
 		font-size: 0.9em;
 		transition: opacity 0.15s;
-		background: color-mix(in srgb, var(--colour) 15%, var(--white_true));
+		background: color-mix(in oklch, var(--colour) 15%, var(--white_true));
 
 		&:disabled {
 			opacity: 0.4;

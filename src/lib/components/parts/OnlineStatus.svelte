@@ -99,7 +99,7 @@
 		padding: 0.7em 1em;
 		margin: 0;
 		align-items: center;
-		color: color-mix(in oklch, var(--grey) 84%, var(--black));
+		color: var(--text_secondary);
 		font-weight: 600;
 		font-size: 0.8em;
 		height: 2.7em;

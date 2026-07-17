@@ -22,38 +22,38 @@
 
 &[data-theme='light'] {
 	--page_bg: var(--background);
-	--sidebar_bg: color-mix(in srgb, var(--background) 90%, var(--black));
-	--border: color-mix(in srgb, var(--background) 78%, var(--black));
+	--sidebar_bg: color-mix(in oklch, var(--background) 90%, var(--black));
+	--border: color-mix(in oklch, var(--background) 78%, var(--black));
 	--text_primary: var(--black);
-	--text_secondary: color-mix(in srgb, var(--grey) 84%, var(--black));
-	--text_muted: color-mix(in srgb, var(--grey) 84%, var(--black));
+	--text_secondary: color-mix(in oklch, var(--grey) 84%, var(--black));
+	--text_muted: color-mix(in oklch, var(--grey) 84%, var(--black));
 	--base_colour: var(--white);
 	--card_top: var(--white);
-	--card_bottom: color-mix(in srgb, var(--white) 70%, var(--background));
-	--row_border: color-mix(in srgb, var(--background) 92%, var(--black));
-	--row_hover: color-mix(in srgb, var(--white) 85%, var(--background));
+	--card_bottom: color-mix(in oklch, var(--white) 70%, var(--background));
+	--row_border: color-mix(in oklch, var(--background) 92%, var(--black));
+	--row_hover: color-mix(in oklch, var(--white) 85%, var(--background));
 	--accent_blue: var(--blue_navy);
-	--nav_hover_bg: color-mix(in srgb, var(--background) 82%, var(--black));
-	--error_bg: color-mix(in srgb, var(--light_red) 12%, var(--white));
-	--error: color-mix(in srgb, var(--light_red) 92%, var(--black));
-	--warning: color-mix(in srgb, var(--orange_dark) 74%, var(--black));
-	--warning_bg: color-mix(in srgb, var(--orange_dark) 12%, var(--white));
-	--info_bg: color-mix(in srgb, var(--navy) 12%, var(--white));
-	--info: color-mix(in srgb, var(--navy) 92%, var(--black));
-	--purple_bright_bg: color-mix(in srgb, var(--purple_bright) 12%, var(--white));
-	--stripe_a: color-mix(in srgb, var(--background) 90%, var(--black));
+	--nav_hover_bg: color-mix(in oklch, var(--background) 82%, var(--black));
+	--error_bg: color-mix(in oklch, var(--light_red) 12%, var(--white));
+	--error: color-mix(in oklch, var(--light_red) 92%, var(--black));
+	--warning: color-mix(in oklch, var(--orange_dark) 74%, var(--black));
+	--warning_bg: color-mix(in oklch, var(--orange_dark) 12%, var(--white));
+	--info_bg: color-mix(in oklch, var(--navy) 12%, var(--white));
+	--info: color-mix(in oklch, var(--navy) 92%, var(--black));
+	--purple_bright_bg: color-mix(in oklch, var(--purple_bright) 12%, var(--white));
+	--stripe_a: color-mix(in oklch, var(--background) 90%, var(--black));
 	--stripe_b: var(--background);
-	--photo_label_bg: color-mix(in srgb, var(--white) 80%, transparent);
-	--input_bg: color-mix(in srgb, var(--white) 70%, var(--background));
+	--photo_label_bg: color-mix(in oklch, var(--white) 80%, transparent);
+	--input_bg: color-mix(in oklch, var(--white) 70%, var(--background));
 	--input_border: var(--border);
-	--purple_solid_flat: color-mix(in srgb, var(--light_purple_bright) 91%, var(--black));
-	--success: color-mix(in srgb, var(--green_dark) 74%, var(--black));
-	--success_bg: color-mix(in srgb, var(--green_dark) 12%, var(--white));
+	--purple_solid_flat: color-mix(in oklch, var(--light_purple_bright) 91%, var(--black));
+	--success: color-mix(in oklch, var(--green_dark) 74%, var(--black));
+	--success_bg: color-mix(in oklch, var(--green_dark) 12%, var(--white));
 	--table_header_bg: var(--blue_navy);
 	--table_header_text: var(--white);
-	--table_stripe: color-mix(in srgb, var(--background) 90%, var(--white));
-	--missed_bg: color-mix(in srgb, var(--light_red) 35%, var(--background));
-	--not_due_bg: color-mix(in srgb, var(--background) 82%, var(--black));
+	--table_stripe: color-mix(in oklch, var(--background) 90%, var(--white));
+	--missed_bg: color-mix(in oklch, var(--light_red) 35%, var(--background));
+	--not_due_bg: color-mix(in oklch, var(--background) 82%, var(--black));
 	--gradient_nav_active_bg: linear-gradient(
 		180deg,
 		color-mix(in oklch, var(--background) 60%, var(--white)) 0%,
@@ -65,34 +65,34 @@
 
 &[data-theme='dark'] {
 	--page_bg: var(--dark_background);
-	--sidebar_bg: color-mix(in srgb, var(--dark_background) 90%, var(--white));
-	--border: color-mix(in srgb, var(--dark_background) 78%, var(--white));
-	--text_primary: color-mix(in srgb, var(--white) 92%, var(--black));
+	--sidebar_bg: color-mix(in oklch, var(--dark_background) 90%, var(--white));
+	--border: color-mix(in oklch, var(--dark_background) 78%, var(--white));
+	--text_primary: color-mix(in oklch, var(--white) 92%, var(--black));
 	--text_secondary: var(--grey_light);
-	--text_muted: color-mix(in srgb, var(--grey_light) 85%, var(--dark_background));
+	--text_muted: color-mix(in oklch, var(--grey_light) 85%, var(--dark_background));
 	--base_colour: #1f242d;
-	--card_top: color-mix(in srgb, var(--dark_background) 85%, var(--white));
-	--card_bottom: color-mix(in srgb, var(--dark_background) 90%, var(--white));
-	--row_border: color-mix(in srgb, var(--dark_background) 80%, var(--white));
-	--row_hover: color-mix(in srgb, var(--dark_background) 86%, var(--white));
-	--accent_blue: color-mix(in srgb, var(--dark_navy) 90%, var(--white));
-	--nav_hover_bg: color-mix(in srgb, var(--dark_background) 75%, var(--white));
-	--error_bg: color-mix(in srgb, var(--dark_red) 16%, var(--dark_background));
-	--error: color-mix(in srgb, var(--dark_red) 92%, var(--white));
+	--card_top: color-mix(in oklch, var(--dark_background) 85%, var(--white));
+	--card_bottom: color-mix(in oklch, var(--dark_background) 90%, var(--white));
+	--row_border: color-mix(in oklch, var(--dark_background) 80%, var(--white));
+	--row_hover: color-mix(in oklch, var(--dark_background) 86%, var(--white));
+	--accent_blue: color-mix(in oklch, var(--dark_navy) 90%, var(--white));
+	--nav_hover_bg: color-mix(in oklch, var(--dark_background) 75%, var(--white));
+	--error_bg: color-mix(in oklch, var(--dark_red) 16%, var(--dark_background));
+	--error: color-mix(in oklch, var(--dark_red) 92%, var(--white));
 	--warning: var(--dark_orange);
-	--stripe_a: color-mix(in srgb, var(--dark_background) 88%, var(--white));
-	--stripe_b: color-mix(in srgb, var(--dark_background) 90%, var(--white));
-	--photo_label_bg: color-mix(in srgb, var(--black) 60%, transparent);
-	--input_bg: color-mix(in srgb, var(--dark_background) 82%, var(--white));
+	--stripe_a: color-mix(in oklch, var(--dark_background) 88%, var(--white));
+	--stripe_b: color-mix(in oklch, var(--dark_background) 90%, var(--white));
+	--photo_label_bg: color-mix(in oklch, var(--black) 60%, transparent);
+	--input_bg: color-mix(in oklch, var(--dark_background) 82%, var(--white));
 	--input_border: var(--border);
-	--purple_solid_flat: color-mix(in srgb, var(--dark_purple_bright) 53%, var(--black));
-	--success: color-mix(in srgb, var(--dark_green) 94%, var(--white));
-	--success_bg: color-mix(in srgb, var(--dark_green) 18%, var(--dark_background));
-	--table_header_bg: color-mix(in srgb, var(--dark_navy) 48%, var(--dark_background));
-	--table_header_text: color-mix(in srgb, var(--white) 92%, var(--black));
-	--table_stripe: color-mix(in srgb, var(--dark_background) 90%, var(--white));
-	--missed_bg: color-mix(in srgb, var(--dark_red) 40%, var(--dark_background));
-	--not_due_bg: color-mix(in srgb, var(--dark_background) 75%, var(--white));
+	--purple_solid_flat: color-mix(in oklch, var(--dark_purple_bright) 53%, var(--black));
+	--success: color-mix(in oklch, var(--dark_green) 94%, var(--white));
+	--success_bg: color-mix(in oklch, var(--dark_green) 18%, var(--dark_background));
+	--table_header_bg: color-mix(in oklch, var(--dark_navy) 48%, var(--dark_background));
+	--table_header_text: color-mix(in oklch, var(--white) 92%, var(--black));
+	--table_stripe: color-mix(in oklch, var(--dark_background) 90%, var(--white));
+	--missed_bg: color-mix(in oklch, var(--dark_red) 40%, var(--dark_background));
+	--not_due_bg: color-mix(in oklch, var(--dark_background) 75%, var(--white));
 	--gradient_nav_active_bg: linear-gradient(
 		180deg,
 		color-mix(in oklch, var(--dark_background) 60%, var(--white)) 0%,

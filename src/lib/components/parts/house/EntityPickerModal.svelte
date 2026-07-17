@@ -1,4 +1,7 @@
-<script lang="ts" generics="T extends { id: string }">
+<script
+	lang="ts"
+	generics="T extends { id: string }"
+>
 	import type { Snippet } from 'svelte';
 	import Modal from '$parts/Modal.svelte';
 
@@ -19,21 +22,30 @@
 	} = $props();
 </script>
 
-<Modal bind:open {title}>
+<Modal
+	bind:open
+	{title}
+>
 	{#if entities.length === 0}
 		<p>{@render emptyMessage()}</p>
 	{:else}
 		<ul class="picker_list">
 			{#each entities as entity (entity.id)}
 				<li>
-					<button type="button" onclick={() => onPick(entity)}>
+					<button
+						type="button"
+						onclick={() => onPick(entity)}
+					>
 						{@render label(entity)}
 					</button>
 				</li>
 			{/each}
 		</ul>
 	{/if}
-	<button type="button" onclick={() => (open = false)}>Cancel</button>
+	<button
+		type="button"
+		onclick={() => (open = false)}>Cancel</button
+	>
 </Modal>
 
 <style>
@@ -60,7 +72,7 @@
 			cursor: pointer;
 
 			&:hover {
-				background: color-mix(in srgb, var(--purple_bright) 8%, var(--transparent));
+				background: color-mix(in oklch, var(--purple_bright) 8%, var(--transparent));
 			}
 		}
 	}

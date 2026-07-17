@@ -25,6 +25,10 @@ const messages = stylelint.utils.ruleMessages(ruleName, {
 		`Colour "${value}" duplicates existing variable${varNames.length > 1 ? `s` : ``} ${varNames
 			.map((name) => `var(--${name})`)
 			.join(` / `)} - use the variable instead of the literal value`,
+	rejectedCompound: (value, varNames) =>
+		`Value "${value}" duplicates existing variable${varNames.length > 1 ? `s` : ``} ${varNames
+			.map((name) => `var(--${name})`)
+			.join(` / `)} - use the variable instead of repeating the full expression`,
 });
 
 const meta = {
@@ -69,6 +73,20 @@ const normalizeColour = (value) => {
 	return parsed.isValid() ? parsed.toRgbString() : null;
 };
 
+// Whitespace-insensitive key for matching a whole compound expression
+// (gradient/color-mix/etc.) against a variable's declared value - source
+// files format multi-value declarations across lines, call sites don't.
+// Purely syntactic: `color-mix(in oklch, ...)` won't match an otherwise
+// identical `color-mix(in srgb, ...)`, by design (see rule doc comment).
+/** @param {string} value */
+const normalizeCompoundValue = (value) => value.trim().replace(/\s+/g, ` `);
+
+// A bare `var(--x)` (optionally with a fallback) is a semantic alias, eg.
+// `--amy: var(--purple_bright)` - not a compound colour formula. Using the
+// base name where the alias exists is a legitimate, unrelated style choice,
+// so these never enter the compound map.
+const BARE_VAR_RE = /^var\(--[a-zA-Z0-9_-]+(?:\s*,.*)?\)$/;
+
 // `_text` vars are per-colour computed contrast fallbacks (see
 // buildColoursCss.js) - they're allowed to coincide with a plain literal
 // used for an unrelated purpose (eg. a generic gradient mix), so they're not
@@ -83,11 +101,12 @@ const preferredNames = (names) => {
 	return plain.length ? plain : names;
 };
 
-let cachedMap = null;
+let cachedMaps = null;
 let cachedAt = 0;
 
 const buildColourMap = () => {
 	const map = new Map();
+	const compoundMap = new Map();
 
 	for (const file of COLOUR_SOURCE_FILES) {
 		let contents;
@@ -104,29 +123,41 @@ const buildColourMap = () => {
 			if (isTextVar(name)) continue;
 
 			const normalized = normalizeColour(rawValue);
-			if (!normalized) continue; // not a literal colour (eg. a var() reference, gradient(), color-mix())
+			if (normalized) {
+				const existing = map.get(normalized) ?? [];
+				if (!existing.includes(name)) existing.push(name);
+				map.set(normalized, existing);
+				continue;
+			}
 
-			const existing = map.get(normalized) ?? [];
+			// Not a bare colour. Skip semantic aliases (a single var() ref) -
+			// only real compound expressions (gradient(), color-mix(), light-dark(),
+			// ...) are worth matching whole.
+			const trimmedValue = rawValue.trim();
+			if (BARE_VAR_RE.test(trimmedValue)) continue;
+
+			const key = normalizeCompoundValue(rawValue);
+			const existing = compoundMap.get(key) ?? [];
 			if (!existing.includes(name)) existing.push(name);
-			map.set(normalized, existing);
+			compoundMap.set(key, existing);
 		}
 	}
 
-	return map;
+	return { map, compoundMap };
 };
 
 // Re-read the (tiny) colour source files at most once a second rather than
 // once per rule instantiation, so `vite dev` regenerating colours.generated.css
 // is picked up without needing to restart the stylelint watcher/extension.
-const getColourMap = () => {
+const getColourMaps = () => {
 	const now = Date.now();
 
-	if (!cachedMap || now - cachedAt > 1000) {
-		cachedMap = buildColourMap();
+	if (!cachedMaps || now - cachedAt > 1000) {
+		cachedMaps = buildColourMap();
 		cachedAt = now;
 	}
 
-	return cachedMap;
+	return cachedMaps;
 };
 
 /** Finds every standalone colour token in a declaration value: word nodes (hex, named keywords, `transparent`) and whole colour-function calls (rgb/hsl/hwb/lab/lch). Returns each token's source span (rather than just its text) so a fix can splice `var(--name)` in over exactly that span. @param {string} value */
@@ -162,16 +193,11 @@ const ruleFunction = (enabled) => {
 		const filePath = root.source?.input?.file ? path.normalize(root.source.input.file) : null;
 		if (filePath && COLOUR_SOURCE_FILES.includes(filePath)) return;
 
-		const colourMap = getColourMap();
-		if (colourMap.size === 0) return;
+		const { map: colourMap, compoundMap } = getColourMaps();
+		if (colourMap.size === 0 && compoundMap.size === 0) return;
 
 		root.walkDecls((decl) => {
-			// Fix callbacks (only invoked in `--fix` mode) push here instead of
-			// mutating decl.value immediately - later tokens' spans are computed
-			// against the *original* string, so edits must be applied in one
-			// right-to-left pass afterwards to avoid earlier splices shifting
-			// the source positions of tokens still to come.
-			const edits = [];
+			const tokenMatches = [];
 
 			for (const { start, end } of collectColourTokens(decl.value)) {
 				const raw = decl.value.slice(start, end);
@@ -181,6 +207,45 @@ const ruleFunction = (enabled) => {
 				const names = colourMap.get(normalized);
 				if (!names) continue;
 
+				tokenMatches.push({ start, end, raw, names });
+			}
+
+			// Build the value as it'd read once every literal token above is
+			// swapped for its variable, and check *that* against known compound
+			// expressions - source vars like `--border` are themselves written
+			// with var() refs, so this only has a chance of matching post-substitution.
+			let substituted = decl.value;
+			if (tokenMatches.length) {
+				const sortedDesc = [...tokenMatches].sort((a, b) => b.start - a.start);
+				for (const { start, end, names } of sortedDesc) {
+					substituted = substituted.slice(0, start) + `var(--${preferredNames(names)[0]})` + substituted.slice(end);
+				}
+			}
+
+			const compoundNames = compoundMap.get(normalizeCompoundValue(substituted));
+			if (compoundNames) {
+				const [preferred] = preferredNames(compoundNames);
+
+				stylelint.utils.report({
+					message: messages.rejectedCompound(decl.value, preferredNames(compoundNames)),
+					node: decl,
+					result,
+					ruleName,
+					fix: () => { decl.value = `var(--${preferred})`; },
+				});
+				return;
+			}
+
+			if (!tokenMatches.length) return;
+
+			// Fix callbacks (only invoked in `--fix` mode) push here instead of
+			// mutating decl.value immediately - later tokens' spans are computed
+			// against the *original* string, so edits must be applied in one
+			// right-to-left pass afterwards to avoid earlier splices shifting
+			// the source positions of tokens still to come.
+			const edits = [];
+
+			for (const { start, end, raw, names } of tokenMatches) {
 				const [preferred] = preferredNames(names);
 
 				stylelint.utils.report({

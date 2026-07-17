@@ -27,7 +27,10 @@
 	}
 </script>
 
-<section class="palette {className}" aria-label="{season} recipes">
+<section
+	class="palette {className}"
+	aria-label="{season} recipes"
+>
 	<h2>{season} recipes</h2>
 
 	{#if loading}
@@ -49,15 +52,24 @@
 			onfinalize={handleFinalize}
 		>
 			{#each paletteItems as item (item.id)}
-				<div class="card" animate:flip={{ duration: MEAL_PLANNING_FLIP_MS }} aria-label={item.recipe.name}>
+				<div
+					class="card"
+					animate:flip={{ duration: MEAL_PLANNING_FLIP_MS }}
+					aria-label={item.recipe.name}
+				>
 					{#if item.recipe.image}
-						<img src={item.recipe.image} alt={item.recipe.name} loading="lazy" />
+						<img
+							src={item.recipe.image}
+							alt={item.recipe.name}
+							loading="lazy"
+						/>
 					{/if}
 					<span class="name">{item.recipe.name}</span>
 					{#if item.recipe.totalTime || item.recipe.servings}
 						<span class="meta">
 							{#if item.recipe.totalTime}{formatMinutes(item.recipe.totalTime)}{/if}
-							{#if item.recipe.servings} · {item.recipe.servings} servings{/if}
+							{#if item.recipe.servings}
+								· {item.recipe.servings} servings{/if}
 						</span>
 					{/if}
 				</div>
@@ -72,7 +84,7 @@
 	.palette {
 		margin-bottom: 1.5em;
 		padding: 1em;
-		background: color-mix(in srgb, var(--purple_bright) 4%, var(--transparent));
+		background: color-mix(in oklch, var(--purple_bright) 4%, var(--transparent));
 		border-radius: 0.5em;
 		border: 1px solid var(--grey_light);
 

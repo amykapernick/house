@@ -2,13 +2,7 @@
 	import { dndzone } from 'svelte-dnd-action';
 	import { flip } from 'svelte/animate';
 	import { format } from 'date-fns';
-	import {
-		MEAL_PLANNING_DND_TYPE,
-		MEAL_PLANNING_FLIP_MS,
-		resolveDroppedItem,
-		type PlanningDndItem,
-		type ExistingDndItem,
-	} from '$utils/mealPlanningDnd';
+	import { MEAL_PLANNING_DND_TYPE, MEAL_PLANNING_FLIP_MS, resolveDroppedItem, type PlanningDndItem, type ExistingDndItem } from '$utils/mealPlanningDnd';
 	import { formatMinutes } from '$utils/formatMinutes';
 
 	let {
@@ -46,7 +40,10 @@
 	}
 </script>
 
-<div class="day {className}" class:today={isToday}>
+<div
+	class="day {className}"
+	class:today={isToday}
+>
 	<h2>
 		{label}
 		<span class="date">{displayDate}</span>
@@ -63,16 +60,30 @@
 			<p class="empty">Drop a recipe here</p>
 		{/if}
 		{#each items as item (item.id)}
-			<div class="meal" class:draft={item.kind === `draft`} animate:flip={{ duration: MEAL_PLANNING_FLIP_MS }}>
+			<div
+				class="meal"
+				class:draft={item.kind === `draft`}
+				animate:flip={{ duration: MEAL_PLANNING_FLIP_MS }}
+			>
 				<div class="meal-header">
 					<span class="meal-type">{item.entryType}</span>
 					{#if item.kind === `draft`}
 						<span class="new-badge">New</span>
-						<button type="button" class="remove-btn" onclick={() => removeDraft(item.id)} aria-label="Remove {item.recipe.name}">
+						<button
+							type="button"
+							class="remove-btn"
+							onclick={() => removeDraft(item.id)}
+							aria-label="Remove {item.recipe.name}"
+						>
 							×
 						</button>
 					{:else}
-						<button type="button" class="edit-btn" onclick={() => onEditItem?.(item)} aria-label="Edit meal">✎</button>
+						<button
+							type="button"
+							class="edit-btn"
+							onclick={() => onEditItem?.(item)}
+							aria-label="Edit meal">✎</button
+						>
 					{/if}
 				</div>
 				{#if item.recipe}
@@ -80,7 +91,8 @@
 					{#if item.recipe.totalTime || item.recipe.servings}
 						<span class="recipe-meta">
 							{#if item.recipe.totalTime}{formatMinutes(item.recipe.totalTime)}{/if}
-							{#if item.recipe.servings} · {item.recipe.servings} servings{/if}
+							{#if item.recipe.servings}
+								· {item.recipe.servings} servings{/if}
 						</span>
 					{/if}
 				{:else if item.kind === `existing` && item.title}
@@ -91,7 +103,11 @@
 		{/each}
 	</div>
 
-	<button type="button" class="add-meal" onclick={() => onAddMeal?.()}>+ Add meal</button>
+	<button
+		type="button"
+		class="add-meal"
+		onclick={() => onAddMeal?.()}>+ Add meal</button
+	>
 
 	{#if eveningEvents.length}
 		<ul class="evening-events">
@@ -116,7 +132,7 @@
 
 		&.today {
 			border-color: var(--purple_bright);
-			background: color-mix(in srgb, var(--purple_bright) 4%, var(--transparent));
+			background: color-mix(in oklch, var(--purple_bright) 4%, var(--transparent));
 		}
 
 		& h2 {
@@ -146,7 +162,7 @@
 	.meal {
 		margin-bottom: 0.5em;
 		padding: 0.4em;
-		background: color-mix(in srgb, var(--blue) 6%, var(--transparent));
+		background: color-mix(in oklch, var(--blue) 6%, var(--transparent));
 		border-radius: 0.3em;
 		cursor: grab;
 

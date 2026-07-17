@@ -83,7 +83,7 @@
 		padding: 0;
 		border: none;
 		background: none;
-		color: color-mix(in oklch, var(--grey) 84%, var(--black));
+		color: var(--text_secondary);
 		font-size: 1em;
 		font-weight: 600;
 		text-transform: capitalize;

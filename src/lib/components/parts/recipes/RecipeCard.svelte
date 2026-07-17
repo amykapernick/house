@@ -10,7 +10,7 @@
 		description?: string | null;
 		totalTime?: number | string | null;
 		servings?: number | null;
-		tags?: { name: string, slug: string }[] | null;
+		tags?: { name: string; slug: string }[] | null;
 	};
 
 	let {
@@ -23,17 +23,28 @@
 		/** `compact` is used for the dashboard's smaller widget grid - shorter image, smaller type, h3 instead of h2. */
 		size?: `default` | `compact`;
 		dayLabel?: string;
-		tags?: Snippet<[{ name: string, slug: string }[]]>;
+		tags?: Snippet<[{ name: string; slug: string }[]]>;
 	} = $props();
 </script>
 
-<a class="card" class:compact={size === `compact`} href={resolve(`/recipes/[slug]`, { slug: recipe.slug })}>
+<a
+	class="card"
+	class:compact={size === `compact`}
+	href={resolve(`/recipes/[slug]`, { slug: recipe.slug })}
+>
 	{#if recipe.image}
-		<img src={recipe.image} alt={recipe.name} loading="lazy" />
+		<img
+			src={recipe.image}
+			alt={recipe.name}
+			loading="lazy"
+		/>
 	{:else}
 		<div class="no-image"></div>
 	{/if}
-	<div class="info" class:compact={size === `compact`}>
+	<div
+		class="info"
+		class:compact={size === `compact`}
+	>
 		{#if dayLabel}
 			<span class="day">{dayLabel}</span>
 		{/if}
@@ -43,9 +54,17 @@
 			<h2>{recipe.name}</h2>
 		{/if}
 		{#if recipe.description}
-			<p class="description" class:compact={size === `compact`}>{recipe.description}</p>
+			<p
+				class="description"
+				class:compact={size === `compact`}
+			>
+				{recipe.description}
+			</p>
 		{/if}
-		<div class="meta" class:compact={size === `compact`}>
+		<div
+			class="meta"
+			class:compact={size === `compact`}
+		>
 			{#if recipe.totalTime}<span>{formatMinutes(recipe.totalTime)}</span>{/if}
 			{#if recipe.servings}<span>{recipe.servings} servings</span>{/if}
 		</div>
@@ -79,11 +98,12 @@
 		& .no-image {
 			width: 100%;
 			height: 180px;
-			background: color-mix(in srgb, var(--purple_bright) 8%, var(--transparent));
+			background: color-mix(in oklch, var(--purple_bright) 8%, var(--transparent));
 		}
 
 		&.compact {
-			& img, & .no-image {
+			& img,
+			& .no-image {
 				height: 140px;
 			}
 		}

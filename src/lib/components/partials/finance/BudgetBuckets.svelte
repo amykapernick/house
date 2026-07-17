@@ -18,8 +18,7 @@
 		class?: string;
 	} = $props();
 
-	const formatCurrency = (value: number) =>
-		value.toLocaleString('en-AU', { style: 'currency', currency: 'AUD' });
+	const formatCurrency = (value: number) => value.toLocaleString('en-AU', { style: 'currency', currency: 'AUD' });
 
 	let rows = $derived(bucketTotals(buckets, budget));
 
@@ -36,16 +35,23 @@
 
 	function sortValue(row: (typeof rows)[number], key: SortKey): string | number | null {
 		switch (key) {
-			case 'name': return row.name;
-			case 'percentage': return row.percentage ?? 0;
-			case 'income': return row.income;
-			case 'expenses': return row.expenses;
+			case 'name':
+				return row.name;
+			case 'percentage':
+				return row.percentage ?? 0;
+			case 'income':
+				return row.income;
+			case 'expenses':
+				return row.expenses;
 		}
 	}
 
 	function toggleSort(key: SortKey) {
 		if (sortKey === key) sortDir = sortDir === 'asc' ? 'desc' : 'asc';
-		else { sortKey = key; sortDir = 'asc'; }
+		else {
+			sortKey = key;
+			sortDir = 'asc';
+		}
 	}
 
 	// Sorting is disabled while editing so rows don't reorder under the user's
@@ -63,10 +69,20 @@
 </script>
 
 {#snippet sortableHeader(key: SortKey, label: string, alignRight = false)}
-	<th aria-sort={sortKey === key ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none'} class:amount={alignRight}>
-		<button type="button" onclick={() => toggleSort(key)}>
+	<th
+		aria-sort={sortKey === key ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none'}
+		class:amount={alignRight}
+	>
+		<button
+			type="button"
+			onclick={() => toggleSort(key)}
+		>
 			{label}
-			<span class="sort-icon" class:active={sortKey === key} aria-hidden="true">
+			<span
+				class="sort-icon"
+				class:active={sortKey === key}
+				aria-hidden="true"
+			>
 				{sortKey === key ? (sortDir === 'asc' ? '▲' : '▼') : '⇅'}
 			</span>
 		</button>
@@ -89,11 +105,19 @@
 				{#if editing}
 					<td class="amount edit-percentage">
 						<input
-							type="range" min="0" max="100" step="1" value={percentage ?? 0}
+							type="range"
+							min="0"
+							max="100"
+							step="1"
+							value={percentage ?? 0}
 							oninput={(e) => updatePercentage(id, Number(e.currentTarget.value))}
 						/>
 						<input
-							type="number" min="0" max="100" step="1" value={percentage ?? 0}
+							type="number"
+							min="0"
+							max="100"
+							step="1"
+							value={percentage ?? 0}
 							oninput={(e) => updatePercentage(id, Number(e.currentTarget.value))}
 						/>%
 					</td>
@@ -101,7 +125,10 @@
 					<td class="amount">{percentage != null ? `${percentage}%` : ''}</td>
 				{/if}
 				<td class="amount">{formatCurrency(income)}</td>
-				<td class="amount" data-over-budget={expenses > income}>
+				<td
+					class="amount"
+					data-over-budget={expenses > income}
+				>
 					{expenses ? formatCurrency(expenses) : ''}
 				</td>
 			</tr>
@@ -171,7 +198,7 @@
 		cursor: pointer;
 
 		&:hover {
-			background: color-mix(in srgb, var(--navy) 80%, var(--white_true));
+			background: color-mix(in oklch, var(--navy) 80%, var(--white_true));
 		}
 	}
 

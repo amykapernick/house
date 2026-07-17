@@ -16,14 +16,14 @@
 
 <style>
 	ul {
-		list-style: none;
 		margin: 0;
 		padding: 0;
-		background: light-dark(linear-gradient(rgb(255, 255, 255) 0%, color-mix(in oklch, rgb(247, 240, 235) 55%, rgb(255, 255, 255)) 100%), linear-gradient(color-mix(in oklch, rgb(20, 23, 29) 85%, rgb(245, 240, 240)) 0%, color-mix(in oklch, rgb(20, 23, 29) 90%, rgb(245, 240, 240)) 100%));
-		border: 1px solid light-dark(color-mix(in oklch, rgb(247, 240, 235) 78%, rgb(13, 13, 13)), color-mix(in oklch, rgb(20, 23, 29) 78%, rgb(245, 240, 240)));
+		border: 1px solid light-dark(color-mix(in oklch, var(--background) 78%, var(--black)), color-mix(in oklch, var(--dark_background) 78%, var(--white)));
 		border-radius: 1em;
+		background: light-dark(linear-gradient(var(--white_true) 0%, color-mix(in oklch, var(--background) 55%, var(--white_true)) 100%), linear-gradient(color-mix(in oklch, var(--dark_background) 85%, var(--white)) 0%, color-mix(in oklch, var(--dark_background) 90%, var(--white)) 100%));
 		box-shadow:
-			rgba(13, 13, 13, 0.04) 0px 1px 2px,
-			rgba(95, 65, 50, 0.07) 0px 3px 10px;
+			rgb(13 13 13 / 4%) 0 1px 2px,
+			rgb(95 65 50 / 7%) 0 3px 10px;
+		list-style: none;
 	}
 </style>

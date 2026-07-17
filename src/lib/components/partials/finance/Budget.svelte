@@ -27,16 +27,23 @@
 
 	function sortValue(item: BudgetItem, key: SortKey): string | number | null {
 		switch (key) {
-			case 'description': return item.description ?? '';
-			case 'bucket': return item.bucket?.name ?? '';
-			case 'tags': return item.tags ?? '';
-			case 'amount': return item.monthlyAmount ?? 0;
+			case 'description':
+				return item.description ?? '';
+			case 'bucket':
+				return item.bucket?.name ?? '';
+			case 'tags':
+				return item.tags ?? '';
+			case 'amount':
+				return item.monthlyAmount ?? 0;
 		}
 	}
 
 	function toggleSort(key: SortKey) {
 		if (sortKey === key) sortDir = sortDir === 'asc' ? 'desc' : 'asc';
-		else { sortKey = key; sortDir = 'asc'; }
+		else {
+			sortKey = key;
+			sortDir = 'asc';
+		}
 	}
 
 	// Sorting is disabled while editing so rows don't reorder under the user's
@@ -52,9 +59,7 @@
 	}
 
 	function updateAmount(id: string, amount: number, period: string) {
-		budget = budget.map((item) =>
-			item.id === id ? { ...item, amount, period, monthlyAmount: monthlyAmount(amount, period) ?? undefined } : item
-		);
+		budget = budget.map((item) => (item.id === id ? { ...item, amount, period, monthlyAmount: monthlyAmount(amount, period) ?? undefined } : item));
 		onChange?.();
 	}
 
@@ -89,10 +94,20 @@
 </script>
 
 {#snippet sortableHeader(key: SortKey, label: string, alignRight = false)}
-	<th aria-sort={sortKey === key ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none'} class:amount={alignRight}>
-		<button type="button" onclick={() => toggleSort(key)}>
+	<th
+		aria-sort={sortKey === key ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none'}
+		class:amount={alignRight}
+	>
+		<button
+			type="button"
+			onclick={() => toggleSort(key)}
+		>
 			{label}
-			<span class="sort-icon" class:active={sortKey === key} aria-hidden="true">
+			<span
+				class="sort-icon"
+				class:active={sortKey === key}
+				aria-hidden="true"
+			>
 				{sortKey === key ? (sortDir === 'asc' ? '▲' : '▼') : '⇅'}
 			</span>
 		</button>
@@ -100,67 +115,93 @@
 {/snippet}
 
 <div class={className}>
-<table class="budget">
-	<thead>
-		<tr>
-			{@render sortableHeader('description', 'Description')}
-			{@render sortableHeader('bucket', 'Bucket')}
-			{@render sortableHeader('tags', 'Tags')}
-			{@render sortableHeader('amount', 'Monthly Amount', true)}
-			{#if editing}<th class="actions"></th>{/if}
-		</tr>
-	</thead>
-	<tbody>
-		{#each sorted as { id, description, bucket, tags, monthlyAmount: amountPerMonth, income, amount, period } (id)}
-			<tr data-income={income}>
-				{#if editing}
-					<td>
-						<input
-							type="text" value={description ?? ''}
-							oninput={(e) => updateField(id, 'description', e.currentTarget.value)}
-						/>
-					</td>
-					<td>
-						<select value={bucket?.id ?? ''} onchange={(e) => updateBucket(id, e.currentTarget.value)}>
-							<option value="">No bucket</option>
-							{#each buckets as b (b.id)}<option value={b.id}>{b.name}</option>{/each}
-						</select>
-					</td>
-					<td>
-						<input type="text" value={tags ?? ''} oninput={(e) => updateField(id, 'tags', e.currentTarget.value)} />
-					</td>
-					<td class="amount edit-amount">
-						<input
-							type="number" step="0.01" value={amount ?? 0}
-							oninput={(e) => updateAmount(id, Number(e.currentTarget.value), period ?? 'Month')}
-						/>
-						<select value={period ?? 'Month'} onchange={(e) => updateAmount(id, amount ?? 0, e.currentTarget.value)}>
-							{#each PERIODS as p (p)}<option value={p}>{p}ly</option>{/each}
-						</select>
-						<span class="income-toggle">
-							<input type="checkbox" id="income-toggle-{id}" checked={income} onchange={(e) => updateField(id, 'income', e.currentTarget.checked)} />
-							<label for="income-toggle-{id}">Income</label>
-						</span>
-					</td>
-					<td class="actions">
-						<button type="button" onclick={() => removeItem(id)} aria-label="Remove {description || 'item'}">✕</button>
-					</td>
-				{:else}
-					<td>{description}</td>
-					<td>{bucket?.name}</td>
-					<td>{tags}</td>
-					<td class="amount">
-						{income ? '+' : ''}{amountPerMonth != null ? amountPerMonth.toLocaleString('en-AU', { style: 'currency', currency: 'AUD' }) : ''}
-					</td>
-				{/if}
+	<table class="budget">
+		<thead>
+			<tr>
+				{@render sortableHeader('description', 'Description')}
+				{@render sortableHeader('bucket', 'Bucket')}
+				{@render sortableHeader('tags', 'Tags')}
+				{@render sortableHeader('amount', 'Monthly Amount', true)}
+				{#if editing}<th class="actions"></th>{/if}
 			</tr>
-		{/each}
-	</tbody>
-</table>
+		</thead>
+		<tbody>
+			{#each sorted as { id, description, bucket, tags, monthlyAmount: amountPerMonth, income, amount, period } (id)}
+				<tr data-income={income}>
+					{#if editing}
+						<td>
+							<input
+								type="text"
+								value={description ?? ''}
+								oninput={(e) => updateField(id, 'description', e.currentTarget.value)}
+							/>
+						</td>
+						<td>
+							<select
+								value={bucket?.id ?? ''}
+								onchange={(e) => updateBucket(id, e.currentTarget.value)}
+							>
+								<option value="">No bucket</option>
+								{#each buckets as b (b.id)}<option value={b.id}>{b.name}</option>{/each}
+							</select>
+						</td>
+						<td>
+							<input
+								type="text"
+								value={tags ?? ''}
+								oninput={(e) => updateField(id, 'tags', e.currentTarget.value)}
+							/>
+						</td>
+						<td class="amount edit-amount">
+							<input
+								type="number"
+								step="0.01"
+								value={amount ?? 0}
+								oninput={(e) => updateAmount(id, Number(e.currentTarget.value), period ?? 'Month')}
+							/>
+							<select
+								value={period ?? 'Month'}
+								onchange={(e) => updateAmount(id, amount ?? 0, e.currentTarget.value)}
+							>
+								{#each PERIODS as p (p)}<option value={p}>{p}ly</option>{/each}
+							</select>
+							<span class="income-toggle">
+								<input
+									type="checkbox"
+									id="income-toggle-{id}"
+									checked={income}
+									onchange={(e) => updateField(id, 'income', e.currentTarget.checked)}
+								/>
+								<label for="income-toggle-{id}">Income</label>
+							</span>
+						</td>
+						<td class="actions">
+							<button
+								type="button"
+								onclick={() => removeItem(id)}
+								aria-label="Remove {description || 'item'}">✕</button
+							>
+						</td>
+					{:else}
+						<td>{description}</td>
+						<td>{bucket?.name}</td>
+						<td>{tags}</td>
+						<td class="amount">
+							{income ? '+' : ''}{amountPerMonth != null ? amountPerMonth.toLocaleString('en-AU', { style: 'currency', currency: 'AUD' }) : ''}
+						</td>
+					{/if}
+				</tr>
+			{/each}
+		</tbody>
+	</table>
 
-{#if editing}
-	<button type="button" class="add-item" onclick={addItem}>+ Add item</button>
-{/if}
+	{#if editing}
+		<button
+			type="button"
+			class="add-item"
+			onclick={addItem}>+ Add item</button
+		>
+	{/if}
 </div>
 
 <style>
@@ -217,7 +258,7 @@
 		cursor: pointer;
 
 		&:hover {
-			background: color-mix(in srgb, var(--navy) 80%, var(--white_true));
+			background: color-mix(in oklch, var(--navy) 80%, var(--white_true));
 		}
 	}
 

@@ -7,7 +7,8 @@
 	"stylelint.validate": [
 		"css",
 		"less",
-		"postcss"
+		"postcss",
+		"svelte"
 	],
 	"prettier.configPath": "./config/prettier.config.cjs",
 	"eslint.options": {

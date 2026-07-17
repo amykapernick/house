@@ -15,11 +15,15 @@
 			isYesterday: boolean;
 			entries: any[];
 		};
-		eveningEvents?: { id: string, title: string, start: Date, end: Date }[];
+		eveningEvents?: { id: string; title: string; start: Date; end: Date }[];
 	} = $props();
 </script>
 
-<div class="day" class:today={day.isToday} class:yesterday={day.isYesterday}>
+<div
+	class="day"
+	class:today={day.isToday}
+	class:yesterday={day.isYesterday}
+>
 	<h2>
 		{day.label}
 		<span class="date">{day.displayDate}</span>
@@ -34,16 +38,24 @@
 					<span class="meal-type">{entry.entryType}</span>
 				</div>
 				{#if entry.recipe}
-					<a href={resolve(`/recipes/[slug]`, { slug: entry.recipe.slug })} class="recipe-link">
+					<a
+						href={resolve(`/recipes/[slug]`, { slug: entry.recipe.slug })}
+						class="recipe-link"
+					>
 						{#if entry.recipe.image}
-							<img src={entry.recipe.image} alt={entry.recipe.name} loading="lazy" />
+							<img
+								src={entry.recipe.image}
+								alt={entry.recipe.name}
+								loading="lazy"
+							/>
 						{/if}
 						<span class="recipe-name">{entry.recipe.name}</span>
 					</a>
 					{#if entry.recipe.totalTime || entry.recipe.servings}
 						<span class="recipe-meta">
 							{#if entry.recipe.totalTime}{formatMinutes(entry.recipe.totalTime)}{/if}
-							{#if entry.recipe.servings} · {entry.recipe.servings} servings{/if}
+							{#if entry.recipe.servings}
+								· {entry.recipe.servings} servings{/if}
 						</span>
 					{/if}
 				{:else if entry.title}
@@ -75,7 +87,7 @@
 
 		&.today {
 			border-color: var(--purple_bright);
-			background: color-mix(in srgb, var(--purple_bright) 4%, var(--transparent));
+			background: color-mix(in oklch, var(--purple_bright) 4%, var(--transparent));
 		}
 
 		&.yesterday {
@@ -105,7 +117,7 @@
 	.meal {
 		margin-bottom: 0.5em;
 		padding: 0.4em;
-		background: color-mix(in srgb, var(--blue) 6%, var(--transparent));
+		background: color-mix(in oklch, var(--blue) 6%, var(--transparent));
 		border-radius: 0.3em;
 	}
 

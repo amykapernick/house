@@ -16,8 +16,8 @@
 		class?: string;
 	} = $props();
 
-	const upcoming = $derived(teeth.teeth.filter(t => t.status === 'upcoming'));
-	const existing = $derived(teeth.teeth.filter(t => t.status === 'erupted'));
+	const upcoming = $derived(teeth.teeth.filter((t) => t.status === 'upcoming'));
+	const existing = $derived(teeth.teeth.filter((t) => t.status === 'erupted'));
 
 	let confirmingTooth = $state<Tooth | null>(null);
 	let confirmOpen = $state(false);
@@ -27,7 +27,7 @@
 		const el = (target as HTMLElement)?.closest?.('[class*="t_"]');
 		const fdi = Number(el?.getAttribute('class')?.match(/t_(\d+)/)?.[1]);
 		if (!fdi) return;
-		return teeth.teeth.find(t => t.fdi === fdi);
+		return teeth.teeth.find((t) => t.fdi === fdi);
 	}
 
 	function tryOpenConfirm(tooth: Tooth | undefined) {
@@ -64,20 +64,38 @@
 		if (confirmingTooth) onMarkErupted?.(confirmingTooth.fdi);
 		confirmOpen = false;
 	}
-	const upcomingCss = $derived(upcoming.map(t => `
+	const upcomingCss = $derived(
+		upcoming
+			.map(
+				(t) => `
 		svg .t_${t.fdi} { 
 			--tooth: color-mix(var(--blue_light) 10%, var(--white)); 
 			opacity: 0.5;
-		}`).join('\n'));
-	const existingCss = $derived(existing.map(t => `
+		}`,
+			)
+			.join('\n'),
+	);
+	const existingCss = $derived(
+		existing
+			.map(
+				(t) => `
 		svg .t_${t.fdi} { 
 			--tooth: var(--white); 
 			opacity: 1;
-		}`).join('\n'));
-	const toothDetailsStyle = $derived(teeth.teeth.map(t => `
+		}`,
+			)
+			.join('\n'),
+	);
+	const toothDetailsStyle = $derived(
+		teeth.teeth
+			.map(
+				(t) => `
 		.teeth:has(svg .t_${t.fdi}:is(:hover, :focus, :focus-within)) ~ .teeth_details .t_${t.fdi} {
 			visibility: visible;
-		}`).join('\n'))
+		}`,
+			)
+			.join('\n'),
+	);
 
 	const upcomingStyleBlock = $derived(`<${'style'}>${upcomingCss} ${existingCss} ${toothDetailsStyle}</${'style'}>`);
 </script>
@@ -87,53 +105,63 @@
 	{@html upcomingStyleBlock}
 </svelte:head>
 
-	<div class={className}>
-		<!-- Event delegation wrapper - the actual interactive targets (tooth groups) have role="button"/tabindex/keydown handling set individually -->
-		<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-		<figure class="teeth" bind:this={wrapper} onclick={handleTeethClick} onkeydown={handleTeethKeydown}>
-			<TeethGraphic />
-			<figcaption>{teeth.note}</figcaption>
-		</figure>
-		{#if teeth.teething_now}
-			<Pill colour="orange">Currently Teething</Pill>
-		{/if}
-		<Stats items={[
+<div class={className}>
+	<!-- Event delegation wrapper - the actual interactive targets (tooth groups) have role="button"/tabindex/keydown handling set individually -->
+	<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+	<figure
+		class="teeth"
+		bind:this={wrapper}
+		onclick={handleTeethClick}
+		onkeydown={handleTeethKeydown}
+	>
+		<TeethGraphic />
+		<figcaption>{teeth.note}</figcaption>
+	</figure>
+	{#if teeth.teething_now}
+		<Pill colour="orange">Currently Teething</Pill>
+	{/if}
+	<Stats
+		items={[
 			{ name: 'Erupted', value: existing.length.toString() },
 			{ name: 'Upcoming', value: upcoming.length.toString() },
-			{ name: 'Remaining', value: (20 - existing.length).toString() }
-		]} />
-		<p>{teeth.teething_note}</p>
-		<div class="teeth_details">
-			{#each teeth.teeth as tooth (tooth.fdi)}
-				<p class={`t_${tooth.fdi}`}>
-					<span class="name">{tooth.fdi}: {tooth.name} - </span>
-					{#if tooth.erupted_date}
-						<span>Erupted at {tooth.erupted_age_months} months</span>
-					{:else}
-						<span>Expected at {tooth.expected_months} months</span>
-					{/if}
-				</p>
-			{/each}
-		</div>
-		<h3>Upcoming Teeth</h3>
-		<dl>
-			{#each upcoming as tooth (tooth.fdi)}
-				<dt>{tooth.name}</dt>
-				<dd>Expected at {tooth.expected_months} months</dd>
-			{/each}
-		</dl>
-		<h3>Dental Care</h3>
-		<dl>
-			<dt>Toothbrush</dt>
-			<dd>{teeth.dental_care.toothbrush}</dd>
-			<dt>Toothpaste</dt>
-			<dd>{teeth.dental_care.toothpaste}</dd>
-			<dt>Next Dentist Appointment</dt>
-			<dd>{teeth.dental_care.todoist_task && formatDate(new Date(teeth.dental_care.todoist_task.due), 'dd MMM')}</dd>
-		</dl>
+			{ name: 'Remaining', value: (20 - existing.length).toString() },
+		]}
+	/>
+	<p>{teeth.teething_note}</p>
+	<div class="teeth_details">
+		{#each teeth.teeth as tooth (tooth.fdi)}
+			<p class={`t_${tooth.fdi}`}>
+				<span class="name">{tooth.fdi}: {tooth.name} - </span>
+				{#if tooth.erupted_date}
+					<span>Erupted at {tooth.erupted_age_months} months</span>
+				{:else}
+					<span>Expected at {tooth.expected_months} months</span>
+				{/if}
+			</p>
+		{/each}
 	</div>
+	<h3>Upcoming Teeth</h3>
+	<dl>
+		{#each upcoming as tooth (tooth.fdi)}
+			<dt>{tooth.name}</dt>
+			<dd>Expected at {tooth.expected_months} months</dd>
+		{/each}
+	</dl>
+	<h3>Dental Care</h3>
+	<dl>
+		<dt>Toothbrush</dt>
+		<dd>{teeth.dental_care.toothbrush}</dd>
+		<dt>Toothpaste</dt>
+		<dd>{teeth.dental_care.toothpaste}</dd>
+		<dt>Next Dentist Appointment</dt>
+		<dd>{teeth.dental_care.todoist_task && formatDate(new Date(teeth.dental_care.todoist_task.due), 'dd MMM')}</dd>
+	</dl>
+</div>
 
-<Modal bind:open={confirmOpen} title="Mark tooth as erupted?">
+<Modal
+	bind:open={confirmOpen}
+	title="Mark tooth as erupted?"
+>
 	{#if confirmingTooth}
 		<p>Mark <strong>{confirmingTooth.name}</strong> (tooth {confirmingTooth.fdi}) as erupted?</p>
 		<div class="confirm_actions">
@@ -156,7 +184,7 @@
 
 	.teeth {
 		--tooth: var(--background);
-		
+
 		max-height: 70vh;
 		max-width: 400px;
 		float: right;
@@ -175,13 +203,13 @@
 		& p {
 			visibility: hidden;
 			grid-area: details;
-			background: color-mix(in srgb, var(--navy) 10%, var(--white_true));
+			background: color-mix(in oklch, var(--navy) 10%, var(--white_true));
 			padding: 0.2em 0.5em;
 			border: 2px solid var(--navy);
 			border-radius: 0.4em;
 			color: var(--navy);
 		}
-		
+
 		& span {
 			margin-left: 1em;
 			display: block;
@@ -197,7 +225,9 @@
 		opacity: 0.2;
 		cursor: pointer;
 
-		&:hover, &:focus, &:focus-within {
+		&:hover,
+		&:focus,
+		&:focus-within {
 			opacity: 1;
 		}
 	}

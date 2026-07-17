@@ -30,7 +30,7 @@ label, legend {
 
 legend {
 	margin-bottom: 1.5em;
-	color: color-mix(in oklch, var(--grey) 84%, var(--black));
+	color: var(--text_secondary);
 	font-size: 0.7em;
 	font-weight: 800;
 	text-transform: uppercase;
@@ -81,7 +81,7 @@ fieldset {
 	& label {
 		grid-column: 2;
 		margin: 0;
-		color: color-mix(in oklch, var(--grey) 84%, var(--black));
+		color: var(--text_secondary);
 	}
 
 	& input {

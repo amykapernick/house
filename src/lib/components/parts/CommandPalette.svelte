@@ -38,6 +38,7 @@
 		// Extra fields (description, tags, etc.) a result should also match
 		// against besides its label - see matchSection below.
 		searchText?: string;
+		archived?: boolean;
 	};
 
 	type PlannedMeal = { date: string; entryType: string };
@@ -141,7 +142,7 @@
 				sublabel: route.sublabel,
 				section: `Pages` as const,
 				link: route.path,
-			}))
+			})),
 	);
 
 	const pages = $derived([...navPages, ...orphanPages]);
@@ -160,16 +161,16 @@
 		if (deepSearchMatch) {
 			return !deepSearchMatch.scope || deepSearchMatch.scope === section ? deepSearchMatch.term : null;
 		}
-		return section === `Pages` || section === `Recipes` || section === `Content` ? (term || null) : null;
+		return section === `Pages` || section === `Recipes` || section === `Content` ? term || null : null;
 	}
 
 	const recentResults = $derived(
 		term || deepSearchMatch
 			? []
 			: recentLinks
-				.map((link) => pages.find((page) => page.link === link))
-				.filter((page): page is Result => !!page)
-				.map((page) => ({ ...page, key: `recent:${page.link}`, section: `Recent` as const }))
+					.map((link) => pages.find((page) => page.link === link))
+					.filter((page): page is Result => !!page)
+					.map((page) => ({ ...page, key: `recent:${page.link}`, section: `Recent` as const })),
 	);
 
 	const pageResults = $derived.by(() => {
@@ -217,26 +218,29 @@
 			.slice(0, SECTION_DISPLAY_LIMIT);
 	}
 
-	const referenceResults = $derived(matchSection(`References`, resources, (resource) => ({
-		key: `resource:${resource.id}`,
-		label: resource.name,
-		sublabel: resource.category,
-		section: `References` as const,
-		link: resource.url || resolve(`/reference`),
-		searchText: [resource.category, resource.description].filter(Boolean).join(` `),
-	})));
+	const referenceResults = $derived(
+		matchSection(`References`, resources, (resource) => ({
+			key: `resource:${resource.id}`,
+			label: resource.name,
+			sublabel: resource.category,
+			section: `References` as const,
+			link: resource.url || resolve(`/reference`),
+			searchText: [resource.category, resource.description].filter(Boolean).join(` `),
+			archived: resource.archived,
+		})),
+	);
 
 	// Each supplier can surface up to three results under its own name: the
 	// supplier itself (opens their website), plus a "call"/"email" action if a
 	// phone/email is on file - flattened first so matchSection's per-item label
 	// filter naturally keeps or drops all of a matching supplier's actions together.
 	const supplierResults = $derived.by(() => {
-		const items: { id: string; name: string; sublabel?: string; link: string; searchText: string }[] = [];
+		const items: { id: string; name: string; sublabel?: string; link: string; searchText: string; archived?: boolean }[] = [];
 		for (const supplier of suppliers) {
 			const searchText = (supplier.category ?? []).join(` `);
-			items.push({ id: `supplier:${supplier.id}`, name: supplier.name, link: supplier.url || resolve(`/reference`), searchText });
-			if (supplier.email) items.push({ id: `supplier-email:${supplier.id}`, name: supplier.name, sublabel: `Email ${supplier.email}`, link: `mailto:${supplier.email}`, searchText });
-			if (supplier.phone) items.push({ id: `supplier-call:${supplier.id}`, name: supplier.name, sublabel: `Call ${supplier.phone}`, link: `tel:${supplier.phone}`, searchText });
+			items.push({ id: `supplier:${supplier.id}`, name: supplier.name, link: supplier.url || resolve(`/reference`), searchText, archived: supplier.archived });
+			if (supplier.email) items.push({ id: `supplier-email:${supplier.id}`, name: supplier.name, sublabel: `Email ${supplier.email}`, link: `mailto:${supplier.email}`, searchText, archived: supplier.archived });
+			if (supplier.phone) items.push({ id: `supplier-call:${supplier.id}`, name: supplier.name, sublabel: `Call ${supplier.phone}`, link: `tel:${supplier.phone}`, searchText, archived: supplier.archived });
 		}
 		return matchSection(`Suppliers`, items, (item) => ({
 			key: item.id,
@@ -245,16 +249,22 @@
 			section: `Suppliers` as const,
 			link: item.link,
 			searchText: item.searchText,
+			archived: item.archived,
 		}));
 	});
 
-	const assetResults = $derived(matchSection(`Assets`, assets, (asset) => ({
-		key: `asset:${asset.id}`,
-		label: asset.name,
-		section: `Assets` as const,
-		link: asset.external || resolve(`/reference`),
-		searchText: [asset.brand, asset.model, asset.status, ...(asset.category ?? []), asset.content].filter(Boolean).join(` `),
-	})));
+	// Links to the asset's own entry on the Reference page (Item.svelte gives
+	// each entry's heading a matching id) rather than asset.external - the
+	// palette should take you to the household's own record, not the retailer.
+	const assetResults = $derived(
+		matchSection(`Assets`, assets, (asset) => ({
+			key: `asset:${asset.id}`,
+			label: asset.name,
+			section: `Assets` as const,
+			link: `${resolve(`/reference`)}#${asset.id}`,
+			searchText: [asset.brand, asset.model, asset.status, ...(asset.category ?? []), asset.content].filter(Boolean).join(` `),
+		})),
+	);
 
 	// Flattens the named/titled sub-items of each smallHuman tab - not raw
 	// measurements or narrative blocks - into individual results tagged with
@@ -286,35 +296,38 @@
 		}));
 	});
 
-	const taskResults = $derived(matchSection(`Tasks`, searchTasks, (task) => ({
-		key: `task:${task.id}`,
-		label: task.name,
-		sublabel: task.dueLabel,
-		section: `Tasks` as const,
-		link: task.link || resolve(`/tasks`),
-	})));
+	const taskResults = $derived(
+		matchSection(`Tasks`, searchTasks, (task) => ({
+			key: `task:${task.id}`,
+			label: task.name,
+			sublabel: task.dueLabel,
+			section: `Tasks` as const,
+			link: task.link || resolve(`/tasks`),
+		})),
+	);
 
-	const shoppingListResults = $derived(matchSection(`Shopping List`, shoppingListItems, (item) => ({
-		key: `shopping:${item.id}`,
-		label: item.display,
-		sublabel: item.category,
-		section: `Shopping List` as const,
-		link: resolve(`/shopping-list`),
-	})));
+	const shoppingListResults = $derived(
+		matchSection(`Shopping List`, shoppingListItems, (item) => ({
+			key: `shopping:${item.id}`,
+			label: item.display,
+			sublabel: item.category,
+			section: `Shopping List` as const,
+			link: resolve(`/shopping-list`),
+		})),
+	);
 
-	const budgetResults = $derived(matchSection(`Budget`, budgetItems, (item) => ({
-		key: `budget:${item.id}`,
-		label: item.description,
-		sublabel: item.bucket?.name,
-		section: `Budget` as const,
-		link: resolve(`/budget`),
-	})));
+	const budgetResults = $derived(
+		matchSection(`Budget`, budgetItems, (item) => ({
+			key: `budget:${item.id}`,
+			label: item.description,
+			sublabel: item.bucket?.name,
+			section: `Budget` as const,
+			link: resolve(`/budget`),
+		})),
+	);
 
 	const scheduleResults = $derived.by(() => {
-		const combined = [
-			...scheduleEvents.map((event) => ({ id: `event:${event.id}`, label: event.name })),
-			...icsEvents.map((event) => ({ id: `ics:${event.id}`, label: event.name })),
-		];
+		const combined = [...scheduleEvents.map((event) => ({ id: `event:${event.id}`, label: event.name })), ...icsEvents.map((event) => ({ id: `ics:${event.id}`, label: event.name }))];
 		return matchSection(`Schedule`, combined, (event) => ({
 			key: event.id,
 			label: event.label,
@@ -323,11 +336,7 @@
 		}));
 	});
 
-	const results = $derived([
-		...recentResults, ...pageResults, ...contentResults, ...recipeResults,
-		...referenceResults, ...supplierResults, ...assetResults,
-		...smallHumanResults, ...taskResults, ...shoppingListResults, ...budgetResults, ...scheduleResults,
-	]);
+	const results = $derived([...recentResults, ...pageResults, ...contentResults, ...recipeResults, ...referenceResults, ...supplierResults, ...assetResults, ...smallHumanResults, ...taskResults, ...shoppingListResults, ...budgetResults, ...scheduleResults]);
 
 	function escapeGqlString(value: string): string {
 		return value.replace(/\\/g, `\\\\`).replace(/"/g, `\\"`);
@@ -379,16 +388,16 @@
 		// eagerly pull every entry's own index too, so its subpages are
 		// search-able here as well. Long-lived, same cache key the /content
 		// pages use, so visiting a page and searching for it share one fetch.
-		const pagesByEntry = await Promise.all(contentEntries.map(async (entry) => {
-			const indexRes = await fetchClientData({
-				cacheKey: `content-index-${entry.slug}`,
-				ttl: CONTENT_CACHE_TTL,
-				gqlQuery: contentIndexQuery(entry.slug),
-			});
-			return (indexRes.contentIndex ?? []).flatMap((group: any) =>
-				(group.pages ?? []).map((page: any) => ({ entrySlug: entry.slug, pageSlug: page.slug, title: page.title, group: group.title }))
-			);
-		}));
+		const pagesByEntry = await Promise.all(
+			contentEntries.map(async (entry) => {
+				const indexRes = await fetchClientData({
+					cacheKey: `content-index-${entry.slug}`,
+					ttl: CONTENT_CACHE_TTL,
+					gqlQuery: contentIndexQuery(entry.slug),
+				});
+				return (indexRes.contentIndex ?? []).flatMap((group: any) => (group.pages ?? []).map((page: any) => ({ entrySlug: entry.slug, pageSlug: page.slug, title: page.title, group: group.title })));
+			}),
+		);
 		contentPages = pagesByEntry.flat();
 	}
 
@@ -401,37 +410,51 @@
 
 		fetchClientData({
 			cacheKey: `resources`,
-			onStale: (res) => { resources = res.resources ?? []; },
+			onStale: (res) => {
+				resources = res.resources ?? [];
+			},
 			gqlQuery: `
 				query {
 					resources { name id category description image login url icon archived }
 				}
 			`,
-		}).then((res) => { resources = res.resources ?? []; });
+		}).then((res) => {
+			resources = res.resources ?? [];
+		});
 
 		fetchClientData({
 			cacheKey: `suppliers`,
-			onStale: (res) => { suppliers = res.suppliers ?? []; },
+			onStale: (res) => {
+				suppliers = res.suppliers ?? [];
+			},
 			gqlQuery: `
 				query {
 					suppliers { name id category archived url lastUsed email phone }
 				}
 			`,
-		}).then((res) => { suppliers = res.suppliers ?? []; });
+		}).then((res) => {
+			suppliers = res.suppliers ?? [];
+		});
 
 		fetchClientData({
 			cacheKey: `assets`,
-			onStale: (res) => { assets = res.assets ?? []; },
+			onStale: (res) => {
+				assets = res.assets ?? [];
+			},
 			gqlQuery: `
 				query {
 					assets { name id icon content external category brand cost receipt dateOfPurchase ipAddress image macAddress model ramStorage status }
 				}
 			`,
-		}).then((res) => { assets = res.assets ?? []; });
+		}).then((res) => {
+			assets = res.assets ?? [];
+		});
 
 		fetchClientData({
 			cacheKey: `small-human`,
-			onStale: (res) => { smallHuman = res.smallHuman ?? null; },
+			onStale: (res) => {
+				smallHuman = res.smallHuman ?? null;
+			},
 			gqlQuery: `
 				query {
 					smallHuman {
@@ -521,13 +544,19 @@
 					}
 				}
 			`,
-		}).then((res) => { smallHuman = res.smallHuman ?? null; });
+		}).then((res) => {
+			smallHuman = res.smallHuman ?? null;
+		});
 
-		fetchTasksData().then((tasks) => { searchTasks = tasks; });
+		fetchTasksData().then((tasks) => {
+			searchTasks = tasks;
+		});
 
 		fetchClientData({
 			cacheKey: `shopping-list`,
-			onStale: (res) => { shoppingListItems = res.shoppingList?.items ?? []; },
+			onStale: (res) => {
+				shoppingListItems = res.shoppingList?.items ?? [];
+			},
 			gqlQuery: `
 				query {
 					shoppingList {
@@ -540,39 +569,53 @@
 					}
 				}
 			`,
-		}).then((res) => { shoppingListItems = res.shoppingList?.items ?? []; });
+		}).then((res) => {
+			shoppingListItems = res.shoppingList?.items ?? [];
+		});
 
 		fetchClientData({
 			cacheKey: `budget`,
-			onStale: (res) => { budgetItems = res.budget ?? []; },
+			onStale: (res) => {
+				budgetItems = res.budget ?? [];
+			},
 			gqlQuery: `
 				query {
 					budget { id description amount period monthlyAmount income bucket { id name } tags note }
 					budgetBuckets { id name percentage percentageGoal items { id monthlyAmount income } }
 				}
 			`,
-		}).then((res) => { budgetItems = res.budget ?? []; });
+		}).then((res) => {
+			budgetItems = res.budget ?? [];
+		});
 
 		fetchClientData({
 			cacheKey: `calendar`,
-			onStale: (res) => { scheduleEvents = res.events ?? []; },
+			onStale: (res) => {
+				scheduleEvents = res.events ?? [];
+			},
 			gqlQuery: `
 				query {
 					tasks { id name assigned { name slug profile colour } status due end allDay estimate link platform }
 					events { name dates { start end } status id }
 				}
 			`,
-		}).then((res) => { scheduleEvents = res.events ?? []; });
+		}).then((res) => {
+			scheduleEvents = res.events ?? [];
+		});
 
 		fetchClientData({
 			cacheKey: `icsEvents`,
-			onStale: (res) => { icsEvents = res.icsEvents ?? []; },
+			onStale: (res) => {
+				icsEvents = res.icsEvents ?? [];
+			},
 			gqlQuery: `
 				query {
 					icsEvents { id name dates { start end } status allDay colour family { slug } }
 				}
 			`,
-		}).then((res) => { icsEvents = res.icsEvents ?? []; });
+		}).then((res) => {
+			icsEvents = res.icsEvents ?? [];
+		});
 	}
 
 	function formatPlannedLabel(planned: PlannedMeal): string {
@@ -684,16 +727,14 @@
 		quickAddSuccess = ``;
 
 		const labels = QUICK_ADD_LABELS[match.type];
-		const mutation = match.type === `task`
-			? `mutation { createTask(content: ${JSON.stringify(match.content)}${match.due ? `, due: ${JSON.stringify(match.due)}` : ``}) { success } }`
-			: `mutation { createShoppingItem(note: ${JSON.stringify(match.content)}, source: "todoist") { success } }`;
+		const mutation = match.type === `task` ? `mutation { createTask(content: ${JSON.stringify(match.content)}${match.due ? `, due: ${JSON.stringify(match.due)}` : ``}) { success } }` : `mutation { createShoppingItem(note: ${JSON.stringify(match.content)}, source: "todoist") { success } }`;
 
 		const token = await getToken();
 		const res = await fetch(getGraphqlUrl(), {
 			method: `POST`,
 			headers: {
 				'Content-Type': `application/json`,
-				...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+				...(token ? { Authorization: `Bearer ${token}` } : {}),
 			},
 			body: JSON.stringify({ query: mutation }),
 		}).then((r) => r.json());
@@ -753,7 +794,10 @@
 		aria-label="Search pages and recipes, /task or /shop to quickly add, or /s to search everything"
 		autocomplete="off"
 		onkeydown={handleKeydown}
-		oninput={() => { quickAddError = ``; quickAddSuccess = ``; }}
+		oninput={() => {
+			quickAddError = ``;
+			quickAddSuccess = ``;
+		}}
 	/>
 	{#if quickAddMatch}
 		{@const labels = QUICK_ADD_LABELS[quickAddMatch.type]}
@@ -763,16 +807,17 @@
 			{#if quickAddError}<p class="quick-add-status error">{quickAddError}</p>{/if}
 		</div>
 	{:else}
-		<ul class="results" bind:this={resultsEl}>
+		<ul
+			class="results"
+			bind:this={resultsEl}
+		>
 			{#each results as result, i (result.key)}
-				{#if i === 0 || results[i - 1].section !== result.section}
-					<li class="heading">{result.section}</li>
-				{/if}
 				<li>
 					<!-- result.link is already resolve()d (internal) or a raw external/mailto/tel URL (References/Suppliers/Assets/Tasks) above -->
 					<!-- eslint-disable svelte/no-navigation-without-resolve -->
 					<a
 						class="result"
+						class:archived={result.archived}
 						href={result.link}
 						target={result.link.startsWith(`http`) ? `_blank` : undefined}
 						rel={result.link.startsWith(`http`) ? `noreferrer` : undefined}
@@ -781,12 +826,17 @@
 						onclick={() => (open = false)}
 					>
 						{#if result.contentIcon}
-							<ContentIcon icon={result.contentIcon.icon} iconType={result.contentIcon.iconType} />
+							<ContentIcon
+								icon={result.contentIcon.icon}
+								iconType={result.contentIcon.iconType}
+							/>
 						{:else if result.Icon}
 							<result.Icon />
 						{/if}
 						<span class="label">{result.label}</span>
 						{#if result.sublabel}<span class="sublabel">{result.sublabel}</span>{/if}
+						{#if result.archived}<span class="tag tag-archived">Archived</span>{/if}
+						<span class="tag">{result.section}</span>
 					</a>
 					<!-- eslint-enable svelte/no-navigation-without-resolve -->
 				</li>
@@ -839,10 +889,10 @@
 		overflow: hidden;
 		background: var(--background);
 		color: var(--background_text);
-		box-shadow: 0 5px 30px color-mix(in srgb, var(--neutral) 30%, var(--transparent));
+		box-shadow: 0 5px 30px color-mix(in oklch, var(--neutral) 30%, var(--transparent));
 
 		&::backdrop {
-			background: color-mix(in srgb, var(--neutral) 60%, var(--transparent));
+			background: color-mix(in oklch, var(--neutral) 60%, var(--transparent));
 		}
 	}
 
@@ -902,15 +952,6 @@
 		margin-left: auto;
 	}
 
-	.heading {
-		padding: 0.6em 0.75em 0.2em;
-		color: var(--neutral);
-		font-size: 0.75em;
-		font-weight: 600;
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-	}
-
 	.result {
 		display: flex;
 		align-items: center;
@@ -933,6 +974,10 @@
 			color: var(--purple_bright_text);
 		}
 
+		&.archived {
+			opacity: 0.5;
+		}
+
 		& :global(svg) {
 			flex-shrink: 0;
 			width: 1.2em;
@@ -947,6 +992,27 @@
 	.sublabel {
 		color: var(--neutral);
 		font-size: 0.8em;
+	}
+
+	.tag {
+		flex-shrink: 0;
+		padding: 0.15em 0.6em;
+		border: 1px solid var(--neutral_light);
+		border-radius: 1em;
+		color: var(--neutral);
+		font-size: 0.7em;
+		text-transform: uppercase;
+		letter-spacing: 0.03em;
+
+		.result[data-active='true'] & {
+			border-color: currentColor;
+			color: inherit;
+		}
+	}
+
+	.tag-archived {
+		border-color: var(--red);
+		color: var(--red);
 	}
 
 	.hint {

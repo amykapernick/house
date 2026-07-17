@@ -19,7 +19,12 @@
 					<h2>{alert.title}</h2>
 					<p>{alert.detail}</p>
 				</div>
-				<button type="button" class="urgent-dismiss" onclick={() => onDismiss(alert)} aria-label="Dismiss {alert.title}">&times;</button>
+				<button
+					type="button"
+					class="urgent-dismiss"
+					onclick={() => onDismiss(alert)}
+					aria-label="Dismiss {alert.title}">&times;</button
+				>
 			</div>
 		{/each}
 	</div>
@@ -40,7 +45,7 @@
 		padding: 1em;
 		border: 2px solid var(--red);
 		border-radius: 0.5em;
-		background: color-mix(in srgb, var(--red) 12%, var(--white_true));
+		background: color-mix(in oklch, var(--red) 12%, var(--white_true));
 	}
 
 	.urgent-badge {
@@ -73,7 +78,7 @@
 		cursor: pointer;
 
 		&:hover {
-			background: color-mix(in srgb, var(--red) 20%, var(--transparent));
+			background: color-mix(in oklch, var(--red) 20%, var(--transparent));
 		}
 	}
 
