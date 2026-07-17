@@ -1,9 +1,10 @@
 // Runs ESLint and stylelint (the full stylelint.config.cjs, same scope as
-// `lint:styles`) with --fix in-memory, then opens a GitHub issue for each
-// error that survives fixing (warnings are left alone). Auto-fixable style
-// issues never reach here - only violations that need a human. Existing open
-// issues are matched via a hidden marker in the body so re-runs don't
-// duplicate them.
+// `lint:styles`) with --fix in-memory, then opens one GitHub issue per rule
+// that has errors surviving the fix (warnings are left alone), listing every
+// current file:line for that rule. Auto-fixable style issues never reach
+// here - only violations that need a human. Existing open issues are
+// matched via a hidden marker in the body so re-runs update them in place
+// instead of duplicating.
 //
 // Only meant to run on direct pushes to prod/dev - PRs already get fast-fail
 // feedback from the plain `lint:ci` step and shouldn't spawn permanent issues
@@ -75,61 +76,84 @@ async function findExistingIssue(owner, repo, marker) {
 	return result?.items?.[0] ?? null;
 }
 
-// `problem` is normalized to `{ line, column, ruleId, message }` regardless
-// of which linter produced it.
-async function createIssueForError(owner, repo, problem, filePath, runUrl) {
-	const marker = `<!-- lint-issue-id: ${filePath}:${problem.line}:${problem.column}:${problem.ruleId} -->`;
-	const existing = await findExistingIssue(owner, repo, marker);
-	if (existing) {
-		console.log(`Issue already open for ${filePath}:${problem.line} (${problem.ruleId}): #${existing.number}`);
-		return;
-	}
+// One issue per *rule* (from either linter), not per occurrence - filing one
+// issue per hit would be dozens of duplicates for the same underlying
+// cleanup. The body lists every current file:line for that rule, grouped by
+// file. Re-runs update the existing issue's body in place (rather than
+// skip) so the file list doesn't go stale as the backlog is worked down or
+// grows.
+function formatRuleIssueBody(ruleId, occurrencesByFile) {
+	return [...occurrencesByFile.entries()]
+		.map(([filePath, occurrences]) => {
+			const lines = occurrences.map((o) => `  ${o.line}:${o.column}  ✖  ${o.text}  ${ruleId}`).join(`\n`);
+			return `${filePath}\n${lines}`;
+		})
+		.join(`\n\n`);
+}
 
-	const title = `Lint: ${problem.ruleId ?? `error`} in ${filePath}:${problem.line}`;
+async function createOrUpdateIssueForRule(owner, repo, source, ruleId, occurrencesByFile, runUrl) {
+	const marker = `<!-- lint-issue-id: ${source}-rule:${ruleId} -->`;
 	const body = [
-		problem.message,
-		``,
-		`\`${filePath}:${problem.line}:${problem.column}\``,
-		problem.ruleId ? `Rule: \`${problem.ruleId}\`` : ``,
+		`\`\`\``,
+		formatRuleIssueBody(ruleId, occurrencesByFile),
+		`\`\`\``,
 		``,
 		runUrl ? `Found in [this run](${runUrl}).` : ``,
 		``,
 		marker,
 	].filter(Boolean).join(`\n`);
 
+	const existing = await findExistingIssue(owner, repo, marker);
+	if (existing) {
+		await ghFetch(`/repos/${owner}/${repo}/issues/${existing.number}`, {
+			method: `PATCH`,
+			body: JSON.stringify({ body }),
+		});
+		console.log(`Updated issue #${existing.number}: ${ruleId}`);
+		return;
+	}
+
 	const created = await ghFetch(`/repos/${owner}/${repo}/issues`, {
 		method: `POST`,
-		body: JSON.stringify({ title, body, labels: [`lint`] }),
+		body: JSON.stringify({ title: ruleId, body, labels: [`lint`] }),
 	});
-	console.log(`Created issue #${created.number}: ${title}`);
+	console.log(`Created issue #${created.number}: ${ruleId}`);
 }
 
 const cwd = process.cwd();
 const relativePath = (filePath) => (filePath.startsWith(cwd) ? filePath.slice(cwd.length + 1) : filePath);
 
-// Each entry: normalized file path + the errors (severity 2 for ESLint,
-// `'error'` for stylelint - warnings of either kind are left for a human to
-// notice locally, same as today). `blocking` is per-group, not per-rule -
-// ESLint errors indicate a broken change; stylelint errors are style debt.
-const fileProblems = [
-	...eslintResults.map((result) => ({
-		filePath: relativePath(result.filePath),
-		blocking: true,
-		problems: result.messages
-			.filter((message) => message.severity === 2)
-			.map((message) => ({ line: message.line, column: message.column, ruleId: message.ruleId, message: message.message })),
-	})),
-	...stylelintResults.map((result) => ({
-		filePath: relativePath(result.source),
-		blocking: false,
-		problems: result.warnings
-			.filter((warning) => warning.severity === `error`)
-			.map((warning) => ({ line: warning.line, column: warning.column, ruleId: warning.rule, message: warning.text })),
-	})),
-];
+// ruleId -> filePath -> { line, column, text }[]
+const groupByRule = (entries) => {
+	const byRule = new Map();
+	for (const { filePath, ruleId, line, column, text } of entries) {
+		if (!byRule.has(ruleId)) byRule.set(ruleId, new Map());
+		const byFile = byRule.get(ruleId);
+		if (!byFile.has(filePath)) byFile.set(filePath, []);
+		byFile.get(filePath).push({ line, column, text });
+	}
+	return byRule;
+};
 
-const errorCount = fileProblems.reduce((total, { problems }) => total + problems.length, 0);
-const blockingErrorCount = fileProblems.reduce((total, { blocking, problems }) => total + (blocking ? problems.length : 0), 0);
+const eslintErrorCount = eslintResults.reduce((total, result) => total + result.messages.filter((message) => message.severity === 2).length, 0);
+const stylelintErrorCount = stylelintResults.reduce((total, result) => total + result.warnings.filter((warning) => warning.severity === `error`).length, 0);
+const errorCount = eslintErrorCount + stylelintErrorCount;
+const blockingErrorCount = eslintErrorCount;
+
+const eslintByRule = groupByRule(
+	eslintResults.flatMap((result) =>
+		result.messages
+			.filter((message) => message.severity === 2)
+			.map((message) => ({ filePath: relativePath(result.filePath), ruleId: message.ruleId ?? `error`, line: message.line, column: message.column, text: message.message }))
+	)
+);
+const stylelintByRule = groupByRule(
+	stylelintResults.flatMap((result) =>
+		result.warnings
+			.filter((warning) => warning.severity === `error`)
+			.map((warning) => ({ filePath: relativePath(result.source), ruleId: warning.rule, line: warning.line, column: warning.column, text: warning.text }))
+	)
+);
 
 if (token && repoSlug) {
 	const [owner, repo] = repoSlug.split(`/`);
@@ -137,10 +161,12 @@ if (token && repoSlug) {
 
 	await ensureLabelExists(owner, repo);
 
-	for (const { filePath, problems } of fileProblems) {
-		for (const problem of problems) {
-			await createIssueForError(owner, repo, problem, filePath, runUrl);
-		}
+	for (const [ruleId, occurrencesByFile] of eslintByRule) {
+		await createOrUpdateIssueForRule(owner, repo, `eslint`, ruleId, occurrencesByFile, runUrl);
+	}
+
+	for (const [ruleId, occurrencesByFile] of stylelintByRule) {
+		await createOrUpdateIssueForRule(owner, repo, `stylelint`, ruleId, occurrencesByFile, runUrl);
 	}
 }
 else {
