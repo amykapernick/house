@@ -730,11 +730,11 @@
 	}
 
 	pre {
+		padding: 1em;
+		overflow-x: auto;
+		border-radius: 0.3em;
 		background: var(--blue);
 		color: var(--blue_text);
-		padding: 1em;
-		border-radius: 0.3em;
-		overflow-x: auto;
 		font-size: 0.85em;
 		line-height: 1.4;
 	}

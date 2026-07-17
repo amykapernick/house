@@ -35,7 +35,9 @@
 
 <Card
 	class="card {className} {onDismiss ? 'has-dismiss' : ''}"
-	style="--order: {order}"
+	style="
+
+--order: {order}"
 >
 	{#if onDismiss}
 		<button
@@ -78,41 +80,41 @@
 
 <style>
 	:global(.card) {
-		position: relative;
-		border-radius: 1em;
-		border: 2px solid var(--colour);
-		width: auto;
-		padding: 0.5em 0.75em;
-		color: var(--black);
-		background: color-mix(in oklch, var(--colour) 10%, var(--white_true));
 		display: grid;
-		grid-template-rows: auto 1fr auto auto;
-		grid-template-columns: 1fr auto;
+		position: relative;
 		grid-template-areas:
 			'heading 	heading'
 			'content 	content'
 			'tags		.'
 			'footer		icon';
+		grid-template-columns: 1fr auto;
+		grid-template-rows: auto 1fr auto auto;
 		order: var(--order);
+		width: auto;
+		padding: 0.5em 0.75em;
+		border: 2px solid var(--colour);
+		border-radius: 1em;
+		background: color-mix(in oklch, var(--colour) 10%, var(--white_true));
+		color: var(--black);
 	}
 
 	.heading {
-		color: var(--black);
 		display: block;
+		grid-area: heading;
 		margin: 0 0 0.2em;
 		padding: 0 0.2em;
-		grid-area: heading;
-	}
+		color: var(--black);
 
-	:global(.card.has-dismiss) .heading {
+	:global(.card.has-dismiss) & {
 		padding-right: 1.6em;
+	}
 	}
 
 	.dismiss {
+		display: flex;
 		position: absolute;
 		top: 0.4em;
 		right: 0.4em;
-		display: flex;
 		align-items: center;
 		justify-content: center;
 		width: 1.5em;
@@ -146,8 +148,8 @@
 		line-height: 1;
 
 		:global(svg) {
-			height: 2em;
 			width: auto;
+			height: 2em;
 		}
 	}
 

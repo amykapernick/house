@@ -124,9 +124,9 @@
 		}
 
 		& input {
-			background: inherit;
-			border: none;
 			margin: 0;
+			border: none;
+			background: inherit;
 			
 			&:focus {
 				outline: none;
@@ -134,14 +134,17 @@
 		}
 
 		& button[type="submit"] {
+
 			@include button_icon;
+
 			@include button_secondary;
-			border-radius: inherit;
+
 			height: 100%;
-			font-size: 1.5em;
 			border: none;
+			border-radius: inherit;
 			border-top-left-radius: 0;
 			border-bottom-left-radius: 0;
+			font-size: 1.5em;
 
 			& :global(svg) {
 				width: 1em;
@@ -151,25 +154,27 @@
 	}
 
 	.results {
+		grid-column: 1 / -1;
+		max-height: 200px;
 		margin: 0.3em 0 0;
 		padding: 0;
-		list-style: none;
-		border-radius: 0 0 0.5em 0.5em;
-		max-height: 200px;
-		border-top: 1.2px solid var(--purple_bright);
 		overflow-y: auto;
-		grid-column: 1 / -1;
+		border-top: 1.2px solid var(--purple_bright);
+		border-radius: 0 0 0.5em 0.5em;
 		background: var(--white_true);
+		list-style: none;
 
 		& button {
+
 			@include button_text;
-			padding: 0.5em 1em;
-			color: inherit;
+
 			display: flex;
 			align-items: center;
-			gap: 10px;
-			border-radius: 0;
 			width: 100%;
+			padding: 0.5em 1em;
+			border-radius: 0;
+			color: inherit;
+			gap: 10px;
 
 			&:hover {
 				background: var(--gradient_nav_active_bg);

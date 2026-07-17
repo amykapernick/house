@@ -19,26 +19,26 @@
 
 <style>
 	.task_reminders {
-		position: fixed;
-		left: 1em;
-		bottom: 4.5em;
 		display: flex;
-		flex-direction: column;
-		gap: 0.5em;
-		max-width: calc(100vw - 2em);
+		position: fixed;
 		z-index: 1000;
+		bottom: 4.5em;
+		left: 1em;
+		flex-direction: column;
+		max-width: calc(100vw - 2em);
+		gap: 0.5em;
 	}
 
 	.task_reminder {
 		display: flex;
 		align-items: center;
-		gap: 0.5em;
 		padding: 0.5em 1em;
+		border-radius: 0.4em;
 		background: var(--purple_bright);
+		box-shadow: 0 0.1em 0.5em rgb(0 0 0 / 25%);
 		color: var(--purple_bright_text);
 		font-size: 0.85em;
-		border-radius: 0.4em;
-		box-shadow: 0 0.1em 0.5em rgba(0, 0, 0, 0.25);
+		gap: 0.5em;
 
 		a {
 			color: inherit;

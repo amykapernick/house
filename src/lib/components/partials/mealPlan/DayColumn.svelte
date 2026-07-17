@@ -80,10 +80,10 @@
 
 <style>
 	.day {
+		min-height: 150px;
+		padding: 0.8em;
 		border: 1px solid var(--grey_light);
 		border-radius: 0.3em;
-		padding: 0.8em;
-		min-height: 150px;
 
 		&.today {
 			border-color: var(--purple_bright);
@@ -95,30 +95,30 @@
 		}
 
 		& h2 {
-			font-size: 0.85em;
-			margin: 0 0 0.5em;
 			display: flex;
 			flex-direction: column;
+			margin: 0 0 0.5em;
+			font-size: 0.85em;
 		}
 	}
 
 	.date {
+		color: var(--grey);
 		font-size: 0.85em;
 		font-weight: 400;
-		color: var(--grey);
 	}
 
 	.empty {
-		font-size: 0.8em;
 		color: var(--grey);
+		font-size: 0.8em;
 		font-style: italic;
 	}
 
 	.meal {
 		margin-bottom: 0.5em;
 		padding: 0.4em;
-		background: color-mix(in oklch, var(--blue) 6%, var(--transparent));
 		border-radius: 0.3em;
+		background: color-mix(in oklch, var(--blue) 6%, var(--transparent));
 	}
 
 	.meal-header {
@@ -130,19 +130,19 @@
 
 	.meal-type {
 		display: inline-block;
-		font-size: 0.65em;
-		text-transform: uppercase;
-		font-weight: 600;
-		color: var(--grey);
 		margin-bottom: 0.2em;
+		color: var(--grey);
+		font-size: 0.65em;
+		font-weight: 600;
+		text-transform: uppercase;
 	}
 
 	.evening-events {
 		margin: 0.6em 0 0;
 		padding: 0.5em 0 0;
 		border-top: 1px dashed var(--grey_light);
-		list-style: none;
 		font-size: 0.75em;
+		list-style: none;
 
 		& li {
 			display: flex;
@@ -163,8 +163,8 @@
 
 	.recipe-link {
 		display: block;
-		text-decoration: none;
 		color: inherit;
+		text-decoration: none;
 
 		&:hover .recipe-name {
 			text-decoration: underline;
@@ -173,9 +173,9 @@
 		& img {
 			width: 100%;
 			height: 60px;
-			object-fit: cover;
-			border-radius: 0.2em;
 			margin-bottom: 0.3em;
+			border-radius: 0.2em;
+			object-fit: cover;
 		}
 	}
 
@@ -187,13 +187,13 @@
 
 	.recipe-meta {
 		display: block;
-		font-size: 0.7em;
 		color: var(--grey);
+		font-size: 0.7em;
 	}
 
 	.meal-text {
-		font-size: 0.8em;
-		color: var(--grey);
 		margin: 0.2em 0 0;
+		color: var(--grey);
+		font-size: 0.8em;
 	}
 </style>

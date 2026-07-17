@@ -187,10 +187,10 @@
 
 	fieldset {
 		display: flex;
-		gap: 1em;
-		border: none;
-		padding: 0;
 		margin: 0 0 1em;
+		padding: 0;
+		border: none;
+		gap: 1em;
 	}
 
 	.link_mode_option {
@@ -203,22 +203,22 @@
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		gap: 0.5em;
-		padding: 0.5em 0.75em;
 		margin-bottom: 1em;
+		padding: 0.5em 0.75em;
 		border: 1px solid var(--grey_light);
 		border-radius: 0.3em;
+		gap: 0.5em;
 
 		& .name {
 			font-weight: 600;
 		}
 
 		& .change {
-			background: none;
+			padding: 0;
 			border: none;
+			background: none;
 			color: var(--purple_bright);
 			cursor: pointer;
-			padding: 0;
 		}
 	}
 

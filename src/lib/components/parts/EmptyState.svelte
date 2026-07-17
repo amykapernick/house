@@ -27,10 +27,10 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: 0.3em;
 		padding: 2em 1em;
-		text-align: center;
 		color: var(--grey);
+		text-align: center;
+		gap: 0.3em;
 
 		& h3 {
 			margin: 0;

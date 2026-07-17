@@ -304,8 +304,8 @@
 	}
 
 	.axis {
-		stroke: var(--grey);
 		stroke-width: 1.5;
+		stroke: var(--grey);
 	}
 
 	.axis--right {
@@ -313,30 +313,30 @@
 	}
 
 	.axis-tick {
-		stroke: var(--grey);
 		stroke-width: 1;
+		stroke: var(--grey);
 	}
 
 	.axis-label {
+		fill: var(--grey);
 		font-size: 11px;
 		font-weight: 600;
-		fill: var(--grey);
 	}
 
 	.gridline {
-		stroke: var(--grey_light);
 		stroke-width: 1;
 		stroke-dasharray: 4 4;
+		stroke: var(--grey_light);
 	}
 
 	.dot {
-		cursor: pointer;
 		transition: r 0.1s ease;
+		cursor: pointer;
 	}
 
 	.tick-label {
-		font-size: 11px;
 		fill: var(--grey);
+		font-size: 11px;
 	}
 
 	.tick-label--right {
@@ -349,13 +349,13 @@
 	}
 
 	.tooltip-bg {
-		fill: var(--black);
 		opacity: 0.85;
+		fill: var(--black);
 	}
 
 	.tooltip-text {
+		fill: var(--white);
 		font-size: 12px;
 		font-weight: 600;
-		fill: var(--white);
 	}
 </style>

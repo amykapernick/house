@@ -24,19 +24,19 @@
 
 <style>
 	.icon-chip {
-		border: 1.5px solid currentColor;
-		color: color-mix(in oklch, var(--orange) 74%, var(--black));
 		display: inline-block;
-		text-align: center;
-		border-radius: 0.7em;
 		padding: 0.7em 1em;
+		border: 1.5px solid currentColor;
+		border-radius: 0.7em;
+		color: color-mix(in oklch, var(--orange) 74%, var(--black));
 		font-weight: 600;
+		text-align: center;
 	}
 
 	.icon {
 		display: flex;
-		margin: 0 auto 0.4em;
 		justify-content: center;
+		margin: 0 auto 0.4em;
 
 		:global(svg) {
 			width: auto;

@@ -580,9 +580,9 @@
 			cursor: pointer;
 
 			&.today {
+				border-color: var(--purple_bright);
 				background: var(--purple_bright);
 				color: var(--purple_bright_text);
-				border-color: var(--purple_bright);
 			}
 		}
 	}
@@ -614,14 +614,14 @@
 	}
 
 	.shopping-list-message {
-		font-size: 0.85em;
-		color: var(--grey);
 		margin: -1em 0 1.5em;
+		color: var(--grey);
+		font-size: 0.85em;
 	}
 
 	.unsaved {
-		font-size: 0.85em;
 		color: var(--grey);
+		font-size: 0.85em;
 		font-style: italic;
 	}
 
@@ -638,10 +638,10 @@
 		& .week-option {
 			display: flex;
 			align-items: center;
-			gap: 0.3em;
-			font-size: 0.9em;
 			color: var(--navy);
+			font-size: 0.9em;
 			cursor: pointer;
+			gap: 0.3em;
 		}
 	}
 
@@ -650,7 +650,7 @@
 		grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
 		gap: 0.5em;
 
-		@media (max-width: 900px) {
+		@media (width <= 900px) {
 			grid-template-columns: 1fr;
 		}
 	}

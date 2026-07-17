@@ -43,7 +43,7 @@
 		display: inline-block;
 		width: 0.9em;
 		height: 0.9em;
-		border-radius: 50%;
 		margin-right: 0.5em;
+		border-radius: 50%;
 	}
 </style>

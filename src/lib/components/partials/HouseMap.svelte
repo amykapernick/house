@@ -223,7 +223,9 @@
 	}
 </script>
 
-<div class="container {className}" style="--width: {size[0]}; --height: {size[1]}" bind:this={containerEl}>
+<div class="container {className}" style="
+
+--width: {size[0]}; --height: {size[1]}" bind:this={containerEl}>
 	<!-- Placing a new item/area by clicking the map background is a spatial drag-editing
 		affordance with no keyboard equivalent in this pass; the toolbar buttons remain fully
 		keyboard-operable for add/edit/delete. -->
@@ -231,7 +233,9 @@
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<svg class="map" viewBox="0 0 {size.join(' ')}" fill="none" bind:this={svgEl} onclick={handleMapClick}>
 		{#each areas as area (area.id)}
-			<g class="area" style="--colour: var(--{area.colour ?? 'primary'})">
+			<g class="area" style="
+
+--colour: var(--{area.colour ?? 'primary'})">
 				<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- area.link is an external smart-home control URL, not an internal route -->
 				<a href={editMode ? undefined : area.link} target={editMode ? undefined : '_blank'}>
 					<!-- Drag-to-reposition in edit mode; the wrapping <a> (external HA link,
@@ -288,7 +292,9 @@
 			class="item"
 			class:draggable={editMode}
 			href={editMode ? undefined : item.link}
-			style="--width: {(itemSize[0] / size[0]) * 100}%; --height: {(itemSize[1] / size[1]) * 100}%; --offset_x: {(item.start[0] / size[0]) * 100}%; --offset_y: {(item.start[1] / size[1]) * 100}%; --rotate: {item.rotation ? `${item.rotation}deg` : '0deg'}"
+			style="
+
+--width: {(itemSize[0] / size[0]) * 100}%; --height: {(itemSize[1] / size[1]) * 100}%; --offset_x: {(item.start[0] / size[0]) * 100}%; --offset_y: {(item.start[1] / size[1]) * 100}%; --rotate: {item.rotation ? `${item.rotation}deg` : '0deg'}"
 			onpointerdown={(e) => startDrag(e, 'item', item.id, item.start)}
 			onpointermove={handlePointerMove}
 			onpointerup={() => handlePointerUp('item', item.id)}
@@ -303,7 +309,9 @@
 		{#if area.info?.length}
 			<ul
 				class="info"
-				style="--offset_x: {(area.start[0] / size[0]) * 100}%; --offset_y: {(area.start[1] / size[1]) * 100}%; --width: {(area.size[0] / size[0]) * 100}%; --height: {(area.size[1] / size[1]) * 100}%"
+				style="
+
+--offset_x: {(area.start[0] / size[0]) * 100}%; --offset_y: {(area.start[1] / size[1]) * 100}%; --width: {(area.size[0] / size[0]) * 100}%; --height: {(area.size[1] / size[1]) * 100}%"
 			>
 				{#each area.info as info (info.type)}
 					<li class="stat">
@@ -361,9 +369,9 @@
 	}
 
 	.resize_handle {
-		fill: var(--colour);
-		stroke: var(--background);
 		stroke-width: 2;
+		stroke: var(--background);
+		fill: var(--colour);
 		cursor: nwse-resize;
 		touch-action: none;
 	}

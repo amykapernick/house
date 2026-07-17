@@ -93,9 +93,9 @@
 <style>
 	.breadcrumb {
 		display: flex;
-		gap: 0.4em;
-		font-size: 0.9em;
 		margin-bottom: 1em;
+		font-size: 0.9em;
+		gap: 0.4em;
 
 		& a {
 			color: var(--purple_bright);
@@ -112,9 +112,9 @@
 	}
 
 	.count {
-		font-size: 0.85em;
-		color: var(--grey);
 		margin: 0 0 1em;
+		color: var(--grey);
+		font-size: 0.85em;
 	}
 
 	.grid {

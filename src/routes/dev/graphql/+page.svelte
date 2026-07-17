@@ -179,13 +179,14 @@
 	}
 
 	.run {
+
 		@include button;
 
 		margin-left: auto;
 
 		& kbd {
-			padding: 0.1em 0.4em;
 			margin-left: 0.3em;
+			padding: 0.1em 0.4em;
 			border: 1px solid color-mix(in oklch, currentColor 40%, var(--transparent));
 			border-radius: 0.25em;
 			font-family: inherit;
@@ -206,22 +207,22 @@
 	}
 
 	.editor {
+		overflow: hidden;
 		border: 1px solid var(--neutral_light);
 		border-radius: 0.3em;
-		overflow: hidden;
 		font-size: 0.95em;
 	}
 
 	.result {
 		margin: 0;
 		padding: 1em;
+		overflow: auto;
 		border: 1px solid var(--neutral_light);
 		border-radius: 0.3em;
 		background: var(--neutral_light);
 		color: var(--neutral_light_text);
-		overflow: auto;
 		font-size: 0.85em;
-		white-space: pre-wrap;
 		word-break: break-word;
+		white-space: pre-wrap;
 	}
 </style>

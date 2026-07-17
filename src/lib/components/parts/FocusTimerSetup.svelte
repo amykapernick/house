@@ -67,8 +67,8 @@
 <style>
 	.permission {
 		position: absolute;
-		right: 1em;
 		top: 1em;
+		right: 1em;
 	}
 
 	.setup_content {
@@ -87,18 +87,18 @@
 
 		.selection {
 			display: grid;
-			grid-template-columns: subgrid;
-			grid-template-rows: subgrid;
+			position: relative;
 			grid-column: 1 / -1;
 			grid-row-end: span 2;
-			border: 1.5px solid var(--transparent);
+			grid-template-columns: subgrid;
+			grid-template-rows: subgrid;
 			padding: 1em;
+			border: 1.5px solid var(--transparent);
 			border-radius: 0.8em;
-			position: relative;
 
 			&:has(input[type='radio']:checked) {
-				background: color-mix(in oklch, color-mix(in oklch, var(--light_purple_bright) 91%, var(--black)) 10%, var(--transparent));
 				border-color: var(--purple_solid_flat);
+				background: color-mix(in oklch, color-mix(in oklch, var(--light_purple_bright) 91%, var(--black)) 10%, var(--transparent));
 			}
 
 			&:focus-within {
@@ -125,22 +125,22 @@
 		}
 
 		.preset_description {
-			font-size: 0.85em;
-			color: var(--text_secondary);
-			font-weight: 400;
 			grid-column: 2;
+			color: var(--text_secondary);
+			font-size: 0.85em;
+			font-weight: 400;
 		}
 	}
 
 	.hours {
 		display: flex;
-		align-items: center;
-		gap: 0.5em;
-		background: color-mix(in oklch, var(--white_true) 80%, var(--background));
 		display: grid;
 		grid-template-columns: 1fr auto;
+		align-items: center;
 		padding: 0.5em;
 		border-radius: 0.5em;
+		background: color-mix(in oklch, var(--white_true) 80%, var(--background));
+		gap: 0.5em;
 
 		input {
 			width: 5em;
@@ -149,8 +149,8 @@
 	}
 
 	.start {
+		grid-column: 1 / -1;
 		margin-top: 20px;
 		font-size: 1.2em;
-		grid-column: 1 / -1;
 	}
 </style>

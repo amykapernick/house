@@ -23,14 +23,14 @@
 	.toast {
 		display: flex;
 		align-items: center;
-		gap: 0.75em;
 		width: max-content;
 		max-width: 100%;
 		padding: 0.7em 1em;
 		border-radius: 0.5em;
 		background: var(--black);
+		box-shadow: rgb(13 13 13 / 4%) 0 1px 2px, rgb(95 65 50 / 9%) 0 8px 20px;
 		color: var(--white);
-		box-shadow: rgba(13, 13, 13, 0.04) 0px 1px 2px, rgba(95, 65, 50, 0.09) 0px 8px 20px;
+		gap: 0.75em;
 
 		&.success {
 			background: var(--success);
@@ -51,12 +51,12 @@
 		flex-shrink: 0;
 		padding: 0;
 		border: none;
+		opacity: 0.8;
 		background: none;
 		color: inherit;
 		font-size: 1.2em;
 		line-height: 1;
 		cursor: pointer;
-		opacity: 0.8;
 
 		&:hover {
 			opacity: 1;

@@ -99,13 +99,13 @@
 		& th,
 		& td {
 			padding: 10px;
-			text-align: left;
 			border-bottom: 1px solid var(--grey_light);
+			text-align: left;
 		}
 
 		& th {
-			color: var(--navy_text);
 			background: var(--navy);
+			color: var(--navy_text);
 		}
 	}
 
@@ -113,8 +113,8 @@
 		display: inline-block;
 		width: 0.9em;
 		height: 0.9em;
-		border-radius: 50%;
 		margin-right: 0.5em;
+		border-radius: 50%;
 	}
 
 	.value-cell {
@@ -129,8 +129,8 @@
 	}
 
 	.or {
-		font-size: 0.85em;
 		color: var(--grey);
+		font-size: 0.85em;
 	}
 
 	.neutral-cell {
@@ -143,12 +143,12 @@
 		text-align: center;
 
 		& button {
+			padding: 0.2em 0.5em;
 			border: none;
 			background: none;
 			color: var(--red);
 			font-size: 1.1em;
 			cursor: pointer;
-			padding: 0.2em 0.5em;
 		}
 	}
 

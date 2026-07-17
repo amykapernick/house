@@ -79,10 +79,10 @@
 	fieldset {
 		display: flex;
 		flex-direction: column;
-		gap: 0.5em;
-		border: none;
-		padding: 0;
 		margin: 0 0 1em;
+		padding: 0;
+		border: none;
+		gap: 0.5em;
 	}
 
 	.scope_option {

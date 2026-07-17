@@ -56,18 +56,18 @@
 		color: var(--red_text);
 		font-size: 0.75em;
 		font-weight: 700;
-		text-transform: uppercase;
 		letter-spacing: 0.03em;
+		text-transform: uppercase;
 	}
 
 	.urgent-dismiss {
-		flex-shrink: 0;
-		margin-left: auto;
 		display: flex;
+		flex-shrink: 0;
 		align-items: center;
 		justify-content: center;
 		width: 1.6em;
 		height: 1.6em;
+		margin-left: auto;
 		padding: 0;
 		border: none;
 		border-radius: 50%;
@@ -85,8 +85,8 @@
 	.urgent-body {
 		& h2 {
 			margin: 0 0 0.2em;
-			font-size: 1.1em;
 			color: var(--red);
+			font-size: 1.1em;
 		}
 
 		& p {

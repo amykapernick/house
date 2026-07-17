@@ -20,7 +20,9 @@
 	let columnCount = $derived(Object.keys(parsedTasks).length);
 </script>
 
-<div class="board {className}" style="--columns: {columnCount}">
+<div class="board {className}" style="
+
+--columns: {columnCount}">
 	{#each Object.entries(parsedTasks) as [status, statusTasks] (status)}
 		<div class="column">
 			<h2>{status}</h2>

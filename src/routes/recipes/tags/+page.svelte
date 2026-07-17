@@ -73,8 +73,8 @@
 		display: inline-block;
 		margin-bottom: 1em;
 		color: var(--purple_bright);
-		text-decoration: none;
 		font-size: 0.9em;
+		text-decoration: none;
 
 		&:hover {
 			text-decoration: underline;
@@ -84,17 +84,17 @@
 	.filter {
 		width: 100%;
 		max-width: 400px;
+		margin-bottom: 1em;
 		padding: 0.5em;
 		border: 1px solid var(--grey_light);
 		border-radius: 0.3em;
 		font-size: 1em;
-		margin-bottom: 1em;
 	}
 
 	.count {
-		font-size: 0.85em;
-		color: var(--grey);
 		margin: 0 0 1em;
+		color: var(--grey);
+		font-size: 0.85em;
 	}
 
 	.grid {
@@ -106,17 +106,17 @@
 	.tag-card {
 		display: inline-block;
 		padding: 0.4em 0.8em;
+		transition: background 0.15s, border-color 0.15s;
 		border: 1px solid var(--blue);
 		border-radius: 0.3em;
-		text-decoration: none;
-		color: var(--blue_text);
 		background: var(--blue);
+		color: var(--blue_text);
 		font-size: 0.9em;
-		transition: background 0.15s, border-color 0.15s;
+		text-decoration: none;
 
 		&:hover {
-			background: var(--purple_bright);
 			border-color: var(--purple_bright);
+			background: var(--purple_bright);
 			color: var(--purple_bright_text);
 		}
 	}

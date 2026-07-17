@@ -40,16 +40,17 @@
 
 	.segments {
 		display: flex;
-		gap: 0;
-		border: 1px solid currentColor;
-		color: var(--purple_bright);
-		width: max-content;
 		justify-content: start;
+		width: max-content;
+		overflow: hidden;
+		border: 1px solid currentColor;
 		border-radius: 0.5em;
-		overflow: hidden
+		color: var(--purple_bright);
+		gap: 0
 	}
 
 	input {
+
 		@include sr_only;
 
 		&:checked {
@@ -61,9 +62,9 @@
 	}
 
 	label {
-		color: inherit;
 		padding: 0.5em 1em;
 		border-left-width: 0;
+		color: inherit;
 		cursor: pointer;
 
 		&:not(:first-of-type) {

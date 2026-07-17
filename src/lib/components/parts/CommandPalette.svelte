@@ -883,13 +883,13 @@
 		max-width: 500px;
 		margin: 0;
 		padding: 0;
+		overflow: hidden;
 		transform: translateX(-50%);
 		border: none;
 		border-radius: 0.5em;
-		overflow: hidden;
 		background: var(--background);
-		color: var(--background_text);
 		box-shadow: 0 5px 30px color-mix(in oklch, var(--neutral) 30%, var(--transparent));
+		color: var(--background_text);
 
 		&::backdrop {
 			background: color-mix(in oklch, var(--neutral) 60%, var(--transparent));
@@ -913,9 +913,9 @@
 	}
 
 	.results {
+		max-height: 50vh;
 		margin: 0;
 		padding: 0.5em;
-		max-height: 50vh;
 		overflow-y: auto;
 		list-style: none;
 
@@ -1001,8 +1001,8 @@
 		border-radius: 1em;
 		color: var(--neutral);
 		font-size: 0.7em;
-		text-transform: uppercase;
 		letter-spacing: 0.03em;
+		text-transform: uppercase;
 
 		.result[data-active='true'] & {
 			border-color: currentColor;

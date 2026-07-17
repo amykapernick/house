@@ -81,13 +81,13 @@
 
 <style>
 	.video_link {
+		padding: 0;
 		border: none;
 		background: none;
 		color: inherit;
+		font: inherit;
 		text-decoration: underline;
 		cursor: pointer;
-		padding: 0;
-		font: inherit;
 	}
 
 	.video {

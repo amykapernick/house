@@ -123,9 +123,8 @@
 
 <style>
 	li {
-		margin: 0;
-		padding: 0.5em 1em;
 		display: grid;
+		position: relative;
 		grid-template-areas:
 			'icon title title title'
 			'desc desc desc desc'
@@ -133,8 +132,9 @@
 			'. . ext op';
 		grid-template-columns: auto auto 1fr auto;
 		grid-template-rows: auto 1fr auto;
+		margin: 0;
+		padding: 0.5em 1em;
 		row-gap: 0.5em;
-		position: relative;
 
 		&:not(:last-child) {
 			border-bottom: inherit;
@@ -146,12 +146,12 @@
 		}
 
 		&:last-child {
-			border-bottom-left-radius: inherit;
 			border-bottom-right-radius: inherit;
+			border-bottom-left-radius: inherit;
 		}
 
 		&:has(h3 a:hover) {
-			background: linear-gradient(155deg, rgb(53, 71, 140), rgb(26, 36, 71));
+			background: linear-gradient(155deg, rgb(53 71 140), rgb(26 36 71));
 			color: var(--navy_text);
 		}
 
@@ -187,15 +187,15 @@
 
 	.icon {
 		grid-area: icon;
-		height: 2em;
 		width: auto;
 		max-width: 2em;
+		height: 2em;
 		margin-right: 1em;
 	}
 
 	.op {
-		grid-area: op;
 		z-index: 5;
+		grid-area: op;
 	}
 
 	.ext {
@@ -213,10 +213,10 @@
 		display: grid;
 		grid-area: meta;
 		grid-template-columns: auto 1fr;
-		gap: 0.2em 0.5em;
+		align-self: start;
 		margin: 0;
 		font-size: 0.85em;
-		align-self: start;
+		gap: 0.2em 0.5em;
 
 		& dt {
 			font-weight: 600;
@@ -228,10 +228,10 @@
 	}
 
 	.photo {
-		max-height: 150px;
-		max-width: 150px;
 		grid-area: img;
-		margin-right: 1em;
 		align-self: start;
+		max-width: 150px;
+		max-height: 150px;
+		margin-right: 1em;
 	}
 </style>

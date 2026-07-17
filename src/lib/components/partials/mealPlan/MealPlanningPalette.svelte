@@ -84,13 +84,13 @@
 	.palette {
 		margin-bottom: 1.5em;
 		padding: 1em;
-		background: color-mix(in oklch, var(--purple_bright) 4%, var(--transparent));
-		border-radius: 0.5em;
 		border: 1px solid var(--grey_light);
+		border-radius: 0.5em;
+		background: color-mix(in oklch, var(--purple_bright) 4%, var(--transparent));
 
 		& h2 {
-			font-size: 0.95em;
 			margin: 0 0 0.8em;
+			font-size: 0.95em;
 		}
 	}
 
@@ -102,21 +102,21 @@
 	}
 
 	.card {
-		width: 140px;
-		padding: 0.5em;
-		background: var(--white_true);
-		border: 1px solid var(--grey_light);
-		border-radius: 0.3em;
-		cursor: grab;
 		display: flex;
 		flex-direction: column;
+		width: 140px;
+		padding: 0.5em;
+		border: 1px solid var(--grey_light);
+		border-radius: 0.3em;
+		background: var(--white_true);
+		cursor: grab;
 
 		& img {
 			width: 100%;
 			height: 60px;
-			object-fit: cover;
-			border-radius: 0.2em;
 			margin-bottom: 0.3em;
+			border-radius: 0.2em;
+			object-fit: cover;
 		}
 	}
 
@@ -128,7 +128,7 @@
 
 	.meta {
 		display: block;
-		font-size: 0.7em;
 		color: var(--grey);
+		font-size: 0.7em;
 	}
 </style>

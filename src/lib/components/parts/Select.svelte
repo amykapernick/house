@@ -52,23 +52,23 @@
 
 <style>
 	.select {
-		cursor: pointer;
 		padding: 0;
-		background: var(--input_bg);
 		border: 1px solid var(--input_border);
+		background: var(--input_bg);
+		cursor: pointer;
 
 		&, &::picker(select) {
-			appearance: base-select;
 			display: grid;
 			grid-template-areas: 'selected picker';
 			grid-template-columns: 1fr auto;
-			gap: 0;
 			align-items: center;
 			margin-top: 0.2em;
-			border-radius: 0.5em;
 			border: 1px solid var(--input_border);
-			box-shadow: rgba(13, 13, 13, 0.04) 0px 1px 2px, rgba(95, 65, 50, 0.09) 0px 8px 20px;
+			border-radius: 0.5em;
 			background: var(--white_true);
+			box-shadow: rgb(13 13 13 / 4%) 0 1px 2px, rgb(95 65 50 / 9%) 0 8px 20px;
+			appearance: base-select;
+			gap: 0;
 		}
 
 		/* TODO: Clean up these styles */
@@ -85,9 +85,9 @@
 
 		& > option {
 			grid-column: 1 / -1;
-			cursor: pointer;
 			padding: 0.5em 1em;
 			line-height: 1;
+			cursor: pointer;
 			
 			&:hover {
 				background: color-mix(var(--navy) 10%, light-dark(var(--white), var(--black)));
@@ -108,14 +108,14 @@
 	}
 
 	.selected {
-		grid-area: selected;
 		display: block;
-		cursor: pointer;
-		padding: 0.5em 1em;
+		grid-area: selected;
 		height: 100%;
-		background: none;
+		padding: 0.5em 1em;
 		border: none;
-		font-size: 1em;
+		background: none;
 		color: var(--black);
+		font-size: 1em;
+		cursor: pointer;
 	}
 </style>

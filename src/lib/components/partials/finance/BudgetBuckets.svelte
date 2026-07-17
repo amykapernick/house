@@ -152,14 +152,14 @@
 		& th,
 		& td {
 			padding: 10px;
-			text-align: left;
 			border-bottom: 1px solid var(--grey_light);
+			text-align: left;
 		}
 
 		& th {
-			color: var(--navy_text);
-			background: var(--navy);
 			padding: 0;
+			background: var(--navy);
+			color: var(--navy_text);
 
 			&.amount button {
 				justify-content: flex-end;
@@ -172,8 +172,8 @@
 		}
 
 		& tfoot td {
-			border-bottom: none;
 			border-top: 2px solid var(--grey);
+			border-bottom: none;
 			font-weight: 700;
 		}
 
@@ -203,8 +203,8 @@
 	}
 
 	.sort-icon {
-		font-size: 0.75em;
 		opacity: 0.5;
+		font-size: 0.75em;
 
 		&.active {
 			opacity: 1;

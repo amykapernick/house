@@ -78,20 +78,19 @@
 	@import '@mixins';
 
 	.active {
-		background: linear-gradient(155deg, color-mix(in oklch, var(--light_purple_bright) 80%, var(--white)) 0%, var(--light_purple_bright) 55%, color-mix(in oklch, var(--light_purple_bright) 80%, var(--black)) 100%);
-		padding: 1em;
-		border-radius: 0.8em;
 		display: grid;
-		grid-template-columns: auto auto 1fr auto;
-		align-items: center;
 		grid-template-areas:
 			'label timer desc desc'
 			'prog prog prog prog'
 			'total total total total'
 			'toggle toggle toggle stop';
-		column-gap: 20px;
+		grid-template-columns: auto auto 1fr auto;
+		align-items: center;
+		padding: 1em;
+		gap: 10px 20px;
+		border-radius: 0.8em;
+		background: linear-gradient(155deg, color-mix(in oklch, var(--light_purple_bright) 80%, var(--white)) 0%, var(--light_purple_bright) 55%, color-mix(in oklch, var(--light_purple_bright) 80%, var(--black)) 100%);
 		color: var(--white);
-		row-gap: 10px;
 
 		&.break {
 			background: linear-gradient(155deg, color-mix(in oklch, var(--green) 80%, var(--white)) 0%, var(--green) 55%, color-mix(in oklch, var(--green) 80%, var(--black)) 100%);
@@ -119,29 +118,29 @@
 
 	.phase {
 		grid-area: label;
-		font-weight: 800;
-		font-size: 0.8em;
-		text-transform: uppercase;
 		align-self: end;
+		font-size: 0.8em;
+		font-weight: 800;
+		text-transform: uppercase;
 	}
 
 	.time {
 		--circular_progress_size: 7ch;
-		font-variant-numeric: tabular-nums;
-		font-size: 1.2em;
-		grid-area: timer;
-		font-weight: 700;
+
 		display: grid;
-		align-items: center;
-		align-content: center;
 		position: relative;
-		justify-content: center;
+		grid-area: timer;
+		place-content: center center;
+		align-items: center;
+		font-size: 1.2em;
+		font-weight: 700;
+		font-variant-numeric: tabular-nums;
 
 		& div {
 			position: absolute;
 			left: 1ch;
-			text-align: center;
 			width: 5ch;
+			text-align: center;
 		}
 	}
 
@@ -150,6 +149,7 @@
 		align-self: start;
 
 		& :global(button) {
+
 			@include button_secondary;
 
 			--button_text: var(--purple_bright_text);
@@ -165,9 +165,9 @@
 	}
 
 	.description {
+		grid-area: desc;
 		font-size: 0.85em;
 		font-weight: 700;
-		grid-area: desc;
 		text-align: right;
 	}
 
@@ -179,17 +179,17 @@
 	}
 
 	.total_progress {
-		grid-area: total;
 		display: flex;
+		grid-area: total;
 		width: 100%;
 		gap: 3px;
 	}
 
 	.segment {
-		height: 1em;
-		min-width: 4px;
-		flex-shrink: 0;
 		flex-basis: 0;
+		flex-shrink: 0;
+		min-width: 4px;
+		height: 1em;
 		border-radius: 3px;
 
 		&.break {
@@ -199,45 +199,46 @@
 
 	.progress,
 	.segment {
-		appearance: none;
-		-webkit-appearance: none;
-		border: none;
 		overflow: hidden;
+		border: none;
 		color: inherit;
+		appearance: none;
+		appearance: none;
 
 		&::-webkit-progress-bar {
-			background: rgba(255, 255, 255, 0.25);
 			border-radius: inherit;
+			background: rgb(255 255 255 / 25%);
 		}
 
 		&.break {
 			&::-webkit-progress-bar {
-				background: repeating-linear-gradient(45deg, rgba(245, 240, 240, 0.18) 0px, rgba(245, 240, 240, 0.18) 2px, var(--transparent) 2px, var(--transparent) 5px);
+				background: repeating-linear-gradient(45deg, rgb(245 240 240 / 18%) 0, rgb(245 240 240 / 18%) 2px, var(--transparent) 2px, var(--transparent) 5px);
 			}
 
 			&::-webkit-progress-value {
-				background: rgba(245, 240, 240, 0.55);
+				background: rgb(245 240 240 / 55%);
 			}
 
 			&::-moz-progress-bar {
-				background: rgba(245, 240, 240, 0.55);
+				background: rgb(245 240 240 / 55%);
 			}
 		}
 
 		&::-webkit-progress-value {
-			background: currentColor;
-			border-radius: inherit;
 			transition: width 0.3s linear;
+			border-radius: inherit;
+			background: currentColor;
 		}
 
 		&::-moz-progress-bar {
-			background: currentColor;
 			border-radius: inherit;
+			background: currentColor;
 		}
 	}
 
 	.toggle,
 	.compact_tog {
+
 		@include button_secondary;
 
 		--button_text: var(--purple_bright_text);
@@ -254,6 +255,7 @@
 	}
 
 	.stop {
+
 		@include button_text;
 
 		--button_text: var(--purple_bright_text);
@@ -267,7 +269,6 @@
 
 	.compact_tog {
 		grid-area: desc;
-		align-self: start;
-		justify-self: end;
+		place-self: start end;
 	}
 </style>

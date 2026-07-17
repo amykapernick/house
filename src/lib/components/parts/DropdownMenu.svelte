@@ -31,8 +31,8 @@
 	@import '@mixins';
 
 	.dropdown {
-		position: relative;
 		display: inline-block;
+		position: relative;
 	}
 
 	.trigger {

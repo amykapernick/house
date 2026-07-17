@@ -51,9 +51,9 @@
 		position: relative;
 		align-items: center;
 		align-self: center;
+		width: 2em;
 		height: 1em;
 		font-size: 1.5em;
-		width: 2em;
 
 		& .switch::before, & :global(label svg) {
 			transition: all 5s ease-in-out;
@@ -90,8 +90,8 @@
 	}
 
 	label {
-		font-size: 1em;
 		z-index: 10;
+		font-size: 1em;
 
 		& :global(svg) {
 			display: none;
@@ -116,11 +116,11 @@
 
 	.switch {
 		display: block;
+		z-index: 5;
 		width: 2em;
 		height: 1em;
 		border-radius: 1em;
 		background: light-dark(#ded0bd, var(--purple_bright));
-		z-index: 5;
 
 		&::before {
 			content: '';

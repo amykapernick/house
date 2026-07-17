@@ -132,7 +132,7 @@
 		grid-template-columns: 1fr;
 		gap: 2em;
 
-		@media (min-width: 60em) {
+		@media (width >= 60em) {
 			grid-template-columns: 1fr 1fr;
 		}
 	}
@@ -144,8 +144,8 @@
 	}
 
 	figcaption {
-		text-align: right;
 		padding-top: 1em;
 		font-style: italic;
+		text-align: right;
 	}
 </style>

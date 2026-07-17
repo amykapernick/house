@@ -57,21 +57,21 @@
 
 <style>
 	.trend {
-		font-size: 0.9rem;
 		opacity: 0.7;
+		font-size: 0.9rem;
 		font-style: italic;
 	}
 
 	figure {
 		width: auto;
-		border: 2px solid var(--navy);
-		margin-bottom: 2em;
 		margin-top: 2em;
+		margin-bottom: 2em;
+		border: 2px solid var(--navy);
 	}
 
 	figcaption {
-		text-align: right;
 		padding: 1em;
 		font-style: italic;
+		text-align: right;
 	}
 </style>

@@ -42,30 +42,30 @@
 
 <style>
 	.tooltip-trigger {
-		position: relative;
 		display: inline-block;
+		position: relative;
 		cursor: default;
-		-webkit-touch-callout: none;
-		-webkit-user-select: none;
 		user-select: none;
+		user-select: none;
+		-webkit-touch-callout: none;
 	}
 
 	.tooltip {
 		position: absolute;
+		z-index: 1;
 		bottom: 100%;
 		left: 50%;
-		z-index: 1;
-		padding: 0.2em 0.6em;
 		margin-bottom: 0.3em;
+		padding: 0.2em 0.6em;
 		transform: translateX(-50%);
 		transition: opacity 0.15s ease;
-		white-space: nowrap;
 		border-radius: 0.2em;
+		opacity: 0;
 		background: var(--black);
 		color: var(--white);
 		font-size: 0.75em;
 		font-weight: 400;
-		opacity: 0;
+		white-space: nowrap;
 		pointer-events: none;
 	}
 

@@ -125,10 +125,10 @@
 	@import '@mixins';
 
 	.day {
+		min-height: 150px;
+		padding: 0.8em;
 		border: 1px solid var(--grey_light);
 		border-radius: 0.3em;
-		padding: 0.8em;
-		min-height: 150px;
 
 		&.today {
 			border-color: var(--purple_bright);
@@ -136,17 +136,17 @@
 		}
 
 		& h2 {
-			font-size: 0.85em;
-			margin: 0 0 0.5em;
 			display: flex;
 			flex-direction: column;
+			margin: 0 0 0.5em;
+			font-size: 0.85em;
 		}
 	}
 
 	.date {
+		color: var(--grey);
 		font-size: 0.85em;
 		font-weight: 400;
-		color: var(--grey);
 	}
 
 	.entries {
@@ -154,16 +154,16 @@
 	}
 
 	.empty {
-		font-size: 0.8em;
 		color: var(--grey);
+		font-size: 0.8em;
 		font-style: italic;
 	}
 
 	.meal {
 		margin-bottom: 0.5em;
 		padding: 0.4em;
-		background: color-mix(in oklch, var(--blue) 6%, var(--transparent));
 		border-radius: 0.3em;
+		background: color-mix(in oklch, var(--blue) 6%, var(--transparent));
 		cursor: grab;
 
 		&.draft {
@@ -178,29 +178,29 @@
 	}
 
 	.meal-type {
-		font-size: 0.65em;
-		text-transform: uppercase;
-		font-weight: 600;
 		color: var(--grey);
+		font-size: 0.65em;
+		font-weight: 600;
+		text-transform: uppercase;
 	}
 
 	.new-badge {
-		font-size: 0.6em;
-		text-transform: uppercase;
-		font-weight: 600;
 		color: var(--purple_bright);
+		font-size: 0.6em;
+		font-weight: 600;
+		text-transform: uppercase;
 	}
 
 	.edit-btn {
-		margin-left: auto;
 		flex-shrink: 0;
+		margin-left: auto;
+		padding: 0;
 		border: none;
 		background: none;
 		color: var(--grey);
-		cursor: pointer;
 		font-size: 0.75em;
-		padding: 0;
 		line-height: 1;
+		cursor: pointer;
 
 		&:hover {
 			color: var(--purple_bright);
@@ -226,13 +226,13 @@
 
 	.remove-btn {
 		margin-left: auto;
+		padding: 0;
 		border: none;
 		background: none;
 		color: var(--grey);
-		cursor: pointer;
 		font-size: 0.9em;
 		line-height: 1;
-		padding: 0;
+		cursor: pointer;
 
 		&:hover {
 			color: var(--red);
@@ -248,22 +248,22 @@
 
 	.recipe-meta {
 		display: block;
-		font-size: 0.7em;
 		color: var(--grey);
+		font-size: 0.7em;
 	}
 
 	.meal-text {
-		font-size: 0.8em;
-		color: var(--grey);
 		margin: 0.2em 0 0;
+		color: var(--grey);
+		font-size: 0.8em;
 	}
 
 	.evening-events {
 		margin: 0.6em 0 0;
 		padding: 0.5em 0 0;
 		border-top: 1px dashed var(--grey_light);
-		list-style: none;
 		font-size: 0.75em;
+		list-style: none;
 
 		& li {
 			display: flex;

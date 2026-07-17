@@ -21,11 +21,11 @@
 <style>
 	.pagination {
 		display: flex;
-		justify-content: center;
 		align-items: center;
-		gap: 1em;
+		justify-content: center;
 		margin-top: 2em;
 		padding: 1em 0;
+		gap: 1em;
 
 		& button {
 			padding: 0.5em 1em;
@@ -42,8 +42,8 @@
 		}
 
 		& span {
-			font-size: 0.9em;
 			color: var(--grey);
+			font-size: 0.9em;
 		}
 	}
 </style>

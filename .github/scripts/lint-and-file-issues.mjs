@@ -1,5 +1,5 @@
-// Runs ESLint and stylelint (the `house/*` colour rules only, same scope as
-// `lint:colours`) with --fix in-memory, then opens a GitHub issue for each
+// Runs ESLint and stylelint (the full stylelint.config.cjs, same scope as
+// `lint:styles`) with --fix in-memory, then opens a GitHub issue for each
 // error that survives fixing (warnings are left alone). Auto-fixable style
 // issues never reach here - only violations that need a human. Existing open
 // issues are matched via a hidden marker in the body so re-runs don't
@@ -9,13 +9,11 @@
 // feedback from the plain `lint:ci` step and shouldn't spawn permanent issues
 // for in-progress work.
 //
-// NON_BLOCKING_RULES get an issue filed like anything else, but don't fail
-// this step / block deploy - reserved for rules that can never be
-// auto-fixed and flag pre-existing debt rather than a broken change (right
-// now: house/no-repeated-value, which would otherwise block every future
-// push to prod for as long as any repeated value exists anywhere in `src`).
-const NON_BLOCKING_RULES = new Set([`house/no-repeated-value`]);
-
+// stylelint findings are reported and filed as issues but never fail this
+// step / block deploy - most of the full config's non-auto-fixable rules
+// (selector-nested-pattern, house/no-repeated-value, ...) flag pre-existing
+// debt or judgment calls rather than a broken change, and there's a real
+// backlog of them right now. ESLint errors are the only hard gate.
 import { ESLint } from 'eslint';
 import stylelint from 'stylelint';
 
@@ -37,7 +35,7 @@ console.log(await eslintFormatter.format(eslintResults));
 
 const { results: stylelintResults, output: stylelintOutput } = await stylelint.lint({
 	files: [`src/**/*.{css,svelte}`],
-	configFile: `./config/stylelint.colours.config.cjs`,
+	configFile: `./config/stylelint.config.cjs`,
 	fix: true,
 	formatter: `string`,
 });
@@ -111,16 +109,19 @@ const relativePath = (filePath) => (filePath.startsWith(cwd) ? filePath.slice(cw
 
 // Each entry: normalized file path + the errors (severity 2 for ESLint,
 // `'error'` for stylelint - warnings of either kind are left for a human to
-// notice locally, same as today).
+// notice locally, same as today). `blocking` is per-group, not per-rule -
+// ESLint errors indicate a broken change; stylelint errors are style debt.
 const fileProblems = [
 	...eslintResults.map((result) => ({
 		filePath: relativePath(result.filePath),
+		blocking: true,
 		problems: result.messages
 			.filter((message) => message.severity === 2)
 			.map((message) => ({ line: message.line, column: message.column, ruleId: message.ruleId, message: message.message })),
 	})),
 	...stylelintResults.map((result) => ({
 		filePath: relativePath(result.source),
+		blocking: false,
 		problems: result.warnings
 			.filter((warning) => warning.severity === `error`)
 			.map((warning) => ({ line: warning.line, column: warning.column, ruleId: warning.rule, message: warning.text })),
@@ -128,10 +129,7 @@ const fileProblems = [
 ];
 
 const errorCount = fileProblems.reduce((total, { problems }) => total + problems.length, 0);
-const blockingErrorCount = fileProblems.reduce(
-	(total, { problems }) => total + problems.filter((problem) => !NON_BLOCKING_RULES.has(problem.ruleId)).length,
-	0
-);
+const blockingErrorCount = fileProblems.reduce((total, { blocking, problems }) => total + (blocking ? problems.length : 0), 0);
 
 if (token && repoSlug) {
 	const [owner, repo] = repoSlug.split(`/`);

@@ -69,21 +69,21 @@
 		& input[type='number'] {
 			width: calc(3ch + 0.2em + 3ch);
 			margin: 0;
-			padding: 0.1em 0.4em 0.1em;
-			text-align: right;
-			appearance: none;
+			padding: 0.1em 0.4em;
 			border-width: 0;
 			border-bottom-width: 1px;
 			border-radius: 0;
 			background: none;
+			text-align: right;
+			appearance: none;
 
 		}
 
 		& .unit {
-			color: var(--neutral);
-			font-size: 0.85em;
 			position: relative;
 			left: -2.5ch;
+			color: var(--neutral);
+			font-size: 0.85em;
 		}
 	}
 </style>

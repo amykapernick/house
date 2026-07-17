@@ -93,10 +93,12 @@
 
 	button {
 		&.secondary {
+
 			@include button_secondary;
 		}
 
 		&.text {
+
 			@include button_text;
 		}
 	}

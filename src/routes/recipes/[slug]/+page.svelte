@@ -373,8 +373,8 @@
 		display: inline-block;
 		margin-bottom: 1em;
 		color: var(--purple_bright);
-		text-decoration: none;
 		font-size: 0.9em;
+		text-decoration: none;
 
 		&:hover {
 			text-decoration: underline;
@@ -384,9 +384,9 @@
 	.hero {
 		width: 100%;
 		max-height: 400px;
-		object-fit: cover;
-		border-radius: 0.5em;
 		margin-bottom: 1em;
+		border-radius: 0.5em;
+		object-fit: cover;
 	}
 
 	h1 {
@@ -394,19 +394,19 @@
 	}
 
 	.description {
-		font-size: 1.1em;
-		color: var(--grey);
 		margin: 0 0 1em;
+		color: var(--grey);
+		font-size: 1.1em;
 	}
 
 	.meta-bar {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 1.5em;
 		margin-bottom: 1em;
 		padding: 0.8em;
-		background: color-mix(in oklch, var(--blue) 8%, var(--transparent));
 		border-radius: 0.3em;
+		background: color-mix(in oklch, var(--blue) 8%, var(--transparent));
+		gap: 1.5em;
 	}
 
 	.meta-item {
@@ -414,10 +414,10 @@
 		flex-direction: column;
 
 		& .label {
-			font-size: 0.75em;
-			text-transform: uppercase;
 			color: var(--grey);
+			font-size: 0.75em;
 			font-weight: 600;
+			text-transform: uppercase;
 		}
 	}
 
@@ -432,8 +432,8 @@
 		padding: 0.15em 0.5em;
 		border: 1px solid currentColor;
 		border-radius: 0.2em;
-		font-size: 0.8em;
 		color: var(--navy);
+		font-size: 0.8em;
 
 		&.category {
 			color: var(--purple_bright);
@@ -447,7 +447,7 @@
 		gap: 2em;
 		margin-bottom: 2em;
 
-		@media (max-width: 700px) {
+		@media (width <= 700px) {
 			grid-template-columns: 1fr;
 		}
 	}
@@ -471,11 +471,11 @@
 			gap: 0.3em;
 
 			& .label {
-				font-size: 0.75em;
-				text-transform: uppercase;
-				color: var(--grey);
-				font-weight: 600;
 				margin-right: 0.2em;
+				color: var(--grey);
+				font-size: 0.75em;
+				font-weight: 600;
+				text-transform: uppercase;
 			}
 		}
 
@@ -484,8 +484,8 @@
 			border: 1px solid var(--grey_light);
 			border-radius: 0.3em;
 			background: var(--transparent);
-			cursor: pointer;
 			font-size: 0.85em;
+			cursor: pointer;
 
 			&:hover {
 				border-color: var(--purple_bright);
@@ -493,8 +493,8 @@
 			}
 
 			&.active {
-				background: var(--purple_bright);
 				border-color: var(--purple_bright);
+				background: var(--purple_bright);
 				color: var(--white);
 			}
 		}
@@ -515,10 +515,10 @@
 			margin: 0.6em 0 0.8em;
 
 			& .label {
-				font-size: 0.75em;
-				text-transform: uppercase;
 				color: var(--grey);
+				font-size: 0.75em;
 				font-weight: 600;
+				text-transform: uppercase;
 			}
 		}
 
@@ -541,11 +541,11 @@
 
 		& li {
 			display: flex;
-			align-items: center;
 			flex-wrap: wrap;
-			gap: 0.5em;
+			align-items: center;
 			padding: 0.4em 0;
 			border-bottom: 1px solid var(--grey_light);
+			gap: 0.5em;
 
 			&.checked {
 				opacity: 0.6;
@@ -558,10 +558,10 @@
 
 			& input {
 				display: inline-block;
+				flex-shrink: 0;
 				width: auto;
 				margin: 0;
 				padding: 0;
-				flex-shrink: 0;
 			}
 		}
 
@@ -576,16 +576,16 @@
 			padding: 0.1em 0.3em;
 			border: 1px solid var(--grey_light);
 			border-radius: 0.3em;
-			font-size: 0.8em;
-			color: var(--grey);
 			background: var(--transparent);
+			color: var(--grey);
+			font-size: 0.8em;
 		}
 
 		& .section-title {
-			font-weight: 600;
 			margin-top: 0.5em;
 			border-bottom: none;
 			color: var(--navy);
+			font-weight: 600;
 		}
 	}
 
@@ -611,10 +611,10 @@
 
 			& input {
 				display: inline-block;
+				flex-shrink: 0;
 				width: auto;
 				margin: 0.3em 0 0;
 				padding: 0;
-				flex-shrink: 0;
 			}
 		}
 
@@ -637,14 +637,14 @@
 
 		& div {
 			padding: 0.5em;
-			background: color-mix(in oklch, var(--blue) 8%, var(--transparent));
 			border-radius: 0.3em;
+			background: color-mix(in oklch, var(--blue) 8%, var(--transparent));
 		}
 
 		& dt {
+			color: var(--grey);
 			font-size: 0.75em;
 			text-transform: uppercase;
-			color: var(--grey);
 		}
 
 		& dd {
@@ -654,10 +654,10 @@
 	}
 
 	.note {
-		padding: 0.5em;
 		margin: 0.3em 0;
-		background: color-mix(in oklch, var(--orange) 8%, var(--transparent));
+		padding: 0.5em;
 		border-radius: 0.3em;
+		background: color-mix(in oklch, var(--orange) 8%, var(--transparent));
 
 		& p {
 			margin: 0.2em 0 0;
@@ -673,8 +673,8 @@
 
 		& li {
 			padding: 0.3em 0.7em;
-			background: color-mix(in oklch, var(--blue) 8%, var(--transparent));
 			border-radius: 0.3em;
+			background: color-mix(in oklch, var(--blue) 8%, var(--transparent));
 			font-size: 0.9em;
 		}
 	}
@@ -687,12 +687,12 @@
 	.footer-meta {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 1.5em;
 		margin-top: 2em;
 		padding-top: 1em;
 		border-top: 1px solid var(--grey_light);
-		font-size: 0.85em;
 		color: var(--grey);
+		font-size: 0.85em;
+		gap: 1.5em;
 
 		& a {
 			color: var(--purple_bright);

@@ -73,12 +73,12 @@
 		justify-content: center;
 		width: 1.6em;
 		height: 1.6em;
+		transition: all 0.15s;
 		border: 2px solid var(--grey_light);
 		border-radius: 0.3em;
 		background: var(--transparent);
 		color: var(--grey);
 		font-size: 0.85em;
-		transition: all 0.15s;
 
 		&:hover:not(:disabled) {
 			border-color: var(--purple_bright);
@@ -86,8 +86,8 @@
 		}
 
 		&.complete {
-			background: var(--green);
 			border-color: var(--green);
+			background: var(--green);
 			color: var(--green_text);
 		}
 

@@ -44,18 +44,18 @@
 
 <style>
 	.circular_progress {
-		transform: rotate(-90deg);
 		flex-shrink: 0;
+		transform: rotate(-90deg);
 	}
 
 	.track {
-		stroke: rgba(255, 255, 255, 0.3);
 		stroke-dasharray: 2 4;
+		stroke: rgb(255 255 255 / 30%);
 	}
 
 	.value {
-		stroke: currentColor;
-		stroke-linecap: round;
 		transition: stroke-dashoffset 0.3s linear;
+		stroke-linecap: round;
+		stroke: currentColor;
 	}
 </style>

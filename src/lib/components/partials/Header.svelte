@@ -100,6 +100,7 @@
 
 		display: grid;
 		position: fixed;
+		z-index: 50;
 		top: 0;
 		right: 0;
 		left: 0;
@@ -112,7 +113,6 @@
 		border-color: var(--header_border);
 		background: var(--header_background);
 		gap: 0.5em;
-		z-index: 50;
 	}
 
 	.title {

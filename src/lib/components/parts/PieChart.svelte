@@ -80,7 +80,7 @@
 			{@const [labelX, labelY] = polar((outerR + INNER_R) / 2, (start + end) / 2)}
 			<path
 				d={donutPath(start, end, outerR)}
-				style="fill: var(--{slice.colour}); transition: d 0.1s ease;"
+				style=" transition: d 0.1s ease;fill: var(--{slice.colour});"
 				class="slice"
 				role="img"
 				aria-label="{slice.label}: {formatValue(slice.value)} ({(share * 100).toFixed(0)}%)"
@@ -140,15 +140,15 @@
 <style>
 	.pie-wrap {
 		display: flex;
+		flex-wrap: wrap;
 		align-items: center;
 		gap: 1.5em;
-		flex-wrap: wrap;
 	}
 
 	.chart {
+		flex-shrink: 0;
 		width: 200px;
 		height: 200px;
-		flex-shrink: 0;
 		overflow: visible;
 	}
 
@@ -163,55 +163,55 @@
 	}
 
 	.center-value {
+		fill: var(--background_text);
 		font-size: 20px;
 		font-weight: 700;
-		fill: var(--background_text);
 	}
 
 	.center-label {
-		font-size: 10px;
 		fill: var(--grey);
+		font-size: 10px;
 	}
 
 	.tooltip-bg {
-		fill: var(--black);
 		opacity: 0.85;
+		fill: var(--black);
 	}
 
 	.tooltip-text {
+		fill: var(--white);
 		font-size: 12px;
 		font-weight: 600;
-		fill: var(--white);
 	}
 
 	.legend {
-		list-style: none;
-		margin: 0;
-		padding: 0;
 		display: flex;
 		flex-direction: column;
-		gap: 0.4em;
+		margin: 0;
+		padding: 0;
 		font-size: 0.85em;
-	}
+		list-style: none;
+		gap: 0.4em;
 
-	.legend li {
+	& li {
 		display: flex;
 		align-items: center;
-		gap: 0.5em;
-		cursor: pointer;
-		border-radius: 0.2em;
 		padding: 0.1em 0.3em;
-	}
+		border-radius: 0.2em;
+		cursor: pointer;
+		gap: 0.5em;
 
-	.legend li.hovered {
+	&.hovered {
 		background: var(--grey_light);
+	}
+	}
 	}
 
 	.swatch {
+		flex-shrink: 0;
 		width: 0.8em;
 		height: 0.8em;
 		border-radius: 0.15em;
-		flex-shrink: 0;
 	}
 
 	.legend-label {

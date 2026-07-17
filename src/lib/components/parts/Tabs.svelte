@@ -79,25 +79,25 @@
 	}
 
 	button {
+		flex-shrink: 0;
 		margin: 0;
 		padding: 0;
 		border: none;
+		border-radius: 0.2em;
 		background: none;
 		color: var(--text_secondary);
 		font-size: 1em;
 		font-weight: 600;
 		text-transform: capitalize;
 		cursor: pointer;
-		border-radius: 0.2em;
-		flex-shrink: 0;
 
 		&:hover {
 			text-decoration: underline;
 		}
 
 		&[data-active='true'] {
-			color: var(--navy);
 			opacity: 1;
+			color: var(--navy);
 		}
 
 		&:focus-visible {

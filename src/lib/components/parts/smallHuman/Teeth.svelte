@@ -185,39 +185,38 @@
 	.teeth {
 		--tooth: var(--background);
 
-		max-height: 70vh;
 		max-width: 400px;
+		max-height: 70vh;
+		padding: 1em;
 		float: right;
+		border: 2px solid var(--navy);
 		background: var(--background);
 		color: var(--background_text);
-		padding: 1em;
-		border: 2px solid var(--navy);
 	}
 
 	.teeth_details {
 		display: grid;
 		grid-template-areas: 'details';
-		align-items: start;
-		justify-items: start;
+		place-items: start start;
 
 		& p {
 			visibility: hidden;
 			grid-area: details;
-			background: color-mix(in oklch, var(--navy) 10%, var(--white_true));
 			padding: 0.2em 0.5em;
 			border: 2px solid var(--navy);
 			border-radius: 0.4em;
+			background: color-mix(in oklch, var(--navy) 10%, var(--white_true));
 			color: var(--navy);
 		}
 
 		& span {
-			margin-left: 1em;
 			display: block;
+			margin-left: 1em;
 		}
 
 		.name {
-			font-weight: 600;
 			margin-left: 0;
+			font-weight: 600;
 		}
 	}
 

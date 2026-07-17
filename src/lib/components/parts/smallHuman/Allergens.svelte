@@ -67,11 +67,11 @@
 	.list {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 0.5em;
-		list-style: none;
 		margin-bottom: 2em;
-		font-weight: 700;
 		padding: 0;
+		font-weight: 700;
+		list-style: none;
+		gap: 0.5em;
 	}
 
 	button {
@@ -81,13 +81,13 @@
 		flex-direction: column;
 		align-items: center;
 		padding: 0.6em 1em;
+		transition: opacity 0.15s;
 		border: 2px solid var(--colour);
 		border-radius: 0.4em;
-		cursor: pointer;
+		background: color-mix(in oklch, var(--colour) 15%, var(--white_true));
 		color: var(--black);
 		font-size: 0.9em;
-		transition: opacity 0.15s;
-		background: color-mix(in oklch, var(--colour) 15%, var(--white_true));
+		cursor: pointer;
 
 		&:disabled {
 			opacity: 0.4;
@@ -114,6 +114,7 @@
 	}
 
 	.label {
+
 		@include sr_only;
 	}
 

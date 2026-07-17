@@ -17,10 +17,14 @@
 
 <dl
 	class={className}
-	style="--colour: var(--{colour || 'blue'})"
+	style="
+
+--colour: var(--{colour || 'blue'})"
 >
 	{#each items as { name, value, colour, Icon } (name)}
-		<div style="--colour: var(--{colour})">
+		<div style="
+
+--colour: var(--{colour})">
 			<dt class={Icon ? 'sr-only' : ''}>{name}</dt>
 			<dd>{value}</dd>
 			{#if Icon}<Icon />{/if}
@@ -33,27 +37,27 @@
 		--colour: var(--blue);
 
 		display: flex;
-		font-size: 0.75em;
 		flex-wrap: wrap;
+		font-size: 0.75em;
 	}
 
 	div {
-		border-radius: 0.2em;
-		border: 1.5px solid var(--colour);
-		width: auto;
-		padding: 0.2em 0.5em;
-		max-width: max-content;
-		color: var(--colour);
-		margin: 0.2em;
-		text-align: center;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
+		width: auto;
+		max-width: max-content;
+		margin: 0.2em;
+		padding: 0.2em 0.5em;
+		border: 1.5px solid var(--colour);
+		border-radius: 0.2em;
+		color: var(--colour);
+		text-align: center;
 
 		:global(svg) {
 			order: -1;
-			height: 3em;
 			width: auto;
+			height: 3em;
 		}
 	}
 

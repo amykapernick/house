@@ -359,19 +359,19 @@
 	.widget-header {
 		display: flex;
 		flex-wrap: wrap;
-		justify-content: space-between;
 		align-items: baseline;
-		gap: 0.5em 1em;
+		justify-content: space-between;
 		margin-bottom: 0.5em;
+		gap: 0.5em 1em;
 
 		& h2 {
-			font-size: 1.1em;
 			margin: 0;
+			font-size: 1.1em;
 		}
 
 		& a {
-			font-size: 0.85em;
 			color: var(--purple_bright);
+			font-size: 0.85em;
 			text-decoration: none;
 
 			&:hover {
@@ -402,11 +402,11 @@
 
 	.agenda-item {
 		display: flex;
-		justify-content: space-between;
 		align-items: baseline;
-		gap: 1em;
+		justify-content: space-between;
 		padding: 0.5em 0;
 		border-bottom: 1px solid var(--grey_light);
+		gap: 1em;
 
 		&:last-child {
 			border-bottom: none;
@@ -419,8 +419,8 @@
 
 	.agenda-meta {
 		flex-shrink: 0;
-		font-size: 0.8em;
 		color: var(--grey);
+		font-size: 0.8em;
 
 		&.overdue {
 			color: var(--red);
@@ -446,8 +446,8 @@
 			padding: 0.1em 0.3em;
 			border: 1px solid currentColor;
 			border-radius: 0.2em;
-			font-size: 0.65em;
 			color: var(--blue);
+			font-size: 0.65em;
 		}
 	}
 </style>

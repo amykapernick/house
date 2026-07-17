@@ -50,11 +50,11 @@
 
 <style>
 	.picker_list {
+		max-height: 50vh;
 		margin: 0 0 1em;
 		padding: 0;
-		list-style: none;
-		max-height: 50vh;
 		overflow-y: auto;
+		list-style: none;
 
 		& li {
 			margin: 0;

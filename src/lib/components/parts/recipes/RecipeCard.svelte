@@ -77,22 +77,22 @@
 <style>
 	.card {
 		display: block;
+		overflow: hidden;
+		transition: box-shadow 0.2s;
 		border: 1px solid var(--grey_light);
 		border-radius: 0.5em;
-		overflow: hidden;
-		text-decoration: none;
 		color: inherit;
-		transition: box-shadow 0.2s;
+		text-decoration: none;
 
 		&:hover {
-			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+			box-shadow: 0 2px 8px rgb(0 0 0 / 10%);
 		}
 
 		& img {
+			display: block;
 			width: 100%;
 			height: 180px;
 			object-fit: cover;
-			display: block;
 		}
 
 		& .no-image {
@@ -113,8 +113,8 @@
 		padding: 0.8em;
 
 		& h2 {
-			font-size: 1em;
 			margin: 0 0 0.3em;
+			font-size: 1em;
 			line-height: 1.3;
 		}
 
@@ -122,8 +122,8 @@
 			padding: 0.6em;
 
 			& h3 {
-				font-size: 0.9em;
 				margin: 0 0 0.2em;
+				font-size: 0.9em;
 				line-height: 1.3;
 			}
 		}
@@ -131,40 +131,40 @@
 
 	.day {
 		display: block;
+		margin-bottom: 0.2em;
+		color: var(--purple_bright);
 		font-size: 0.7em;
 		font-weight: 600;
-		text-transform: uppercase;
 		letter-spacing: 0.03em;
-		color: var(--purple_bright);
-		margin-bottom: 0.2em;
+		text-transform: uppercase;
 	}
 
 	.description {
-		font-size: 0.85em;
-		color: var(--grey);
-		margin: 0 0 0.5em;
 		display: -webkit-box;
+		margin: 0 0 0.5em;
+		overflow: hidden;
+		color: var(--grey);
+		font-size: 0.85em;
 		-webkit-line-clamp: 2;
 		-webkit-box-orient: vertical;
-		overflow: hidden;
 
 		&.compact {
-			font-size: 0.8em;
 			margin: 0 0 0.3em;
+			font-size: 0.8em;
 		}
 	}
 
 	.meta {
 		display: flex;
-		gap: 1em;
-		font-size: 0.8em;
-		color: var(--grey);
 		margin-bottom: 0.5em;
+		color: var(--grey);
+		font-size: 0.8em;
+		gap: 1em;
 
 		&.compact {
-			gap: 0.8em;
-			font-size: 0.75em;
 			margin-bottom: 0.3em;
+			font-size: 0.75em;
+			gap: 0.8em;
 		}
 	}
 </style>

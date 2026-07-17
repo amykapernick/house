@@ -272,8 +272,8 @@
 			border-radius: 0.3em;
 			background: var(--purple_bright);
 			color: var(--purple_bright_text);
-			cursor: pointer;
 			font-size: 0.95em;
+			cursor: pointer;
 
 			&:disabled {
 				opacity: 0.5;
@@ -283,30 +283,30 @@
 	}
 
 	.error {
-		color: var(--red);
 		margin: 0 0 1em;
+		color: var(--red);
 	}
 
 	.controls {
 		display: flex;
-		justify-content: space-between;
 		align-items: center;
+		justify-content: space-between;
 		margin-bottom: 1.5em;
 	}
 
 	.count {
-		font-size: 0.9em;
-		color: var(--grey);
 		margin: 0;
+		color: var(--grey);
+		font-size: 0.9em;
 	}
 
 	.toggle {
 		display: flex;
 		align-items: center;
-		gap: 0.4em;
-		font-size: 0.85em;
 		color: var(--grey);
+		font-size: 0.85em;
 		cursor: pointer;
+		gap: 0.4em;
 
 		& input {
 			cursor: pointer;
@@ -317,8 +317,8 @@
 		margin-bottom: 1.5em;
 
 		& > summary {
-			cursor: pointer;
 			list-style: none;
+			cursor: pointer;
 
 			&::marker,
 			&::-webkit-details-marker {
@@ -326,12 +326,12 @@
 			}
 
 			& h2 {
-				font-size: 1.1em;
+				display: flex;
+				align-items: center;
 				margin: 0;
 				padding-bottom: 0.3em;
 				border-bottom: 2px solid var(--navy);
-				display: flex;
-				align-items: center;
+				font-size: 1.1em;
 				gap: 0.5em;
 
 				&::before {
@@ -350,8 +350,8 @@
 		margin: 0.5em 0 0.5em 1em;
 
 		& > summary {
-			cursor: pointer;
 			list-style: none;
+			cursor: pointer;
 
 			&::marker,
 			&::-webkit-details-marker {
@@ -359,20 +359,20 @@
 			}
 
 			& h3 {
-				font-size: 0.95em;
+				display: flex;
+				align-items: center;
 				margin: 0;
 				padding-bottom: 0.2em;
 				border-bottom: 1px solid var(--grey_light);
 				color: var(--navy);
+				font-size: 0.95em;
 				text-transform: capitalize;
-				display: flex;
-				align-items: center;
 				gap: 0.5em;
 
 				&::before {
 					content: '▸';
-					font-size: 0.8em;
 					transition: transform 0.15s;
+					font-size: 0.8em;
 				}
 			}
 		}
@@ -409,8 +409,8 @@
 	}
 
 	.item-row {
-		flex: 1;
 		display: flex;
+		flex: 1;
 		flex-direction: column;
 		gap: 0.3em;
 	}
@@ -425,8 +425,8 @@
 		padding: 0.1em 0.5em;
 		border: 1px solid currentColor;
 		border-radius: 0.2em;
-		font-size: 0.75em;
 		color: var(--purple_bright);
+		font-size: 0.75em;
 		text-decoration: none;
 
 		&:hover {

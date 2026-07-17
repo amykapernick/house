@@ -65,14 +65,14 @@
 		display: flex;
 		flex-wrap: wrap;
 		align-items: center;
-		gap: 1em;
-		border: none;
-		padding: 0;
 		margin-bottom: 1em;
+		padding: 0;
+		border: none;
+		gap: 1em;
 
 		legend {
-			font-weight: bold;
 			padding: 0;
+			font-weight: bold;
 		}
 
 		.option {

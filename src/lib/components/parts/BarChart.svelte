@@ -192,19 +192,19 @@
 	}
 
 	.axis {
-		stroke: var(--grey);
 		stroke-width: 1.5;
+		stroke: var(--grey);
 	}
 
 	.gridline {
-		stroke: var(--grey_light);
 		stroke-width: 1;
 		stroke-dasharray: 4 4;
+		stroke: var(--grey_light);
 	}
 
 	.tick-label {
-		font-size: 11px;
 		fill: var(--grey);
+		font-size: 11px;
 	}
 
 	.bar {
@@ -212,36 +212,36 @@
 	}
 
 	.tooltip-bg {
-		fill: var(--black);
 		opacity: 0.85;
+		fill: var(--black);
 	}
 
 	.tooltip-text {
+		fill: var(--white);
 		font-size: 12px;
 		font-weight: 600;
-		fill: var(--white);
 	}
 
 	.legend {
-		list-style: none;
-		margin: 0.5em 0 0;
-		padding: 0;
 		display: flex;
 		flex-wrap: wrap;
-		gap: 0.3em 1em;
+		margin: 0.5em 0 0;
+		padding: 0;
 		font-size: 0.85em;
-	}
+		list-style: none;
+		gap: 0.3em 1em;
 
-	.legend li {
+	& li {
 		display: flex;
 		align-items: center;
 		gap: 0.5em;
 	}
+	}
 
 	.swatch {
+		flex-shrink: 0;
 		width: 0.8em;
 		height: 0.8em;
 		border-radius: 0.15em;
-		flex-shrink: 0;
 	}
 </style>
