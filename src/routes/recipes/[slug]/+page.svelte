@@ -352,12 +352,13 @@
 
 		<div class="footer-meta">
 			{#if recipe.orgURL}
-				<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- orgURL is the external source recipe page, not an internal route -->
+				<!-- eslint-disable svelte/no-navigation-without-resolve -- orgURL is the external source recipe page, not an internal route -->
 				<a
 					href={recipe.orgURL}
 					target="_blank"
 					rel="noreferrer">Original recipe</a
 				>
+				<!-- eslint-enable svelte/no-navigation-without-resolve -->
 			{/if}
 			{#if recipe.dateAdded}<span>Added: {format(parseISO(recipe.dateAdded), 'd MMM yyyy')}</span>{/if}
 			{#if recipe.lastMade}<span>Last made: {format(parseISO(recipe.lastMade), 'd MMM yyyy')}</span>{/if}
