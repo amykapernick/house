@@ -204,10 +204,10 @@
 
 	.saved {
 		align-self: center;
-		color: var(--success, green);
+		color: var(--success);
 	}
 
 	.error {
-		color: var(--error, red);
+		color: var(--error);
 	}
 </style>

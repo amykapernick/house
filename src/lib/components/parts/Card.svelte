@@ -20,7 +20,7 @@
 		position: relative;
 		width: auto;
 		padding: 0.5em 0.75em;
-		border: 1px solid color-mix(in oklch, var(--background) 78%, var(--black));
+		border: 1px solid var(--border);
 		border-radius: 0.5em;
 		background: light-dark(
 			linear-gradient(var(--white_true), color-mix(in oklch, var(--background) 55%, var(--white_true))),
@@ -29,7 +29,7 @@
 
 		&.dark {
 			border: none;
-			background: linear-gradient(155deg, rgb(53 71 140), rgb(26 36 71));
+			background: var(--gradient_navy);
 			color: var(--dark_background_text);
 		}
 	}     

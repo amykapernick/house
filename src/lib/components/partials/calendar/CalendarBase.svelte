@@ -48,11 +48,11 @@
 	.calendar-container {
 		height: 80vh;
 
-		:global(.ec) {
+		& :global(.ec) {
 			font-family: inherit;
 		}
 
-		:global(.ec-toolbar) {
+		& :global(.ec-toolbar) {
 			flex-wrap: wrap;
 			gap: 10px;
 		}

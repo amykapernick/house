@@ -132,7 +132,7 @@
 
 		&.today {
 			border-color: var(--purple_bright);
-			background: color-mix(in oklch, var(--purple_bright) 4%, var(--transparent));
+			background: var(--purple_bright_tint_bg);
 		}
 
 		& h2 {

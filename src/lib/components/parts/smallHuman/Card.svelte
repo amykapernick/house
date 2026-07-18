@@ -83,10 +83,10 @@
 		display: grid;
 		position: relative;
 		grid-template-areas:
-			'heading 	heading'
-			'content 	content'
-			'tags		.'
-			'footer		icon';
+			'heading heading'
+			'content content'
+			'tags .'
+			'footer icon';
 		grid-template-columns: 1fr auto;
 		grid-template-rows: auto 1fr auto auto;
 		order: var(--order);
@@ -96,6 +96,10 @@
 		border-radius: 1em;
 		background: color-mix(in oklch, var(--colour) 10%, var(--white_true));
 		color: var(--black);
+
+		&:global(.has-dismiss) .heading {
+			padding-right: 1.6em;
+		}
 	}
 
 	.heading {
@@ -104,10 +108,6 @@
 		margin: 0 0 0.2em;
 		padding: 0 0.2em;
 		color: var(--black);
-
-	:global(.card.has-dismiss) & {
-		padding-right: 1.6em;
-	}
 	}
 
 	.dismiss {
@@ -147,7 +147,7 @@
 		height: auto;
 		line-height: 1;
 
-		:global(svg) {
+		& :global(svg) {
 			width: auto;
 			height: 2em;
 		}

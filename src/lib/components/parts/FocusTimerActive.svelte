@@ -101,16 +101,16 @@
 			grid-template-areas: 'timer desc' 'timer toggle';
 			grid-template-columns: auto 1fr;
 
-			.phase,
-			.progress,
-			.total_progress,
-			.stop,
-			.description,
-			.permission {
+			& .phase,
+			& .progress,
+			& .total_progress,
+			& .stop,
+			& .description,
+			& .permission {
 				display: none;
 			}
 
-			.time {
+			& .time {
 				font-size: 0.8em;
 			}
 		}

@@ -214,7 +214,7 @@
 			margin-left: 1em;
 		}
 
-		.name {
+		& .name {
 			margin-left: 0;
 			font-weight: 600;
 		}

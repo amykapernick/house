@@ -132,12 +132,12 @@
 		border: none;
 		gap: 1em;
 
-		legend {
+		& legend {
 			padding: 0;
 			font-weight: bold;
 		}
 
-		.option {
+		& .option {
 			display: flex;
 			align-items: center;
 			gap: 0.3em;

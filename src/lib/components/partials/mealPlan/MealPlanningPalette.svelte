@@ -86,7 +86,7 @@
 		padding: 1em;
 		border: 1px solid var(--grey_light);
 		border-radius: 0.5em;
-		background: color-mix(in oklch, var(--purple_bright) 4%, var(--transparent));
+		background: var(--purple_bright_tint_bg);
 
 		& h2 {
 			margin: 0 0 0.8em;

@@ -65,9 +65,7 @@
 		padding: 1em;
 		border-radius: 1em;
 		background: linear-gradient(var(--white_true), color-mix(in oklch, var(--background) 55%, var(--white_true)));
-		box-shadow:
-			rgb(13 13 13 / 4%) 0 1px 2px,
-			rgb(95 65 50 / 7%) 0 3px 10px;
+		box-shadow: var(--shadow_card);
 		row-gap: 10px;
 
 		&.has-active {

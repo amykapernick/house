@@ -85,7 +85,7 @@
 			margin-bottom: 10px;
 		}
 
-		.selection {
+		& .selection {
 			display: grid;
 			position: relative;
 			grid-column: 1 / -1;
@@ -124,7 +124,7 @@
 			}
 		}
 
-		.preset_description {
+		& .preset_description {
 			grid-column: 2;
 			color: var(--text_secondary);
 			font-size: 0.85em;
@@ -142,7 +142,7 @@
 		background: color-mix(in oklch, var(--white_true) 80%, var(--background));
 		gap: 0.5em;
 
-		input {
+		& input {
 			width: 5em;
 			margin: 0;
 		}

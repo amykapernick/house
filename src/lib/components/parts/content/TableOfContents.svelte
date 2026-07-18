@@ -63,7 +63,7 @@
 		margin: 10px 0 20px;
 		padding: 15px 20px;
 		border-radius: 0.5em;
-		background: linear-gradient(155deg, rgb(53 71 140), rgb(26 36 71));
+		background: var(--gradient_navy);
 		color: var(--navy_text);
 		font-weight: 600;
 

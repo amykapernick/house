@@ -96,7 +96,7 @@
 		gap: 1em;
 		margin-bottom: 1em;
 
-		.field {
+		& .field {
 			display: flex;
 			flex-direction: column;
 			gap: 0.25em;

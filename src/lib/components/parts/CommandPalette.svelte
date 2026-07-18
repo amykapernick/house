@@ -972,6 +972,11 @@
 		&[data-active='true'] {
 			background: var(--purple_bright);
 			color: var(--purple_bright_text);
+
+			& .tag {
+				border-color: currentColor;
+				color: inherit;
+			}
 		}
 
 		&.archived {
@@ -1003,11 +1008,6 @@
 		font-size: 0.7em;
 		letter-spacing: 0.03em;
 		text-transform: uppercase;
-
-		.result[data-active='true'] & {
-			border-color: currentColor;
-			color: inherit;
-		}
 	}
 
 	.tag-archived {

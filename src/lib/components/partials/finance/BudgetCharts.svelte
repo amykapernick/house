@@ -122,7 +122,7 @@
 	.charts {
 		margin-bottom: 2em;
 
-		:global(dl) {
+		& :global(dl) {
 			margin-bottom: 1.5em;
 		}
 	}

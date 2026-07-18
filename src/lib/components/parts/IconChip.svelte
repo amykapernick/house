@@ -38,7 +38,7 @@
 		justify-content: center;
 		margin: 0 auto 0.4em;
 
-		:global(svg) {
+		& :global(svg) {
 			width: auto;
 			height: 1em;
 		}

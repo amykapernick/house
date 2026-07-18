@@ -191,7 +191,7 @@
 		right: 0.5em;
 		bottom: 4.5rem;
 		margin: 0;
-		box-shadow: 0 0.1em 0.5em rgb(0 0 0 / 25%);
+		box-shadow: var(--shadow_soft);
 		font-size: 1.3em;
 	}
 
@@ -204,7 +204,7 @@
 		right: 3.5em;
 		bottom: 4.5rem;
 		margin: 0;
-		box-shadow: 0 0.1em 0.5em rgb(0 0 0 / 25%);
+		box-shadow: var(--shadow_soft);
 		font-size: 1.3em;
 	}
 

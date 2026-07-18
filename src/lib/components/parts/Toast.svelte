@@ -28,7 +28,7 @@
 		padding: 0.7em 1em;
 		border-radius: 0.5em;
 		background: var(--black);
-		box-shadow: rgb(13 13 13 / 4%) 0 1px 2px, rgb(95 65 50 / 9%) 0 8px 20px;
+		box-shadow: var(--shadow_popover);
 		color: var(--white);
 		gap: 0.75em;
 

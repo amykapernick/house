@@ -405,7 +405,7 @@
 		margin-bottom: 1em;
 		padding: 0.8em;
 		border-radius: 0.3em;
-		background: color-mix(in oklch, var(--blue) 8%, var(--transparent));
+		background: var(--blue_tint_bg);
 		gap: 1.5em;
 	}
 
@@ -638,7 +638,7 @@
 		& div {
 			padding: 0.5em;
 			border-radius: 0.3em;
-			background: color-mix(in oklch, var(--blue) 8%, var(--transparent));
+			background: var(--blue_tint_bg);
 		}
 
 		& dt {
@@ -674,7 +674,7 @@
 		& li {
 			padding: 0.3em 0.7em;
 			border-radius: 0.3em;
-			background: color-mix(in oklch, var(--blue) 8%, var(--transparent));
+			background: var(--blue_tint_bg);
 			font-size: 0.9em;
 		}
 	}

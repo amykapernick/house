@@ -93,12 +93,10 @@
 		height: 2.7em;
 		margin: 0;
 		padding: 0.7em 1em;
-		border: 1px solid color-mix(in oklch, var(--background) 78%, var(--black));
+		border: 1px solid var(--border);
 		border-radius: 2em;
 		background: linear-gradient(var(--white_true), color-mix(in oklch, var(--background) 55%, var(--white_true)));
-		box-shadow:
-			rgb(13 13 13 / 4%) 0 1px 2px,
-			rgb(95 65 50 / 7%) 0 3px 10px;
+		box-shadow: var(--shadow_card);
 		color: var(--text_secondary);
 		font-size: 0.8em;
 		font-weight: 600;
@@ -112,7 +110,7 @@
 		}
 
 		&.offline {
-			.dot {
+			& .dot {
 				background: var(--warning);
 			}
 		}
@@ -120,8 +118,8 @@
 		&:not(&:hover, &:focus-within) {
 			width: 2.7em;
 
-			.status,
-			button {
+			& .status,
+			& button {
 
 				@include sr_only;
 			}

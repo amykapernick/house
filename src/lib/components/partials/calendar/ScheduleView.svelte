@@ -52,7 +52,7 @@
 			method: `POST`,
 			headers: {
 				'Content-Type': `application/json`,
-				...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+				...(token ? { Authorization: `Bearer ${token}` } : {}),
 			},
 			body: JSON.stringify({
 				query: `mutation { completeTask(taskId: "${selectedTask.id}", platform: ${selectedTask.platform}) { success } }`,
@@ -131,9 +131,7 @@
 			end: new Date(block.end),
 			allDay: false,
 			editable: true,
-			backgroundColor: block.colour
-				? (block.colour.startsWith('#') ? block.colour : `var(--${block.colour})`)
-				: 'var(--purple_bright)',
+			backgroundColor: block.colour ? (block.colour.startsWith('#') ? block.colour : `var(--${block.colour})`) : 'var(--purple_bright)',
 			textColor: textColourFor(block.colour),
 			classNames: block.isOverride ? ['schedule-override'] : [],
 			extendedProps: { type: 'block', link: undefined, status: undefined, platform: undefined },
@@ -206,11 +204,8 @@
 					isOverride: false,
 				},
 			];
-		}
-		else {
-			editableBlocks = editableBlocks.map((block) =>
-				block.id === draftId ? { ...block, label: draftLabel.trim(), colour: draftColour } : block
-			);
+		} else {
+			editableBlocks = editableBlocks.map((block) => (block.id === draftId ? { ...block, label: draftLabel.trim(), colour: draftColour } : block));
 		}
 
 		hasChanges = true;
@@ -230,11 +225,7 @@
 		}
 
 		const { id, start, end } = info.event;
-		editableBlocks = editableBlocks.map((block) =>
-			block.id === id
-				? { ...block, start: format(start, LOCAL_DATETIME), end: format(end, LOCAL_DATETIME) }
-				: block
-		);
+		editableBlocks = editableBlocks.map((block) => (block.id === id ? { ...block, start: format(start, LOCAL_DATETIME), end: format(end, LOCAL_DATETIME) } : block));
 		hasChanges = true;
 	}
 
@@ -278,10 +269,7 @@
 
 	async function confirmSave(scopePayload: { scope: `default` } | { scope: `range`; start: string; end: string }) {
 		const days = blocksToRoutineDays(editableBlocks);
-		const payload: ScheduleSavePayload =
-			scopePayload.scope === `default`
-				? { scope: `default`, days }
-				: { scope: `range`, start: scopePayload.start, end: scopePayload.end, days };
+		const payload: ScheduleSavePayload = scopePayload.scope === `default` ? { scope: `default`, days } : { scope: `range`, start: scopePayload.start, end: scopePayload.end, days };
 
 		saving = true;
 		saveError = ``;
@@ -289,11 +277,9 @@
 			await onSave?.(payload);
 			saveModalOpen = false;
 			hasChanges = false;
-		}
-		catch {
+		} catch {
 			saveError = `Failed to save changes.`;
-		}
-		finally {
+		} finally {
 			saving = false;
 		}
 	}
@@ -346,11 +332,18 @@
 			{#if hasChanges}
 				<span class="unsaved">Unsaved changes</span>
 			{/if}
-			<button disabled={!hasChanges} onclick={() => (saveModalOpen = true)}>Save changes</button>
+			<button
+				disabled={!hasChanges}
+				onclick={() => (saveModalOpen = true)}>Save changes</button
+			>
 		{/if}
 	</div>
 
-	<CalendarBase plugins={[TimeGrid, Interaction]} events={calendarEvents} {optionsOverride} />
+	<CalendarBase
+		plugins={[TimeGrid, Interaction]}
+		events={calendarEvents}
+		{optionsOverride}
+	/>
 
 	<ScheduleBlockModal
 		bind:open={blockModalOpen}
@@ -401,9 +394,5 @@
 	.hint {
 		color: var(--grey);
 		font-style: italic;
-	}
-
-	:global(.schedule-override) {
-		border: 2px dashed var(--white) !important;
 	}
 </style>

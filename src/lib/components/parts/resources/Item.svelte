@@ -151,7 +151,7 @@
 		}
 
 		&:has(h3 a:hover) {
-			background: linear-gradient(155deg, rgb(53 71 140), rgb(26 36 71));
+			background: var(--gradient_navy);
 			color: var(--navy_text);
 		}
 

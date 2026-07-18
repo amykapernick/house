@@ -35,21 +35,21 @@
 		padding: 0.5em 1em;
 		border-radius: 0.4em;
 		background: var(--purple_bright);
-		box-shadow: 0 0.1em 0.5em rgb(0 0 0 / 25%);
+		box-shadow: var(--shadow_soft);
 		color: var(--purple_bright_text);
 		font-size: 0.85em;
 		gap: 0.5em;
 
-		a {
+		& a {
 			color: inherit;
 			font-weight: 600;
 		}
 
-		.due_label {
+		& .due_label {
 			opacity: 0.85;
 		}
 
-		button {
+		& button {
 			margin-left: auto;
 			padding: 0;
 			border: none;

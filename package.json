@@ -13,7 +13,7 @@
     "lint": "eslint -c ./config/eslint.config.mjs --fix . && npm run lint:styles",
     "lint:ci": "eslint -c ./config/eslint.config.mjs . && npm run lint:styles:ci",
     "lint:styles": "stylelint --config ./config/stylelint.config.cjs --fix \"src/**/*.{css,svelte}\" || true",
-    "lint:styles:ci": "stylelint --config ./config/stylelint.config.cjs \"src/**/*.{css,svelte}\" || true",
+    "lint:styles:ci": "node scripts/lint-styles-ci.mjs",
     "generate": "graphql-codegen",
     "pretest:unit": "svelte-kit sync",
     "test:unit": "vitest run",

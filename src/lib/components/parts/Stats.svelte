@@ -54,7 +54,7 @@
 		color: var(--colour);
 		text-align: center;
 
-		:global(svg) {
+		& :global(svg) {
 			order: -1;
 			width: auto;
 			height: 3em;

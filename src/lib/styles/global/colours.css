@@ -16,7 +16,13 @@
 		color-mix(in oklch, var(--gradient_base) 78%, #000000) 100%
 	);
 	--background_gradient: var(--gradient_background);
-	
+	--gradient_navy: linear-gradient(155deg, rgb(53 71 140), rgb(26 36 71));
+	--shadow_soft: 0 0.1em 0.5em rgb(0 0 0 / 25%);
+	--shadow_card: rgb(13 13 13 / 4%) 0 1px 2px, rgb(95 65 50 / 7%) 0 3px 10px;
+	--shadow_popover: rgb(13 13 13 / 4%) 0 1px 2px, rgb(95 65 50 / 9%) 0 8px 20px;
+	--blue_tint_bg: color-mix(in oklch, var(--blue) 8%, var(--transparent));
+	--purple_bright_tint_bg: color-mix(in oklch, var(--purple_bright) 4%, var(--transparent));
+
 
 	color-scheme: light dark;
 

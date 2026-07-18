@@ -66,7 +66,7 @@
 			border: 1px solid var(--input_border);
 			border-radius: 0.5em;
 			background: var(--white_true);
-			box-shadow: rgb(13 13 13 / 4%) 0 1px 2px, rgb(95 65 50 / 9%) 0 8px 20px;
+			box-shadow: var(--shadow_popover);
 			appearance: base-select;
 			gap: 0;
 		}
