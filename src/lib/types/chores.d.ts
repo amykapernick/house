@@ -5,5 +5,7 @@ export type Chore = {
 	recurrence?: string | null,
 	isRecurring?: boolean,
 	// chores sharing a label are grouped into one routine
-	labels: string[]
+	labels: string[],
+	upcoming?: boolean,
+	durationMinutes?: number | null
 }

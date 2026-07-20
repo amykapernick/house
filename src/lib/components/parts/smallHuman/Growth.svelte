@@ -1,14 +1,12 @@
 <script lang="ts">
 	import type { Growth } from '$types/smallHuman';
 	import { parseISO, format } from 'date-fns';
-	import LineChart from '$parts/LineChart.svelte';
-	import type { LineChartLine } from '$parts/LineChart.svelte';
+	import LineChart from '$components/parts/graph/LineChart.svelte';
+	import type { LineChartLine } from '$components/parts/graph/LineChart.svelte';
 
 	const { growth, class: className = '' }: { growth: Growth; class?: string } = $props();
 
-	const sorted = $derived(
-		[...growth.measurements].sort((a, b) => a.date.localeCompare(b.date))
-	);
+	const sorted = $derived([...growth.measurements].sort((a, b) => a.date.localeCompare(b.date)));
 
 	const percentileLine = (data: { x: Date; y: number; tooltip: string }[]): LineChartLine => ({
 		data,
@@ -20,13 +18,12 @@
 
 	const measurementLines = (key: 'weight' | 'height' | 'head', colour: string, decimals: number): LineChartLine[] => [
 		{
-			data: sorted.filter(m => m[key]?.value != null).map(m => ({ x: parseISO(m.date), y: m[key]!.value! })),
-			style: { colour }, unit: sorted.find(m => m[key]?.unit)?.[key]?.unit ?? '', decimals,
+			data: sorted.filter((m) => m[key]?.value != null).map((m) => ({ x: parseISO(m.date), y: m[key]!.value! })),
+			style: { colour },
+			unit: sorted.find((m) => m[key]?.unit)?.[key]?.unit ?? '',
+			decimals,
 		},
-		percentileLine(
-			sorted.filter(m => m[key]?.percentile != null)
-				.map(m => ({ x: parseISO(m.date), y: m[key]!.percentile!, tooltip: `${m[key]!.percentile}th %ile` }))
-		),
+		percentileLine(sorted.filter((m) => m[key]?.percentile != null).map((m) => ({ x: parseISO(m.date), y: m[key]!.percentile!, tooltip: `${m[key]!.percentile}th %ile` }))),
 	];
 
 	const weightLines = $derived(measurementLines('weight', 'green', 1));
@@ -35,25 +32,40 @@
 
 	const formatX = (x: Date) => format(x, 'd MMM');
 </script>
-	
-	<div class={className}>
-		<p class="trend">{growth.trend_notes}</p>
 
-		<figure>
-			<LineChart lines={weightLines} {formatX} leftLabel={weightLines[0]?.unit} rightLabel={weightLines[1]?.unit} />
-			<figcaption>Weight</figcaption>
-		</figure>
+<div class={className}>
+	<p class="trend">{growth.trend_notes}</p>
 
-		<figure>
-			<LineChart lines={heightLines} {formatX} leftLabel={heightLines[0]?.unit} rightLabel={heightLines[1]?.unit} />
-			<figcaption>Height</figcaption>
-		</figure>
+	<figure>
+		<LineChart
+			lines={weightLines}
+			{formatX}
+			leftLabel={weightLines[0]?.unit}
+			rightLabel={weightLines[1]?.unit}
+		/>
+		<figcaption>Weight</figcaption>
+	</figure>
 
-		<figure>
-			<LineChart lines={headLines} {formatX} leftLabel={headLines[0]?.unit} rightLabel={headLines[1]?.unit} />
-			<figcaption>Head Circumference</figcaption>
-		</figure>
-	</div>
+	<figure>
+		<LineChart
+			lines={heightLines}
+			{formatX}
+			leftLabel={heightLines[0]?.unit}
+			rightLabel={heightLines[1]?.unit}
+		/>
+		<figcaption>Height</figcaption>
+	</figure>
+
+	<figure>
+		<LineChart
+			lines={headLines}
+			{formatX}
+			leftLabel={headLines[0]?.unit}
+			rightLabel={headLines[1]?.unit}
+		/>
+		<figcaption>Head Circumference</figcaption>
+	</figure>
+</div>
 
 <style>
 	.trend {

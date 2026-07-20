@@ -33,10 +33,10 @@
 	import DataTable from '$parts/DataTable.svelte';
 	import Stepper from '$parts/Stepper.svelte';
 	import FamilyFilter from '$parts/FamilyFilter.svelte';
-	import PieChart from '$parts/PieChart.svelte';
-	import BarChart from '$parts/BarChart.svelte';
+	import PieChart from '$components/parts/graph/PieChart.svelte';
+	import BarChart from '$components/parts/graph/BarChart.svelte';
 	import ProgressBarChart from '$parts/ProgressBarChart.svelte';
-	import LineChart from '$parts/LineChart.svelte';
+	import LineChart from '$components/parts/graph/LineChart.svelte';
 	import Milestone from '$parts/smallHuman/Milestone.svelte';
 	import StatusSelect from '$parts/smallHuman/StatusSelect.svelte';
 
@@ -160,8 +160,16 @@
 
 	<section>
 		<h2>Tabs</h2>
-		<Tabs tabs={devTabs} active={activeTab} onSelect={(id) => (activeTab = id)} />
-		<div role="tabpanel" id="panel-{activeTab}" aria-labelledby="tab-{activeTab}">
+		<Tabs
+			tabs={devTabs}
+			active={activeTab}
+			onSelect={(id) => (activeTab = id)}
+		/>
+		<div
+			role="tabpanel"
+			id="panel-{activeTab}"
+			aria-labelledby="tab-{activeTab}"
+		>
 			{#if activeTab === 'overview'}Overview panel content.{/if}
 			{#if activeTab === 'details'}Details panel content.{/if}
 			{#if activeTab === 'history'}History panel content.{/if}
@@ -189,21 +197,34 @@
 			name="Colour Mode"
 			value={themeOptions.indexOf($theme)}
 			toggleFunction={handleThemeToggle}
-			options={[{ label: 'Light Mode', Icon: Sun }, { label: 'Dark Mode', Icon: Moon }]}
+			options={[
+				{ label: 'Light Mode', Icon: Sun },
+				{ label: 'Dark Mode', Icon: Moon },
+			]}
 		/>
 	</section>
 
 	<section>
 		<h2>Modal/dialog</h2>
-		<button type="button" onclick={() => (modalOpen = true)}>Open modal</button>
-		<Modal bind:open={modalOpen} title="Modal title">
+		<button
+			type="button"
+			onclick={() => (modalOpen = true)}>Open modal</button
+		>
+		<Modal
+			bind:open={modalOpen}
+			title="Modal title"
+		>
 			<p>Modal body content.</p>
 		</Modal>
 	</section>
 
 	<section>
 		<h2>Sticky drawer/TOC</h2>
-		<TableOfContents toc={devToc} readAnchors={devReadAnchors} bind:showToc />
+		<TableOfContents
+			toc={devToc}
+			readAnchors={devReadAnchors}
+			bind:showToc
+		/>
 	</section>
 
 	<section>
@@ -227,19 +248,34 @@
 			legend="View"
 			name="dev-segmented"
 			bind:value={segmentedValue}
-			options={[{ value: 'day', label: 'Day' }, { value: 'week', label: 'Week' }, { value: 'month', label: 'Month' }]}
+			options={[
+				{ value: 'day', label: 'Day' },
+				{ value: 'week', label: 'Week' },
+				{ value: 'month', label: 'Month' },
+			]}
 		/>
 	</section>
 
 	<section>
 		<h2>Command palette</h2>
-		<button type="button" onclick={() => (paletteOpen = true)}>Open command palette</button>
-		<CommandPalette bind:open={paletteOpen} {menuItems} isAuthenticated={$isAuthenticated} />
+		<button
+			type="button"
+			onclick={() => (paletteOpen = true)}>Open command palette</button
+		>
+		<CommandPalette
+			bind:open={paletteOpen}
+			{menuItems}
+			isAuthenticated={$isAuthenticated}
+		/>
 	</section>
 
 	<section>
 		<h2>Colour swatch select</h2>
-		<ColourSelect id="dev-colour" bind:value={swatchColour} colours={['purple_bright', 'blue', 'green']} />
+		<ColourSelect
+			id="dev-colour"
+			bind:value={swatchColour}
+			colours={['purple_bright', 'blue', 'green']}
+		/>
 	</section>
 
 	<section>
@@ -254,29 +290,51 @@
 
 	<section>
 		<h2>Icon chip/tag</h2>
-		<IconChip icon="calendar" label="Urgent" colour="red" />
+		<IconChip
+			icon="calendar"
+			label="Urgent"
+			colour="red"
+		/>
 	</section>
 
 	<section>
 		<h2>Toast notification</h2>
-		<Toast message="Saved successfully." variant="success" />
+		<Toast
+			message="Saved successfully."
+			variant="success"
+		/>
 	</section>
 
 	<section>
 		<h2>Empty state</h2>
-		<EmptyState title="No tasks yet" message="Add your first task to get started.">
+		<EmptyState
+			title="No tasks yet"
+			message="Add your first task to get started."
+		>
 			<button type="button">Add a task</button>
 		</EmptyState>
 	</section>
 
 	<section>
 		<h2>Confirmation dialog</h2>
-		<button type="button" onclick={() => (confirmOpen = true)}>Delete item</button>
-		<Modal bind:open={confirmOpen} title="Delete this item?">
+		<button
+			type="button"
+			onclick={() => (confirmOpen = true)}>Delete item</button
+		>
+		<Modal
+			bind:open={confirmOpen}
+			title="Delete this item?"
+		>
 			<p>This can't be undone.</p>
 			<div class="confirm_actions">
-				<button type="button" onclick={() => (confirmOpen = false)}>Cancel</button>
-				<button type="button" onclick={() => (confirmOpen = false)}>Delete</button>
+				<button
+					type="button"
+					onclick={() => (confirmOpen = false)}>Cancel</button
+				>
+				<button
+					type="button"
+					onclick={() => (confirmOpen = false)}>Delete</button
+				>
 			</div>
 		</Modal>
 	</section>
@@ -309,14 +367,23 @@
 		<h2>Data table</h2>
 		<DataTable
 			id="dev-table-filter"
-			columns={[{ key: 'name', label: 'Name' }, { key: 'status', label: 'Status' }]}
-			rows={[{ name: 'Row one', status: 'Active' }, { name: 'Row two', status: 'Inactive' }]}
+			columns={[
+				{ key: 'name', label: 'Name' },
+				{ key: 'status', label: 'Status' },
+			]}
+			rows={[
+				{ name: 'Row one', status: 'Active' },
+				{ name: 'Row two', status: 'Inactive' },
+			]}
 		/>
 	</section>
 
 	<section>
 		<h2>Progress/stepper</h2>
-		<Stepper steps={['Details', 'Payment', 'Confirmation']} currentIndex={1} />
+		<Stepper
+			steps={['Details', 'Payment', 'Confirmation']}
+			currentIndex={1}
+		/>
 	</section>
 
 	<section>
@@ -351,21 +418,29 @@
 
 	<section>
 		<h2>Progress bar chart</h2>
-		<ProgressBarChart id="dev-progress-bar" items={[{ label: 'Task one', value: 70 }, { label: 'Task two', value: 30 }]} />
+		<ProgressBarChart
+			id="dev-progress-bar"
+			items={[
+				{ label: 'Task one', value: 70 },
+				{ label: 'Task two', value: 30 },
+			]}
+		/>
 	</section>
 
 	<section>
 		<h2>Line chart</h2>
 		<LineChart
-			lines={[{
-				data: [
-					{ x: new Date('2026-07-10'), y: 10 },
-					{ x: new Date('2026-07-12'), y: 14 },
-					{ x: new Date('2026-07-14'), y: 9 },
-				],
-				style: { colour: 'green' },
-				unit: 'kg',
-			}]}
+			lines={[
+				{
+					data: [
+						{ x: new Date('2026-07-10'), y: 10 },
+						{ x: new Date('2026-07-12'), y: 14 },
+						{ x: new Date('2026-07-14'), y: 9 },
+					],
+					style: { colour: 'green' },
+					unit: 'kg',
+				},
+			]}
 			formatX={(x) => x.toLocaleDateString()}
 			leftLabel="Weight"
 		/>
@@ -397,10 +472,14 @@
 
 	<section>
 		<h2>Status select</h2>
-		<StatusSelect id="dev-status-select" status={devStatus} labels={devMilestoneStatuses} onChange={handleStatusChange} />
+		<StatusSelect
+			id="dev-status-select"
+			status={devStatus}
+			labels={devMilestoneStatuses}
+			onChange={handleStatusChange}
+		/>
 	</section>
 {/if}
-
 
 <style>
 	.example {

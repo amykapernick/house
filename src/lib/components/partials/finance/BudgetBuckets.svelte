@@ -1,18 +1,23 @@
 <script lang="ts">
+	import { startOfMonth } from 'date-fns';
 	import type { BudgetItem } from '$types/budget';
 	import type { BudgetBucket } from '$types/budgetBucket';
+	import type { BudgetSpendEntry } from '$types/budgetSpend';
 	import { bucketTotals } from '$utils/budgetTotals';
+	import { monthComparison } from '$utils/budgetSpendComparison';
 	import { compareValues, type SortDirection } from '$utils/sortable';
 
 	let {
 		buckets = $bindable([]),
 		budget,
+		entries = [],
 		editing = false,
 		onChange,
 		class: className = '',
 	}: {
 		buckets: BudgetBucket[];
 		budget: BudgetItem[];
+		entries?: BudgetSpendEntry[];
 		editing?: boolean;
 		onChange?: () => void;
 		class?: string;
@@ -20,15 +25,24 @@
 
 	const formatCurrency = (value: number) => value.toLocaleString('en-AU', { style: 'currency', currency: 'AUD' });
 
-	let rows = $derived(bucketTotals(buckets, budget));
+	// This month's actual spend per bucket, read-only regardless of edit mode -
+	// there's no in-place way to edit actual spend here, that's what the
+	// check-in modal is for.
+	let actualByBucketId = $derived.by(() => {
+		const actualBuckets = monthComparison(budget, buckets, entries, startOfMonth(new Date())).buckets;
+		return new Map(actualBuckets.map((bucket) => [bucket.id, bucket.actual]));
+	});
+
+	let rows = $derived(bucketTotals(buckets, budget).map((row) => ({ ...row, actual: actualByBucketId.get(row.id) ?? 0 })));
 
 	let totals = $derived({
 		percentage: rows.reduce((sum, row) => sum + (row.percentage ?? 0), 0),
 		income: rows.reduce((sum, row) => sum + row.income, 0),
 		expenses: rows.reduce((sum, row) => sum + row.expenses, 0),
+		actual: rows.reduce((sum, row) => sum + row.actual, 0),
 	});
 
-	type SortKey = 'name' | 'percentage' | 'income' | 'expenses';
+	type SortKey = 'name' | 'percentage' | 'income' | 'expenses' | 'actual';
 
 	let sortKey = $state<SortKey | null>(null);
 	let sortDir = $state<SortDirection>('asc');
@@ -43,6 +57,8 @@
 				return row.income;
 			case 'expenses':
 				return row.expenses;
+			case 'actual':
+				return row.actual;
 		}
 	}
 
@@ -96,10 +112,11 @@
 			{@render sortableHeader('percentage', 'Percentage', true)}
 			{@render sortableHeader('income', 'Income', true)}
 			{@render sortableHeader('expenses', 'Expenses', true)}
+			{@render sortableHeader('actual', 'Actual', true)}
 		</tr>
 	</thead>
 	<tbody>
-		{#each sorted as { id, name, percentage, income, expenses } (id)}
+		{#each sorted as { id, name, percentage, income, expenses, actual } (id)}
 			<tr>
 				<td>{name}</td>
 				{#if editing}
@@ -131,6 +148,12 @@
 				>
 					{expenses ? formatCurrency(expenses) : ''}
 				</td>
+				<td
+					class="amount"
+					data-over-budget={actual > expenses}
+				>
+					{formatCurrency(actual)}
+				</td>
 			</tr>
 		{/each}
 	</tbody>
@@ -140,6 +163,7 @@
 			<td class="amount">{totals.percentage}%</td>
 			<td class="amount">{formatCurrency(totals.income)}</td>
 			<td class="amount">{formatCurrency(totals.expenses)}</td>
+			<td class="amount">{formatCurrency(totals.actual)}</td>
 		</tr>
 	</tfoot>
 </table>

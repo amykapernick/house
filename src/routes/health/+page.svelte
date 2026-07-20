@@ -2,8 +2,8 @@
 	import { format, parseISO } from 'date-fns';
 	import { isAuthenticated } from '$lib/auth';
 	import fetchClientData from '$utils/fetchClientData';
-	import LineChart from '$parts/LineChart.svelte';
-	import type { LineChartLine } from '$parts/LineChart.svelte';
+	import LineChart from '$components/parts/graph/LineChart.svelte';
+	import type { LineChartLine } from '$components/parts/graph/LineChart.svelte';
 	import Skeleton from '$parts/Skeleton.svelte';
 	import EmptyState from '$parts/EmptyState.svelte';
 	import type { Colour } from '$types/global';
@@ -69,9 +69,7 @@
 			}
 		}
 
-		return [...byKey.values()].sort((a, b) =>
-			a.key === 'daily_steps' ? -1 : b.key === 'daily_steps' ? 1 : a.label.localeCompare(b.label)
-		);
+		return [...byKey.values()].sort((a, b) => (a.key === 'daily_steps' ? -1 : b.key === 'daily_steps' ? 1 : a.label.localeCompare(b.label)));
 	});
 
 	// Colours are stable per-person across every chart on the page, so one shared
@@ -81,7 +79,10 @@
 
 <svelte:head>
 	<title>{getPageTitle(`Health`)}</title>
-	<meta name="description" content="Family Health Connect stats" />
+	<meta
+		name="description"
+		content="Family Health Connect stats"
+	/>
 </svelte:head>
 
 <h1>Health</h1>
@@ -90,7 +91,13 @@
 	<legend>Show</legend>
 	{#each DAY_OPTIONS as option (option)}
 		<div class="option">
-			<input type="radio" id="days-{option}" name="days" value={option} bind:group={days} />
+			<input
+				type="radio"
+				id="days-{option}"
+				name="days"
+				value={option}
+				bind:group={days}
+			/>
 			<label for="days-{option}">{option} days</label>
 		</div>
 	{/each}
@@ -99,13 +106,19 @@
 {#if loading}
 	<Skeleton rows={3} />
 {:else if metricCards.length === 0}
-	<EmptyState title="No Health Connect data yet" message="Link a family member's Home Assistant id and make sure their companion app is reporting Health Connect sensors." />
+	<EmptyState
+		title="No Health Connect data yet"
+		message="Link a family member's Home Assistant id and make sure their companion app is reporting Health Connect sensors."
+	/>
 {:else}
 	{#if legend.length > 1}
 		<ul class="legend">
 			{#each legend as user (user.slug)}
 				<li>
-					<span class="swatch" style="background: var(--{user.colour ?? 'blue'});"></span>
+					<span
+						class="swatch"
+						style="background: var(--{user.colour ?? 'blue'});"
+					></span>
 					<span>{user.name}</span>
 				</li>
 			{/each}
@@ -115,7 +128,11 @@
 	<div class="grid">
 		{#each metricCards as card (card.key)}
 			<figure class="chart-card">
-				<LineChart lines={card.lines} formatX={(x) => format(x, 'd MMM')} leftLabel={card.unit ?? undefined} />
+				<LineChart
+					lines={card.lines}
+					formatX={(x) => format(x, 'd MMM')}
+					leftLabel={card.unit ?? undefined}
+				/>
 				<figcaption>{card.label}</figcaption>
 			</figure>
 		{/each}
@@ -153,11 +170,11 @@
 		list-style: none;
 		gap: 0.3em 1.2em;
 
-	& li {
-		display: flex;
-		align-items: center;
-		gap: 0.5em;
-	}
+		& li {
+			display: flex;
+			align-items: center;
+			gap: 0.5em;
+		}
 	}
 
 	.swatch {

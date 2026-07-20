@@ -4,11 +4,7 @@
 	import ChoreItem from './ChoreItem.svelte';
 	import type { Chore } from '$types/chores';
 
-	let {
-		chores = [],
-		onComplete,
-		class: className = '',
-	}: { chores: Chore[]; onComplete?: (id: string) => void; class?: string } = $props();
+	let { chores = [], onComplete, class: className = '' }: { chores: Chore[]; onComplete?: (id: string) => void; class?: string } = $props();
 
 	// A chore's first label is treated as its routine - a task's other labels (e.g. "urgent")
 	// don't create extra groups, since rendering it under two labels would give it independent,
@@ -30,21 +26,31 @@
 <ul class="list {className}">
 	{#each routines as { label, chores: routineChores } (label)}
 		<li class="item">
-			<RoutineCard {label} chores={routineChores} {onComplete} />
+			<RoutineCard
+				{label}
+				chores={routineChores}
+				{onComplete}
+			/>
 		</li>
 	{/each}
 	{#each unlabelled as chore (chore.id)}
 		<li class="item">
-			<ChoreItem {...chore} {onComplete} />
+			<ChoreItem
+				{...chore}
+				{onComplete}
+			/>
 		</li>
 	{/each}
 </ul>
 
 <style>
 	.list {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
 		margin: 0;
 		padding: 0;
 		list-style: none;
+		gap: 20px;
 	}
 
 	.item {

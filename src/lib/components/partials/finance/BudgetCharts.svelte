@@ -1,16 +1,27 @@
 <script lang="ts">
 	import type { BudgetItem } from '$types/budget';
 	import type { BudgetBucket } from '$types/budgetBucket';
+	import type { BudgetSpendEntry } from '$types/budgetSpend';
 	import { bucketTotals, totalMonthlyExpenses, totalMonthlyIncome } from '$utils/budgetTotals';
+	import { bucketExpenseTrend } from '$utils/budgetSpendComparison';
 	import { categoricalColour, OTHER_LABEL, topNPlusOther } from '$utils/chartColours';
-	import PieChart from '$parts/PieChart.svelte';
-	import BarChart from '$parts/BarChart.svelte';
+	import PieChart from '$components/parts/graph/PieChart.svelte';
+	import BarChart from '$components/parts/graph/BarChart.svelte';
 	import Stats from '$parts/Stats.svelte';
 
-	let { budget, buckets, class: className = '' }: { budget: BudgetItem[]; buckets: BudgetBucket[]; class?: string } = $props();
+	let {
+		budget,
+		buckets,
+		entries,
+		class: className = '',
+	}: {
+		budget: BudgetItem[];
+		buckets: BudgetBucket[];
+		entries: BudgetSpendEntry[];
+		class?: string;
+	} = $props();
 
-	const formatCurrency = (value: number) =>
-		value.toLocaleString('en-AU', { style: 'currency', currency: 'AUD', maximumFractionDigits: 0 });
+	const formatCurrency = (value: number) => value.toLocaleString('en-AU', { style: 'currency', currency: 'AUD', maximumFractionDigits: 0 });
 	const formatPercent = (value: number) => `${value.toFixed(0)}%`;
 
 	const income = $derived(totalMonthlyIncome(budget));
@@ -24,9 +35,7 @@
 	// Every bucket gets its own named slice - past the 7th, colours repeat
 	// (grey_light onward) rather than merging real buckets into "Other".
 	const bucketSlices = $derived.by(() => {
-		const slices = bucketRows
-			.filter((b) => b.percentage > 0)
-			.map((b, i) => ({ label: b.name, value: b.percentage, colour: categoricalColour(i) }));
+		const slices = bucketRows.filter((b) => b.percentage > 0).map((b, i) => ({ label: b.name, value: b.percentage, colour: categoricalColour(i) }));
 
 		const allocated = bucketRows.reduce((sum, b) => sum + b.percentage, 0);
 		const unallocated = 100 - allocated;
@@ -52,7 +61,7 @@
 						flagLabel: 'over budget',
 					},
 				],
-			}))
+			})),
 	);
 
 	// Tag split - monthly spend grouped by the free-text, comma-separated tags
@@ -75,8 +84,28 @@
 		return topNPlusOther(raw, (value) => ({ label: OTHER_LABEL, value }), 9).sort((a, b) => b.value - a.value);
 	});
 	/* eslint-enable svelte/prefer-svelte-reactivity */
-	const tagBarGroups = $derived(
-		tagTotals.map((t) => ({ label: t.label, bars: [{ name: 'Spend', colour: categoricalColour(1), value: t.value }] }))
+	const tagBarGroups = $derived(tagTotals.map((t) => ({ label: t.label, bars: [{ name: 'Spend', colour: categoricalColour(1), value: t.value }] })));
+
+	// Actual spend trend per bucket, against that bucket's income/budgeted
+	// reference figures - same shape as bucketBarGroups above but with Income
+	// and Budgeted as fixed reference bars alongside one bar per time period,
+	// flagged over-budget against that bucket's current budgeted figure.
+	const now = new Date();
+	const trendGroups = $derived(
+		bucketExpenseTrend(budget, buckets, entries, now).map((bucket) => ({
+			label: bucket.name,
+			bars: [
+				{ name: 'Income', colour: categoricalColour(0), value: bucket.income },
+				{ name: 'Budgeted', colour: categoricalColour(1), value: bucket.budgeted },
+				...bucket.periods.map((period, i) => ({
+					name: period.label,
+					colour: categoricalColour(i + 2),
+					value: period.actual,
+					flag: period.actual > bucket.budgeted,
+					flagLabel: 'over budget',
+				})),
+			],
+		})),
 	);
 </script>
 
@@ -104,15 +133,32 @@
 
 		{#if bucketBarGroups.length}
 			<figure>
-				<BarChart groups={bucketBarGroups} formatValue={formatCurrency} />
+				<BarChart
+					groups={bucketBarGroups}
+					formatValue={formatCurrency}
+				/>
 				<figcaption>Income vs expenses per bucket</figcaption>
 			</figure>
 		{/if}
 
 		{#if tagBarGroups.length}
 			<figure>
-				<BarChart groups={tagBarGroups} formatValue={formatCurrency} orientation="horizontal" />
+				<BarChart
+					groups={tagBarGroups}
+					formatValue={formatCurrency}
+					orientation="horizontal"
+				/>
 				<figcaption>Monthly spend by tag</figcaption>
+			</figure>
+		{/if}
+
+		{#if trendGroups.length}
+			<figure>
+				<BarChart
+					groups={trendGroups}
+					formatValue={formatCurrency}
+				/>
+				<figcaption>Actual expenses by bucket</figcaption>
 			</figure>
 		{/if}
 	</div>

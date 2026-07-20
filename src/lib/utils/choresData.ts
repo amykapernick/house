@@ -16,13 +16,15 @@ export default async function fetchChoresData(props: FetchChoresDataProps = {}):
 		onStale: (data) => onStale?.(data.chores ?? []),
 		gqlQuery: `
 			query {
-				chores {
+				chores(today: "${today}") {
 					id
 					name
 					due
 					recurrence
 					isRecurring
 					labels
+					upcoming
+					durationMinutes
 				}
 			}
 		`,

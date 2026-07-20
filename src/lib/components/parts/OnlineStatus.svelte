@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { isOnline } from '$utils/online';
 	import { lastDataUpdate, clearAllCache } from '$utils/fetchClientData';
-	import Offline from '$img/icons/cloud_off.svg?component';
+	import Offline from '$img/icons/offline-fill.svg?component';
+	import Refresh from '$img/icons/cloud-data-sync-fill.svg?component';
 	import Pill from './Pill.svelte';
 
 	const RELATIVE_TIME_REFRESH_MS = 30_000;
@@ -58,7 +59,7 @@
 		onclick={handleRefresh}
 		disabled={!$isOnline}
 	>
-		⟳
+		<Refresh />
 		<span class="sr-only">Refresh Data</span>
 	</button>
 	<button
@@ -120,13 +121,11 @@
 
 			& .status,
 			& button {
-
 				@include sr_only;
 			}
 		}
 
 		& button {
-
 			@include button_icon;
 
 			--button_background: var(--transparent);
@@ -139,8 +138,8 @@
 			}
 		}
 
-	@media (width >= 50em) {
-			inset: 1em 1em auto auto
-	}
+		@media (width >= 50em) {
+			inset: 1em 1em auto auto;
+		}
 	}
 </style>

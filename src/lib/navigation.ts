@@ -1,96 +1,117 @@
 import type { MenuItem } from '$types/global';
 import { resolve } from '$app/paths';
-import Dashboard from '$img/icons/layout-11.svg?component';
-import Archive from '$img/icons/archive-drawer.svg?component';
-import List from '$img/icons/list.svg?component';
-import CheckList from '$img/icons/check-list.svg?component';
-import Chores from '$img/icons/checkbox.svg?component';
+import Dashboard from '$img/icons/board-2-1.svg?component';
+import References from '$img/icons/saved-items-2.svg?component';
+import Tasks from '$img/icons/check-list-1.svg?component';
+import Habits from '$img/icons/questionnaire-2.svg?component';
+import Chores from '$img/icons/clear-data-1.svg?component';
 import Calendar from '$img/icons/calendar-date.svg?component';
-import Plan from '$img/icons/diet-plan.svg?component';
-import Cart from '$img/icons/cart.svg?component';
-import Recipes from '$img/icons/recipe-book-47.svg?component';
-import Baby from '$img/icons/baby.svg?component';
-import Schedule from '$img/icons/calendar-day-view.svg?component'
-import Budget from '$img/icons/chart-bar-33.svg?component'
-import Health from '$img/icons/phone-health.svg?component'
+import MealPlan from '$img/icons/diet-plan-1.svg?component';
+import ShopList from '$img/icons/receipt-list-42-2.svg?component';
+import Recipes from '$img/icons/recipe-book-47-1.svg?component';
+import SmallHuman from '$img/icons/baby-1.svg?component';
+import Schedule from '$img/icons/gantt-1.svg'
+import Budget from '$img/icons/analytics-1.svg'
+import Health from '$img/icons/phone-heartbeat-1.svg'
 import Graphql from '$img/icons/graphql.svg?component'
+import DashboardIcon from '$img/icons/layout-11-1.svg'
+import DashboardColour from '$img/icons/board-2-2.svg?component';
+import ReferencesColour from '$img/icons/saved-items-3.svg?component';
+import TasksColour from '$img/icons/check-list-2.svg?component';
+import HabitsColour from '$img/icons/questionnaire-3.svg?component';
+import ChoresColour from '$img/icons/clear-data-2.svg?component';
+import CalendarColour from '$img/icons/calendar-date-2.svg?component';
+import MealPlanColour from '$img/icons/diet-plan-2.svg?component';
+import ShopListColour from '$img/icons/receipt-list-42-3.svg?component';
+import RecipesColour from '$img/icons/recipe-book-47-2.svg?component';
+import SmallHumanColour from '$img/icons/baby-3.svg?component';
+import ScheduleColour from '$img/icons/gantt-2.svg'
+import BudgetColour from '$img/icons/analytics-2.svg'
+import HealthColour from '$img/icons/phone-heartbeat-2.svg'
+import DashboardIconColour from '$img/icons/layout-11-3.svg'
 
 export const menuItems: MenuItem[] = [
 	{
 		label: `Home`,
 		link: resolve(`/`),
-		Icon: Dashboard
+		Icon: DashboardColour
 	},
 	{
 		label: `To Do`,
 		link: resolve(`/tasks`),
 		auth: true,
-		Icon: List
+		Icon: TasksColour
 	},
 	{
 		label: `Habits`,
 		link: resolve(`/habits`),
 		auth: true,
-		Icon: CheckList
+		Icon: HabitsColour
 	},
 	{
 		label: `Chores`,
 		link: resolve(`/chores`),
 		auth: true,
-		Icon: Chores
+		Icon: ChoresColour
 	},
 	{
 		label: `Calendar`,
 		link: resolve(`/calendar`),
 		auth: true,
-		Icon: Calendar
+		Icon: CalendarColour
 	},
 	{
 		label: `Schedule`,
 		link: resolve(`/schedule`),
 		auth: true,
-		Icon: Schedule
+		Icon: ScheduleColour
 	},
 	{
 		label: `Budget`,
 		link: resolve(`/budget`),
 		auth: true,
-		Icon: Budget
+		Icon: BudgetColour
 	},
 	{
 		label: `Recipes`,
 		link: resolve(`/recipes`),
-		Icon: Recipes
+		Icon: RecipesColour
 	},
 	{
 		label: `Meal Plan`,
 		link: resolve(`/meal-plan`),
 		auth: true,
-		Icon: Plan
+		Icon: MealPlanColour
 	},
 	{
 		label: `Shopping List`,
 		link: resolve(`/shopping-list`),
 		auth: true,
-		Icon: Cart
+		Icon: ShopListColour
 	},
 	{
 		label: `Reference`,
 		link: resolve(`/reference`),
 		auth: true,
-		Icon: Archive
+		Icon: ReferencesColour
 	},
 	{
 		label: `Small Human`,
 		link: resolve(`/small-human`),
 		auth: true,
-		Icon: Baby
+		Icon: SmallHumanColour
 	},
 	{
 		label: `Health`,
 		link: resolve(`/health`),
 		auth: true,
-		Icon: Health
+		Icon: HealthColour
+	},
+	{
+		label: `Dashboard`,
+		link: resolve(`/dashboard`),
+		auth: true,
+		Icon: DashboardIconColour
 	},
 	...(import.meta.env.DEV ? [{
 		label: `GraphQL`,

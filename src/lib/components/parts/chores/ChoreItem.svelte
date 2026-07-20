@@ -2,11 +2,14 @@
 	import CheckboxButton from '$parts/CheckboxButton.svelte';
 	import { getToken } from '$lib/auth';
 	import { getGraphqlUrl } from '$utils/fetchClientData';
+	import { formatMinutes } from '$utils/formatMinutes';
 	import type { Chore } from '$types/chores';
 
 	let {
 		id,
 		name,
+		upcoming,
+		durationMinutes,
 		onComplete,
 		class: className = '',
 	}: Chore & { onComplete?: (id: string) => void; class?: string } = $props();
@@ -53,6 +56,8 @@
 		label={completed ? `${name} done` : `Mark ${name} done`}
 	/>
 	<span class="name">{name}</span>
+	{#if durationMinutes}<span class="duration">{formatMinutes(durationMinutes)}</span>{/if}
+	{#if upcoming && !completed}<span class="upcoming">Upcoming</span>{/if}
 	{#if actionError}<p class="error">{actionError}</p>{/if}
 </div>
 
@@ -69,6 +74,19 @@
 
 	.name {
 		flex: 1;
+	}
+
+	.duration {
+		flex-shrink: 0;
+		color: var(--grey);
+		font-size: 0.75em;
+	}
+
+	.upcoming {
+		flex-shrink: 0;
+		color: var(--orange);
+		font-size: 0.75em;
+		font-weight: 700;
 	}
 
 	.error {

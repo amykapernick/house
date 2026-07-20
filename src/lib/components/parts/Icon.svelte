@@ -1,15 +1,24 @@
 <script lang="ts">
-	import type { Component } from "svelte";
-	import type { MilestoneStatus, SignStatus } from "$types/generated";
-	import Calendar from '$img/icons/calendar-date.svg?component'
-	import Watch from '$img/icons/time-machine.svg?component'
-	import Checked from '$img/icons/s-check.svg?component'
-	import Unchecked from '$img/icons/s-unchecked.svg?component'
-	import Progress from '$img/icons/progress-indicator.svg?component'
-	import View from '$img/icons/view.svg?component'
-	import Syringe from '$img/smallHuman/syringe.svg?component'
+	import type { Component } from 'svelte';
+	import type { MilestoneStatus, SignStatus } from '$types/generated';
+	import Calendar from '$img/icons/calendar-date.svg?component';
+	import Watch from '$img/icons/eye-2.svg?component';
+	import Checked from '$img/icons/check-double-2.svg?component';
+	import Unchecked from '$img/icons/s-unchecked.svg?component';
+	import Progress from '$img/icons/progress-indicator-fill.svg?component';
+	import Understand from '$img/icons/artificial-brain-fill.svg?component';
+	import Syringe from '$img/icons/syringe-1.svg?component';
+	import CalendarColour from '$img/icons/calendar-date-2.svg?component';
+	import WatchColour from '$img/icons/view.svg?component';
+	import CheckedColour from '$img/icons/check-double.svg?component';
+	import UncheckedColour from '$img/icons/s-check (2).svg?component';
+	import ProgressColour from '$img/icons/progress-indicator-colored.svg?component';
+	import UnderstandColour from '$img/icons/artificial-brain-colored.svg?component';
+	import SyringeColour from '$img/icons/syringe-2.svg?component';
 
 	export type IconName = MilestoneStatus | SignStatus | 'calendar' | 'vaccine';
+
+	// TODO: Allow enabling colour icons
 
 	const icons: Record<IconName, Component> = {
 		calendar: Calendar,
@@ -19,7 +28,7 @@
 		watch: Watch,
 		introduce_next: Unchecked,
 		signing_occasionally: Progress,
-		recognises: View,
+		recognises: Understand,
 		coming_soon: Watch,
 		vaccine: Syringe,
 	};
@@ -40,7 +49,7 @@
 
 	$effect(() => {
 		if (!wrapper) return;
-		const svg = wrapper.querySelector('svg');
+		const svg = wrapper.querySelector('svg?component');
 		if (!svg) return;
 
 		// eslint-disable-next-line svelte/prefer-svelte-reactivity -- built and discarded synchronously within this effect, never read reactively
@@ -66,7 +75,10 @@
 	});
 </script>
 
-<span bind:this={wrapper} class="icon {className}">
+<span
+	bind:this={wrapper}
+	class="icon {className}"
+>
 	<IconComponent />
 </span>
 

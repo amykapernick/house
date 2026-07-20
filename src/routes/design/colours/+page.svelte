@@ -2,6 +2,7 @@
 	import { onDestroy } from 'svelte';
 	import { beforeNavigate } from '$app/navigation';
 	import Colours from '$partials/design/Colours.svelte';
+	import ColourModal from '$partials/design/ColourModal.svelte';
 	import Skeleton from '$parts/Skeleton.svelte';
 	import { isAuthenticated, getToken } from '$lib/auth';
 	import fetchClientData, { getGraphqlUrl, clearCache } from '$utils/fetchClientData';
@@ -84,6 +85,96 @@
 		dirty = false;
 		saveError = '';
 		editing = false;
+	}
+
+	// Colour modal - shared between "add" and "edit", same as the house map's
+	// item/area modals. Saving/deleting mutates the relevant theme's working
+	// copy array directly; nothing reaches the API until the page-level Save.
+	let colourModalOpen = $state(false);
+	let colourModalMode = $state<`create` | `edit`>(`create`);
+	let colourModalTheme = $state('');
+	let colourModalId = $state('');
+	let colourModalName = $state('');
+	let colourModalHex = $state<string | null>('#000000');
+	let colourModalLink = $state('');
+	let colourModalNeutral = $state(false);
+
+	function sectionArray(theme: string) {
+		return theme === `Light` ? editableLight : theme === `Dark` ? editableDark : editableStandard;
+	}
+
+	function setSectionArray(theme: string, items: EditableColour[]) {
+		if (theme === `Light`) editableLight = items;
+		else if (theme === `Dark`) editableDark = items;
+		else editableStandard = items;
+	}
+
+	let colourModalLinkOptions = $derived(
+		sectionArray(colourModalTheme)
+			.filter((c) => c.id !== colourModalId)
+			.map((c) => c.name)
+	);
+
+	function openAddColourModal(theme: string) {
+		colourModalMode = `create`;
+		colourModalTheme = theme;
+		colourModalId = crypto.randomUUID();
+		colourModalName = '';
+		colourModalHex = '#000000';
+		colourModalLink = '';
+		colourModalNeutral = false;
+		colourModalOpen = true;
+	}
+
+	function openEditColourModal(theme: string, id: string) {
+		const item = sectionArray(theme).find((c) => c.id === id);
+		if (!item) return;
+		colourModalMode = `edit`;
+		colourModalTheme = theme;
+		colourModalId = item.id;
+		colourModalName = item.name;
+		colourModalHex = item.hex;
+		colourModalLink = item.link ?? '';
+		colourModalNeutral = item.neutral;
+		colourModalOpen = true;
+	}
+
+	function saveColourModal() {
+		const arr = sectionArray(colourModalTheme);
+
+		if (colourModalMode === `create`) {
+			setSectionArray(colourModalTheme, [
+				...arr,
+				{
+					id: colourModalId,
+					name: colourModalName,
+					hex: colourModalHex,
+					link: colourModalLink || null,
+					theme: colourModalTheme || null,
+					neutral: colourModalNeutral,
+					text: null,
+				},
+			]);
+		}
+		else {
+			setSectionArray(
+				colourModalTheme,
+				arr.map((c) =>
+					c.id === colourModalId
+						? { ...c, name: colourModalName, hex: colourModalHex, link: colourModalLink || null, neutral: colourModalNeutral }
+						: c
+				)
+			);
+		}
+
+		dirty = true;
+		colourModalOpen = false;
+	}
+
+	function deleteColourFromModal() {
+		setSectionArray(colourModalTheme, sectionArray(colourModalTheme).filter((c) => c.id !== colourModalId));
+		dirty = true;
+		colourModalOpen = false;
 	}
 
 	const gqlStr = (value?: string | null) => JSON.stringify(value ?? '');
@@ -229,13 +320,25 @@
 	</div>
 
 	<h2>Standard</h2>
-	<Colours bind:colours={editableStandard} theme="" {editing} onChange={() => (dirty = true)} />
+	<Colours colours={editableStandard} theme="" {editing} onEdit={(id) => openEditColourModal('', id)} onAdd={() => openAddColourModal('')} />
 
 	<h2>Light theme</h2>
-	<Colours bind:colours={editableLight} theme="Light" {editing} onChange={() => (dirty = true)} />
+	<Colours colours={editableLight} theme="Light" {editing} onEdit={(id) => openEditColourModal('Light', id)} onAdd={() => openAddColourModal('Light')} />
 
 	<h2>Dark theme</h2>
-	<Colours bind:colours={editableDark} theme="Dark" {editing} onChange={() => (dirty = true)} />
+	<Colours colours={editableDark} theme="Dark" {editing} onEdit={(id) => openEditColourModal('Dark', id)} onAdd={() => openAddColourModal('Dark')} />
+
+	<ColourModal
+		bind:open={colourModalOpen}
+		mode={colourModalMode}
+		bind:name={colourModalName}
+		bind:hex={colourModalHex}
+		bind:link={colourModalLink}
+		bind:neutral={colourModalNeutral}
+		linkOptions={colourModalLinkOptions}
+		onSave={saveColourModal}
+		onDelete={colourModalMode === `edit` ? deleteColourFromModal : undefined}
+	/>
 {/if}
 
 <style>

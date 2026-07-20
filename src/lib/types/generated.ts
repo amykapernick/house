@@ -116,6 +116,11 @@ export type BedroomTempPattern = {
   swing_note: Scalars['String']['output'];
 };
 
+export type BinCollection = {
+  binType: Scalars['String']['output'];
+  nextDate: Scalars['String']['output'];
+};
+
 export type BudgetBucket = {
   id: Maybe<Scalars['String']['output']>;
   items: Maybe<Array<Maybe<BudgetItem>>>;
@@ -151,6 +156,13 @@ export type BudgetMutationResult = {
   success: Scalars['Boolean']['output'];
 };
 
+export type BudgetSpendEntry = {
+  amount: Maybe<Scalars['Float']['output']>;
+  budgetItem: Maybe<Scalars['String']['output']>;
+  id: Maybe<Scalars['String']['output']>;
+  weekStart: Maybe<Scalars['String']['output']>;
+};
+
 export type Calendar = {
   colour: Maybe<Scalars['String']['output']>;
   family: Maybe<Array<Maybe<User>>>;
@@ -177,11 +189,13 @@ export type CheckShoppingItemResult = {
 
 export type Chore = {
   due: Maybe<Scalars['String']['output']>;
+  durationMinutes: Maybe<Scalars['Int']['output']>;
   id: Maybe<Scalars['String']['output']>;
   isRecurring: Maybe<Scalars['Boolean']['output']>;
   labels: Maybe<Array<Maybe<Scalars['String']['output']>>>;
   name: Maybe<Scalars['String']['output']>;
   recurrence: Maybe<Scalars['String']['output']>;
+  upcoming: Maybe<Scalars['Boolean']['output']>;
 };
 
 export type Clothing = {
@@ -309,6 +323,13 @@ export type CurrentClothingRecommendation = {
   outdoor: ClothingSet;
 };
 
+export type Dashboard = {
+  binCollections: Array<BinCollection>;
+  sun: Maybe<SunTimes>;
+  uv: Maybe<UvIndex>;
+  weather: Maybe<Weather>;
+};
+
 export type DateRange = {
   end: Maybe<Scalars['String']['output']>;
   start: Maybe<Scalars['String']['output']>;
@@ -334,6 +355,12 @@ export type DentalCare = {
   todoist_task: Maybe<Task>;
   toothbrush: Scalars['String']['output'];
   toothpaste: Scalars['String']['output'];
+};
+
+export type ElevationPoint = {
+  moonElevation: Scalars['Float']['output'];
+  sunElevation: Scalars['Float']['output'];
+  time: Scalars['String']['output'];
 };
 
 export type Event = {
@@ -673,8 +700,10 @@ export type Mutation = {
   deleteHouseItem: Maybe<HouseMutationResult>;
   deleteMealPlanEntry: Maybe<MealPlanMutationResult>;
   dismissAlert: Maybe<Scalars['Boolean']['output']>;
+  importRecipe: Maybe<Recipe>;
   markToothErupted: Maybe<Tooth>;
   saveArticle: Maybe<Scalars['String']['output']>;
+  setBudgetSpend: Maybe<BudgetMutationResult>;
   updateAuslanSignStatus: Maybe<AuslanSign>;
   updateBudgetBucketPercentage: Maybe<BudgetMutationResult>;
   updateBudgetItem: Maybe<BudgetMutationResult>;
@@ -806,6 +835,11 @@ export type MutationDismissAlertArgs = {
 };
 
 
+export type MutationImportRecipeArgs = {
+  url: Scalars['String']['input'];
+};
+
+
 export type MutationMarkToothEruptedArgs = {
   fdi: Scalars['Int']['input'];
 };
@@ -815,6 +849,13 @@ export type MutationSaveArticleArgs = {
   excerpt?: InputMaybe<Scalars['String']['input']>;
   title: Scalars['String']['input'];
   url: Scalars['String']['input'];
+};
+
+
+export type MutationSetBudgetSpendArgs = {
+  amount: Scalars['Float']['input'];
+  budgetItem: Scalars['String']['input'];
+  weekStart: Scalars['String']['input'];
 };
 
 
@@ -976,6 +1017,7 @@ export type Query = {
   availableHouseItems: Array<AvailableHouseEntity>;
   budget: Maybe<Array<Maybe<BudgetItem>>>;
   budgetBuckets: Maybe<Array<Maybe<BudgetBucket>>>;
+  budgetSpend: Maybe<Array<Maybe<BudgetSpendEntry>>>;
   calendars: Maybe<Array<Maybe<Calendar>>>;
   chores: Maybe<Array<Maybe<Chore>>>;
   colour: Maybe<PaletteColour>;
@@ -986,6 +1028,7 @@ export type Query = {
   contentEntries: Maybe<Array<Maybe<ContentEntry>>>;
   contentIndex: Maybe<Array<Maybe<ContentGroup>>>;
   contentPage: Maybe<ContentPage>;
+  dashboard: Maybe<Dashboard>;
   events: Maybe<Array<Maybe<Event>>>;
   habits: Maybe<Array<Maybe<Habit>>>;
   homeAssistantState: Maybe<HomeAssistantState>;
@@ -1012,6 +1055,11 @@ export type Query = {
 
 
 export type QueryAllergensArgs = {
+  today: Scalars['String']['input'];
+};
+
+
+export type QueryChoresArgs = {
   today: Scalars['String']['input'];
 };
 
@@ -1409,6 +1457,22 @@ export type SunSafety = {
   uv_threshold_for_coverage: Scalars['Int']['output'];
 };
 
+export type SunTimes = {
+  dawn: Maybe<Scalars['String']['output']>;
+  dusk: Maybe<Scalars['String']['output']>;
+  moonAzimuth: Scalars['Float']['output'];
+  moonElevation: Scalars['Float']['output'];
+  moonPhase: Maybe<Scalars['String']['output']>;
+  moonrise: Maybe<Scalars['String']['output']>;
+  moonset: Maybe<Scalars['String']['output']>;
+  path: Array<ElevationPoint>;
+  solarNoon: Maybe<Scalars['String']['output']>;
+  southernHemisphere: Scalars['Boolean']['output'];
+  sunElevation: Scalars['Float']['output'];
+  sunrise: Maybe<Scalars['String']['output']>;
+  sunset: Maybe<Scalars['String']['output']>;
+};
+
 export type Supplier = {
   archived: Maybe<Scalars['Boolean']['output']>;
   category: Maybe<Array<Maybe<Scalars['String']['output']>>>;
@@ -1567,6 +1631,11 @@ export type UserIds = {
   todoist: Maybe<Scalars['String']['output']>;
 };
 
+export type UvIndex = {
+  band: Scalars['String']['output'];
+  value: Scalars['Float']['output'];
+};
+
 export type VaccinationItem = {
   date: Maybe<Scalars['String']['output']>;
   detail: Scalars['String']['output'];
@@ -1602,4 +1671,19 @@ export type ValueNote = {
   note: Scalars['String']['output'];
   unit: Maybe<Scalars['String']['output']>;
   value: Maybe<Array<Scalars['Float']['output']>>;
+};
+
+export type Weather = {
+  condition: Scalars['String']['output'];
+  forecast: Array<WeatherForecastDay>;
+  humidity: Maybe<Scalars['Float']['output']>;
+  temperature: Maybe<Scalars['Float']['output']>;
+};
+
+export type WeatherForecastDay = {
+  condition: Maybe<Scalars['String']['output']>;
+  date: Scalars['String']['output'];
+  precipitationChance: Maybe<Scalars['Float']['output']>;
+  tempHigh: Maybe<Scalars['Float']['output']>;
+  tempLow: Maybe<Scalars['Float']['output']>;
 };

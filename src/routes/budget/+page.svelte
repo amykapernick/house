@@ -1,17 +1,26 @@
 <script lang="ts">
+	import { format, startOfWeek } from 'date-fns';
 	import { beforeNavigate } from '$app/navigation';
 	import Budget from '$partials/finance/Budget.svelte';
 	import BudgetBuckets from '$partials/finance/BudgetBuckets.svelte';
 	import BudgetCharts from '$partials/finance/BudgetCharts.svelte';
+	import BudgetComparison from '$partials/finance/BudgetComparison.svelte';
+	import BudgetCheckIn from '$partials/finance/BudgetCheckIn.svelte';
+	import Modal from '$parts/Modal.svelte';
 	import Skeleton from '$parts/Skeleton.svelte';
 	import { isAuthenticated, getToken } from '$lib/auth';
 	import fetchClientData, { getGraphqlUrl } from '$utils/fetchClientData';
 	import type { BudgetItem } from '$types/budget';
 	import type { BudgetBucket } from '$types/budgetBucket';
+	import type { BudgetSpendEntry } from '$types/budgetSpend';
 	import { getPageTitle } from '$utils/pageTitle';
+
+	let checkInOpen = $state(false);
+	const currentWeekStart = format(startOfWeek(new Date(), { weekStartsOn: 1 }), 'yyyy-MM-dd');
 
 	let budget = $state<BudgetItem[]>([]);
 	let buckets = $state<BudgetBucket[]>([]);
+	let budgetSpend = $state<BudgetSpendEntry[]>([]);
 	let loading = $state(true);
 
 	const BUDGET_QUERY = `
@@ -41,12 +50,19 @@
 					income
 				}
 			}
+			budgetSpend {
+				id
+				budgetItem
+				weekStart
+				amount
+			}
 		}
 	`;
 
 	function handleBudget(res: any) {
 		budget = res.budget ?? [];
 		buckets = res.budgetBuckets ?? [];
+		budgetSpend = res.budgetSpend ?? [];
 		loading = false;
 	}
 
@@ -216,14 +232,24 @@
 		{:else}
 			<button type="button" onclick={startEditing}>Edit</button>
 		{/if}
+		<button type="button" onclick={() => (checkInOpen = true)}>Log this week's spend</button>
 	</div>
 
 	<h2>Overview</h2>
-	<BudgetCharts budget={editableBudget} buckets={editableBuckets} />
+	<BudgetCharts budget={editableBudget} buckets={editableBuckets} entries={budgetSpend} />
+	<h2>Actual vs Budget</h2>
+	<BudgetComparison budget={budget} buckets={buckets} entries={budgetSpend} />
 	<h2>Buckets</h2>
-	<BudgetBuckets bind:buckets={editableBuckets} budget={editableBudget} {editing} onChange={() => (dirty = true)} />
-	<h2>Items</h2>
-	<Budget bind:budget={editableBudget} buckets={editableBuckets} {editing} onChange={() => (dirty = true)} />
+	<BudgetBuckets bind:buckets={editableBuckets} budget={editableBudget} entries={budgetSpend} {editing} onChange={() => (dirty = true)} />
+	<h2>Expenses</h2>
+	<Budget bind:budget={editableBudget} buckets={editableBuckets} entries={budgetSpend} income={false} {editing} onChange={() => (dirty = true)} />
+	<h2>Income</h2>
+	<Budget bind:budget={editableBudget} buckets={editableBuckets} entries={budgetSpend} income={true} {editing} onChange={() => (dirty = true)} />
+
+	<Modal bind:open={checkInOpen} title="Budget Check-in">
+		<p class="week-label">Week starting {currentWeekStart}</p>
+		<BudgetCheckIn budget={budget} entries={budgetSpend} weekStart={currentWeekStart} onSaved={() => loadBudget(true)} />
+	</Modal>
 {/if}
 
 <style>
@@ -240,5 +266,10 @@
 
 	.error {
 		color: var(--red);
+	}
+
+	.week-label {
+		margin-top: 0;
+		color: var(--grey);
 	}
 </style>

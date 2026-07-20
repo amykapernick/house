@@ -2,11 +2,14 @@
 	import { onMount } from 'svelte';
 	import fetchClientData from '$utils/fetchClientData';
 	import { resolve } from '$app/paths';
+	import { goto } from '$app/navigation';
+	import { importRecipeMutation } from '$utils/recipes';
 	import RecipeCard from '$components/parts/recipes/RecipeCard.svelte';
 	import Pagination from '$components/parts/Pagination.svelte';
 	import TagCloud from '$components/parts/recipes/TagCloud.svelte';
 	import Skeleton from '$components/parts/Skeleton.svelte';
 	import EmptyState from '$components/parts/EmptyState.svelte';
+	import ImportRecipeModal from '$components/parts/recipes/ImportRecipeModal.svelte';
 	import { getPageTitle } from '$utils/pageTitle';
 
 	let recipes = $state<any[]>([]);
@@ -135,6 +138,36 @@
 	function tagName(slug: string) {
 		return allTags.find(t => t.slug === slug)?.name ?? slug;
 	}
+
+	// Import from URL - Mealie scrapes the page and creates the recipe; we then
+	// jump straight to its detail page rather than refreshing this list.
+	let importModalOpen = $state(false);
+	let importUrl = $state('');
+	let importSaving = $state(false);
+	let importError = $state('');
+
+	function openImportModal() {
+		importUrl = '';
+		importError = '';
+		importModalOpen = true;
+	}
+
+	async function handleImport() {
+		importSaving = true;
+		importError = '';
+
+		const res = await fetchClientData({ gqlQuery: importRecipeMutation(importUrl.trim()) });
+		importSaving = false;
+
+		const slug = res?.importRecipe?.slug;
+		if (!slug) {
+			importError = 'Failed to import recipe - check the URL and try again.';
+			return;
+		}
+
+		importModalOpen = false;
+		goto(resolve(`/recipes/[slug]`, { slug }));
+	}
 </script>
 
 <svelte:head>
@@ -142,6 +175,16 @@
 </svelte:head>
 
 <h1>Recipes</h1>
+
+<button type="button" class="import" onclick={openImportModal}>Import from URL</button>
+
+<ImportRecipeModal
+	bind:open={importModalOpen}
+	bind:url={importUrl}
+	saving={importSaving}
+	error={importError}
+	onImport={handleImport}
+/>
 
 {#if !tagsLoading}
 	<TagCloud tags={allTags} {selectedTags} onToggle={toggleTag} onClear={clearTags} />
@@ -215,6 +258,13 @@
 
 <style>
 	@import '@mixins';
+
+	.import {
+
+		@include button_secondary;
+
+		margin-bottom: 1em;
+	}
 
 	.controls {
 		display: flex;

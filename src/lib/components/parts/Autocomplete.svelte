@@ -1,5 +1,8 @@
-<script lang="ts" generics="Item">
-	import Search from '$img/icons/search.svg?component';
+<script
+	lang="ts"
+	generics="Item"
+>
+	import Search from '$img/icons/search-1.svg?component';
 	import Pill from './Pill.svelte';
 	const DEFAULT_MIN_CHARS = 2;
 	const DEFAULT_DEBOUNCE_MS = 250;
@@ -18,7 +21,7 @@
 		placeholder,
 		noResultsText = 'No matches',
 		class: className = '',
-		hiddenLabel = false
+		hiddenLabel = false,
 	}: {
 		id: string;
 		label: string;
@@ -70,9 +73,19 @@
 	}
 </script>
 
-<label class={hiddenLabel ? 'sr-only' : ''} for={id}>{label}</label>
+<label
+	class={hiddenLabel ? 'sr-only' : ''}
+	for={id}>{label}</label
+>
 <div class="search">
-	<input {id} class={className} type="text" bind:value {placeholder} autocomplete="off" />
+	<input
+		{id}
+		class={className}
+		type="text"
+		bind:value
+		{placeholder}
+		autocomplete="off"
+	/>
 	<!-- TODO: Tie search function to button as well -->
 	<button type="submit">
 		<Search />
@@ -82,10 +95,16 @@
 		<ul class="results">
 			{#each results as item (getKey(item))}
 				<li>
-					<button type="button" onclick={() => select(item)}>
+					<button
+						type="button"
+						onclick={() => select(item)}
+					>
 						<span class="name">{getLabel(item)}</span>
 						{#if getBadge?.(item)}
-							<Pill class="tag" outline={true}>{getBadge(item)}</Pill>
+							<Pill
+								class="tag"
+								outline={true}>{getBadge(item)}</Pill
+							>
 						{/if}
 					</button>
 				</li>
@@ -112,12 +131,9 @@
 		border-radius: 0.5em;
 		background: var(--input_bg);
 		box-shadow: none;
-		color: light-dark(
-			var(--black), 
-			color-mix(in oklch, var(--white) 92%, var(--black))
-		);
+		color: light-dark(var(--black), color-mix(in oklch, var(--white) 92%, var(--black)));
 		line-height: 1.5;
-		
+
 		&:focus-within {
 			border-color: var(--purple_bright);
 			outline: 2px dotted var(--green);
@@ -127,14 +143,13 @@
 			margin: 0;
 			border: none;
 			background: inherit;
-			
+
 			&:focus {
 				outline: none;
 			}
 		}
 
-		& button[type="submit"] {
-
+		& button[type='submit'] {
 			@include button_icon;
 
 			@include button_secondary;
@@ -165,7 +180,6 @@
 		list-style: none;
 
 		& button {
-
 			@include button_text;
 
 			display: flex;

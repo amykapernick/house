@@ -1,26 +1,48 @@
 <script lang="ts">
+	import { startOfMonth } from 'date-fns';
 	import type { BudgetItem } from '$types/budget';
 	import type { BudgetBucket } from '$types/budgetBucket';
+	import type { BudgetSpendEntry } from '$types/budgetSpend';
 	import { compareValues, type SortDirection } from '$utils/sortable';
 	import monthlyAmount from '$utils/monthlyAmount';
+	import { monthComparison } from '$utils/budgetSpendComparison';
 
 	const PERIODS = [`Week`, `Fortnight`, `Month`, `Year`] as const;
 
 	let {
 		budget = $bindable([]),
 		buckets = [],
+		entries = [],
+		income = false,
 		editing = false,
 		onChange,
 		class: className = '',
 	}: {
 		budget: BudgetItem[];
 		buckets?: BudgetBucket[];
+		entries?: BudgetSpendEntry[];
+		// Which slice of `budget` this instance shows/edits - income items or
+		// expense items - so the same component can back both the Expenses and
+		// Income tables on the budget page, each bound to the same underlying
+		// array. New items added from this instance default to matching.
+		income?: boolean;
 		editing?: boolean;
 		onChange?: () => void;
 		class?: string;
 	} = $props();
 
-	type SortKey = 'description' | 'bucket' | 'tags' | 'amount';
+	const formatCurrency = (value: number) => value.toLocaleString('en-AU', { style: 'currency', currency: 'AUD' });
+
+	// This month's actual spend per item, read-only regardless of edit mode -
+	// there's no in-place way to edit actual spend here, that's what the
+	// check-in modal is for. Income items have no actual-spend tracking, so
+	// they're simply absent from the map (monthComparison excludes them).
+	let thisMonthActualById = $derived.by(() => {
+		const items = monthComparison(budget, buckets, entries, startOfMonth(new Date())).items;
+		return new Map(items.map((item) => [item.id, item.actual]));
+	});
+
+	type SortKey = 'description' | 'bucket' | 'tags' | 'amount' | 'actual';
 
 	let sortKey = $state<SortKey | null>(null);
 	let sortDir = $state<SortDirection>('asc');
@@ -35,6 +57,8 @@
 				return item.tags ?? '';
 			case 'amount':
 				return item.monthlyAmount ?? 0;
+			case 'actual':
+				return thisMonthActualById.get(item.id) ?? null;
 		}
 	}
 
@@ -46,11 +70,13 @@
 		}
 	}
 
+	let visibleItems = $derived(budget.filter((item) => !!item.income === income));
+
 	// Sorting is disabled while editing so rows don't reorder under the user's
 	// cursor mid-edit.
 	let sorted = $derived.by(() => {
-		if (!sortKey || editing) return budget;
-		return [...budget].sort((a, b) => compareValues(sortValue(a, sortKey!), sortValue(b, sortKey!), sortDir));
+		if (!sortKey || editing) return visibleItems;
+		return [...visibleItems].sort((a, b) => compareValues(sortValue(a, sortKey!), sortValue(b, sortKey!), sortDir));
 	});
 
 	function updateField<K extends 'description' | 'tags' | 'note' | 'income'>(id: string, field: K, value: BudgetItem[K]) {
@@ -78,7 +104,7 @@
 				amount: 0,
 				period: 'Month',
 				monthlyAmount: 0,
-				income: false,
+				income,
 				bucket: undefined,
 				tags: '',
 				note: '',
@@ -121,13 +147,14 @@
 				{@render sortableHeader('description', 'Description')}
 				{@render sortableHeader('bucket', 'Bucket')}
 				{@render sortableHeader('tags', 'Tags')}
-				{@render sortableHeader('amount', 'Monthly Amount', true)}
+				{@render sortableHeader('amount', 'Budgeted', true)}
+				{#if !income}{@render sortableHeader('actual', 'Actual', true)}{/if}
 				{#if editing}<th class="actions"></th>{/if}
 			</tr>
 		</thead>
 		<tbody>
-			{#each sorted as { id, description, bucket, tags, monthlyAmount: amountPerMonth, income, amount, period } (id)}
-				<tr data-income={income}>
+			{#each sorted as { id, description, bucket, tags, monthlyAmount: amountPerMonth, income: itemIncome, amount, period } (id)}
+				<tr data-income={itemIncome}>
 					{#if editing}
 						<td>
 							<input
@@ -169,12 +196,13 @@
 								<input
 									type="checkbox"
 									id="income-toggle-{id}"
-									checked={income}
+									checked={itemIncome}
 									onchange={(e) => updateField(id, 'income', e.currentTarget.checked)}
 								/>
 								<label for="income-toggle-{id}">Income</label>
 							</span>
 						</td>
+						{#if !income}<td class="amount">{thisMonthActualById.has(id) ? formatCurrency(thisMonthActualById.get(id) ?? 0) : ''}</td>{/if}
 						<td class="actions">
 							<button
 								type="button"
@@ -187,8 +215,13 @@
 						<td>{bucket?.name}</td>
 						<td>{tags}</td>
 						<td class="amount">
-							{income ? '+' : ''}{amountPerMonth != null ? amountPerMonth.toLocaleString('en-AU', { style: 'currency', currency: 'AUD' }) : ''}
+							{itemIncome ? '+' : ''}{amountPerMonth != null ? amountPerMonth.toLocaleString('en-AU', { style: 'currency', currency: 'AUD' }) : ''}
 						</td>
+						{#if !income}
+							<td class="amount" data-over-budget={(thisMonthActualById.get(id) ?? 0) > (amountPerMonth ?? 0)}>
+								{thisMonthActualById.has(id) ? formatCurrency(thisMonthActualById.get(id) ?? 0) : ''}
+							</td>
+						{/if}
 					{/if}
 				</tr>
 			{/each}
@@ -239,6 +272,11 @@
 
 		& tr[data-income='true'] td.amount {
 			color: var(--green);
+			font-weight: 600;
+		}
+
+		& td[data-over-budget='true'] {
+			color: var(--red);
 			font-weight: 600;
 		}
 	}
