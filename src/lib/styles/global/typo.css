@@ -69,6 +69,11 @@ nav {
 button, .btn, input[type="submit"] {
 
 	@include button;
+
+	&.secondary {
+
+		@include button_secondary;
+	}
 }
 
 a {

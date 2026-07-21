@@ -2,6 +2,7 @@
 	import Icon from "$parts/Icon.svelte";
 	import type { IconName } from "$parts/Icon.svelte";
 	import Modal from "$parts/Modal.svelte";
+	import type { ModalAction } from "$parts/Modal.svelte";
 	import Select from "$parts/Select.svelte";
 
 	const {
@@ -45,6 +46,11 @@
 		confirmed = false;
 		pendingValue = null;
 	});
+
+	let modalActions: ModalAction[] = $derived([
+		{ label: `Cancel`, onclick: () => (confirmOpen = false), style: `secondary`, variant: `danger` },
+		{ label: `Confirm`, onclick: confirmChange, variant: `success` },
+	]);
 </script>
 
 <Select id="status-{id}" label="Change Status" bind:value={selectedValue} {options} onchange={handleChange} class={className}>
@@ -54,20 +60,8 @@
 	{/snippet}
 </Select>
 
-<Modal bind:open={confirmOpen} title="Change status?">
+<Modal bind:open={confirmOpen} title="Change status?" actions={modalActions}>
 	{#if pendingValue}
 		<p>Change status to <strong>{labels[pendingValue]}</strong>?</p>
-		<div class="confirm_actions">
-			<button onclick={confirmChange}>Confirm</button>
-			<button onclick={() => (confirmOpen = false)}>Cancel</button>
-		</div>
 	{/if}
 </Modal>
-
-<style>
-	.confirm_actions {
-		display: flex;
-		gap: 0.5em;
-		margin-top: 1em;
-	}
-</style>

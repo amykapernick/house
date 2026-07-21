@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Modal from '$parts/Modal.svelte';
+	import type { ModalAction } from '$parts/Modal.svelte';
 	import ColourSelect from '$parts/ColourSelect.svelte';
 	import type { PaletteColour } from '$types/schedule';
 
@@ -24,9 +25,15 @@
 	} = $props();
 
 	let colourNames = $derived(colours.map((c) => c.name));
+
+	let modalActions: ModalAction[] = $derived([
+		{ label: `Cancel`, onclick: () => (open = false), style: `secondary`, variant: `danger` },
+		...(mode === `edit` && onDelete ? [{ label: `Delete`, onclick: onDelete, style: `secondary`, variant: `danger` } as ModalAction] : []),
+		{ label: mode === `create` ? `Add` : `Save`, onclick: onSave, variant: `success`, disabled: !label.trim() },
+	]);
 </script>
 
-<Modal bind:open class={className} title={mode === `create` ? `New block` : `Edit block`}>
+<Modal bind:open class={className} title={mode === `create` ? `New block` : `Edit block`} actions={modalActions}>
 	<div class="field">
 		<label for="block-label">Label</label>
 		<input type="text" id="block-label" bind:value={label} placeholder="e.g. Admin tasks" />
@@ -34,14 +41,6 @@
 	<div class="field">
 		Colour
 		<ColourSelect id="block-colour" bind:value={colour} colours={colourNames} />
-	</div>
-
-	<div class="actions">
-		<button onclick={onSave} disabled={!label.trim()}>{mode === `create` ? `Add` : `Save`}</button>
-		<button onclick={() => (open = false)}>Cancel</button>
-		{#if mode === `edit` && onDelete}
-			<button class="delete" onclick={onDelete}>Delete</button>
-		{/if}
 	</div>
 </Modal>
 
@@ -51,15 +50,5 @@
 		flex-direction: column;
 		gap: 0.25em;
 		margin-bottom: 1em;
-	}
-
-	.actions {
-		display: flex;
-		gap: 0.5em;
-	}
-
-	.delete {
-		margin-left: auto;
-		color: var(--red);
 	}
 </style>

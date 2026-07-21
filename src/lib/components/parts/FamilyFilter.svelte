@@ -31,7 +31,9 @@
 	$effect(() => {
 		if (!$isAuthenticated) return;
 
-		function handleFamily(members: FamilyMember[]) { familyMembers = members; }
+		function handleFamily(members: FamilyMember[]) {
+			familyMembers = members;
+		}
 		fetchFamilyMembers(handleFamily).then(handleFamily);
 
 		fetchCurrentUserSlug(applyDefault).then(applyDefault);
@@ -45,40 +47,77 @@
 </script>
 
 {#if familyMembers.length}
-	<fieldset class="user_filter {className}">
-		<legend>Filter by family member</legend>
-		<div class="option">
-			<input type="radio" id="family-filter-{pageKey}-everyone" name="family-filter" value={EVERYONE} bind:group={selectedUserSlug} />
+	<fieldset class={className}>
+		<div class="filter">
+			<legend>Filter by family member</legend>
+			<input
+				type="radio"
+				id="family-filter-{pageKey}-everyone"
+				name="family-filter"
+				value={EVERYONE}
+				bind:group={selectedUserSlug}
+			/>
 			<label for="family-filter-{pageKey}-everyone">Everyone</label>
+			{#each familyMembers as member (member.slug)}
+				<input
+					type="radio"
+					id="family-filter-{pageKey}-{member.slug}"
+					name="family-filter"
+					value={member.slug}
+					bind:group={selectedUserSlug}
+				/>
+				<label for="family-filter-{pageKey}-{member.slug}" style={member.colour ? `--personColour: var(--${member.colour})` : ''}>{member.name}</label>
+			{/each}
 		</div>
-		{#each familyMembers as member (member.slug)}
-			<div class="option">
-				<input type="radio" id="family-filter-{pageKey}-{member.slug}" name="family-filter" value={member.slug} bind:group={selectedUserSlug} />
-				<label for="family-filter-{pageKey}-{member.slug}">{member.name}</label>
-			</div>
-		{/each}
 	</fieldset>
 {/if}
 
 <style>
-	.user_filter {
+	@import '@mixins';
+
+	.filter {
 		display: flex;
 		flex-wrap: wrap;
 		align-items: center;
 		margin-bottom: 1em;
 		padding: 0;
 		border: none;
-		gap: 1em;
+		gap: 0.5em;
 
 		& legend {
+			width: 100%;
 			padding: 0;
 			font-weight: bold;
 		}
+	}
 
-		& .option {
-			display: flex;
-			align-items: center;
-			gap: 0.3em;
+	input[type='radio'] {
+		@include sr_only;
+
+		&:checked {
+			& + label {
+				border-color: var(--purple_solid_flat);
+				background: linear-gradient(color-mix(in oklch, var(--background) 60%, var(--white)) 0%, color-mix(in oklch, var(--background) 70%, var(--brown)) 100%);
+			}
+		}
+	}
+
+	label {
+		display: flex;
+		align-items: center;
+		padding: 0.6em 1.2em;
+		border: 1px solid color-mix(in oklch, var(--background) 78%, var(--black));
+		border-radius: 2em;
+		color: var(--black);
+		gap: 1ch;
+		cursor: pointer;
+
+		&::before {
+			content: '';
+			width: 1em;
+			height: 1em;
+			border-radius: 100%;
+			background: var(--personColour, var(--kapers-crewe));
 		}
 	}
 </style>

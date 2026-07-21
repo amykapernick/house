@@ -2,34 +2,27 @@
 	import { add, endOfDay, format, isBefore, isToday, isTomorrow, isWithinInterval, isYesterday, startOfDay, startOfToday, subDays } from 'date-fns';
 	import { SvelteSet } from 'svelte/reactivity';
 	import CheckboxButton from '$parts/CheckboxButton.svelte';
+	import type { CheckState } from '$parts/CheckboxButton.svelte';
 	import { getToken } from '$lib/auth';
 	import { getGraphqlUrl } from '$utils/fetchClientData';
 	import type { Habit, HabitViewRange } from '$types/habits';
 
-	let {
-		id,
-		name,
-		due,
-		recurrenceInterval,
-		streak,
-		completions,
-		days,
-		range,
-		onComplete,
-		class: className = '',
-	}: Habit & { days: Date[]; range: HabitViewRange; onComplete?: (id: string) => void; class?: string } = $props();
+	let { id, name, due, recurrenceInterval, streak, completions, days, range, onComplete, class: className = '' }: Habit & { days: Date[]; range: HabitViewRange; onComplete?: (id: string) => void; class?: string } = $props();
 
 	let saving = $state(false);
 	let actionError = $state('');
 
+	// Todoist only gives us a time (due.datetime, ISO with a "T") when the task
+	// actually has one set - a plain due.date ("2026-07-21") is date-only, so
+	// don't invent a misleading "at 12:00am" for those.
 	function formatDue(dueDate: string) {
 		const date = new Date(dueDate);
-		const time = format(date, 'h:mmaaa');
+		const time = dueDate.includes('T') ? ` at ${format(date, 'h:mmaaa')}` : '';
 
-		if (isToday(date)) return `Today at ${time}`;
-		if (isTomorrow(date)) return `Tomorrow at ${time}`;
-		if (isYesterday(date)) return `Yesterday at ${time}`;
-		return `${format(date, 'dd MMM')} at ${time}`;
+		if (isToday(date)) return `Today${time}`;
+		if (isTomorrow(date)) return `Tomorrow${time}`;
+		if (isYesterday(date)) return `Yesterday${time}`;
+		return `${format(date, 'dd MMM')}${time}`;
 	}
 
 	// When the next occurrence is due, per this habit's actual Todoist
@@ -65,6 +58,23 @@
 		});
 	}
 
+	// A day is only "explicitly" done if it's the actual completion date itself,
+	// as opposed to a later day just riding along in that completion's coverage
+	// window (see isDayDone above) - the name checkbox distinguishes the two so
+	// a habit someone hasn't touched today doesn't look fully done.
+	function isExplicitlyDone(day: Date) {
+		const dateKey = format(day, 'yyyy-MM-dd');
+		if (pendingCompletions.has(dateKey)) return true;
+
+		return completions.some((completion) => format(new Date(completion), 'yyyy-MM-dd') === dateKey);
+	}
+
+	function habitState(day: Date): CheckState {
+		if (isExplicitlyDone(day)) return 'complete';
+		if (isDayDone(day)) return 'partial';
+		return 'incomplete';
+	}
+
 	// Extended_Pictographic covers emoji; ‍ (ZWJ) keeps combined sequences
 	// like a family emoji together as one match instead of splitting them up.
 	const EMOJI_PATTERN = /\p{Extended_Pictographic}(‍\p{Extended_Pictographic})*/gu;
@@ -81,7 +91,9 @@
 	let pressTimer: ReturnType<typeof setTimeout> | undefined;
 
 	function startPress() {
-		pressTimer = setTimeout(() => { showTooltip = true; }, 500);
+		pressTimer = setTimeout(() => {
+			showTooltip = true;
+		}, 500);
 	}
 
 	function endPress() {
@@ -103,7 +115,7 @@
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
-				...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+				...(token ? { Authorization: `Bearer ${token}` } : {}),
 			},
 			body: JSON.stringify({ query: `mutation { completeHabit(${args}) { success } }` }),
 		}).then((r) => r.json());
@@ -128,7 +140,13 @@
 
 <tr class="habit {className}">
 	<td class="name">
-		<CheckboxButton class="checkbox" disabled={saving} onclick={() => completeHabit()} label="Mark {name} complete" />
+		<CheckboxButton
+			class="checkbox"
+			state={habitState(startOfToday())}
+			disabled={saving}
+			onclick={() => completeHabit()}
+			label="Mark {name} complete"
+		/>
 		<span class="label">
 			{#if emoji && label}
 				<span
@@ -141,7 +159,11 @@
 					ontouchcancel={endPress}
 				>
 					{emoji}
-					<span class="tooltip" class:visible={showTooltip} role="tooltip">{label}</span>
+					<span
+						class="tooltip"
+						class:visible={showTooltip}
+						role="tooltip">{label}</span
+					>
 				</span>
 			{:else}
 				{name}
@@ -149,13 +171,16 @@
 			{#if due}<span class="due">{formatDue(due)}</span>{/if}
 		</span>
 		{#if streak > 0}
-			<span class="streak">🔥 {streak}</span>
+			<span class="streak">🔥 {streak} <span class="sr-only">days in a row</span></span>
 		{/if}
 		{#if actionError}<p class="error">{actionError}</p>{/if}
 	</td>
 	{#if range === 'week'}
 		{#each days as day (day.toISOString())}
-			<td class="day" title={format(day, 'EEEE d MMM')}>
+			<td
+				class="day"
+				title={format(day, 'EEEE d MMM')}
+			>
 				{@render dayIcon(day)}
 			</td>
 		{/each}
@@ -181,29 +206,54 @@
 			class="day-complete"
 			disabled={saving}
 			onclick={() => completeHabit(format(day, 'yyyy-MM-dd'))}
-			aria-label="Mark {name} complete for {format(day, 'EEEE d MMM')}"
 		>
-			<span aria-hidden="true">{missed ? '🟥' : '⬜'}</span>
+			<span
+				aria-hidden="true"
+				data-done={done}
+				data-missed={missed}
+				class="status"
+			></span>
+			<span class="sr-only">Mark {name} complete for {format(day, 'EEEE d MMM')}</span>
 		</button>
-	{:else if done}
-		<span class="sr-only">{name} completed on {format(day, 'EEEE d MMM')}</span>
-		<span aria-hidden="true">🟩</span>
-	{:else if missed}
-		<span class="sr-only">{name} wasn't completed on {format(day, 'EEEE d MMM')}</span>
-		<span aria-hidden="true">🟥</span>
 	{:else}
-		<span class="sr-only">{name} is upcoming on {format(day, 'EEEE d MMM')}</span>
-		<span aria-hidden="true">⬜</span>
+		<span
+			aria-hidden="true"
+			data-done={done}
+			data-missed={missed}
+			class="status"
+		></span>
+		<!-- TODO: simplify this to just be one line with swithc out statement -->
+		{#if done}
+			<span class="sr-only">{name} completed on {format(day, 'EEEE d MMM')}</span>
+		{:else if missed}
+			<span class="sr-only">{name} wasn't completed on {format(day, 'EEEE d MMM')}</span>
+		{:else}
+			<span class="sr-only">{name} is upcoming on {format(day, 'EEEE d MMM')}</span>
+		{/if}
 	{/if}
 {/snippet}
 
 <style>
+	@import '@mixins';
+
+	.habit {
+		background: var(--transparent);
+	}
+
 	.name {
 		display: flex;
 		position: relative;
 		align-items: center;
-		padding: 0.3em 0.5em;
+		min-width: 200px;
+		padding: 0.3em 0.5em 0.3em 2.8em;
 		gap: 0.5ch;
+
+		& :global(button::before) {
+			content: '';
+			display: block;
+			position: absolute;
+			inset: 0 4em 0 2em;
+		}
 	}
 
 	.label {
@@ -219,7 +269,7 @@
 	}
 
 	.due {
-		color: var(--grey);
+		color: var(--purple_solid_flat);
 		font-size: 0.8em;
 		font-weight: 400;
 	}
@@ -232,6 +282,7 @@
 		user-select: none;
 	}
 
+	/* TODO: Use new css anchoring */
 	.tooltip {
 		position: absolute;
 		z-index: 1;
@@ -262,45 +313,67 @@
 
 	.day {
 		width: 2.5em;
-		border-left: 1px solid var(--grey_light);
 		text-align: center;
 	}
 
 	.day-complete {
+		@include button_icon;
+
+		@include button_text;
+
+		display: block;
+		width: auto;
+		height: auto;
+		margin: 0 auto;
 		padding: 0;
-		border: none;
-		background: none;
-		font: inherit;
 		font-size: 1em;
-		line-height: 1;
-		cursor: pointer;
 
-		&:hover:not(:disabled),
-		&:focus-visible {
-			border-radius: 0.2em;
-			outline: 2px solid var(--purple_bright);
-			outline-offset: 2px;
-		}
-
-		&:disabled {
-			cursor: wait;
+		.status {
+			outline: 2px solid var(--navy);
+			outline-offset: -2px;
 		}
 	}
 
+	.day,
 	.days-column {
-		border-left: 1px solid var(--grey_light);
+		padding: 0.5em 1em 0.5em 0;
 	}
 
 	.days-list {
 		display: flex;
 		flex-wrap: wrap;
 		margin: 0;
-		padding: 0.3em 0.5em;
+		padding: 0;
+		font-size: 0.9em;
+
+		/* padding: 0.3em 0.5em; */
 		list-style: none;
-		gap: 0.15em;
+		gap: 0.2em;
 
 		& li {
-			font-size: 0.9em;
+			/* font-size: 0.9em; */
+		}
+
+		.status {
+			margin: 0;
+		}
+	}
+
+	.status {
+		display: block;
+		width: 1em;
+		height: 1em;
+		margin: 0 auto;
+		border-radius: 0.2em;
+		background: rgb(236 226 240);
+		font-size: 1.5em;
+
+		&[data-done='true'] {
+			background: var(--success);
+		}
+
+		&[data-missed='true'] {
+			background: var(--error);
 		}
 	}
 

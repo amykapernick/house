@@ -16,6 +16,7 @@
 	import Pill from '$parts/Pill.svelte';
 	import Tabs from '$parts/Tabs.svelte';
 	import Modal from '$parts/Modal.svelte';
+	import type { ModalAction } from '$parts/Modal.svelte';
 	import type { Alert, AlertType, MilestoneStatus, SignStatus, ValueNote } from '$types/generated';
 	import Milestone from '$parts/smallHuman/Milestone.svelte';
 	import Auslan from '$parts/smallHuman/Auslan.svelte';
@@ -238,6 +239,11 @@
 		dismissing = false;
 		confirmDismissOpen = false;
 	}
+
+	let dismissAlertActions: ModalAction[] = $derived([
+		{ label: `Cancel`, onclick: () => (confirmDismissOpen = false), style: `secondary`, variant: `danger`, disabled: dismissing },
+		{ label: dismissing ? `Dismissing…` : `Dismiss`, onclick: confirmDismissAlert, variant: `danger`, disabled: dismissing },
+	]);
 
 	async function completeAllergen(taskId: string) {
 		completing.add(taskId);
@@ -689,18 +695,12 @@
 	{/if}
 {/if}
 
-<Modal bind:open={confirmDismissOpen} title="Dismiss alert?">
+<Modal bind:open={confirmDismissOpen} title="Dismiss alert?" actions={dismissAlertActions}>
 	{#if confirmingAlert}
 		<p class="confirm-alert-title"><strong>{confirmingAlert.title}</strong></p>
 		<p>{confirmingAlert.detail}</p>
 	{/if}
 	<p class="confirm-note">This permanently removes the alert - it won't reappear.</p>
-	<div class="actions">
-		<button type="button" onclick={confirmDismissAlert} disabled={dismissing}>
-			{dismissing ? 'Dismissing…' : 'Dismiss'}
-		</button>
-		<button type="button" onclick={() => (confirmDismissOpen = false)} disabled={dismissing}>Cancel</button>
-	</div>
 </Modal>
 
 <style>
@@ -717,16 +717,6 @@
 	.confirm-note {
 		color: var(--grey);
 		font-size: 0.9em;
-	}
-
-	.actions {
-		display: flex;
-		gap: 0.5em;
-		margin-top: 1em;
-
-		& button:first-child {
-			color: var(--red);
-		}
 	}
 
 	pre {

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { format } from 'date-fns';
 	import Modal from '$parts/Modal.svelte';
+	import type { ModalAction } from '$parts/Modal.svelte';
 
 	let {
 		open = $bindable(false),
@@ -28,25 +29,22 @@
 
 	let dueLabel = $derived(due ? format(due, `EEEE, d MMM · h:mma`) : ``);
 	let alreadyDone = $derived(status === `Done`);
+
+	let completeLabel = $derived(alreadyDone ? `Already complete` : saving ? `Completing…` : `Mark complete`);
+
+	let modalActions: ModalAction[] = $derived([
+		{ label: `Close`, onclick: () => (open = false), style: `secondary`, variant: `danger`, disabled: saving },
+		{ label: completeLabel, onclick: onComplete, variant: `success`, disabled: saving || alreadyDone },
+	]);
 </script>
 
-<Modal bind:open class={className} title={title}>
+<Modal bind:open class={className} title={title} actions={modalActions}>
 	{#if dueLabel}<p class="due_label">{dueLabel}</p>{/if}
 
-	{#if error}<p class="error">{error}</p>{/if}
+	<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- link is the external Notion/Todoist task page, not an internal route -->
+	<a class="external" href={link} target="_blank" rel="noreferrer">Open in {platform}</a>
 
-	<div class="actions">
-		<button onclick={onComplete} disabled={saving || alreadyDone}>
-			{#if alreadyDone}
-				Already complete
-			{:else}
-				{saving ? `Completing…` : `Mark complete`}
-			{/if}
-		</button>
-		<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- link is the external Notion/Todoist task page, not an internal route -->
-		<a class="external" href={link} target="_blank" rel="noreferrer">Open in {platform}</a>
-		<button onclick={() => (open = false)} disabled={saving}>Close</button>
-	</div>
+	{#if error}<p class="error">{error}</p>{/if}
 </Modal>
 
 <style>
@@ -62,13 +60,9 @@
 		color: var(--red);
 	}
 
-	.actions {
-		display: flex;
-		align-items: center;
-		gap: 0.5em;
-	}
-
 	.external {
+		display: inline-block;
+		margin-bottom: 1em;
 		color: var(--purple_bright);
 	}
 </style>

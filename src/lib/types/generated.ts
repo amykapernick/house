@@ -305,6 +305,10 @@ export type ContentPageLink = {
   title: Maybe<Scalars['String']['output']>;
 };
 
+export type CreateHabitResult = {
+  success: Scalars['Boolean']['output'];
+};
+
 export type CreateShoppingItemResult = {
   item: Maybe<ShoppingItem>;
   success: Scalars['Boolean']['output'];
@@ -687,6 +691,7 @@ export type Mutation = {
   completeTask: Maybe<CompleteTaskResult>;
   createBudgetItem: Maybe<BudgetMutationResult>;
   createColour: Maybe<ColourMutationResult>;
+  createHabit: Maybe<CreateHabitResult>;
   createHouseArea: Maybe<HouseMutationResult>;
   createHouseItem: Maybe<HouseMutationResult>;
   createMealPlanEntry: Maybe<MealPlanEntry>;
@@ -750,6 +755,13 @@ export type MutationCreateBudgetItemArgs = {
 
 export type MutationCreateColourArgs = {
   input: ColourInput;
+};
+
+
+export type MutationCreateHabitArgs = {
+  assignedUserSlug?: InputMaybe<Scalars['String']['input']>;
+  name: Scalars['String']['input'];
+  recurrence?: InputMaybe<Scalars['String']['input']>;
 };
 
 

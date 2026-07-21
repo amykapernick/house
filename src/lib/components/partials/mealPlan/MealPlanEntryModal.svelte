@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { format, parseISO } from 'date-fns';
 	import Modal from '$parts/Modal.svelte';
+	import type { ModalAction } from '$parts/Modal.svelte';
 	import Select from '$parts/Select.svelte';
 	import Autocomplete from '$parts/Autocomplete.svelte';
 	import fetchClientData from '$utils/fetchClientData';
@@ -99,9 +100,15 @@
 		recipeId = null;
 		recipeName = ``;
 	}
+
+	let modalActions: ModalAction[] = $derived([
+		{ label: `Cancel`, onclick: () => (open = false), style: `secondary`, variant: `danger`, disabled: saving },
+		...(mode === `edit` && onDelete ? [{ label: `Delete`, onclick: onDelete, style: `secondary`, variant: `danger`, disabled: saving } as ModalAction] : []),
+		{ label: saving ? `Saving…` : mode === `create` ? `Add` : `Save`, onclick: onSave, variant: `success`, disabled: !valid || saving },
+	]);
 </script>
 
-<Modal bind:open class={className} title={modalTitle}>
+<Modal bind:open class={className} title={modalTitle} actions={modalActions}>
 	<p class="date_label">{dateLabel}</p>
 
 	<div class="field">
@@ -157,16 +164,6 @@
 	{/if}
 
 	{#if error}<p class="error">{error}</p>{/if}
-
-	<div class="actions">
-		<button onclick={onSave} disabled={!valid || saving}>
-			{saving ? `Saving…` : mode === `create` ? `Add` : `Save`}
-		</button>
-		<button onclick={() => (open = false)} disabled={saving}>Cancel</button>
-		{#if mode === `edit` && onDelete}
-			<button class="delete" onclick={onDelete} disabled={saving}>Delete</button>
-		{/if}
-	</div>
 </Modal>
 
 <style>
@@ -223,16 +220,6 @@
 	}
 
 	.error {
-		color: var(--red);
-	}
-
-	.actions {
-		display: flex;
-		gap: 0.5em;
-	}
-
-	.delete {
-		margin-left: auto;
 		color: var(--red);
 	}
 </style>

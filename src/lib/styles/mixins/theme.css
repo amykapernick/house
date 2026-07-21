@@ -1,14 +1,22 @@
-@mixin button {
-	--gradient_base: var(--purple_bright);
-	--button_background: var(--gradient_background);
-	--button_text: var(--purple_bright_text);
-	--button_border: var(--purple_bright);
-	
+@mixin theme_gradient($gradient_base) {
+	background: var(--$gradient_base);
+	background: linear-gradient(
+		155deg,
+		color-mix(in oklch, var(--$gradient_base) 78%, var(--white_true)) 0%,
+		var(--$gradient_base) 55%,
+		color-mix(in oklch, var(--$gradient_base) 78%, #000000) 100%
+	)
+}
+
+@mixin button($colour: purple_bright) {
+	--button_text: var(--#{$colour}_text);
+	--button_border: var(--#{$colour});
+
+	@include theme_gradient($colour);
 
 	padding: 0.5em 1em;
 	border: none;
 	border-radius: 0.7em;
-	background: var(--button_background);
 	color: var(--button_text);
 	font-family: var(--font_headings);
 	font-size: 0.75em;
@@ -16,41 +24,45 @@
 	cursor: pointer;
 
 	&:hover {
-		--button_background: var(--purple_bright_text);
-		--button_text: var(--purple_bright);
-	}
-}  
+		--button_background: var(--#{$colour}_text);
+		--button_text: var(--#{$colour});
 
-@mixin button_secondary {
-	--button_background: var(--transparent);
-	--button_text: var(--navy);
-	--button_border: var(--navy);
-
-	border: 1px solid var(--button_border);
-
-	&:hover {
-		--button_background: var(--navy);
-		--button_text: var(--navy_text);
+		background: var(--button_background);
 	}
 }
 
-@mixin button_text {
+@mixin button_secondary($colour: navy) {
 	--button_background: var(--transparent);
-	--button_text: var(--purple_bright);
+	--button_text: var(--#{$colour});
+	--button_border: var(--#{$colour});
+
+	border: 1px solid var(--button_border);
+	background: var(--button_background);
+
+	&:hover {
+		--button_background: var(--#{$colour});
+		--button_text: var(--#{$colour}_text);
+	}
+}
+
+@mixin button_text($colour: purple_bright) {
+	--button_background: var(--transparent);
+	--button_text: var(--#{$colour});
 
 	display: inline-flex;
 	padding: 0;
 	border-width: 0;
+	background: var(--button_background);
 
 	&:hover {
 		--button_background: var(--transparent);
-		--button_text: var(--purple_bright);
+		--button_text: var(--#{$colour});
 
 		text-decoration: underline;
 	}
 }
 
-@mixin button_icon {	
+@mixin button_icon {
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -58,14 +70,4 @@
 	height: 2em;
 	padding: 0.2em;
 	border-radius: 50%;
-}
-
-@mixin theme_gradient($gradient_base) {
-	background: var($gradient_base);
-	background: linear-gradient(
-		155deg,
-		color-mix(in oklch, var($gradient_base) 78%, var(--white_true)) 0%,
-		var($gradient_base) 55%,
-		color-mix(in oklch, var($gradient_base) 78%, #000000) 100%
-	)
 }

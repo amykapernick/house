@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Modal from '$parts/Modal.svelte';
+	import type { ModalAction } from '$parts/Modal.svelte';
 
 	let {
 		open = $bindable(false),
@@ -40,9 +41,14 @@
 			onConfirm({ scope: `range`, start, end });
 		}
 	}
+
+	let modalActions: ModalAction[] = $derived([
+		{ label: `Cancel`, onclick: () => (open = false), style: `secondary`, variant: `danger`, disabled: saving },
+		{ label: saving ? `Saving…` : `Save`, onclick: confirm, variant: `success`, disabled: saving },
+	]);
 </script>
 
-<Modal bind:open class={className} title="Save schedule changes">
+<Modal bind:open class={className} title="Save schedule changes" actions={modalActions}>
 	<fieldset>
 		<div class="scope_option">
 			<input type="radio" id="schedule-save-default" bind:group={scope} value="default" />
@@ -68,11 +74,6 @@
 	{/if}
 
 	{#if error}<p class="error">{error}</p>{/if}
-
-	<div class="actions">
-		<button onclick={confirm} disabled={saving}>{saving ? `Saving…` : `Save`}</button>
-		<button onclick={() => (open = false)} disabled={saving}>Cancel</button>
-	</div>
 </Modal>
 
 <style>
@@ -105,10 +106,5 @@
 
 	.error {
 		color: var(--red);
-	}
-
-	.actions {
-		display: flex;
-		gap: 0.5em;
 	}
 </style>

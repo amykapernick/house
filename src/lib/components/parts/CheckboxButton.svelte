@@ -1,4 +1,8 @@
 <script lang="ts">
+	import type { Component } from 'svelte';
+	import Check from '$img/icons/check (2).svg?component';
+	import PartialCheck from '$img/icons/progress-2.svg?component';
+	import Incomplete from '$img/icons/circle-outline.svg?component';
 	export type CheckState = 'incomplete' | 'partial' | 'complete';
 
 	let {
@@ -19,7 +23,8 @@
 		onclick?: () => void;
 	} = $props();
 
-	const GLYPH: Record<CheckState, string> = { incomplete: '○', partial: '◐', complete: '✓' };
+	const ICON: Record<CheckState, Component> = { incomplete: Incomplete, partial: PartialCheck, complete: Check };
+	const IconComponent = $derived(ICON[state]);
 </script>
 
 <button
@@ -32,9 +37,9 @@
 	{#if loading}
 		…
 	{:else if variant === 'boxed'}
-		{#if state === 'complete'}✓{/if}
+		{#if state === 'complete'}<Check />{/if}
 	{:else}
-		{GLYPH[state]}
+		<IconComponent />
 	{/if}
 </button>
 
@@ -64,6 +69,12 @@
 
 		&.complete {
 			color: var(--green);
+
+			& :global(svg) {
+				padding: 0.15em;
+				border: 1px solid currentColor;
+				border-radius: 50%;
+			}
 		}
 	}
 

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Modal from '$parts/Modal.svelte';
+	import type { ModalAction } from '$parts/Modal.svelte';
 
 	let {
 		open = $bindable(false),
@@ -16,9 +17,14 @@
 	} = $props();
 
 	let valid = $derived(url.trim().length > 0);
+
+	let modalActions: ModalAction[] = $derived([
+		{ label: `Cancel`, onclick: () => (open = false), style: `secondary`, variant: `danger`, disabled: saving },
+		{ label: saving ? `Importing…` : `Import`, onclick: onImport, variant: `success`, disabled: !valid || saving },
+	]);
 </script>
 
-<Modal bind:open title="Import recipe from URL">
+<Modal bind:open title="Import recipe from URL" actions={modalActions}>
 	<p class="hint">Paste a link to a recipe page and Mealie will scrape and import it.</p>
 
 	<div class="field">
@@ -33,13 +39,6 @@
 	</div>
 
 	{#if error}<p class="error">{error}</p>{/if}
-
-	<div class="actions">
-		<button onclick={onImport} disabled={!valid || saving}>
-			{saving ? `Importing…` : `Import`}
-		</button>
-		<button onclick={() => (open = false)} disabled={saving}>Cancel</button>
-	</div>
 </Modal>
 
 <style>
@@ -67,10 +66,5 @@
 
 	.error {
 		color: var(--red);
-	}
-
-	.actions {
-		display: flex;
-		gap: 0.5em;
 	}
 </style>

@@ -5,6 +5,7 @@
 	import Pill from '$parts/Pill.svelte';
 	import Stats from '$parts/Stats.svelte';
 	import Modal from '$parts/Modal.svelte';
+	import type { ModalAction } from '$parts/Modal.svelte';
 
 	const {
 		teeth,
@@ -64,6 +65,11 @@
 		if (confirmingTooth) onMarkErupted?.(confirmingTooth.fdi);
 		confirmOpen = false;
 	}
+
+	let modalActions: ModalAction[] = $derived([
+		{ label: `Cancel`, onclick: () => (confirmOpen = false), style: `secondary`, variant: `danger` },
+		{ label: `Confirm`, onclick: confirmErupted, variant: `success` },
+	]);
 	const upcomingCss = $derived(
 		upcoming
 			.map(
@@ -161,23 +167,14 @@
 <Modal
 	bind:open={confirmOpen}
 	title="Mark tooth as erupted?"
+	actions={modalActions}
 >
 	{#if confirmingTooth}
 		<p>Mark <strong>{confirmingTooth.name}</strong> (tooth {confirmingTooth.fdi}) as erupted?</p>
-		<div class="confirm_actions">
-			<button onclick={confirmErupted}>Confirm</button>
-			<button onclick={() => (confirmOpen = false)}>Cancel</button>
-		</div>
 	{/if}
 </Modal>
 
 <style>
-	.confirm_actions {
-		display: flex;
-		gap: 0.5em;
-		margin-top: 1em;
-	}
-
 	dt {
 		font-weight: 700;
 	}

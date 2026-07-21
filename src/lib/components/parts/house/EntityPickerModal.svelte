@@ -4,6 +4,7 @@
 >
 	import type { Snippet } from 'svelte';
 	import Modal from '$parts/Modal.svelte';
+	import type { ModalAction } from '$parts/Modal.svelte';
 
 	let {
 		open = $bindable(false),
@@ -20,11 +21,16 @@
 		onPick: (entity: T) => void;
 		label: Snippet<[T]>;
 	} = $props();
+
+	let modalActions: ModalAction[] = $derived([
+		{ label: `Cancel`, onclick: () => (open = false), style: `secondary`, variant: `danger` },
+	]);
 </script>
 
 <Modal
 	bind:open
 	{title}
+	actions={modalActions}
 >
 	{#if entities.length === 0}
 		<p>{@render emptyMessage()}</p>
@@ -42,10 +48,6 @@
 			{/each}
 		</ul>
 	{/if}
-	<button
-		type="button"
-		onclick={() => (open = false)}>Cancel</button
-	>
 </Modal>
 
 <style>

@@ -2,7 +2,7 @@ import fetchClientData from './fetchClientData';
 
 export const EVERYONE = `everyone`;
 
-export type FamilyMember = { slug: string; name: string };
+export type FamilyMember = { slug: string; name: string; colour: string | null };
 
 // Shared by the schedule, tasks, and calendar pages so all three filter
 // consistently: EVERYONE always passes, otherwise at least one linked family
@@ -21,6 +21,7 @@ export default async function fetchFamilyMembers(onStale?: (members: FamilyMembe
 				users {
 					slug
 					name
+					colour
 				}
 			}
 		`,

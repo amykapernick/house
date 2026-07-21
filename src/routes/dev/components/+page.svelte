@@ -17,6 +17,7 @@
 	import Cards from '$parts/Cards.svelte';
 	import Switch from '$parts/Switch.svelte';
 	import Modal from '$parts/Modal.svelte';
+	import type { ModalAction } from '$parts/Modal.svelte';
 	import TableOfContents from '$parts/content/TableOfContents.svelte';
 	import Autocomplete from '$parts/Autocomplete.svelte';
 	import SegmentedToggle from '$parts/SegmentedToggle.svelte';
@@ -54,6 +55,10 @@
 
 	let modalOpen = $state(false);
 	let confirmOpen = $state(false);
+	const confirmActions: ModalAction[] = [
+		{ label: `Cancel`, onclick: () => (confirmOpen = false), style: `secondary`, variant: `danger` },
+		{ label: `Delete`, onclick: () => (confirmOpen = false), variant: `danger` },
+	];
 
 	let showToc = $state(false);
 	const devToc: TocEntry[] = [
@@ -324,18 +329,9 @@
 		<Modal
 			bind:open={confirmOpen}
 			title="Delete this item?"
+			actions={confirmActions}
 		>
 			<p>This can't be undone.</p>
-			<div class="confirm_actions">
-				<button
-					type="button"
-					onclick={() => (confirmOpen = false)}>Cancel</button
-				>
-				<button
-					type="button"
-					onclick={() => (confirmOpen = false)}>Delete</button
-				>
-			</div>
 		</Modal>
 	</section>
 
@@ -490,9 +486,4 @@
 		}
 	}
 
-	.confirm_actions {
-		display: flex;
-		gap: 0.5em;
-		margin-top: 1em;
-	}
 </style>
