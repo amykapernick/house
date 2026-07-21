@@ -1,7 +1,10 @@
 <script lang="ts">
-	import type { Snippet } from "svelte";
+	import type { Snippet } from 'svelte';
 
-	const { children, class: className = '' }: {
+	const {
+		children,
+		class: className = '',
+	}: {
 		children: Snippet;
 		class?: string;
 	} = $props();
@@ -18,13 +21,18 @@
 		gap: 0.5em;
 	}
 
-	@supports(grid-template-areas: '.') {
+	@supports (grid-template-areas: '.') {
 		div {
 			display: grid;
-			grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+			grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
 			justify-content: stretch;
 			justify-items: stretch;
 		}
 	}
 
+	@media (width >= 50em) {
+		div {
+			gap: 1em;
+		}
+	}
 </style>

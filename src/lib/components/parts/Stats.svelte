@@ -1,15 +1,18 @@
 <script lang="ts">
-	import type { Colour } from "$types/global";
-	import type { Component } from "svelte";
+	import type { Colour } from '$types/global';
+	import type { Component } from 'svelte';
 
-
-	const { items, colour, class: className = '' }: {
+	const {
+		items,
+		colour,
+		class: className = '',
+	}: {
 		items: {
 			name: string;
 			value: string;
 			colour?: Colour;
-			Icon?: Component
-		}[]
+			Icon?: Component;
+		}[];
 		colour?: Colour;
 		class?: string;
 	} = $props();
@@ -22,9 +25,11 @@
 --colour: var(--{colour || 'blue'})"
 >
 	{#each items as { name, value, colour, Icon } (name)}
-		<div style="
+		<div
+			style="
 
---colour: var(--{colour})">
+--colour: var(--{colour})"
+		>
 			<dt class={Icon ? 'sr-only' : ''}>{name}</dt>
 			<dd>{value}</dd>
 			{#if Icon}<Icon />{/if}
@@ -34,11 +39,12 @@
 
 <style>
 	dl {
-		--colour: var(--blue);
-
 		display: flex;
 		flex-wrap: wrap;
+		color: var(--text_secondary);
 		font-size: 0.75em;
+		font-weight: 700;
+		gap: 1em;
 	}
 
 	div {
@@ -47,11 +53,10 @@
 		align-items: center;
 		width: auto;
 		max-width: max-content;
-		margin: 0.2em;
-		padding: 0.2em 0.5em;
-		border: 1.5px solid var(--colour);
-		border-radius: 0.2em;
-		color: var(--colour);
+		padding: 1em;
+		border: 1px solid color-mix(in oklch, var(--background) 78%, var(--black));
+		border-radius: 0.8em;
+		background: var(--white_true);
 		text-align: center;
 
 		& :global(svg) {
@@ -63,7 +68,7 @@
 
 	dd {
 		margin: 0;
+		color: var(--navy);
 		font-size: 1.5em;
-		font-weight: 600;
 	}
 </style>

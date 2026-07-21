@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Growth } from '$types/smallHuman';
 	import { parseISO, format } from 'date-fns';
-	import LineChart from '$components/parts/graph/LineChart.svelte';
+	import Chart from '$components/parts/graph/Chart.svelte';
 	import type { LineChartLine } from '$components/parts/graph/LineChart.svelte';
 
 	const { growth, class: className = '' }: { growth: Growth; class?: string } = $props();
@@ -11,7 +11,7 @@
 	const percentileLine = (data: { x: Date; y: number; tooltip: string }[]): LineChartLine => ({
 		data,
 		style: { colour: 'grey', weight: 1.5, style: 'dashed' },
-		unit: '%ile',
+		unit: 'Percentile',
 		decimals: 0,
 		axis: 'right',
 	});
@@ -23,7 +23,7 @@
 			unit: sorted.find((m) => m[key]?.unit)?.[key]?.unit ?? '',
 			decimals,
 		},
-		percentileLine(sorted.filter((m) => m[key]?.percentile != null).map((m) => ({ x: parseISO(m.date), y: m[key]!.percentile!, tooltip: `${m[key]!.percentile}th %ile` }))),
+		percentileLine(sorted.filter((m) => m[key]?.percentile != null).map((m) => ({ x: parseISO(m.date), y: m[key]!.percentile!, tooltip: `${m[key]!.percentile}%` }))),
 	];
 
 	const weightLines = $derived(measurementLines('weight', 'green', 1));
@@ -36,35 +36,32 @@
 <div class={className}>
 	<p class="trend">{growth.trend_notes}</p>
 
-	<figure>
-		<LineChart
-			lines={weightLines}
-			{formatX}
-			leftLabel={weightLines[0]?.unit}
-			rightLabel={weightLines[1]?.unit}
-		/>
-		<figcaption>Weight</figcaption>
-	</figure>
+	<Chart
+		type="line"
+		lines={weightLines}
+		{formatX}
+		leftLabel={weightLines[0]?.unit}
+		rightLabel={weightLines[1]?.unit}
+		caption="Weight"
+	/>
 
-	<figure>
-		<LineChart
-			lines={heightLines}
-			{formatX}
-			leftLabel={heightLines[0]?.unit}
-			rightLabel={heightLines[1]?.unit}
-		/>
-		<figcaption>Height</figcaption>
-	</figure>
+	<Chart
+		type="line"
+		lines={heightLines}
+		{formatX}
+		leftLabel={heightLines[0]?.unit}
+		rightLabel={heightLines[1]?.unit}
+		caption="Height"
+	/>
 
-	<figure>
-		<LineChart
-			lines={headLines}
-			{formatX}
-			leftLabel={headLines[0]?.unit}
-			rightLabel={headLines[1]?.unit}
-		/>
-		<figcaption>Head Circumference</figcaption>
-	</figure>
+	<Chart
+		type="line"
+		lines={headLines}
+		{formatX}
+		leftLabel={headLines[0]?.unit}
+		rightLabel={headLines[1]?.unit}
+		caption="Head Circumference"
+	/>
 </div>
 
 <style>
@@ -72,18 +69,5 @@
 		opacity: 0.7;
 		font-size: 0.9rem;
 		font-style: italic;
-	}
-
-	figure {
-		width: auto;
-		margin-top: 2em;
-		margin-bottom: 2em;
-		border: 2px solid var(--navy);
-	}
-
-	figcaption {
-		padding: 1em;
-		font-style: italic;
-		text-align: right;
 	}
 </style>

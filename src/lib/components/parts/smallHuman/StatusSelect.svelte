@@ -1,9 +1,12 @@
-<script lang="ts" generics="Status extends IconName">
-	import Icon from "$parts/Icon.svelte";
-	import type { IconName } from "$parts/Icon.svelte";
-	import Modal from "$parts/Modal.svelte";
-	import type { ModalAction } from "$parts/Modal.svelte";
-	import Select from "$parts/Select.svelte";
+<script
+	lang="ts"
+	generics="Status extends IconName"
+>
+	import Icon from '$parts/Icon.svelte';
+	import type { IconName } from '$parts/Icon.svelte';
+	import Modal from '$parts/Modal.svelte';
+	import type { ModalAction } from '$parts/Modal.svelte';
+	import Select from '$parts/Select.svelte';
 
 	const {
 		id,
@@ -24,9 +27,7 @@
 	let confirmOpen = $state(false);
 	let confirmed = false;
 
-	let options = $derived(
-		Object.entries(labels).map(([value, label]) => ({ value: value as Status, label: label as string }))
-	);
+	let options = $derived(Object.entries(labels).map(([value, label]) => ({ value: value as Status, label: label as string })));
 
 	function handleChange() {
 		pendingValue = selectedValue;
@@ -53,15 +54,53 @@
 	]);
 </script>
 
-<Select id="status-{id}" label="Change Status" bind:value={selectedValue} {options} onchange={handleChange} class={className}>
+<Select
+	hiddenLabel={true}
+	id="status-{id}"
+	label="Change Status"
+	bind:value={selectedValue}
+	{options}
+	onchange={handleChange}
+	class={`${className} ${selectedValue}`}
+>
 	{#snippet children(option)}
 		<Icon name={option.value} />
 		<span class="label">{option.label}</span>
 	{/snippet}
 </Select>
 
-<Modal bind:open={confirmOpen} title="Change status?" actions={modalActions}>
+<Modal
+	bind:open={confirmOpen}
+	title="Change status?"
+	actions={modalActions}
+>
 	{#if pendingValue}
 		<p>Change status to <strong>{labels[pendingValue]}</strong>?</p>
 	{/if}
 </Modal>
+
+<style>
+	:global(.status.select) {
+		padding: 0.5em 1em;
+		border: none;
+		border-radius: 2em;
+		background: var(--purple_bright_bg);
+		color: var(--purple_bright);
+		font-size: 0.8em;
+	}
+
+	:global(.status.select:is(.in_progress, .recognises)) {
+		background: var(--info_bg);
+		color: var(--info);
+	}
+
+	:global(.status.select:is(.done, .signing_occasionally)) {
+		background: var(--success_bg);
+		color: var(--success);
+	}
+
+	:global(.status.select:is(.watch, .coming_soon)) {
+		background: var(--warning_bg);
+		color: var(--warning);
+	}
+</style>

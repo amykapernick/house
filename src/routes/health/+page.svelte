@@ -2,7 +2,7 @@
 	import { format, parseISO } from 'date-fns';
 	import { isAuthenticated } from '$lib/auth';
 	import fetchClientData from '$utils/fetchClientData';
-	import LineChart from '$components/parts/graph/LineChart.svelte';
+	import Chart from '$components/parts/graph/Chart.svelte';
 	import type { LineChartLine } from '$components/parts/graph/LineChart.svelte';
 	import Skeleton from '$parts/Skeleton.svelte';
 	import EmptyState from '$parts/EmptyState.svelte';
@@ -127,14 +127,14 @@
 
 	<div class="grid">
 		{#each metricCards as card (card.key)}
-			<figure class="chart-card">
-				<LineChart
-					lines={card.lines}
-					formatX={(x) => format(x, 'd MMM')}
-					leftLabel={card.unit ?? undefined}
-				/>
-				<figcaption>{card.label}</figcaption>
-			</figure>
+			<Chart
+				type="line"
+				lines={card.lines}
+				formatX={(x) => format(x, 'd MMM')}
+				leftLabel={card.unit ?? undefined}
+				caption={card.label}
+				class="chart-card"
+			/>
 		{/each}
 	</div>
 {/if}
@@ -190,14 +190,7 @@
 		gap: 1.5em;
 	}
 
-	.chart-card {
+	:global(.chart-card) {
 		margin: 0;
-		border: 2px solid var(--navy);
-	}
-
-	figcaption {
-		padding: 1em;
-		font-style: italic;
-		text-align: right;
 	}
 </style>

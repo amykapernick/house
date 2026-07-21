@@ -8,6 +8,8 @@
 	import Progress from '$img/icons/progress-indicator-fill.svg?component';
 	import Understand from '$img/icons/artificial-brain-fill.svg?component';
 	import Syringe from '$img/icons/syringe-1.svg?component';
+	import Upcoming from '$img/icons/time-machine-1.svg?component';
+	import Next from '$img/icons/double-arrow-right-fill.svg?component';
 	import CalendarColour from '$img/icons/calendar-date-2.svg?component';
 	import WatchColour from '$img/icons/view.svg?component';
 	import CheckedColour from '$img/icons/check-double.svg?component';
@@ -15,6 +17,8 @@
 	import ProgressColour from '$img/icons/progress-indicator-colored.svg?component';
 	import UnderstandColour from '$img/icons/artificial-brain-colored.svg?component';
 	import SyringeColour from '$img/icons/syringe-2.svg?component';
+	import UpcomingColour from '$img/icons/time-machine.svg?component';
+	import NextColour from '$img/icons/double-arrow-right-colored.svg?component';
 
 	export type IconName = MilestoneStatus | SignStatus | 'calendar' | 'vaccine';
 
@@ -24,9 +28,9 @@
 		calendar: Calendar,
 		done: Checked,
 		in_progress: Progress,
-		upcoming: Unchecked,
+		upcoming: Upcoming,
 		watch: Watch,
-		introduce_next: Unchecked,
+		introduce_next: Next,
 		signing_occasionally: Progress,
 		recognises: Understand,
 		coming_soon: Watch,
@@ -49,7 +53,7 @@
 
 	$effect(() => {
 		if (!wrapper) return;
-		const svg = wrapper.querySelector('svg?component');
+		const svg = wrapper.querySelector('svg');
 		if (!svg) return;
 
 		// eslint-disable-next-line svelte/prefer-svelte-reactivity -- built and discarded synchronously within this effect, never read reactively

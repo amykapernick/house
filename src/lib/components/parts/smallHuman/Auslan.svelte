@@ -1,18 +1,12 @@
 <script lang="ts">
-	import type { AuslanSign, SignStatus } from "$types/generated";
-	import Card from "$parts/Card.svelte";
-	import Modal from "$parts/Modal.svelte";
-	import StatusSelect from "./StatusSelect.svelte";
+	import type { AuslanSign, SignStatus } from '$types/generated';
+	import Card from './Card.svelte';
+	import Modal from '$parts/Modal.svelte';
+	import StatusSelect from './StatusSelect.svelte';
+	import Video from '$img/icons/clapperboard-fill.svg?component';
+	import Book from '$img/icons/agenda-bookmark-fill.svg?component';
 
-	const {
-		id,
-		name,
-		status,
-		tip,
-		reference,
-		onStatusChange,
-		class: className = '',
-	}: AuslanSign & { onStatusChange?: (id: string, status: SignStatus) => void; class?: string } = $props();
+	const { id, name, status, tip, reference, onStatusChange, class: className = '' }: AuslanSign & { onStatusChange?: (id: string, status: SignStatus) => void; class?: string } = $props();
 
 	const statusLabel: Record<SignStatus, string> = {
 		introduce_next: 'Introduce',
@@ -21,7 +15,7 @@
 		recognises: 'Recognises',
 		coming_soon: 'Soon',
 		done: 'Signing',
-	}
+	};
 
 	let videoOpen = $state(false);
 	let gifFailed = $state(false);
@@ -30,40 +24,62 @@
 <Card
 	title={name}
 	class={className}
-	icon={onStatusChange ? undefined : status}
-	IconComponent={onStatusChange ? StatusSelect : undefined}
-	iconProps={onStatusChange ? { id, status, labels: statusLabel, onChange: onStatusChange } : undefined}
 >
-	{#if tip}
-		<p>{tip}</p>
-	{/if}
-	{#if reference?.note}
-		<p>{reference.note}</p>
-	{/if}
-	{#if !onStatusChange}
-		<span class="sr-only">{statusLabel[status]}</span>
-	{/if}
-	{#if reference?.video}
-		<button class="video_link" onclick={() => (videoOpen = true)}>
-			Watch video
-		</button>
-	{/if}
-
-	{#snippet footer()}
+	<div class="content">
+		{#if tip}
+			<p class="tip">{tip}</p>
+		{/if}
+		{#if reference?.note}
+			<p class="note">{reference.note}</p>
+		{/if}
+		{#if onStatusChange}
+			<StatusSelect
+				class="status"
+				{id}
+				{status}
+				labels={statusLabel}
+				onChange={onStatusChange}
+			/>
+		{:else}
+			<span class="status">{statusLabel[status]}</span>
+		{/if}
+		{#if reference?.video}
+			<button
+				class="video_link"
+				onclick={() => (videoOpen = true)}
+			>
+				<Video />
+				<span class="sr-only">Watch video</span>
+			</button>
+		{/if}
 		{#if reference?.url}
 			<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- reference.url is the external Signbank dictionary page, not an internal route -->
-			<a href={reference.url} target="_blank" class="sign_link">
+			<a
+				href={reference.url}
+				target="_blank"
+				class="sign_link"
+			>
 				<span class="sr-only">Signbank page for {name}</span>
-				<span aria-hidden="true">Signbank</span>
+				<Book />
 			</a>
 		{/if}
-	{/snippet}
+	</div>
 </Card>
 
 {#if reference?.video}
-	<Modal bind:open={videoOpen} title={`${name} - Signbank video`}>
+	<Modal
+		bind:open={videoOpen}
+		title={`${name} - Signbank video`}
+	>
 		{#if gifFailed}
-			<video src={reference.video} controls autoplay muted loop class="video">
+			<video
+				src={reference.video}
+				controls
+				autoplay
+				muted
+				loop
+				class="video"
+			>
 				<track kind="captions" />
 			</video>
 		{:else}
@@ -80,18 +96,54 @@
 {/if}
 
 <style>
+	@import '@mixins';
+
+	.content {
+		display: grid;
+		grid-template-areas: 'tip tip tip tip' 'note note note note' 'video link . status';
+		grid-template-columns: auto auto 1fr auto;
+		grid-template-rows: auto 1fr auto;
+		height: 100%;
+
+		& :global(.status) {
+			grid-area: status;
+			align-self: center;
+			margin: 0 1ch 0 0;
+		}
+	}
+
 	.video_link {
-		padding: 0;
-		border: none;
-		background: none;
-		color: inherit;
-		font: inherit;
-		text-decoration: underline;
-		cursor: pointer;
+		@include button_icon;
+
+		grid-area: video;
+		margin-right: 1ch;
 	}
 
 	.video {
 		max-width: 100%;
 		max-height: 70vh;
+	}
+
+	.note {
+		grid-area: note;
+	}
+
+	.tip {
+		grid-area: tip;
+	}
+
+	.note,
+	.tip {
+		margin: 0 0 0.7em;
+		font-size: 0.9em;
+	}
+
+	.sign_link {
+		@include button;
+
+		@include button_icon;
+
+		grid-area: link;
+		margin-right: 1ch;
 	}
 </style>

@@ -5,8 +5,7 @@
 	import { bucketTotals, totalMonthlyExpenses, totalMonthlyIncome } from '$utils/budgetTotals';
 	import { bucketExpenseTrend } from '$utils/budgetSpendComparison';
 	import { categoricalColour, OTHER_LABEL, topNPlusOther } from '$utils/chartColours';
-	import PieChart from '$components/parts/graph/PieChart.svelte';
-	import BarChart from '$components/parts/graph/BarChart.svelte';
+	import Chart from '$components/parts/graph/Chart.svelte';
 	import Stats from '$parts/Stats.svelte';
 
 	let {
@@ -120,46 +119,46 @@
 
 	<div class="grid">
 		{#if bucketSlices.length}
-			<figure>
-				<PieChart
-					slices={bucketSlices}
-					formatValue={formatPercent}
-					centerValue="{totalAllocated.toFixed(0)}%"
-					centerLabel="Allocated"
-				/>
-				<figcaption>Bucket split (% of income)</figcaption>
-			</figure>
+			<Chart
+				type="pie"
+				slices={bucketSlices}
+				formatValue={formatPercent}
+				centerValue="{totalAllocated.toFixed(0)}%"
+				centerLabel="Allocated"
+				caption="Bucket split (% of income)"
+				class="chart-card"
+			/>
 		{/if}
 
 		{#if bucketBarGroups.length}
-			<figure>
-				<BarChart
-					groups={bucketBarGroups}
-					formatValue={formatCurrency}
-				/>
-				<figcaption>Income vs expenses per bucket</figcaption>
-			</figure>
+			<Chart
+				type="bar"
+				groups={bucketBarGroups}
+				formatValue={formatCurrency}
+				caption="Income vs expenses per bucket"
+				class="chart-card"
+			/>
 		{/if}
 
 		{#if tagBarGroups.length}
-			<figure>
-				<BarChart
-					groups={tagBarGroups}
-					formatValue={formatCurrency}
-					orientation="horizontal"
-				/>
-				<figcaption>Monthly spend by tag</figcaption>
-			</figure>
+			<Chart
+				type="bar"
+				groups={tagBarGroups}
+				formatValue={formatCurrency}
+				orientation="horizontal"
+				caption="Monthly spend by tag"
+				class="chart-card"
+			/>
 		{/if}
 
 		{#if trendGroups.length}
-			<figure>
-				<BarChart
-					groups={trendGroups}
-					formatValue={formatCurrency}
-				/>
-				<figcaption>Actual expenses by bucket</figcaption>
-			</figure>
+			<Chart
+				type="bar"
+				groups={trendGroups}
+				formatValue={formatCurrency}
+				caption="Actual expenses by bucket"
+				class="chart-card"
+			/>
 		{/if}
 	</div>
 </section>
@@ -183,15 +182,7 @@
 		}
 	}
 
-	figure {
+	:global(.chart-card) {
 		margin: 0;
-		padding: 1em;
-		border: 2px solid var(--navy);
-	}
-
-	figcaption {
-		padding-top: 1em;
-		font-style: italic;
-		text-align: right;
 	}
 </style>

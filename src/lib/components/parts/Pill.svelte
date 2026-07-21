@@ -1,9 +1,12 @@
 <script lang="ts">
-	import type { Snippet } from "svelte";
+	import type { Snippet } from 'svelte';
 
-
-	const { children, status, outline = false, class: className = '' }: {
-
+	const {
+		children,
+		status,
+		outline = false,
+		class: className = '',
+	}: {
 		children: Snippet;
 		status?: 'error' | 'warning' | 'success' | 'info';
 		outline?: boolean;
@@ -30,7 +33,6 @@
 		background: var(--pill_background);
 		color: var(--pill_colour);
 		font-size: 0.8em;
-		font-weight: 600;
 		font-weight: 700;
 
 		&.outline {

@@ -4,6 +4,7 @@ module.exports = {
 		`stylelint-use-nesting`,
 		`./stylelint-rules/no-duplicate-colour-value.mjs`,
 		`./stylelint-rules/no-repeated-value.mjs`,
+		`./stylelint-rules/no-redundant-light-dark.mjs`,
 	],
 	extends: [
 		`stylelint-config-property-sort-order-smacss`,
@@ -63,6 +64,7 @@ module.exports = {
 		'function-url-no-scheme-relative': true,
 		'house/no-duplicate-colour-value': true,
 		'house/no-repeated-value': [true, { threshold: 3 }],
+		'house/no-redundant-light-dark': true,
 		'import-notation': null,
 		'length-zero-no-unit': true,
 		'no-descending-specificity': null,

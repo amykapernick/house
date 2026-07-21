@@ -124,7 +124,10 @@
 		<figcaption>{teeth.note}</figcaption>
 	</figure>
 	{#if teeth.teething_now}
-		<Pill colour="orange">Currently Teething</Pill>
+		<Pill
+			status="warning"
+			outline={true}>Currently Teething</Pill
+		>
 	{/if}
 	<Stats
 		items={[
@@ -147,7 +150,11 @@
 		{/each}
 	</div>
 	<h3>Upcoming Teeth</h3>
-	<dl>
+	<dl class="upcoming">
+		{#each upcoming as tooth (tooth.fdi)}
+			<dt>{tooth.name}</dt>
+			<dd>Expected at {tooth.expected_months} months</dd>
+		{/each}
 		{#each upcoming as tooth (tooth.fdi)}
 			<dt>{tooth.name}</dt>
 			<dd>Expected at {tooth.expected_months} months</dd>
@@ -175,19 +182,12 @@
 </Modal>
 
 <style>
-	dt {
-		font-weight: 700;
-	}
-
 	.teeth {
 		--tooth: var(--background);
 
 		max-width: 400px;
 		max-height: 70vh;
-		padding: 1em;
 		float: right;
-		border: 2px solid var(--navy);
-		background: var(--background);
 		color: var(--background_text);
 	}
 
@@ -228,8 +228,28 @@
 		}
 	}
 
+	.upcoming {
+		width: auto;
+		max-width: max-content;
+		padding: 1em;
+		border: 1px solid color-mix(in oklch, var(--background) 78%, var(--black));
+		border-radius: 0.8em;
+		background: var(--white_true);
+
+		& :global(dd) {
+			color: var(--text_secondary);
+			font-size: 0.9em;
+		}
+
+		& :global(dd:not(:last-of-type)) {
+			width: calc(100% + 2em);
+			margin: 0 0 1em -1em;
+			padding: 0 0 1em 2.5em;
+			border-bottom: 1px solid color-mix(in oklch, var(--background) 92%, var(--black));
+		}
+	}
+
 	figcaption {
 		font-size: 0.7em;
-		text-align: right;
 	}
 </style>

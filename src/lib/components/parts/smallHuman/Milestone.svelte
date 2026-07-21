@@ -1,7 +1,8 @@
 <script lang="ts">
-	import type { MilestoneStatus, MilestoneCategory } from "$types/generated";
-	import Card from "$parts/Card.svelte";
-	import StatusSelect from "./StatusSelect.svelte";
+	import type { MilestoneStatus, MilestoneCategory } from '$types/generated';
+	import Pill from '../Pill.svelte';
+	import Card from './Card.svelte';
+	import StatusSelect from './StatusSelect.svelte';
 
 	const {
 		id,
@@ -42,21 +43,87 @@
 <Card
 	{title}
 	class={className}
-	footer={type && categoryLabel[type]}
-	icon={onStatusChange ? undefined : status}
-	IconComponent={onStatusChange ? StatusSelect : undefined}
-	iconProps={onStatusChange ? { id, status, labels: statusLabel, onChange: onStatusChange } : undefined}
 >
-	{#if detail && status !== 'done'}
-		<p>{detail}</p>
-	{/if}
-	{#if note}
-		<p>{note}</p>
-	{/if}
-	{#if expected_months}
-		<p>{expected_months.map(m => Math.round(m)).join(' - ')} months</p>
-	{/if}
-	{#if !onStatusChange}
-		<span class="sr-only">{statusLabel[status]}</span>
-	{/if}
+	<div class="content">
+		{#if expected_months}
+			<p class="range">{expected_months.map((m) => Math.round(m)).join(' - ')} months</p>
+		{/if}
+		{#if detail && status !== 'done'}
+			<p class="detail">{detail}</p>
+		{/if}
+		{#if note}
+			<p class="note">{note}</p>
+		{/if}
+
+		{#if onStatusChange}
+			<StatusSelect
+				{id}
+				{status}
+				labels={statusLabel}
+				onChange={onStatusChange}
+				class="status"
+			/>
+		{:else}
+			<!-- TODO: Fix status assignment -->
+			<Pill
+				class="status"
+				{status}>{statusLabel[status]}</Pill
+			>
+		{/if}
+		{#if type}
+			<span class="category">{categoryLabel[type]}</span>
+		{/if}
+	</div>
 </Card>
+
+<style>
+	.content {
+		display: grid;
+		grid-template-areas: 'range range range' 'detail detail detail' 'note note note' 'tags . status';
+		grid-template-columns: auto 1fr auto;
+		grid-template-rows: auto auto 1fr auto;
+		height: 100%;
+		column-gap: 1em;
+
+		& :global(.status) {
+			grid-area: status;
+			align-self: center;
+			margin: 0;
+		}
+	}
+
+	.range {
+		grid-area: range;
+		margin: 0;
+		color: var(--purple_bright);
+		font-size: 0.8em;
+		font-weight: 600;
+	}
+
+	.detail {
+		grid-area: detail;
+	}
+
+	.note {
+		grid-area: note;
+	}
+
+	.detail,
+	.tip {
+		margin: 0 0 0.7em;
+		font-size: 0.9em;
+	}
+
+	.category {
+		grid-area: tags;
+		align-self: center;
+		color: var(--text_secondary);
+		font-size: 0.8em;
+		font-weight: 700;
+		text-transform: uppercase;
+	}
+
+	.status {
+		grid-area: status;
+	}
+</style>

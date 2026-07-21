@@ -24,9 +24,9 @@
 	import Skeleton from '$parts/Skeleton.svelte';
 	import EmptyState from '$parts/EmptyState.svelte';
 	import { getPageTitle } from '$utils/pageTitle';
-	import Breasts from '$img/smallHuman/breasts.svg?component'
-	import Water from '$img/icons/glass-water.svg?component'
-	import Food from '$img/icons/soup.svg?component'
+	import Breasts from '$img/smallHuman/breasts.svg?component';
+	import Water from '$img/icons/glass-water.svg?component';
+	import Food from '$img/icons/soup.svg?component';
 	import type { Component } from 'svelte';
 	import { SvelteSet } from 'svelte/reactivity';
 
@@ -40,10 +40,9 @@
 		return unit ? `${joined} ${unit}` : joined;
 	}
 
-
 	$effect(() => {
 		if ($isAuthenticated) {
-		function handleSmallHuman(res: any) {
+			function handleSmallHuman(res: any) {
 				data = res.smallHuman ?? null;
 				loading = false;
 			}
@@ -177,7 +176,9 @@
 				`,
 			}).then(handleSmallHuman);
 
-			function handleAllergens(res: any) { allergens = res.allergens ?? []; }
+			function handleAllergens(res: any) {
+				allergens = res.allergens ?? [];
+			}
 			const today = format(new Date(), 'yyyy-MM-dd');
 			fetchClientData({
 				cacheKey: `allergens-${today}`,
@@ -198,7 +199,7 @@
 		warn: 'orange',
 		info: 'blue',
 		ok: 'green',
-	}
+	};
 
 	let completing = new SvelteSet<string>();
 
@@ -226,12 +227,12 @@
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
-				...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+				...(token ? { Authorization: `Bearer ${token}` } : {}),
 			},
 			body: JSON.stringify({
 				query: `mutation { dismissAlert(id: "${id}") }`,
 			}),
-		}).then(r => r.json());
+		}).then((r) => r.json());
 
 		data = { ...data, alerts: data.alerts.filter((a: Alert) => a.id !== id) };
 		setCache('small-human', { smallHuman: data });
@@ -253,7 +254,7 @@
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
-				...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+				...(token ? { Authorization: `Bearer ${token}` } : {}),
 			},
 			body: JSON.stringify({
 				// completeHabit (not the generic completeTask) so the completion also
@@ -261,42 +262,26 @@
 				// streak on the habits page (also merged in from Todoist).
 				query: `mutation { completeHabit(habitId: "${taskId}") { success } }`,
 			}),
-		}).then(r => r.json());
+		}).then((r) => r.json());
 
 		const newDue = format(addDays(new Date(), 7), 'yyyy-MM-dd');
-		allergens = allergens.map(a =>
-			a.id === taskId ? { ...a, due: newDue } : a
-		);
+		allergens = allergens.map((a) => (a.id === taskId ? { ...a, due: newDue } : a));
 		completing.delete(taskId);
 	}
 
-	async function updateStatus({
-		mutation,
-		fields,
-		id,
-		status,
-		sectionKey,
-		itemsKey,
-	}: {
-		mutation: string;
-		fields: string;
-		id: string;
-		status: string;
-		sectionKey: string;
-		itemsKey: string;
-	}) {
+	async function updateStatus({ mutation, fields, id, status, sectionKey, itemsKey }: { mutation: string; fields: string; id: string; status: string; sectionKey: string; itemsKey: string }) {
 		const token = await getToken();
 
 		const res = await fetch(getGraphqlUrl(), {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
-				...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+				...(token ? { Authorization: `Bearer ${token}` } : {}),
 			},
 			body: JSON.stringify({
 				query: `mutation { ${mutation}(id: "${id}", status: ${status}) { ${fields} } }`,
 			}),
-		}).then(r => r.json());
+		}).then((r) => r.json());
 
 		const updated = res?.data?.[mutation];
 		if (!updated) return;
@@ -305,22 +290,17 @@
 			...data,
 			[sectionKey]: {
 				...data[sectionKey],
-				[itemsKey]: data[sectionKey][itemsKey].map((item: any) =>
-					item.id === updated.id ? { ...item, ...updated } : item
-				),
+				[itemsKey]: data[sectionKey][itemsKey].map((item: any) => (item.id === updated.id ? { ...item, ...updated } : item)),
 			},
 		};
 		setCache('small-human', { smallHuman: data });
 	}
 
-	const updateMilestoneStatus = (id: string, status: MilestoneStatus) =>
-		updateStatus({ mutation: 'updateMilestoneStatus', fields: 'id status achieved_date', id, status, sectionKey: 'milestones', itemsKey: 'items' });
+	const updateMilestoneStatus = (id: string, status: MilestoneStatus) => updateStatus({ mutation: 'updateMilestoneStatus', fields: 'id status achieved_date', id, status, sectionKey: 'milestones', itemsKey: 'items' });
 
-	const updateSwimSkillStatus = (id: string, status: MilestoneStatus) =>
-		updateStatus({ mutation: 'updateSwimSkillStatus', fields: 'id status', id, status, sectionKey: 'swimming', itemsKey: 'skills' });
+	const updateSwimSkillStatus = (id: string, status: MilestoneStatus) => updateStatus({ mutation: 'updateSwimSkillStatus', fields: 'id status', id, status, sectionKey: 'swimming', itemsKey: 'skills' });
 
-	const updateAuslanSignStatus = (id: string, status: SignStatus) =>
-		updateStatus({ mutation: 'updateAuslanSignStatus', fields: 'id status', id, status, sectionKey: 'auslan', itemsKey: 'signs' });
+	const updateAuslanSignStatus = (id: string, status: SignStatus) => updateStatus({ mutation: 'updateAuslanSignStatus', fields: 'id status', id, status, sectionKey: 'auslan', itemsKey: 'signs' });
 
 	async function markToothErupted(fdi: number) {
 		const token = await getToken();
@@ -329,12 +309,12 @@
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
-				...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+				...(token ? { Authorization: `Bearer ${token}` } : {}),
 			},
 			body: JSON.stringify({
 				query: `mutation { markToothErupted(fdi: ${fdi}) { fdi status erupted_date } }`,
 			}),
-		}).then(r => r.json());
+		}).then((r) => r.json());
 
 		const updated = res?.data?.markToothErupted;
 		if (!updated) return;
@@ -343,9 +323,7 @@
 			...data,
 			teeth: {
 				...data.teeth,
-				teeth: data.teeth.teeth.map((t: any) =>
-					t.fdi === updated.fdi ? { ...t, ...updated } : t
-				),
+				teeth: data.teeth.teeth.map((t: any) => (t.fdi === updated.fdi ? { ...t, ...updated } : t)),
 			},
 		};
 		setCache('small-human', { smallHuman: data });
@@ -357,9 +335,7 @@
 		if (ageWeeks == null || ageMonths == null) return '';
 		const wholeMonths = Math.floor(ageMonths);
 		const remainingWeeks = Math.round(ageWeeks - (wholeMonths * 52) / 12);
-		return wholeMonths > 0
-			? `${wholeMonths} month${wholeMonths !== 1 ? 's' : ''} ${remainingWeeks} week${remainingWeeks !== 1 ? 's' : ''}`
-			: `${ageWeeks} week${ageWeeks !== 1 ? 's' : ''}`;
+		return wholeMonths > 0 ? `${wholeMonths} month${wholeMonths !== 1 ? 's' : ''} ${remainingWeeks} week${remainingWeeks !== 1 ? 's' : ''}` : `${ageWeeks} week${ageWeeks !== 1 ? 's' : ''}`;
 	});
 
 	const sortedMilestones = $derived.by(() => {
@@ -373,8 +349,8 @@
 
 	const feedingStage = $derived({
 		current: data?.feeding?.schedule?.stages?.find((s: any) => s.id === data.feeding.schedule.upcoming?.[0]),
-		upcoming: data?.feeding?.schedule?.stages?.find((s: any) => s.id === data.feeding.schedule.upcoming?.[1])
-	})
+		upcoming: data?.feeding?.schedule?.stages?.find((s: any) => s.id === data.feeding.schedule.upcoming?.[1]),
+	});
 
 	const tabs = [
 		{ id: 'growth', label: 'Growth' },
@@ -409,7 +385,6 @@
 		// eslint-disable-next-line svelte/no-navigation-without-resolve -- resolve() is used; the rule can't trace it through template-literal concatenation with the hash
 		goto(`${resolve('/small-human')}#${id}`, { replaceState: true, noScroll: true, keepFocus: true });
 	}
-
 </script>
 
 <svelte:head>
@@ -429,22 +404,7 @@
 {:else if !data}
 	<EmptyState title="No data available" />
 {:else}
-	{@const {
-		overview,
-		alerts,
-		growth,
-		teeth,
-		swimming,
-		milestones,
-		auslan,
-		feeding,
-		sleep,
-		clothing,
-		vaccinations,
-		notes,
-		activities,
-		sources,
-	} = data}
+	{@const { overview, alerts, growth, teeth, swimming, milestones, auslan, feeding, sleep, clothing, vaccinations, notes, activities, sources } = data}
 	{@const car_seat = notes.find((n: any) => n.__typename === 'CarSeat')}
 	{@const parenting_approach = notes.find((n: any) => n.__typename === 'ParentingApproachNote')?.parentingApproachItems ?? []}
 	{@const toddler_sleep_prep = notes.find((n: any) => n.__typename === 'ToddlerSleepPrepNote')?.toddlerSleepPrepDetail}
@@ -455,17 +415,26 @@
 	{@const urgentAlerts = alerts.filter((a: Alert) => a.level === 'urgent')}
 	{@const otherAlerts = alerts.filter((a: Alert) => a.level !== 'urgent')}
 
-	<UrgentAlerts alerts={urgentAlerts} onDismiss={askDismissAlert} />
+	<UrgentAlerts
+		alerts={urgentAlerts}
+		onDismiss={askDismissAlert}
+	/>
 
 	<h2>Overview</h2>
 
-	<Stats items={[
-		{ name: 'Last Updated', value: overview.last_updated, colour: 'blue_navy' },
-		{ name: 'Age', value: ageDisplay, colour: 'blue_navy' },
-	]} />
+	<Stats
+		items={[
+			{ name: 'Last Updated', value: overview.last_updated, colour: 'blue_navy' },
+			{ name: 'Age', value: ageDisplay, colour: 'blue_navy' },
+		]}
+	/>
 	<Cards>
 		{#each otherAlerts as alert (alert.id)}
-			<Card {...alert} colour={alertColours[alert.level]} onDismiss={() => askDismissAlert(alert)}>
+			<Card
+				{...alert}
+				colour={alertColours[alert.level]}
+				onDismiss={() => askDismissAlert(alert)}
+			>
 				<p>{alert.detail}</p>
 			</Card>
 		{/each}
@@ -475,227 +444,327 @@
 		</Card>
 	</Cards>
 
-	<Tabs {tabs} active={activeTab} onSelect={setActiveTab} />
+	<Tabs
+		{tabs}
+		active={activeTab}
+		onSelect={setActiveTab}
+	/>
 
 	{#if activeTab === 'growth'}
-	<div id="panel-growth" role="tabpanel" aria-labelledby="tab-growth" tabindex="0">
-		<h2>Growth</h2>
-		<Growth {growth} />
-	</div>
+		<div
+			id="panel-growth"
+			role="tabpanel"
+			aria-labelledby="tab-growth"
+			tabindex="0"
+		>
+			<h2>Growth</h2>
+			<Growth {growth} />
+		</div>
 	{/if}
 
 	{#if activeTab === 'teeth'}
-	<div id="panel-teeth" role="tabpanel" aria-labelledby="tab-teeth" tabindex="0">
-		<h2>Teeth</h2>
-		<Teeth {teeth} onMarkErupted={markToothErupted} />
-	</div>
+		<div
+			id="panel-teeth"
+			role="tabpanel"
+			aria-labelledby="tab-teeth"
+			tabindex="0"
+		>
+			<h2>Teeth</h2>
+			<Teeth
+				{teeth}
+				onMarkErupted={markToothErupted}
+			/>
+		</div>
 	{/if}
 
 	{#if activeTab === 'swimming'}
-	<div id="panel-swimming" role="tabpanel" aria-labelledby="tab-swimming" tabindex="0">
-		<h2>Swimming</h2>
-		<p>{swimming.note}</p>
-		<Cards>
-			{#each swimming.skills as m (m.id)}
-				<Milestone {...m} onStatusChange={updateSwimSkillStatus} />
-			{/each}
-		</Cards>
-	</div>
+		<div
+			id="panel-swimming"
+			role="tabpanel"
+			aria-labelledby="tab-swimming"
+			tabindex="0"
+		>
+			<h2>Swimming</h2>
+			<p>{swimming.note}</p>
+			<Cards>
+				{#each swimming.skills as m (m.id)}
+					<Milestone
+						{...m}
+						onStatusChange={updateSwimSkillStatus}
+					/>
+				{/each}
+			</Cards>
+		</div>
 	{/if}
 	{#if activeTab === 'milestones'}
-	<div id="panel-milestones" role="tabpanel" aria-labelledby="tab-milestones" tabindex="0">
-		<h2>Milestones</h2>
-		<p>{milestones.note}</p>
-		<Cards>
-			{#each sortedMilestones as m (m.id)}
-				<Milestone {...m} type={m.category} onStatusChange={updateMilestoneStatus} />
-			{/each}
-		</Cards>
-	</div>
+		<div
+			id="panel-milestones"
+			role="tabpanel"
+			aria-labelledby="tab-milestones"
+			tabindex="0"
+		>
+			<h2>Milestones</h2>
+			<p>{milestones.note}</p>
+			<Cards>
+				{#each sortedMilestones as m (m.id)}
+					<Milestone
+						{...m}
+						type={m.category}
+						onStatusChange={updateMilestoneStatus}
+					/>
+				{/each}
+			</Cards>
+		</div>
 	{/if}
 	{#if activeTab === 'auslan'}
-	<div id="panel-auslan" role="tabpanel" aria-labelledby="tab-auslan" tabindex="0">
-		<h2>Auslan</h2>
-		<p>{auslan.note}</p>
-		<Cards>
-			{#each auslan.signs as s (s.id)}
-				<Auslan {...s} onStatusChange={updateAuslanSignStatus} />
-			{/each}
-		</Cards>
-	</div>
+		<div
+			id="panel-auslan"
+			role="tabpanel"
+			aria-labelledby="tab-auslan"
+			tabindex="0"
+		>
+			<h2>Auslan</h2>
+			<p>{auslan.note}</p>
+			<Cards>
+				{#each auslan.signs as s (s.id)}
+					<Auslan
+						{...s}
+						onStatusChange={updateAuslanSignStatus}
+					/>
+				{/each}
+			</Cards>
+		</div>
 	{/if}
 	{#if activeTab === 'feeding'}
-	<div id="panel-feeding" role="tabpanel" aria-labelledby="tab-feeding" tabindex="0">
-		<h2>Feeding</h2>
-		{#if feedingStage.current}
-			<h3>Current Stage - {feedingStage.current.title}</h3>
-			<Stats
-				items={[
-					{
-						name: 'Breastfeeds',
-						value: formatValueNote(feedingStage.current.breastfeeds),
-						Icon: Breasts
-					},
-					{
-						name: 'Solid Meals',
-						value: formatValueNote(feedingStage.current.solid_meals),
-						Icon: Food
-					},
-					{
-						name: 'Water',
-						value: formatValueNote(feedingStage.current.water),
-						Icon: Water
-					}
-				]}
-			/>
-		{/if}
-		{#if feedingStage.upcoming}
-			<h3>Upcoming Stage - {feedingStage.upcoming.title}</h3>
-			<Stats
-				items={[
-					{
-						name: 'Breastfeeds',
-						value: formatValueNote(feedingStage.current.breastfeeds),
-						Icon: Breasts
-					},
-					{
-						name: 'Solid Meals',
-						value: formatValueNote(feedingStage.current.solid_meals),
-						Icon: Food
-					},
-					{
-						name: 'Water',
-						value: formatValueNote(feedingStage.current.water),
-						Icon: Water
-					}
-				]}
-			/>
-		{/if}
-		<pre><code>{JSON.stringify(feeding, null, 2)}</code></pre>
-	</div>
+		<div
+			id="panel-feeding"
+			role="tabpanel"
+			aria-labelledby="tab-feeding"
+			tabindex="0"
+		>
+			<h2>Feeding</h2>
+			{#if feedingStage.current}
+				<h3>Current Stage - {feedingStage.current.title}</h3>
+				<Stats
+					items={[
+						{
+							name: 'Breastfeeds',
+							value: formatValueNote(feedingStage.current.breastfeeds),
+							Icon: Breasts,
+						},
+						{
+							name: 'Solid Meals',
+							value: formatValueNote(feedingStage.current.solid_meals),
+							Icon: Food,
+						},
+						{
+							name: 'Water',
+							value: formatValueNote(feedingStage.current.water),
+							Icon: Water,
+						},
+					]}
+				/>
+			{/if}
+			{#if feedingStage.upcoming}
+				<h3>Upcoming Stage - {feedingStage.upcoming.title}</h3>
+				<Stats
+					items={[
+						{
+							name: 'Breastfeeds',
+							value: formatValueNote(feedingStage.current.breastfeeds),
+							Icon: Breasts,
+						},
+						{
+							name: 'Solid Meals',
+							value: formatValueNote(feedingStage.current.solid_meals),
+							Icon: Food,
+						},
+						{
+							name: 'Water',
+							value: formatValueNote(feedingStage.current.water),
+							Icon: Water,
+						},
+					]}
+				/>
+			{/if}
+			<pre><code>{JSON.stringify(feeding, null, 2)}</code></pre>
+		</div>
 	{/if}
 	{#if activeTab === 'sleep'}
-	<div id="panel-sleep" role="tabpanel" aria-labelledby="tab-sleep" tabindex="0">
-		<h2>Sleep</h2>
-		<pre><code>{JSON.stringify(sleep, null, 2)}</code></pre>
-	</div>
+		<div
+			id="panel-sleep"
+			role="tabpanel"
+			aria-labelledby="tab-sleep"
+			tabindex="0"
+		>
+			<h2>Sleep</h2>
+			<pre><code>{JSON.stringify(sleep, null, 2)}</code></pre>
+		</div>
 	{/if}
 	{#if activeTab === 'sleep-environment'}
-	<div id="panel-sleep-environment" role="tabpanel" aria-labelledby="tab-sleep-environment" tabindex="0">
-		<h2>Sleep Environment</h2>
-		<pre><code>{JSON.stringify(sleep_environment, null, 2)}</code></pre>
-	</div>
+		<div
+			id="panel-sleep-environment"
+			role="tabpanel"
+			aria-labelledby="tab-sleep-environment"
+			tabindex="0"
+		>
+			<h2>Sleep Environment</h2>
+			<pre><code>{JSON.stringify(sleep_environment, null, 2)}</code></pre>
+		</div>
 	{/if}
 	{#if activeTab === 'clothing-seasonal'}
-	<div id="panel-clothing-seasonal" role="tabpanel" aria-labelledby="tab-clothing-seasonal" tabindex="0">
-		<h2>Clothing Seasonal</h2>
-		<pre><code>{JSON.stringify(clothing_seasonal, null, 2)}</code></pre>
-	</div>
+		<div
+			id="panel-clothing-seasonal"
+			role="tabpanel"
+			aria-labelledby="tab-clothing-seasonal"
+			tabindex="0"
+		>
+			<h2>Clothing Seasonal</h2>
+			<pre><code>{JSON.stringify(clothing_seasonal, null, 2)}</code></pre>
+		</div>
 	{/if}
 	{#if activeTab === 'clothing-daytime'}
-	<div id="panel-clothing-daytime" role="tabpanel" aria-labelledby="tab-clothing-daytime" tabindex="0">
-		<h2>Clothing Daytime</h2>
-		<pre><code>{JSON.stringify(clothing_daytime, null, 2)}</code></pre>
-	</div>
+		<div
+			id="panel-clothing-daytime"
+			role="tabpanel"
+			aria-labelledby="tab-clothing-daytime"
+			tabindex="0"
+		>
+			<h2>Clothing Daytime</h2>
+			<pre><code>{JSON.stringify(clothing_daytime, null, 2)}</code></pre>
+		</div>
 	{/if}
 	{#if activeTab === 'vaccinations'}
-	<div id="panel-vaccinations" role="tabpanel" aria-labelledby="tab-vaccinations" tabindex="0">
-		<h2>Vaccinations</h2>
-		<p>{vaccinations.note}</p>
-		<Cards>
-			{#each vaccinations.items as v (v.id)}
-				<Card
-					title={v.title}
-					icon={v.todoist_task ? 'calendar' : 'vaccine'}
-					footer={v.todoist_task && formatDate(new Date(v.todoist_task.due), 'dd MMM')}
-				>
-					<p>{v.detail}</p>
-				</Card>
-			{/each}
-		</Cards>
-	</div>
+		<div
+			id="panel-vaccinations"
+			role="tabpanel"
+			aria-labelledby="tab-vaccinations"
+			tabindex="0"
+		>
+			<h2>Vaccinations</h2>
+			<p>{vaccinations.note}</p>
+			<Cards>
+				{#each vaccinations.items as v (v.id)}
+					<Card
+						title={v.title}
+						icon={v.todoist_task ? 'calendar' : 'vaccine'}
+						footer={v.todoist_task && formatDate(new Date(v.todoist_task.due), 'dd MMM')}
+					>
+						<p>{v.detail}</p>
+					</Card>
+				{/each}
+			</Cards>
+		</div>
 	{/if}
 	{#if activeTab === 'parenting-approach'}
-	<div id="panel-parenting-approach" role="tabpanel" aria-labelledby="tab-parenting-approach" tabindex="0">
-		<h2>Parenting Approach</h2>
-		<Cards>
-			{#each parenting_approach as a (a.id)}
-				<Card
-				title={a.title}
-				>
-					<p>{a.detail}</p>
-				</Card>
-			{/each}
-		</Cards>
-	</div>
+		<div
+			id="panel-parenting-approach"
+			role="tabpanel"
+			aria-labelledby="tab-parenting-approach"
+			tabindex="0"
+		>
+			<h2>Parenting Approach</h2>
+			<Cards>
+				{#each parenting_approach as a (a.id)}
+					<Card title={a.title}>
+						<p>{a.detail}</p>
+					</Card>
+				{/each}
+			</Cards>
+		</div>
 	{/if}
 	{#if activeTab === 'activities'}
-	<div id="panel-activities" role="tabpanel" aria-labelledby="tab-activities" tabindex="0">
-		<h2>Activities</h2>
-		<Cards>
-			{#each activities as a (a.id)}
-				<Card
-				title={a.title}
-				>
-					<p>{a.detail}</p>
-				</Card>
-			{/each}
-		</Cards>
-	</div>
+		<div
+			id="panel-activities"
+			role="tabpanel"
+			aria-labelledby="tab-activities"
+			tabindex="0"
+		>
+			<h2>Activities</h2>
+			<Cards>
+				{#each activities as a (a.id)}
+					<Card title={a.title}>
+						<p>{a.detail}</p>
+					</Card>
+				{/each}
+			</Cards>
+		</div>
 	{/if}
 	{#if activeTab === 'toddler-sleep-prep'}
-	<div id="panel-toddler-sleep-prep" role="tabpanel" aria-labelledby="tab-toddler-sleep-prep" tabindex="0">
-		<h2>Toddler Sleep Prep</h2>
-		<p>{toddler_sleep_prep.note}</p>
-		{#if toddler_sleep_prep.status === 'due'}
-			<Card
-				title={toddler_sleep_prep.alert_when_due.title}
-				colour={alertColours[toddler_sleep_prep.alert_when_due.level as AlertType]}
-			>
-				<p>{toddler_sleep_prep.alert_when_due.detail}</p>
-			</Card>
-		{:else}
-			<Pill colour="blue">Not yet due</Pill>
-		{/if}
-		<h3>Reading</h3>
-		{#each toddler_sleep_prep.reading as i (i.id)}
-			<h4>{i.title}</h4>
-			<p>{i.note}</p>
-		{/each}
-	</div>
+		<div
+			id="panel-toddler-sleep-prep"
+			role="tabpanel"
+			aria-labelledby="tab-toddler-sleep-prep"
+			tabindex="0"
+		>
+			<h2>Toddler Sleep Prep</h2>
+			<p>{toddler_sleep_prep.note}</p>
+			{#if toddler_sleep_prep.status === 'due'}
+				<Card
+					title={toddler_sleep_prep.alert_when_due.title}
+					colour={alertColours[toddler_sleep_prep.alert_when_due.level as AlertType]}
+				>
+					<p>{toddler_sleep_prep.alert_when_due.detail}</p>
+				</Card>
+			{:else}
+				<Pill colour="blue">Not yet due</Pill>
+			{/if}
+			<h3>Reading</h3>
+			{#each toddler_sleep_prep.reading as i (i.id)}
+				<h4>{i.title}</h4>
+				<p>{i.note}</p>
+			{/each}
+		</div>
 	{/if}
 	{#if activeTab === 'food-principles'}
-	<div id="panel-food-principles" role="tabpanel" aria-labelledby="tab-food-principles" tabindex="0">
-		<h2>Food Principles</h2>
-		<p>{food_principles.core_philosophy}</p>
-		<p>{food_principles.note}</p>
-		<h3>Current Principles</h3>
-		{#each food_principles.current_and_ongoing as i (i.id)}
-			<h4>{i.title}</h4>
-			<p>{i.detail}</p>
-		{/each}
-		<h3>What to expect from a toddler</h3>
-		{#each food_principles.toddler_forward_look as i (i.id)}
-			<h4>{i.title}</h4>
-			<p>{i.detail}</p>
-		{/each}
-	</div>
+		<div
+			id="panel-food-principles"
+			role="tabpanel"
+			aria-labelledby="tab-food-principles"
+			tabindex="0"
+		>
+			<h2>Food Principles</h2>
+			<p>{food_principles.core_philosophy}</p>
+			<p>{food_principles.note}</p>
+			<h3>Current Principles</h3>
+			{#each food_principles.current_and_ongoing as i (i.id)}
+				<h4>{i.title}</h4>
+				<p>{i.detail}</p>
+			{/each}
+			<h3>What to expect from a toddler</h3>
+			{#each food_principles.toddler_forward_look as i (i.id)}
+				<h4>{i.title}</h4>
+				<p>{i.detail}</p>
+			{/each}
+		</div>
 	{/if}
 	{#if activeTab === 'sources'}
-	<div id="panel-sources" role="tabpanel" aria-labelledby="tab-sources" tabindex="0">
-		<h2>Sources</h2>
-		{#each sources as s (s.id)}
-			<h3>{s.name}</h3>
-			<p>{s.detail}</p>
-			{#if s.note}<p>{s.note}</p>{/if}
-			<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- s.url is an external reference source, not an internal route -->
-			<a href={s.url} target="_blank">{s.url.replace('https://', '')}</a>
-		{/each}
-	</div>
+		<div
+			id="panel-sources"
+			role="tabpanel"
+			aria-labelledby="tab-sources"
+			tabindex="0"
+		>
+			<h2>Sources</h2>
+			{#each sources as s (s.id)}
+				<h3>{s.name}</h3>
+				<p>{s.detail}</p>
+				{#if s.note}<p>{s.note}</p>{/if}
+				<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- s.url is an external reference source, not an internal route -->
+				<a
+					href={s.url}
+					target="_blank">{s.url.replace('https://', '')}</a
+				>
+			{/each}
+		</div>
 	{/if}
 {/if}
 
-<Modal bind:open={confirmDismissOpen} title="Dismiss alert?" actions={dismissAlertActions}>
+<Modal
+	bind:open={confirmDismissOpen}
+	title="Dismiss alert?"
+	actions={dismissAlertActions}
+>
 	{#if confirmingAlert}
 		<p class="confirm-alert-title"><strong>{confirmingAlert.title}</strong></p>
 		<p>{confirmingAlert.detail}</p>
@@ -727,6 +796,10 @@
 		color: var(--blue_text);
 		font-size: 0.85em;
 		line-height: 1.4;
+	}
+
+	div[role='tabpanel']:focus {
+		outline: none;
 	}
 
 	div[role='tabpanel'] h2 {
