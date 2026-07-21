@@ -29,6 +29,7 @@
 	import Food from '$img/icons/soup.svg?component';
 	import type { Component } from 'svelte';
 	import { SvelteSet } from 'svelte/reactivity';
+	import Icon from '$parts/Icon.svelte';
 
 	let data = $state<any>(null);
 	let allergens = $state<any[]>([]);
@@ -643,17 +644,24 @@
 		>
 			<h2>Vaccinations</h2>
 			<p>{vaccinations.note}</p>
-			<Cards>
+			<div class="vaccinations">
 				{#each vaccinations.items as v (v.id)}
-					<Card
-						title={v.title}
-						icon={v.todoist_task ? 'calendar' : 'vaccine'}
-						footer={v.todoist_task && formatDate(new Date(v.todoist_task.due), 'dd MMM')}
-					>
-						<p>{v.detail}</p>
+					<Card>
+						<h3>{v.title}</h3>
+						<!-- TODO: Add due or given date -->
+						<Icon
+							colour={true}
+							name={v.todoist_task ? 'calendar' : 'vaccine'}
+						/>
+						<p class="detail">{v.detail}</p>
+						<!-- TODO: Allow changing status of vaccination with statusselect component -->
+						<Pill
+							status={v.status}
+							class="status">{v.status}</Pill
+						>
 					</Card>
 				{/each}
-			</Cards>
+			</div>
 		</div>
 	{/if}
 	{#if activeTab === 'parenting-approach'}
@@ -744,17 +752,21 @@
 			role="tabpanel"
 			aria-labelledby="tab-sources"
 			tabindex="0"
+			class="sources"
 		>
 			<h2>Sources</h2>
 			{#each sources as s (s.id)}
-				<h3>{s.name}</h3>
+				<h3>
+					<!-- eslint-disable svelte/no-navigation-without-resolve -- s.url is an external reference source, not an internal route -->
+					<a
+						href={s.url}
+						target="_blank"
+					>
+						{s.name}</a
+					><!-- eslint-enable svelte/no-navigation-without-resolve -->
+				</h3>
 				<p>{s.detail}</p>
 				{#if s.note}<p>{s.note}</p>{/if}
-				<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- s.url is an external reference source, not an internal route -->
-				<a
-					href={s.url}
-					target="_blank">{s.url.replace('https://', '')}</a
-				>
 			{/each}
 		</div>
 	{/if}
@@ -798,17 +810,74 @@
 		line-height: 1.4;
 	}
 
-	div[role='tabpanel']:focus {
-		outline: none;
+	div[role='tabpanel'] {
+		&:focus,
+		&:focus-visible {
+			outline: none;
+		}
+
+		& h2 {
+
+			@include sr_only;
+		}
 	}
 
-	div[role='tabpanel'] h2 {
-		color: var(--navy);
-		font-size: 1.5em;
+	.vaccinations {
+		width: auto;
+		max-width: max-content;
+		padding: 0;
+		border: 1px solid var(--border);
+		border-radius: 0.8em;
+		background: var(--white_true);
+
+		& h3 {
+			grid-area: title;
+			margin: 0;
+			color: var(--black);
+			font-size: 1em;
+			font-weight: 700;
+		}
+
+		& .detail {
+			grid-area: desc;
+			margin: 0;
+		}
+
+		& :global(.card) {
+			grid-template-areas: 'icon title status' 'icon date status' '. desc .';
+			grid-template-columns: auto 1fr auto;
+			grid-template-rows: auto auto 1fr;
+			padding: 1em;
+			border: none;
+			border-radius: 0;
+			background: none;
+		}
+
+		& :global(.card:not(:last-child)) {
+			border-bottom: 1px solid color-mix(in oklch, var(--background) 92%, var(--black));
+		}
+
+		& :global(.icon) {
+			grid-area: icon;
+			font-size: 2em;
+		}
+
+		& :global(.icon svg) {
+			width: 1em;
+			height: 1em;
+			margin-right: 0.5em;
+		}
 	}
 
-	div[role='tabpanel']:focus-visible {
-		outline: 2px solid var(--purple_bright);
-		outline-offset: 2px;
+	.sources {
+		& h3 {
+			color: var(--navy);
+			font-weight: 700;
+
+			&:not(:first-of-type) {
+				padding-top: 1em;
+				border-top: 1px solid color-mix(in oklch, var(--background) 92%, var(--black));
+			}
+		}
 	}
 </style>

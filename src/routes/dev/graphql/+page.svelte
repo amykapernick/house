@@ -101,6 +101,7 @@
 			>
 				{$isAuthenticated ? `Authenticated` : `Not signed in`}
 			</span>
+			<!-- TODO: Add schema lookup without needing autocomplete -->
 			{#if schemaLoading}
 				<span class="status">Loading schema...</span>
 			{:else if schemaError}

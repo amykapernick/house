@@ -12,6 +12,8 @@
 		outline?: boolean;
 		class?: string;
 	} = $props();
+
+	// TODO: allow adding other statuses and mapping to existing ones, eg. done, in_progress, etc, similar to statusselect lookup
 </script>
 
 <div

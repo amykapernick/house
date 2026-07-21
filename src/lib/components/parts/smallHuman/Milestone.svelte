@@ -102,16 +102,12 @@
 
 	.detail {
 		grid-area: detail;
+		margin: 0 0 0.7em;
+		font-size: 0.9em;
 	}
 
 	.note {
 		grid-area: note;
-	}
-
-	.detail,
-	.tip {
-		margin: 0 0 0.7em;
-		font-size: 0.9em;
 	}
 
 	.category {
@@ -121,9 +117,5 @@
 		font-size: 0.8em;
 		font-weight: 700;
 		text-transform: uppercase;
-	}
-
-	.status {
-		grid-area: status;
 	}
 </style>

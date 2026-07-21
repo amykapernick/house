@@ -24,7 +24,7 @@
 
 	// TODO: Allow enabling colour icons
 
-	const icons: Record<IconName, Component> = {
+	const monochromeIcons: Record<IconName, Component> = {
 		calendar: Calendar,
 		done: Checked,
 		in_progress: Progress,
@@ -37,7 +37,22 @@
 		vaccine: Syringe,
 	};
 
-	const { name, class: className = '' }: { name: IconName; class?: string } = $props();
+	const colourIcons: Record<IconName, Component> = {
+		calendar: CalendarColour,
+		done: CheckedColour,
+		in_progress: ProgressColour,
+		upcoming: UpcomingColour,
+		watch: WatchColour,
+		introduce_next: NextColour,
+		signing_occasionally: ProgressColour,
+		recognises: UnderstandColour,
+		coming_soon: WatchColour,
+		vaccine: SyringeColour,
+	};
+
+	const { name, class: className = '', colour }: { name: IconName; class?: string; colour?: Boolean } = $props();
+
+	const icons = $derived(colour ? colourIcons : monochromeIcons);
 
 	const IconComponent = $derived(icons[name]);
 

@@ -59,6 +59,7 @@
 	}
 
 	.toc-toggle {
+
 		@include button_icon;
 
 		margin-left: auto;

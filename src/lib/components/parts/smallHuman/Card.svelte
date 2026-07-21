@@ -40,7 +40,7 @@
 		class="heading">{title}</svelte:element
 	>
 	{#if children}
-		<div>{@render children()}</div>
+		<div class="content">{@render children()}</div>
 	{/if}
 </Card>
 
@@ -53,6 +53,10 @@
 
 		&:global(.has-dismiss) .heading {
 			padding-right: 1.6em;
+		}
+
+		& :global(*:is(p)) {
+			margin: 0;
 		}
 	}
 

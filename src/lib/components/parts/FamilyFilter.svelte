@@ -66,7 +66,10 @@
 					value={member.slug}
 					bind:group={selectedUserSlug}
 				/>
-				<label for="family-filter-{pageKey}-{member.slug}" style={member.colour ? `--personColour: var(--${member.colour})` : ''}>{member.name}</label>
+				<label
+					for="family-filter-{pageKey}-{member.slug}"
+					style={member.colour ? `--personColour: var(--${member.colour})` : ''}>{member.name}</label
+				>
 			{/each}
 		</div>
 	</fieldset>
@@ -92,6 +95,7 @@
 	}
 
 	input[type='radio'] {
+
 		@include sr_only;
 
 		&:checked {
@@ -106,7 +110,7 @@
 		display: flex;
 		align-items: center;
 		padding: 0.6em 1.2em;
-		border: 1px solid color-mix(in oklch, var(--background) 78%, var(--black));
+		border: 1px solid var(--border);
 		border-radius: 2em;
 		color: var(--black);
 		gap: 1ch;

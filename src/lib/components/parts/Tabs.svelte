@@ -47,7 +47,11 @@
 	}
 </script>
 
-<div class="tabs {className}" role="tablist" aria-orientation="horizontal">
+<div
+	class="tabs {className}"
+	role="tablist"
+	aria-orientation="horizontal"
+>
 	{#each tabs as tab, index (tab.id)}
 		<button
 			bind:this={buttons[index]}
@@ -75,7 +79,7 @@
 		gap: 1em 1.5em;
 		margin: 1.5em 0 1em;
 		padding-bottom: 0.8em;
-		border-bottom: 1px solid color-mix(in oklch, var(--background) 78%, var(--black));
+		border-bottom: 1px solid var(--border);
 	}
 
 	button {

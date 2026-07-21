@@ -174,6 +174,7 @@
 	@import '@mixins';
 
 	.habit_view {
+
 		/* TODO: Fix overflow scrolling */
 		max-width: 100%;
 
@@ -214,6 +215,7 @@
 	}
 
 	.toggle {
+
 		@include button_text;
 
 		--button_text: inherit;

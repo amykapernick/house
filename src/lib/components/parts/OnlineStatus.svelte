@@ -121,11 +121,13 @@
 
 			& .status,
 			& button {
+
 				@include sr_only;
 			}
 		}
 
 		& button {
+
 			@include button_icon;
 
 			--button_background: var(--transparent);

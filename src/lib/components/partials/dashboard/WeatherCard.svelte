@@ -159,8 +159,8 @@
 			font-variant-numeric: tabular-nums;
 
 			&.low {
-				text-align: right;
 				color: var(--grey);
+				text-align: right;
 			}
 		}
 	}

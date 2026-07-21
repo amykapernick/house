@@ -79,9 +79,9 @@
 	}
 
 	.needle {
-		stroke: var(--background_text);
 		stroke-width: 3;
 		stroke-linecap: round;
+		stroke: var(--background_text);
 	}
 
 	.pivot {

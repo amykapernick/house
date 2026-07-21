@@ -150,6 +150,7 @@
 		}
 
 		& button[type='submit'] {
+
 			@include button_icon;
 
 			@include button_secondary;
@@ -180,6 +181,7 @@
 		list-style: none;
 
 		& button {
+
 			@include button_text;
 
 			display: flex;

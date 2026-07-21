@@ -17,7 +17,7 @@
 		width: 90vw;
 		max-width: min(100vw, 1200px);
 		margin: 0 auto;
-		padding: 5em 0 4em;
+		padding: 5em 5vw 4em;
 		overflow-x: hidden;
 
 		&.full {
@@ -31,8 +31,8 @@
 		}
 
 		@media (width >= 50em) {
-			width: 90%;
-			padding: 2em 0;
+			width: 100%;
+			padding: 2em 5%;
 		}
 	}
 </style>

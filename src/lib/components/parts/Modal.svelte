@@ -56,7 +56,7 @@
 	{/if}
 	{#if actions.length}
 		<div class="actions">
-			{#each actions as action}
+			{#each actions as action (action.label)}
 				<button
 					type="button"
 					class={[action.style === 'secondary' && 'secondary', action.variant && action.variant !== 'none' && action.variant].filter(Boolean).join(' ')}
@@ -91,6 +91,7 @@
 	}
 
 	.close {
+
 		@include button_secondary(purple_bright);
 
 		@include button_icon;
@@ -109,29 +110,36 @@
 
 	button {
 		&.danger {
+
 			@include button(error);
 		}
 
 		&.warning {
+
 			@include button(warning);
 		}
 
 		&.success {
+
 			@include button(success);
 		}
 
 		&.secondary {
+
 			@include button_secondary;
 
 			&.danger {
+
 				@include button_secondary(error);
 			}
 
 			&.warning {
+
 				@include button_secondary(warning);
 			}
 
 			&.success {
+
 				@include button_secondary(success);
 			}
 		}

@@ -317,6 +317,7 @@
 	}
 
 	.day-complete {
+
 		@include button_icon;
 
 		@include button_text;
@@ -328,7 +329,7 @@
 		padding: 0;
 		font-size: 1em;
 
-		.status {
+		& .status {
 			outline: 2px solid var(--navy);
 			outline-offset: -2px;
 		}
@@ -351,10 +352,11 @@
 		gap: 0.2em;
 
 		& li {
+
 			/* font-size: 0.9em; */
 		}
 
-		.status {
+		& .status {
 			margin: 0;
 		}
 	}

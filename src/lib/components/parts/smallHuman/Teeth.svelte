@@ -232,7 +232,7 @@
 		width: auto;
 		max-width: max-content;
 		padding: 1em;
-		border: 1px solid color-mix(in oklch, var(--background) 78%, var(--black));
+		border: 1px solid var(--border);
 		border-radius: 0.8em;
 		background: var(--white_true);
 

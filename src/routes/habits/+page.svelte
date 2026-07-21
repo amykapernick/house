@@ -129,6 +129,7 @@
 
 <style>
 	.add {
+
 		/* position: absolute; */
 		grid-column: 1;
 		grid-row: 1;
