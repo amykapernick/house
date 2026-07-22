@@ -218,7 +218,10 @@
 							{itemIncome ? '+' : ''}{amountPerMonth != null ? amountPerMonth.toLocaleString('en-AU', { style: 'currency', currency: 'AUD' }) : ''}
 						</td>
 						{#if !income}
-							<td class="amount" data-over-budget={(thisMonthActualById.get(id) ?? 0) > (amountPerMonth ?? 0)}>
+							<td
+								class="amount"
+								data-over-budget={(thisMonthActualById.get(id) ?? 0) > (amountPerMonth ?? 0)}
+							>
 								{thisMonthActualById.has(id) ? formatCurrency(thisMonthActualById.get(id) ?? 0) : ''}
 							</td>
 						{/if}
@@ -263,11 +266,6 @@
 			&.actions {
 				background: var(--navy);
 			}
-		}
-
-		& tbody tr:nth-child(even) {
-			background: var(--background);
-			color: var(--background_text);
 		}
 
 		& tr[data-income='true'] td.amount {

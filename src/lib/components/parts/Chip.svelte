@@ -31,6 +31,8 @@
 </Card>
 
 <style>
+	@import '@mixins';
+
 	:global(.chip) {
 		position: relative;
 		border: var(--border);
@@ -53,9 +55,7 @@
 
 	h3 {
 		margin: 0;
-		color: var(--text_secondary);
-		font-size: 0.8em;
-		font-weight: 800;
-		text-transform: uppercase;
+
+		@include subtitle;
 	}
 </style>

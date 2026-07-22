@@ -386,7 +386,10 @@
 {#if loading}
 	<Skeleton rows={3} />
 {:else if !data}
-	<EmptyState title="No data available" />
+	<EmptyState
+		page={true}
+		title="No data available"
+	/>
 {:else}
 	{@const { overview, alerts, growth, teeth, swimming, milestones, auslan, feeding, sleep, clothing, vaccinations, notes, activities, sources } = data}
 	{@const car_seat = notes.find((n: any) => n.__typename === 'CarSeat')}

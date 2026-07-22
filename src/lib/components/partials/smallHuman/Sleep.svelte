@@ -6,7 +6,7 @@
 	import Card from '$components/parts/smallHuman/Card.svelte';
 	import BaseCard from '$parts/Card.svelte';
 	import Stats from '$components/parts/Stats.svelte';
-	import Onesie from '$img/smallHuman/onesie-long.svg?component';
+	import Outfit from '$components/parts/smallHuman/Outfit.svelte';
 
 	const {
 		sleep,
@@ -72,9 +72,9 @@
 					name: 'tog',
 				},
 				{
-					// TODO: Add icon selection based on layer
 					name: 'Layer',
-					Icon: Onesie,
+					// TODO: Pass js_layer to outfit component
+					Icon: Outfit,
 					note: sleep.environment.current_recommendation.recommended_setup.pj_layer,
 				},
 			]}
@@ -85,7 +85,7 @@
 <h3>Sleep environment</h3>
 <BaseCard>
 	<p>{sleep.environment.note}</p>
-	<dl>
+	<dl class="temp_range">
 		<dt>Bedtime temp range</dt>
 		<dd>{formatTempRange(sleep.environment.bedroom_temp_pattern.bedtime_temp_c, sleep.environment.bedroom_temp_pattern.early_morning_temp_c)}</dd>
 	</dl>
@@ -122,15 +122,22 @@
 	{/each}
 </Cards>
 
-<DebugJson
-	data={sleep}
-	class={className}
-/>
-
 <style>
+	@import '@mixins';
+
 	.overview {
 		display: grid;
 		grid-template-columns: repeat(auto-fit, minmax(100px, max-content));
 		gap: 1em;
+	}
+
+	.temp_range {
+		& dt {
+			@include subtitle;
+		}
+
+		& dd {
+			font-weight: 700;
+		}
 	}
 </style>

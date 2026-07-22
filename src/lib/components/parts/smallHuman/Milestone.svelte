@@ -76,6 +76,8 @@
 </Card>
 
 <style>
+	@import '@mixins';
+
 	.content {
 		display: grid;
 		grid-template-areas: 'range range range' 'detail detail detail' 'note note note' 'tags . status';
@@ -110,11 +112,9 @@
 	}
 
 	.category {
+		@include subtitle;
+
 		grid-area: tags;
 		align-self: center;
-		color: var(--text_secondary);
-		font-size: 0.8em;
-		font-weight: 700;
-		text-transform: uppercase;
 	}
 </style>

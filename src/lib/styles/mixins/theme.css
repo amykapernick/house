@@ -71,3 +71,10 @@
 	padding: 0.2em;
 	border-radius: 50%;
 }
+
+@mixin subtitle {
+	color: var(--text_secondary);
+	font-size: 0.8em;
+	font-weight: 800;
+	text-transform: uppercase;
+}

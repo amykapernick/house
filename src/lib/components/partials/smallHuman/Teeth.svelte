@@ -189,6 +189,11 @@
 		max-height: 70vh;
 		float: right;
 		color: var(--background_text);
+
+		& :global(svg) {
+			width: auto;
+			height: auto;
+		}
 	}
 
 	.teeth_details {

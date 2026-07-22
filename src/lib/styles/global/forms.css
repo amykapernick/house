@@ -30,10 +30,8 @@ label, legend {
 
 legend {
 	margin-bottom: 1.5em;
-	color: var(--text_secondary);
-	font-size: 0.7em;
-	font-weight: 800;
-	text-transform: uppercase;
+
+	@include subtitle;
 }
 
 input {
