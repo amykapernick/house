@@ -75,12 +75,6 @@
 								details { label value }
 								schedule { source note }
 								sources
-								principles {
-									note core_philosophy
-									current_and_ongoing { id title detail sources }
-									toddler_forward_look { id title detail sources }
-									sources
-								}
 								current {
 									id title expected_age
 									breastfeeds { value unit note }
@@ -128,9 +122,8 @@
 								environment {
 									note
 									bedroom_temp_pattern { bedtime_temp_c early_morning_temp_c swing_note }
-									tog_reference { temp_range_c tog layer }
 									current_recommendation { challenge strategy recommended_setup { sleep_sack_tog pj_layer reasoning } sources }
-									current_sizes sleep_sacks_on_hand { tog sizes material note } size_watch
+									current_sizes size_watch
 								}
 							}
 							clothing {
@@ -142,8 +135,6 @@
 								daytime {
 									note layer_rule feet_rule
 									sun_safety { uv_threshold_for_coverage note sources }
-									indoor_reference { indoor_temp_c_min indoor_temp_c_max recommendation layers }
-									outdoor_reference { feels_like_c_min feels_like_c_max recommendation layers extras }
 									rain_suit { recommended trigger note }
 									current_recommendation {
 										generated_from_temp_c generated_from_feels_like_c last_updated
