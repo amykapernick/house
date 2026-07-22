@@ -22,8 +22,6 @@
 
 	export type IconName = MilestoneStatus | SignStatus | 'calendar' | 'vaccine';
 
-	// TODO: Allow enabling colour icons
-
 	const monochromeIcons: Record<IconName, Component> = {
 		calendar: Calendar,
 		done: Checked,
