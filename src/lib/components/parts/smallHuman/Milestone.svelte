@@ -64,7 +64,6 @@
 				class="status"
 			/>
 		{:else}
-			<!-- TODO: Fix status assignment -->
 			<Pill
 				class="status"
 				{status}>{statusLabel[status]}</Pill

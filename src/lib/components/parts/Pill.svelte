@@ -1,5 +1,22 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import type { MilestoneStatus, SignStatus, VaccinationStatus } from '$types/generated';
+
+	type PillStatus = 'error' | 'warning' | 'success' | 'info';
+	type DomainStatus = MilestoneStatus | SignStatus | VaccinationStatus;
+
+	// Maps domain-specific statuses (milestones, signs, vaccinations) onto the four visual Pill statuses,
+	// mirroring the groupings StatusSelect.svelte uses for the same statuses.
+	const statusMap: Record<DomainStatus, PillStatus> = {
+		done: 'success',
+		signing_occasionally: 'success',
+		in_progress: 'info',
+		recognises: 'info',
+		watch: 'warning',
+		coming_soon: 'warning',
+		upcoming: 'warning',
+		introduce_next: 'warning',
+	};
 
 	const {
 		children,
@@ -8,18 +25,18 @@
 		class: className = '',
 	}: {
 		children: Snippet;
-		status?: 'error' | 'warning' | 'success' | 'info';
+		status?: PillStatus | DomainStatus;
 		outline?: boolean;
 		class?: string;
 	} = $props();
 
-	// TODO: allow adding other statuses and mapping to existing ones, eg. done, in_progress, etc, similar to statusselect lookup
+	const resolvedStatus = $derived(status && status in statusMap ? statusMap[status as DomainStatus] : (status as PillStatus | undefined));
 </script>
 
 <div
 	class={className}
 	class:outline
-	style={`--pill_colour: var(--${status ?? 'purple_bright'}); --pill_background: var(--${status ?? 'purple_bright'}_bg)`}
+	style={`--pill_colour: var(--${resolvedStatus ?? 'purple_bright'}); --pill_background: var(--${resolvedStatus ?? 'purple_bright'}_bg)`}
 >
 	{@render children()}
 </div>
