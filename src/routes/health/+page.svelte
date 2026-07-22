@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { format, parseISO } from 'date-fns';
+	import { DATE_FORMATS } from '$utils/dateFormats';
 	import { isAuthenticated } from '$lib/auth';
 	import fetchClientData from '$utils/fetchClientData';
 	import Chart from '$components/parts/graph/Chart.svelte';
@@ -130,7 +131,7 @@
 			<Chart
 				type="line"
 				lines={card.lines}
-				formatX={(x) => format(x, 'd MMM')}
+				formatX={(x) => format(x, DATE_FORMATS.short)}
 				leftLabel={card.unit ?? undefined}
 				caption={card.label}
 				class="chart-card"

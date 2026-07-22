@@ -1,5 +1,6 @@
 import { format } from 'date-fns';
 import fetchClientData from './fetchClientData';
+import { DATE_FORMATS } from './dateFormats';
 import type { Habit } from '$types/habits';
 
 type FetchHabitsDataProps = {
@@ -9,7 +10,7 @@ type FetchHabitsDataProps = {
 
 export default async function fetchHabitsData(props: FetchHabitsDataProps = {}): Promise<Habit[]> {
 	const { onStale } = props;
-	const today = format(new Date(), `yyyy-MM-dd`);
+	const today = format(new Date(), DATE_FORMATS.iso);
 
 	const res = await fetchClientData({
 		cacheKey: `habits-${today}`,

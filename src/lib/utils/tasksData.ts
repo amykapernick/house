@@ -1,5 +1,6 @@
 import { format } from 'date-fns';
 import fetchClientData from './fetchClientData';
+import { DATE_FORMATS } from './dateFormats';
 import type { Task } from '$types/tasks';
 
 type FetchTasksDataProps = {
@@ -11,7 +12,7 @@ type FetchTasksDataProps = {
 // cache entry instead of maintaining two separate queries against the same key.
 export default async function fetchTasksData(props: FetchTasksDataProps = {}): Promise<Task[]> {
 	const { onStale } = props;
-	const today = format(new Date(), `yyyy-MM-dd`);
+	const today = format(new Date(), DATE_FORMATS.iso);
 
 	const res = await fetchClientData({
 		cacheKey: `tasks-${today}`,

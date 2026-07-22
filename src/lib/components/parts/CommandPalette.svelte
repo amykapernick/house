@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import { addDays, format, isToday, isTomorrow, parseISO } from 'date-fns';
+	import { DATE_FORMATS } from '$utils/dateFormats';
 	import { SvelteMap } from 'svelte/reactivity';
 	import fetchClientData, { clearCache, getGraphqlUrl } from '$utils/fetchClientData';
 	import { getRecentPages } from '$utils/recentPages';
@@ -356,8 +357,8 @@
 
 	async function loadUpcomingMealPlan() {
 		if (!isAuthenticated) return;
-		const start = format(new Date(), `yyyy-MM-dd`);
-		const end = format(addDays(new Date(), MEAL_PLAN_LOOKAHEAD_DAYS), `yyyy-MM-dd`);
+		const start = format(new Date(), DATE_FORMATS.iso);
+		const end = format(addDays(new Date(), MEAL_PLAN_LOOKAHEAD_DAYS), DATE_FORMATS.iso);
 		const res = await fetchClientData({
 			cacheKey: `mealplan-upcoming-${start}`,
 			onStale: applyMealPlanResult,
@@ -746,7 +747,7 @@
 			return;
 		}
 
-		clearCache(match.type === `task` ? `tasks-${format(new Date(), `yyyy-MM-dd`)}` : `shopping-list`);
+		clearCache(match.type === `task` ? `tasks-${format(new Date(), DATE_FORMATS.iso)}` : `shopping-list`);
 
 		quickAddSuccess = labels.success;
 		query = `/${match.type} `;

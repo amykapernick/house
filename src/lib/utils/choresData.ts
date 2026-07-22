@@ -1,5 +1,6 @@
 import { format } from 'date-fns';
 import fetchClientData from './fetchClientData';
+import { DATE_FORMATS } from './dateFormats';
 import type { Chore } from '$types/chores';
 
 type FetchChoresDataProps = {
@@ -9,7 +10,7 @@ type FetchChoresDataProps = {
 
 export default async function fetchChoresData(props: FetchChoresDataProps = {}): Promise<Chore[]> {
 	const { onStale } = props;
-	const today = format(new Date(), `yyyy-MM-dd`);
+	const today = format(new Date(), DATE_FORMATS.iso);
 
 	const res = await fetchClientData({
 		cacheKey: `chores-${today}`,

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { format, startOfWeek } from 'date-fns';
+	import { DATE_FORMATS } from '$utils/dateFormats';
 	import { beforeNavigate } from '$app/navigation';
 	import Budget from '$partials/finance/Budget.svelte';
 	import BudgetBuckets from '$partials/finance/BudgetBuckets.svelte';
@@ -16,7 +17,7 @@
 	import { getPageTitle } from '$utils/pageTitle';
 
 	let checkInOpen = $state(false);
-	const currentWeekStart = format(startOfWeek(new Date(), { weekStartsOn: 1 }), 'yyyy-MM-dd');
+	const currentWeekStart = format(startOfWeek(new Date(), { weekStartsOn: 1 }), DATE_FORMATS.iso);
 
 	let budget = $state<BudgetItem[]>([]);
 	let buckets = $state<BudgetBucket[]>([]);

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { format } from 'date-fns';
+	import { DATE_FORMATS } from '$utils/dateFormats';
 	import { isAuthenticated, getToken } from '$lib/auth';
 	import fetchHabitsData from '$utils/habitsData';
 	import { setCache, getGraphqlUrl } from '$utils/fetchClientData';
@@ -37,7 +38,7 @@
 	// Keep the shared cache in sync so a revisit within the TTL doesn't show the pre-update streak.
 	function handleHabitComplete(id: string) {
 		habits = habits.map((habit) => (habit.id === id ? { ...habit, streak: habit.streak + 1, lastCompleted: new Date().toISOString() } : habit));
-		setCache(`habits-${format(new Date(), 'yyyy-MM-dd')}`, { habits });
+		setCache(`habits-${format(new Date(), DATE_FORMATS.iso)}`, { habits });
 	}
 
 	// Add habit modal

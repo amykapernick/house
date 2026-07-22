@@ -5,6 +5,7 @@
 	import type { CheckState } from '$parts/CheckboxButton.svelte';
 	import { getToken } from '$lib/auth';
 	import { getGraphqlUrl } from '$utils/fetchClientData';
+	import { DATE_FORMATS } from '$utils/dateFormats';
 	import type { Habit, HabitViewRange } from '$types/habits';
 
 	let { id, name, due, recurrenceInterval, streak, completions, days, range, onComplete, class: className = '' }: Habit & { days: Date[]; range: HabitViewRange; onComplete?: (id: string) => void; class?: string } = $props();
@@ -22,7 +23,7 @@
 		if (isToday(date)) return `Today${time}`;
 		if (isTomorrow(date)) return `Tomorrow${time}`;
 		if (isYesterday(date)) return `Yesterday${time}`;
-		return `${format(date, 'dd MMM')}${time}`;
+		return `${format(date, DATE_FORMATS.short)}${time}`;
 	}
 
 	// When the next occurrence is due, per this habit's actual Todoist
@@ -48,7 +49,7 @@
 	// occurrence is due, so the grid doesn't falsely show gaps between
 	// completions on their actual cadence.
 	function isDayDone(day: Date) {
-		if (pendingCompletions.has(format(day, 'yyyy-MM-dd'))) return true;
+		if (pendingCompletions.has(format(day, DATE_FORMATS.iso))) return true;
 
 		return completions.some((completion) => {
 			const completedAt = new Date(completion);
@@ -63,10 +64,10 @@
 	// window (see isDayDone above) - the name checkbox distinguishes the two so
 	// a habit someone hasn't touched today doesn't look fully done.
 	function isExplicitlyDone(day: Date) {
-		const dateKey = format(day, 'yyyy-MM-dd');
+		const dateKey = format(day, DATE_FORMATS.iso);
 		if (pendingCompletions.has(dateKey)) return true;
 
-		return completions.some((completion) => format(new Date(completion), 'yyyy-MM-dd') === dateKey);
+		return completions.some((completion) => format(new Date(completion), DATE_FORMATS.iso) === dateKey);
 	}
 
 	function habitState(day: Date): CheckState {
@@ -106,7 +107,7 @@
 		saving = true;
 		actionError = '';
 
-		const dateKey = completedAt ?? format(new Date(), 'yyyy-MM-dd');
+		const dateKey = completedAt ?? format(new Date(), DATE_FORMATS.iso);
 		pendingCompletions.add(dateKey);
 
 		const token = await getToken();
@@ -205,7 +206,7 @@
 			type="button"
 			class="day-complete"
 			disabled={saving}
-			onclick={() => completeHabit(format(day, 'yyyy-MM-dd'))}
+			onclick={() => completeHabit(format(day, DATE_FORMATS.iso))}
 		>
 			<span
 				aria-hidden="true"

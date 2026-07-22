@@ -1,4 +1,7 @@
 <script lang="ts">
+	import { format } from 'date-fns';
+	import { DATE_FORMATS } from '$utils/dateFormats';
+
 	export type LineChartPoint = {
 		x: Date;
 		y: number;
@@ -26,7 +29,7 @@
 		rightLabel?: string;
 	};
 
-	const { lines, formatX = (x) => x.toLocaleDateString(), class: className = '', xLabel, leftLabel, rightLabel }: Props = $props();
+	const { lines, formatX = (x) => format(x, DATE_FORMATS.short), class: className = '', xLabel, leftLabel, rightLabel }: Props = $props();
 
 	const W = 560;
 	const H = 220;

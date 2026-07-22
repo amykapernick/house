@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { format } from 'date-fns';
+	import { DATE_FORMATS } from '$utils/dateFormats';
 	import Assigned from './Assigned.svelte';
 	import CheckboxButton from '$parts/CheckboxButton.svelte';
 	import type { CheckState } from '$parts/CheckboxButton.svelte';
@@ -117,7 +118,7 @@
 		<span class="status" data-status={status.replaceAll(' ', '-').toLowerCase()}>{status}</span>
 	{/if}
 	{#if due}
-		<span class="due">{format(due, 'dd MMM')}</span>
+		<span class="due">{format(due, DATE_FORMATS.short)}</span>
 	{/if}
 	{#if assigned}
 		<Assigned class="assigned" assignees={assigned} />

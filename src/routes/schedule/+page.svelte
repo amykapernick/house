@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { format, startOfWeek, endOfWeek } from 'date-fns';
+	import { DATE_FORMATS } from '$utils/dateFormats';
 	import { SvelteMap } from 'svelte/reactivity';
 	import ScheduleView from '$partials/calendar/ScheduleView.svelte';
 	import FamilyFilter from '$parts/FamilyFilter.svelte';
@@ -140,7 +141,7 @@
 		}).then(handleColours);
 	}
 
-	const toDateStr = (date: Date) => format(date, 'yyyy-MM-dd');
+	const toDateStr = (date: Date) => format(date, DATE_FORMATS.iso);
 
 	function loadSchedule(from: string, to: string, skipCache = false) {
 		currentRange = { from, to };

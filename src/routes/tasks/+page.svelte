@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { format } from 'date-fns';
+	import { DATE_FORMATS } from '$utils/dateFormats';
 	import { isAuthenticated } from '$lib/auth';
 	import fetchTasksData from '$utils/tasksData';
 	import { setCache } from '$utils/fetchClientData';
@@ -38,7 +39,7 @@
 	// Keep the shared cache in sync so a revisit within the TTL doesn't show the pre-update status.
 	function handleTaskUpdate(id: string, status: TaskStatus) {
 		tasks = tasks.map((task) => (task.id === id ? { ...task, status } : task));
-		setCache(`tasks-${format(new Date(), 'yyyy-MM-dd')}`, { tasks });
+		setCache(`tasks-${format(new Date(), DATE_FORMATS.iso)}`, { tasks });
 	}
 </script>
 

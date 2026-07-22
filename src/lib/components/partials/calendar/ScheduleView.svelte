@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { format } from 'date-fns';
+	import { DATE_FORMATS } from '$utils/dateFormats';
 	import { SvelteDate } from 'svelte/reactivity';
 	import { TimeGrid, Interaction } from '@event-calendar/core';
 	import CalendarBase from './CalendarBase.svelte';
@@ -357,8 +358,8 @@
 
 	<ScheduleSaveModal
 		bind:open={saveModalOpen}
-		defaultStart={visibleRange ? format(visibleRange.start, `yyyy-MM-dd`) : ``}
-		defaultEnd={visibleRange ? format(visibleRange.end, `yyyy-MM-dd`) : ``}
+		defaultStart={visibleRange ? format(visibleRange.start, DATE_FORMATS.iso) : ``}
+		defaultEnd={visibleRange ? format(visibleRange.end, DATE_FORMATS.iso) : ``}
 		{saving}
 		error={saveError}
 		onConfirm={confirmSave}

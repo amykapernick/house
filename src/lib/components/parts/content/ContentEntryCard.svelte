@@ -1,9 +1,10 @@
 <script lang="ts">
 	import { format, parseISO } from 'date-fns';
 	import { resolve } from '$app/paths';
+	import { DATE_FORMATS } from '$utils/dateFormats';
 	import ContentIcon from '$components/parts/ContentIcon.svelte';
 	import type { ContentEntry } from '$types/generated';
-	import Completed from '$img/icons/s-check.svg'
+	import Completed from '$img/icons/s-check.svg?component'
 
 	export type EntryStatus = { total: number | null, read: number };
 
@@ -34,7 +35,7 @@
 			{/if}
 		{/if}
 		{#if entry.updatedAt}
-			<span class="updated"><span class="sr-only">Updated</span> {format(parseISO(entry.updatedAt), `d MMM yyyy`)}</span>
+			<span class="updated"><span class="sr-only">Updated</span> {format(parseISO(entry.updatedAt), DATE_FORMATS.full)}</span>
 		{/if}
 </li>
 

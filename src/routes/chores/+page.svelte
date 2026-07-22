@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { format } from 'date-fns';
+	import { DATE_FORMATS } from '$utils/dateFormats';
 	import { isAuthenticated } from '$lib/auth';
 	import fetchChoresData from '$utils/choresData';
 	import { setCache } from '$utils/fetchClientData';
@@ -25,7 +26,7 @@
 	// so drop it from the current view (and the shared cache) too.
 	function handleChoreComplete(id: string) {
 		chores = chores.filter((chore) => chore.id !== id);
-		setCache(`chores-${format(new Date(), 'yyyy-MM-dd')}`, { chores });
+		setCache(`chores-${format(new Date(), DATE_FORMATS.iso)}`, { chores });
 	}
 </script>
 

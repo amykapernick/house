@@ -7,6 +7,7 @@
 	import { buildMealPlanSaveOps, type PlanningDay, type PlanningDndItem, type PlanningRecipe } from '$utils/mealPlanningDnd';
 	import { beforeNavigate } from '$app/navigation';
 	import { format, parseISO, isToday, isYesterday } from 'date-fns';
+	import { DATE_FORMATS } from '$utils/dateFormats';
 	import { SvelteMap } from 'svelte/reactivity';
 	import parseEvents from '$utils/calendar/parseEvents';
 	import MealPlanEntryModal from '$lib/components/partials/mealPlan/MealPlanEntryModal.svelte';
@@ -98,7 +99,7 @@
 		for (const event of parsed) {
 			const hour = event.start.getHours();
 			if (hour < 17 || hour >= 23) continue;
-			const dateKey = format(event.start, `yyyy-MM-dd`);
+			const dateKey = format(event.start, DATE_FORMATS.iso);
 			if (!map.has(dateKey)) map.set(dateKey, []);
 			map.get(dateKey)!.push(event);
 		}
@@ -457,7 +458,7 @@
 			return {
 				...day,
 				label: format(d, 'EEEE'),
-				displayDate: format(d, 'd MMM'),
+				displayDate: format(d, DATE_FORMATS.short),
 				isToday: isToday(d),
 				isYesterday: isYesterday(d),
 			};

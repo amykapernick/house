@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Growth } from '$types/smallHuman';
 	import { parseISO, format } from 'date-fns';
+	import { DATE_FORMATS } from '$utils/dateFormats';
 	import Chart from '$components/parts/graph/Chart.svelte';
 	import type { LineChartLine } from '$components/parts/graph/LineChart.svelte';
 
@@ -30,7 +31,7 @@
 	const heightLines = $derived(measurementLines('height', 'blue', 0));
 	const headLines = $derived(measurementLines('head', 'purple', 0));
 
-	const formatX = (x: Date) => format(x, 'd MMM');
+	const formatX = (x: Date) => format(x, DATE_FORMATS.short);
 </script>
 
 <div class={className}>

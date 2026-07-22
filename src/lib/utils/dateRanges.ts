@@ -1,4 +1,5 @@
 import { addWeeks, subDays, addDays, format } from 'date-fns';
+import { DATE_FORMATS } from './dateFormats';
 
 // "This week" for meal-planning purposes runs from yesterday through +6 days
 // (8 days total). Computed from the browser's own clock so it always matches
@@ -8,8 +9,8 @@ export function getWeekRange(weekOffset = 0): { start: string; end: string } {
 	const end = addDays(start, 7);
 
 	return {
-		start: format(start, `yyyy-MM-dd`),
-		end: format(end, `yyyy-MM-dd`),
+		start: format(start, DATE_FORMATS.iso),
+		end: format(end, DATE_FORMATS.iso),
 	};
 }
 
@@ -21,7 +22,7 @@ function nextSaturdayDate(): Date {
 // The coming Saturday (today itself if today already is one) - the start of
 // the next full Sat-Fri grocery week.
 export function getNextSaturday(): string {
-	return format(nextSaturdayDate(), `yyyy-MM-dd`);
+	return format(nextSaturdayDate(), DATE_FORMATS.iso);
 }
 
 // Meal-planning-mode range: today through the end of the Nth Sat-Fri block
@@ -32,8 +33,8 @@ export function getPlanningRange(weeks: number): { start: string; end: string } 
 	const end = addDays(nextSaturdayDate(), weeks * 7 - 1);
 
 	return {
-		start: format(new Date(), `yyyy-MM-dd`),
-		end: format(end, `yyyy-MM-dd`),
+		start: format(new Date(), DATE_FORMATS.iso),
+		end: format(end, DATE_FORMATS.iso),
 	};
 }
 
@@ -44,7 +45,7 @@ export function getDashboardMealPlanRange(): { start: string; end: string } {
 	const today = new Date();
 
 	return {
-		start: format(subDays(today, 2), `yyyy-MM-dd`),
-		end: format(addDays(today, 7), `yyyy-MM-dd`),
+		start: format(subDays(today, 2), DATE_FORMATS.iso),
+		end: format(addDays(today, 7), DATE_FORMATS.iso),
 	};
 }

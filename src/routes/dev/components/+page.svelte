@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { format } from 'date-fns';
+	import { DATE_FORMATS } from '$utils/dateFormats';
 	import { isAuthenticated } from '$lib/auth';
 	import { menuItems } from '$lib/navigation';
 	import { theme, setTheme } from '$utils/theme';
@@ -437,7 +439,7 @@
 					unit: 'kg',
 				},
 			]}
-			formatX={(x) => x.toLocaleDateString()}
+			formatX={(x) => format(x, DATE_FORMATS.short)}
 			leftLabel="Weight"
 		/>
 	</section>

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { isAuthenticated } from '$lib/auth';
 	import { format, parseISO, startOfDay, endOfDay } from 'date-fns';
+	import { DATE_FORMATS } from '$utils/dateFormats';
 	import { SvelteMap } from 'svelte/reactivity';
 	import fetchClientData from '$utils/fetchClientData';
 	import fetchHabitsData from '$utils/habitsData';
@@ -91,7 +92,7 @@
 
 	$effect(() => {
 		if ($isAuthenticated) {
-			const today = format(new Date(), 'yyyy-MM-dd');
+			const today = format(new Date(), DATE_FORMATS.iso);
 
 			function handleUpcoming(res: any) {
 				upcomingTasks = res.tasks ?? [];
@@ -174,7 +175,7 @@
 				`,
 			}).then(handleColours);
 
-			const todayStr = format(new Date(), 'yyyy-MM-dd');
+			const todayStr = format(new Date(), DATE_FORMATS.iso);
 			function handleSchedule(res: any) { scheduleBlocks = res.schedule ?? []; }
 			fetchClientData({
 				cacheKey: `schedule-${todayStr}-${todayStr}`,
