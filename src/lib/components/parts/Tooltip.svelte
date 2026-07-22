@@ -1,10 +1,10 @@
 <script lang="ts">
-	import type { Snippet } from "svelte";
+	import type { Snippet } from 'svelte';
 
 	let {
 		label,
 		children,
-		class: className = ''
+		class: className = '',
 	}: {
 		label: string;
 		children: Snippet;
@@ -19,7 +19,9 @@
 	let pressTimer: ReturnType<typeof setTimeout> | undefined;
 
 	function startPress() {
-		pressTimer = setTimeout(() => { visible = true; }, 500);
+		pressTimer = setTimeout(() => {
+			visible = true;
+		}, 500);
 	}
 
 	function endPress() {
@@ -37,7 +39,12 @@
 	ontouchcancel={endPress}
 >
 	{@render children()}
-	<span class="tooltip" class:visible id={tooltipId} role="tooltip">{label}</span>
+	<span
+		class="tooltip"
+		class:visible
+		id={tooltipId}
+		role="tooltip">{label}</span
+	>
 </span>
 
 <style>
@@ -55,6 +62,11 @@
 		z-index: 1;
 		bottom: 100%;
 		left: 50%;
+
+		/* TODO: Fix overflowing tooltip */
+
+		/* width: 40vw; */
+		max-width: 300px;
 		margin-bottom: 0.3em;
 		padding: 0.2em 0.6em;
 		transform: translateX(-50%);
@@ -65,7 +77,8 @@
 		color: var(--white);
 		font-size: 0.75em;
 		font-weight: 400;
-		white-space: nowrap;
+
+		/* white-space: nowrap; */
 		pointer-events: none;
 	}
 

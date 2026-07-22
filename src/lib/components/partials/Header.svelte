@@ -6,11 +6,11 @@
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import fetchClientData from '$utils/fetchClientData';
-	import Logo from '$img/monogram_colour.svg?component'
+	import Logo from '$img/monogram_colour.svg?component';
 	import Switch from '$components/parts/Switch.svelte';
 	import ProfileMenu from '$components/parts/ProfileMenu.svelte';
-	import Moon from '$img/icons/moon.svg?component'
-	import Sun from '$img/icons/u2600-sunrays.svg?component'
+	import Moon from '$img/icons/moon.svg?component';
+	import Sun from '$img/icons/u2600-sunrays.svg?component';
 	import { theme, setTheme, type Theme } from '$utils/theme';
 
 	let { class: className = '' }: { class?: string } = $props();
@@ -57,7 +57,10 @@
 </script>
 
 <header class="header {className}">
-	<a href={resolve('/')} class="title">
+	<a
+		href={resolve('/')}
+		class="title"
+	>
 		<Logo />
 		<span class="name">Household</span>
 	</a>
@@ -68,20 +71,32 @@
 		toggleFunction={handleThemeToggle}
 		options={[
 			{
-				label: "Dark Mode",
-				Icon: Moon
+				label: 'Dark Mode',
+				Icon: Moon,
 			},
 			{
-				label: "Light Mode",
-				Icon: Sun
-			}
+				label: 'Light Mode',
+				Icon: Sun,
+			},
 		]}
 	/>
-	<MainMenu class="nav" {menuItems} isAuthenticated={$isAuthenticated} />
+	<MainMenu
+		class="nav"
+		{menuItems}
+		isAuthenticated={$isAuthenticated}
+	/>
 	{#if $isAuthenticated}
-			<ProfileMenu class="profile" {profileName} {profileImage} onSignOut={handleSignOut} />
+		<ProfileMenu
+			class="profile"
+			{profileName}
+			{profileImage}
+			onSignOut={handleSignOut}
+		/>
 	{:else}
-			<button class="profile" onclick={handleSignIn}>Sign in</button>
+		<button
+			class="profile"
+			onclick={handleSignIn}>Sign in</button
+		>
 	{/if}
 </header>
 
@@ -89,14 +104,13 @@
 	@import '@mixins';
 
 	.header {
-
 		@include container_spacing;
 
 		/* TODO: replace this with proper reference */
-		--header_background: light-dark(#efe3d5, #191d25);
+		--header_background: light-dark(color-mix(in oklch, var(--background) 90%, var(--black)), color-mix(in oklch, var(--dark_background) 90%, var(--white)));
 
 		/* TODO: Replace with proper reference */
-		--header_border: light-dark(#ded0bd, #2c323d);
+		--header_border: light-dark(color-mix(in oklch, var(--background) 78%, var(--black)), color-mix(in oklch, var(--dark_background) 78%, var(--white)));
 
 		display: grid;
 		position: fixed;
@@ -139,10 +153,10 @@
 		grid-area: profile;
 	}
 
-	@media(width >= 50em) {
+	@media (width >= 50em) {
 		.header {
 			position: static;
-			grid-template-areas: 
+			grid-template-areas:
 				'title '
 				'menu'
 				'toggle'
@@ -155,7 +169,6 @@
 			max-width: 200px;
 			padding: 20px;
 			gap: 20px;
-
 		}
 
 		.title {
@@ -163,15 +176,14 @@
 			gap: 0.5em;
 
 			& .name {
-
 				@include sr_only;
 			}
 		}
 	}
 
-	@media(width >= 60em) {
+	@media (width >= 60em) {
 		.header {
-			grid-template-areas: 
+			grid-template-areas:
 				'title toggle'
 				'menu menu'
 				'profile profile';

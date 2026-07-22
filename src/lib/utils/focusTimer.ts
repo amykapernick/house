@@ -170,17 +170,58 @@ function unlockAudio() {
 	if (audioCtx.state === `suspended`) audioCtx.resume();
 }
 
-function playChime() {
+type ChimeKind = `focusEnd` | `breakEnd` | `sessionComplete`;
+
+function playTone(startTime: number, freq: number, duration: number, volume = 0.35) {
 	if (!audioCtx) return;
 	const oscillator = audioCtx.createOscillator();
 	const gain = audioCtx.createGain();
-	oscillator.frequency.value = 880;
-	gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-	gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.6);
+	oscillator.frequency.value = freq;
+	gain.gain.setValueAtTime(volume, startTime);
+	gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
 	oscillator.connect(gain);
 	gain.connect(audioCtx.destination);
-	oscillator.start();
-	oscillator.stop(audioCtx.currentTime + 0.6);
+	oscillator.start(startTime);
+	oscillator.stop(startTime + duration);
+}
+
+type ChimeNote = { freq: number; offset: number; duration: number };
+
+// Each phase transition gets its own short tone pattern so you can tell what
+// happened without looking at the screen: a falling two-note chime into a
+// break, a rising two-note chime back into focus, and a three-note fanfare
+// when the whole session ends. Each pattern plays three times in a row so
+// it's hard to miss even if you're not looking at the screen when it starts.
+const CHIME_PATTERNS: Record<ChimeKind, ChimeNote[]> = {
+	focusEnd: [
+		{ freq: 880, offset: 0, duration: 0.8 },
+		{ freq: 659.25, offset: 0.25, duration: 0.9 },
+	],
+	breakEnd: [
+		{ freq: 659.25, offset: 0, duration: 0.7 },
+		{ freq: 880, offset: 0.2, duration: 0.9 },
+	],
+	sessionComplete: [
+		{ freq: 523.25, offset: 0, duration: 0.5 },
+		{ freq: 659.25, offset: 0.28, duration: 0.5 },
+		{ freq: 783.99, offset: 0.56, duration: 1.1 },
+	],
+};
+
+const CHIME_REPEATS = 3;
+const CHIME_REPEAT_GAP = 0.3;
+
+function playChime(kind: ChimeKind) {
+	if (!audioCtx) return;
+	const now = audioCtx.currentTime;
+	const pattern = CHIME_PATTERNS[kind];
+	const patternDuration = Math.max(...pattern.map((note) => note.offset + note.duration));
+	const repeatPeriod = patternDuration + CHIME_REPEAT_GAP;
+
+	for (let i = 0; i < CHIME_REPEATS; i++) {
+		const repeatStart = now + i * repeatPeriod;
+		pattern.forEach((note) => playTone(repeatStart + note.offset, note.freq, note.duration));
+	}
 }
 
 let originalTitle: string | null = null;
@@ -224,7 +265,7 @@ function advancePhase(state: FocusTimerState): FocusTimerState | null {
 			? `${finishedPhase.label} finished - next up: ${state.phases[nextIndex].label}`
 			: `Nice work - you finished your focus session.`
 	);
-	playChime();
+	playChime(!hasNext ? `sessionComplete` : finishedPhase.type === `work` ? `focusEnd` : `breakEnd`);
 	startTitleFlash(hasNext ? `⏰ ${state.phases[nextIndex].label} time!` : `⏰ Session complete!`);
 
 	if (!hasNext) return null;

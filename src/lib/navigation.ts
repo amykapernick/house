@@ -10,11 +10,11 @@ import MealPlan from '$img/icons/diet-plan-1.svg?component';
 import ShopList from '$img/icons/receipt-list-42-2.svg?component';
 import Recipes from '$img/icons/recipe-book-47-1.svg?component';
 import SmallHuman from '$img/icons/baby-1.svg?component';
-import Schedule from '$img/icons/gantt-1.svg'
-import Budget from '$img/icons/analytics-1.svg'
-import Health from '$img/icons/phone-heartbeat-1.svg'
+import Schedule from '$img/icons/gantt-1.svg?component'
+import Budget from '$img/icons/analytics-1.svg?component'
+import Health from '$img/icons/phone-heartbeat-1.svg?component'
 import Graphql from '$img/icons/graphql.svg?component'
-import DashboardIcon from '$img/icons/layout-11-1.svg'
+import DashboardIcon from '$img/icons/layout-11-1.svg?component'
 import DashboardColour from '$img/icons/board-2-2.svg?component';
 import ReferencesColour from '$img/icons/saved-items-3.svg?component';
 import TasksColour from '$img/icons/check-list-2.svg?component';
@@ -25,10 +25,10 @@ import MealPlanColour from '$img/icons/diet-plan-2.svg?component';
 import ShopListColour from '$img/icons/receipt-list-42-3.svg?component';
 import RecipesColour from '$img/icons/recipe-book-47-2.svg?component';
 import SmallHumanColour from '$img/icons/baby-3.svg?component';
-import ScheduleColour from '$img/icons/gantt-2.svg'
-import BudgetColour from '$img/icons/analytics-2.svg'
-import HealthColour from '$img/icons/phone-heartbeat-2.svg'
-import DashboardIconColour from '$img/icons/layout-11-3.svg'
+import ScheduleColour from '$img/icons/gantt-2.svg?component'
+import BudgetColour from '$img/icons/analytics-2.svg?component'
+import HealthColour from '$img/icons/phone-heartbeat-2.svg?component'
+import DashboardIconColour from '$img/icons/layout-11-3.svg?component'
 
 export const menuItems: MenuItem[] = [
 	{

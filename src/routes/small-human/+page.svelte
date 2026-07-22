@@ -2,44 +2,45 @@
 	import { isAuthenticated } from '$lib/auth';
 	import { format, addDays, formatDate, isWithinInterval, addWeeks, differenceInWeeks } from 'date-fns';
 	import fetchClientData, { setCache, getGraphqlUrl } from '$utils/fetchClientData';
+	import { DATE_FORMATS } from '$utils/dateFormats';
 	import { getToken } from '$lib/auth';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import type { Colour } from '$types/global';
 	import Allergens from '$parts/smallHuman/Allergens.svelte';
-	import Teeth from '$parts/smallHuman/Teeth.svelte';
-	import Stats from '$parts/Stats.svelte';
 	import Growth from '$parts/smallHuman/Growth.svelte';
+	import Teeth from '$components/partials/smallHuman/Teeth.svelte';
+	import Swimming from '$components/partials/smallHuman/Swimming.svelte';
+	import Milestones from '$components/partials/smallHuman/Milestones.svelte';
+	import Auslan from '$components/partials/smallHuman/Auslan.svelte';
+	import Feeding from '$components/partials/smallHuman/Feeding.svelte';
+	import Sleep from '$components/partials/smallHuman/Sleep.svelte';
+	import SleepEnvironment from '$components/partials/smallHuman/SleepEnvironment.svelte';
+	import ClothingSeasonal from '$components/partials/smallHuman/ClothingSeasonal.svelte';
+	import ClothingDaytime from '$components/partials/smallHuman/ClothingDaytime.svelte';
+	import Vaccinations from '$components/partials/smallHuman/Vaccinations.svelte';
+	import ParentingApproach from '$components/partials/smallHuman/ParentingApproach.svelte';
+	import Activities from '$components/partials/smallHuman/Activities.svelte';
+	import ToddlerSleepPrep from '$components/partials/smallHuman/ToddlerSleepPrep.svelte';
+	import FoodPrinciples from '$components/partials/smallHuman/FoodPrinciples.svelte';
+	import Sources from '$components/partials/smallHuman/Sources.svelte';
+	import Stats from '$parts/Stats.svelte';
 	import Card from '$parts/Card.svelte';
 	import Cards from '$parts/Cards.svelte';
-	import Pill from '$parts/Pill.svelte';
 	import Tabs from '$parts/Tabs.svelte';
 	import Modal from '$parts/Modal.svelte';
 	import type { ModalAction } from '$parts/Modal.svelte';
-	import type { Alert, AlertType, MilestoneStatus, SignStatus, ValueNote } from '$types/generated';
-	import Milestone from '$parts/smallHuman/Milestone.svelte';
-	import Auslan from '$parts/smallHuman/Auslan.svelte';
+	import type { Alert, AlertType, MilestoneStatus, SignStatus } from '$types/generated';
 	import UrgentAlerts from '$parts/smallHuman/UrgentAlerts.svelte';
 	import Skeleton from '$parts/Skeleton.svelte';
 	import EmptyState from '$parts/EmptyState.svelte';
 	import { getPageTitle } from '$utils/pageTitle';
-	import Breasts from '$img/smallHuman/breasts.svg?component';
-	import Water from '$img/icons/glass-water.svg?component';
-	import Food from '$img/icons/soup.svg?component';
-	import type { Component } from 'svelte';
 	import { SvelteSet } from 'svelte/reactivity';
-	import Icon from '$parts/Icon.svelte';
 
 	let data = $state<any>(null);
 	let allergens = $state<any[]>([]);
 	let loading = $state(true);
-
-	function formatValueNote({ value, unit, note }: ValueNote): string {
-		if (!value?.length) return note;
-		const joined = value.length > 1 ? `${Math.min(...value)}-${Math.max(...value)}` : `${value[0]}`;
-		return unit ? `${joined} ${unit}` : joined;
-	}
 
 	$effect(() => {
 		if ($isAuthenticated) {
@@ -180,7 +181,7 @@
 			function handleAllergens(res: any) {
 				allergens = res.allergens ?? [];
 			}
-			const today = format(new Date(), 'yyyy-MM-dd');
+			const today = format(new Date(), DATE_FORMATS.iso);
 			fetchClientData({
 				cacheKey: `allergens-${today}`,
 				onStale: handleAllergens,
@@ -265,7 +266,7 @@
 			}),
 		}).then((r) => r.json());
 
-		const newDue = format(addDays(new Date(), 7), 'yyyy-MM-dd');
+		const newDue = format(addDays(new Date(), 7), DATE_FORMATS.iso);
 		allergens = allergens.map((a) => (a.id === taskId ? { ...a, due: newDue } : a));
 		completing.delete(taskId);
 	}
@@ -339,20 +340,6 @@
 		return wholeMonths > 0 ? `${wholeMonths} month${wholeMonths !== 1 ? 's' : ''} ${remainingWeeks} week${remainingWeeks !== 1 ? 's' : ''}` : `${ageWeeks} week${ageWeeks !== 1 ? 's' : ''}`;
 	});
 
-	const sortedMilestones = $derived.by(() => {
-		const items = data?.milestones?.items ?? [];
-		return [...items].sort((a, b) => {
-			const aWeek = a.expected_weeks?.[0] ?? Infinity;
-			const bWeek = b.expected_weeks?.[0] ?? Infinity;
-			return aWeek - bWeek;
-		});
-	});
-
-	const feedingStage = $derived({
-		current: data?.feeding?.schedule?.stages?.find((s: any) => s.id === data.feeding.schedule.upcoming?.[0]),
-		upcoming: data?.feeding?.schedule?.stages?.find((s: any) => s.id === data.feeding.schedule.upcoming?.[1]),
-	});
-
 	const tabs = [
 		{ id: 'growth', label: 'Growth' },
 		{ id: 'teeth', label: 'Teeth' },
@@ -361,14 +348,10 @@
 		{ id: 'auslan', label: 'Auslan' },
 		{ id: 'feeding', label: 'Feeding' },
 		{ id: 'sleep', label: 'Sleep' },
-		{ id: 'sleep-environment', label: 'Sleep Environment' },
-		{ id: 'clothing-seasonal', label: 'Clothing Seasonal' },
-		{ id: 'clothing-daytime', label: 'Clothing Daytime' },
+		{ id: 'clothing', label: 'Clothing' },
 		{ id: 'vaccinations', label: 'Vaccinations' },
 		{ id: 'parenting-approach', label: 'Parenting Approach' },
 		{ id: 'activities', label: 'Activities' },
-		{ id: 'toddler-sleep-prep', label: 'Toddler Sleep Prep' },
-		{ id: 'food-principles', label: 'Food Principles' },
 		{ id: 'sources', label: 'Sources' },
 	];
 
@@ -408,11 +391,8 @@
 	{@const { overview, alerts, growth, teeth, swimming, milestones, auslan, feeding, sleep, clothing, vaccinations, notes, activities, sources } = data}
 	{@const car_seat = notes.find((n: any) => n.__typename === 'CarSeat')}
 	{@const parenting_approach = notes.find((n: any) => n.__typename === 'ParentingApproachNote')?.parentingApproachItems ?? []}
-	{@const toddler_sleep_prep = notes.find((n: any) => n.__typename === 'ToddlerSleepPrepNote')?.toddlerSleepPrepDetail}
-	{@const sleep_environment = sleep.environment}
 	{@const clothing_seasonal = clothing.seasonal}
 	{@const clothing_daytime = clothing.daytime}
-	{@const food_principles = feeding.principles}
 	{@const urgentAlerts = alerts.filter((a: Alert) => a.level === 'urgent')}
 	{@const otherAlerts = alerts.filter((a: Alert) => a.level !== 'urgent')}
 
@@ -486,15 +466,10 @@
 			tabindex="0"
 		>
 			<h2>Swimming</h2>
-			<p>{swimming.note}</p>
-			<Cards>
-				{#each swimming.skills as m (m.id)}
-					<Milestone
-						{...m}
-						onStatusChange={updateSwimSkillStatus}
-					/>
-				{/each}
-			</Cards>
+			<Swimming
+				{swimming}
+				onStatusChange={updateSwimSkillStatus}
+			/>
 		</div>
 	{/if}
 	{#if activeTab === 'milestones'}
@@ -505,16 +480,10 @@
 			tabindex="0"
 		>
 			<h2>Milestones</h2>
-			<p>{milestones.note}</p>
-			<Cards>
-				{#each sortedMilestones as m (m.id)}
-					<Milestone
-						{...m}
-						type={m.category}
-						onStatusChange={updateMilestoneStatus}
-					/>
-				{/each}
-			</Cards>
+			<Milestones
+				{milestones}
+				onStatusChange={updateMilestoneStatus}
+			/>
 		</div>
 	{/if}
 	{#if activeTab === 'auslan'}
@@ -525,15 +494,10 @@
 			tabindex="0"
 		>
 			<h2>Auslan</h2>
-			<p>{auslan.note}</p>
-			<Cards>
-				{#each auslan.signs as s (s.id)}
-					<Auslan
-						{...s}
-						onStatusChange={updateAuslanSignStatus}
-					/>
-				{/each}
-			</Cards>
+			<Auslan
+				{auslan}
+				onStatusChange={updateAuslanSignStatus}
+			/>
 		</div>
 	{/if}
 	{#if activeTab === 'feeding'}
@@ -544,51 +508,7 @@
 			tabindex="0"
 		>
 			<h2>Feeding</h2>
-			{#if feedingStage.current}
-				<h3>Current Stage - {feedingStage.current.title}</h3>
-				<Stats
-					items={[
-						{
-							name: 'Breastfeeds',
-							value: formatValueNote(feedingStage.current.breastfeeds),
-							Icon: Breasts,
-						},
-						{
-							name: 'Solid Meals',
-							value: formatValueNote(feedingStage.current.solid_meals),
-							Icon: Food,
-						},
-						{
-							name: 'Water',
-							value: formatValueNote(feedingStage.current.water),
-							Icon: Water,
-						},
-					]}
-				/>
-			{/if}
-			{#if feedingStage.upcoming}
-				<h3>Upcoming Stage - {feedingStage.upcoming.title}</h3>
-				<Stats
-					items={[
-						{
-							name: 'Breastfeeds',
-							value: formatValueNote(feedingStage.current.breastfeeds),
-							Icon: Breasts,
-						},
-						{
-							name: 'Solid Meals',
-							value: formatValueNote(feedingStage.current.solid_meals),
-							Icon: Food,
-						},
-						{
-							name: 'Water',
-							value: formatValueNote(feedingStage.current.water),
-							Icon: Water,
-						},
-					]}
-				/>
-			{/if}
-			<pre><code>{JSON.stringify(feeding, null, 2)}</code></pre>
+			<Feeding {feeding} />
 		</div>
 	{/if}
 	{#if activeTab === 'sleep'}
@@ -599,40 +519,19 @@
 			tabindex="0"
 		>
 			<h2>Sleep</h2>
-			<pre><code>{JSON.stringify(sleep, null, 2)}</code></pre>
+			<Sleep {sleep} />
 		</div>
 	{/if}
-	{#if activeTab === 'sleep-environment'}
+	{#if activeTab === 'clothing'}
 		<div
-			id="panel-sleep-environment"
+			id="panel-clothing"
 			role="tabpanel"
-			aria-labelledby="tab-sleep-environment"
+			aria-labelledby="tab-clothing"
 			tabindex="0"
 		>
-			<h2>Sleep Environment</h2>
-			<pre><code>{JSON.stringify(sleep_environment, null, 2)}</code></pre>
-		</div>
-	{/if}
-	{#if activeTab === 'clothing-seasonal'}
-		<div
-			id="panel-clothing-seasonal"
-			role="tabpanel"
-			aria-labelledby="tab-clothing-seasonal"
-			tabindex="0"
-		>
-			<h2>Clothing Seasonal</h2>
-			<pre><code>{JSON.stringify(clothing_seasonal, null, 2)}</code></pre>
-		</div>
-	{/if}
-	{#if activeTab === 'clothing-daytime'}
-		<div
-			id="panel-clothing-daytime"
-			role="tabpanel"
-			aria-labelledby="tab-clothing-daytime"
-			tabindex="0"
-		>
-			<h2>Clothing Daytime</h2>
-			<pre><code>{JSON.stringify(clothing_daytime, null, 2)}</code></pre>
+			<h2>Clothing</h2>
+			<ClothingSeasonal seasonal={clothing_seasonal} />
+			<ClothingDaytime daytime={clothing_daytime} />
 		</div>
 	{/if}
 	{#if activeTab === 'vaccinations'}
@@ -643,25 +542,7 @@
 			tabindex="0"
 		>
 			<h2>Vaccinations</h2>
-			<p>{vaccinations.note}</p>
-			<div class="vaccinations">
-				{#each vaccinations.items as v (v.id)}
-					<Card>
-						<h3>{v.title}</h3>
-						<!-- TODO: Add due or given date -->
-						<Icon
-							colour={true}
-							name={v.todoist_task ? 'calendar' : 'vaccine'}
-						/>
-						<p class="detail">{v.detail}</p>
-						<!-- TODO: Allow changing status of vaccination with statusselect component -->
-						<Pill
-							status={v.status}
-							class="status">{v.status}</Pill
-						>
-					</Card>
-				{/each}
-			</div>
+			<Vaccinations {vaccinations} />
 		</div>
 	{/if}
 	{#if activeTab === 'parenting-approach'}
@@ -672,13 +553,7 @@
 			tabindex="0"
 		>
 			<h2>Parenting Approach</h2>
-			<Cards>
-				{#each parenting_approach as a (a.id)}
-					<Card title={a.title}>
-						<p>{a.detail}</p>
-					</Card>
-				{/each}
-			</Cards>
+			<ParentingApproach items={parenting_approach} />
 		</div>
 	{/if}
 	{#if activeTab === 'activities'}
@@ -689,61 +564,7 @@
 			tabindex="0"
 		>
 			<h2>Activities</h2>
-			<Cards>
-				{#each activities as a (a.id)}
-					<Card title={a.title}>
-						<p>{a.detail}</p>
-					</Card>
-				{/each}
-			</Cards>
-		</div>
-	{/if}
-	{#if activeTab === 'toddler-sleep-prep'}
-		<div
-			id="panel-toddler-sleep-prep"
-			role="tabpanel"
-			aria-labelledby="tab-toddler-sleep-prep"
-			tabindex="0"
-		>
-			<h2>Toddler Sleep Prep</h2>
-			<p>{toddler_sleep_prep.note}</p>
-			{#if toddler_sleep_prep.status === 'due'}
-				<Card
-					title={toddler_sleep_prep.alert_when_due.title}
-					colour={alertColours[toddler_sleep_prep.alert_when_due.level as AlertType]}
-				>
-					<p>{toddler_sleep_prep.alert_when_due.detail}</p>
-				</Card>
-			{:else}
-				<Pill colour="blue">Not yet due</Pill>
-			{/if}
-			<h3>Reading</h3>
-			{#each toddler_sleep_prep.reading as i (i.id)}
-				<h4>{i.title}</h4>
-				<p>{i.note}</p>
-			{/each}
-		</div>
-	{/if}
-	{#if activeTab === 'food-principles'}
-		<div
-			id="panel-food-principles"
-			role="tabpanel"
-			aria-labelledby="tab-food-principles"
-			tabindex="0"
-		>
-			<h2>Food Principles</h2>
-			<p>{food_principles.core_philosophy}</p>
-			<p>{food_principles.note}</p>
-			<h3>Current Principles</h3>
-			{#each food_principles.current_and_ongoing as i (i.id)}
-				<h4>{i.title}</h4>
-				<p>{i.detail}</p>
-			{/each}
-			<h3>What to expect from a toddler</h3>
-			{#each food_principles.toddler_forward_look as i (i.id)}
-				<h4>{i.title}</h4>
-				<p>{i.detail}</p>
-			{/each}
+			<Activities {activities} />
 		</div>
 	{/if}
 	{#if activeTab === 'sources'}
@@ -752,22 +573,9 @@
 			role="tabpanel"
 			aria-labelledby="tab-sources"
 			tabindex="0"
-			class="sources"
 		>
 			<h2>Sources</h2>
-			{#each sources as s (s.id)}
-				<h3>
-					<!-- eslint-disable svelte/no-navigation-without-resolve -- s.url is an external reference source, not an internal route -->
-					<a
-						href={s.url}
-						target="_blank"
-					>
-						{s.name}</a
-					><!-- eslint-enable svelte/no-navigation-without-resolve -->
-				</h3>
-				<p>{s.detail}</p>
-				{#if s.note}<p>{s.note}</p>{/if}
-			{/each}
+			<Sources {sources} />
 		</div>
 	{/if}
 {/if}
@@ -800,16 +608,6 @@
 		font-size: 0.9em;
 	}
 
-	pre {
-		padding: 1em;
-		overflow-x: auto;
-		border-radius: 0.3em;
-		background: var(--blue);
-		color: var(--blue_text);
-		font-size: 0.85em;
-		line-height: 1.4;
-	}
-
 	div[role='tabpanel'] {
 		&:focus,
 		&:focus-visible {
@@ -817,67 +615,7 @@
 		}
 
 		& h2 {
-
 			@include sr_only;
-		}
-	}
-
-	.vaccinations {
-		width: auto;
-		max-width: max-content;
-		padding: 0;
-		border: 1px solid var(--border);
-		border-radius: 0.8em;
-		background: var(--white_true);
-
-		& h3 {
-			grid-area: title;
-			margin: 0;
-			color: var(--black);
-			font-size: 1em;
-			font-weight: 700;
-		}
-
-		& .detail {
-			grid-area: desc;
-			margin: 0;
-		}
-
-		& :global(.card) {
-			grid-template-areas: 'icon title status' 'icon date status' '. desc .';
-			grid-template-columns: auto 1fr auto;
-			grid-template-rows: auto auto 1fr;
-			padding: 1em;
-			border: none;
-			border-radius: 0;
-			background: none;
-		}
-
-		& :global(.card:not(:last-child)) {
-			border-bottom: 1px solid color-mix(in oklch, var(--background) 92%, var(--black));
-		}
-
-		& :global(.icon) {
-			grid-area: icon;
-			font-size: 2em;
-		}
-
-		& :global(.icon svg) {
-			width: 1em;
-			height: 1em;
-			margin-right: 0.5em;
-		}
-	}
-
-	.sources {
-		& h3 {
-			color: var(--navy);
-			font-weight: 700;
-
-			&:not(:first-of-type) {
-				padding-top: 1em;
-				border-top: 1px solid color-mix(in oklch, var(--background) 92%, var(--black));
-			}
 		}
 	}
 </style>

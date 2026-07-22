@@ -5,6 +5,13 @@ import tsParser from '@typescript-eslint/parser';
 import svelte from 'eslint-plugin-svelte';
 import globals from 'globals';
 import svelteConfig from '../svelte.config.js';
+import svgImportComponent from './eslint-rules/svg-import-component.mjs';
+
+const house = {
+	rules: {
+		'svg-import-component': svgImportComponent,
+	},
+};
 
 export default [
 	{
@@ -26,8 +33,10 @@ export default [
 			'import': eslintImport,
 			'@typescript-eslint': eslintTs,
 			'@stylistic': stylistic,
+			'house': house,
 		},
 		rules: {
+			'house/svg-import-component': `error`,
 			'@stylistic/indent': [
 				`error`,
 				`tab`,
@@ -99,7 +108,11 @@ export default [
 				svelteConfig,
 			},
 		},
+		plugins: {
+			'house': house,
+		},
 		rules: {
+			'house/svg-import-component': `error`,
 			// Surfaces the Svelte compiler's own warnings (including a11y checks)
 			// as lint findings instead of only showing up in svelte-check.
 			'svelte/valid-compile': [`error`, { ignoreWarnings: false }],

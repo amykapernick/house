@@ -2,7 +2,7 @@
 	import { focusTimerState, notificationPermission, requestNotificationPermission } from '$utils/focusTimer';
 	import FocusTimerActive from './FocusTimerActive.svelte';
 	import FocusTimerSetup from './FocusTimerSetup.svelte';
-	import Notification from '$img/icons/alarm-disable.svg';
+	import Notification from '$img/icons/alarm-disable.svg?component';
 
 	let {
 		open = $bindable(false),

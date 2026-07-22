@@ -118,3 +118,8 @@ figcaption {
 	font-style: italic;
 	text-align: right;
 }
+
+svg {
+	width: 1em;
+	height: 1em;
+}
