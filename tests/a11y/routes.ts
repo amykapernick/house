@@ -47,6 +47,7 @@ export const routes: A11yRoute[] = [
 	{ name: `health`, path: `/health`, auth: true },
 	{ name: `dashboard`, path: `/dashboard`, auth: true },
 	{ name: `content`, path: `/content`, auth: true },
+	{ name: `search`, path: `/search`, auth: true },
 	{ name: `content-archive`, path: `/content/archive`, auth: true },
 	{ name: `content-save`, path: `/content/save`, auth: true },
 	{ name: `profile`, path: `/profile`, auth: true },

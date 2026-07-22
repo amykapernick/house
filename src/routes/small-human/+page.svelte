@@ -533,8 +533,7 @@
 			tabindex="0"
 		>
 			<h2>Clothing</h2>
-			<ClothingSeasonal seasonal={clothing_seasonal} />
-			<ClothingDaytime daytime={clothing_daytime} />
+			<ClothingSeasonal clothing={{ clothing_seasonal, clothing_daytime }} />
 		</div>
 	{/if}
 	{#if activeTab === 'vaccinations'}

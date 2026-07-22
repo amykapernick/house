@@ -10,6 +10,12 @@ export default defineConfig({
 			'$lib': path.resolve(`./src/lib`),
 			'$utils': path.resolve(`./src/lib/utils`),
 			'$types': path.resolve(`./src/lib/types`),
+			// $app/paths is normally a virtual module from the SvelteKit vite
+			// plugin, which this config deliberately doesn't load (see above) -
+			// stubbed so utils that call resolve() (e.g. searchResults.ts) are
+			// still unit-testable. Extend src/test/mocks/app-paths.ts if a util
+			// under test starts needing another $app/* export.
+			'$app/paths': path.resolve(`./src/test/mocks/app-paths.ts`),
 		},
 	},
 	test: {

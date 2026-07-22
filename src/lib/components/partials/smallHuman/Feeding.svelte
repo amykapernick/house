@@ -81,7 +81,7 @@
 	{/if}
 	<h3>Details</h3>
 	<dl>
-		{#each feeding.details as { label, value }}
+		{#each feeding.details as { label, value } (label)}
 			<dt>{label}</dt>
 			<dd>{value}</dd>
 		{/each}
@@ -90,7 +90,7 @@
 	<p>{feeding.principles.core_philosophy}</p>
 	<p>{feeding.principles.note}</p>
 	<Cards>
-		{#each feeding.principles.current_and_ongoing as item}
+		{#each feeding.principles.current_and_ongoing as item (item.title)}
 			<Card title={item.title}>
 				<p>{item.detail}</p>
 			</Card>
@@ -98,7 +98,7 @@
 	</Cards>
 	<h4>Toddler Forward Look</h4>
 	<Cards>
-		{#each feeding.principles.toddler_forward_look as item}
+		{#each feeding.principles.toddler_forward_look as item (item.title)}
 			<Card title={item.title}>
 				<p>{item.detail}</p>
 			</Card>

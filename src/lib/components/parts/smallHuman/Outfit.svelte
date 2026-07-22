@@ -32,6 +32,18 @@
 	} = $props();
 </script>
 
+<!-- TODO: parse item and weight from clothign recommendation strings -->
+<!-- sleep.environment.current_recommendation.recommended_setup.pj_layer -->
+<!-- clothing_daytime.indoor_reference[x].recommendation -->
+<!-- clothing_daytime.indoor_reference[x].layers -->
+<!-- clothing_daytime.outdoor_reference[x].recommendation -->
+<!-- clothing_daytime.outdoor_reference[x].layers -->
+<!-- clothing_daytime.outdoor_reference[x].extras -->
+<!-- clothing_daytime.rain_suit.recommended -->
+
+<!-- Explicit items -->
+<!-- clothing_daytime.current_recommendation.indoor/outdoor.layers -->
+
 <div class={`${className}`}>
 	<OnesieLong />
 </div>

@@ -104,6 +104,7 @@
 	@import '@mixins';
 
 	.header {
+
 		@include container_spacing;
 
 		/* TODO: replace this with proper reference */
@@ -176,6 +177,7 @@
 			gap: 0.5em;
 
 			& .name {
+
 				@include sr_only;
 			}
 		}

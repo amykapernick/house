@@ -2,17 +2,30 @@
 	import { resolve } from '$app/paths';
 	import { addDays, format, isToday, isTomorrow, parseISO } from 'date-fns';
 	import { DATE_FORMATS } from '$utils/dateFormats';
-	import { SvelteMap } from 'svelte/reactivity';
+	import { SvelteMap, SvelteURLSearchParams } from 'svelte/reactivity';
 	import fetchClientData, { clearCache, getGraphqlUrl } from '$utils/fetchClientData';
 	import { getRecentPages } from '$utils/recentPages';
 	import { CONTENT_CACHE_TTL, contentEntriesQuery, contentIndexQuery } from '$utils/content';
-	import { getDiscoverableRoutes } from '$utils/routes';
+	import { getDiscoverableRoutes, flattenPages } from '$utils/routes';
 	import fetchTasksData from '$utils/tasksData';
 	import { parseDeepSearch, type SearchSection } from '$utils/commandPaletteSearch';
+	import {
+		type Result,
+		type ContentEntryResult,
+		type ContentPageResult,
+		buildContentResults,
+		buildReferenceResults,
+		buildSupplierResults,
+		buildAssetResults,
+		buildSmallHumanResults,
+		buildTaskResults,
+		buildShoppingListResults,
+		buildBudgetResults,
+		buildScheduleResults,
+	} from '$utils/searchResults';
 	import { getToken } from '$lib/auth';
 	import { routeRequiresAuth } from '$lib/navigation';
 	import type { MenuItem } from '$types/global';
-	import type { Component } from 'svelte';
 	import RecipeIcon from '$img/icons/recipe-book-47.svg?component';
 	import ContentIcon from './ContentIcon.svelte';
 
@@ -27,20 +40,6 @@
 		open?: boolean;
 		class?: string;
 	} = $props();
-
-	type Result = {
-		key: string;
-		label: string;
-		sublabel?: string;
-		section: `Recent` | SearchSection;
-		link: string;
-		Icon?: Component<Record<string, any>>;
-		contentIcon?: { icon?: string | null; iconType?: string | null };
-		// Extra fields (description, tags, etc.) a result should also match
-		// against besides its label - see matchSection below.
-		searchText?: string;
-		archived?: boolean;
-	};
 
 	type PlannedMeal = { date: string; entryType: string };
 	type QuickAddType = `task` | `shop`;
@@ -80,9 +79,8 @@
 	// search like recipes get. Generic over every /content/{slug} entry (e.g.
 	// Possums), not any one entry in particular - a new entry in Notion's App
 	// Content database shows up here with no code change.
-	type ContentEntryResult = { slug: string; title: string; icon?: string | null; iconType?: string | null };
 	let contentEntries = $state<ContentEntryResult[]>([]);
-	let contentPages = $state<{ entrySlug: string; pageSlug: string; title: string; group: string }[]>([]);
+	let contentPages = $state<ContentPageResult[]>([]);
 	let upcomingMealPlan = new SvelteMap<string, PlannedMeal>();
 	// Raw data for the `/s`-gated sections - each fetched/cached under the exact
 	// same cacheKey + query its own page uses, so the cache is shared rather than
@@ -118,20 +116,12 @@
 		return { type, content: rest.trim(), due: undefined };
 	});
 
-	function flattenPages(items: MenuItem[], sublabel?: string): Result[] {
-		return items.flatMap((item) => {
-			if (item.auth && !isAuthenticated) return [];
-			if (item.items) return flattenPages(item.items, item.label);
-			return [{ key: `page:${item.link}`, label: item.label, sublabel, section: `Pages` as const, link: item.link, Icon: item.Icon }];
-		});
-	}
-
 	// File-system routes never linked from the header nav (e.g. /reference/house,
 	// only reachable by following a link within /reference) - static per session,
 	// so computed once rather than re-derived on every render.
 	const discoveredRoutes = getDiscoverableRoutes();
 
-	const navPages = $derived(flattenPages(menuItems));
+	const navPages = $derived(flattenPages(menuItems, isAuthenticated));
 
 	const orphanPages = $derived<Result[]>(
 		discoveredRoutes
@@ -182,162 +172,32 @@
 
 	// Deliberately left out of the main nav/`pages` list - only surfaces here
 	// once you search for it, rather than an always-visible section.
-	const contentBase = $derived<Result[]>([
-		...contentEntries.map((entry) => ({
-			key: `content-entry:${entry.slug}`,
-			label: entry.title,
-			section: `Content` as const,
-			link: resolve(`/content/[slug]`, { slug: entry.slug }),
-			contentIcon: { icon: entry.icon, iconType: entry.iconType },
-		})),
-		...contentPages.map((contentPage) => {
-			const entry = contentEntries.find((e) => e.slug === contentPage.entrySlug);
-			return {
-				key: `content-page:${contentPage.entrySlug}:${contentPage.pageSlug}`,
-				label: contentPage.title,
-				sublabel: contentPage.group,
-				section: `Content` as const,
-				link: resolve(`/content/[slug]/[pageSlug]`, { slug: contentPage.entrySlug, pageSlug: contentPage.pageSlug }),
-				contentIcon: { icon: entry?.icon, iconType: entry?.iconType },
-			};
-		}),
-	]);
-
-	const contentResults = $derived.by(() => {
-		const t = sectionTerm(`Content`);
-		return t ? contentBase.filter((result) => result.label.toLowerCase().includes(t)) : [];
-	});
+	const contentResults = $derived(buildContentResults(contentEntries, contentPages, sectionTerm(`Content`) ?? ``));
 
 	// `/s`-gated sections below - raw data is fetched once when the palette opens
-	// (see loadDeepSearchData) and filtered here the same way Content is above.
-	function matchSection<T>(section: Result[`section`], list: T[], toResult: (item: T) => Result): Result[] {
-		const t = sectionTerm(section);
-		if (!t) return [];
-		return list
-			.map(toResult)
-			.filter((result) => result.label.toLowerCase().includes(t) || result.searchText?.toLowerCase().includes(t))
-			.slice(0, SECTION_DISPLAY_LIMIT);
-	}
-
-	const referenceResults = $derived(
-		matchSection(`References`, resources, (resource) => ({
-			key: `resource:${resource.id}`,
-			label: resource.name,
-			sublabel: resource.category,
-			section: `References` as const,
-			link: resource.url || resolve(`/reference`),
-			searchText: [resource.category, resource.description].filter(Boolean).join(` `),
-			archived: resource.archived,
-		})),
-	);
-
-	// Each supplier can surface up to three results under its own name: the
-	// supplier itself (opens their website), plus a "call"/"email" action if a
-	// phone/email is on file - flattened first so matchSection's per-item label
-	// filter naturally keeps or drops all of a matching supplier's actions together.
-	const supplierResults = $derived.by(() => {
-		const items: { id: string; name: string; sublabel?: string; link: string; searchText: string; archived?: boolean }[] = [];
-		for (const supplier of suppliers) {
-			const searchText = (supplier.category ?? []).join(` `);
-			items.push({ id: `supplier:${supplier.id}`, name: supplier.name, link: supplier.url || resolve(`/reference`), searchText, archived: supplier.archived });
-			if (supplier.email) items.push({ id: `supplier-email:${supplier.id}`, name: supplier.name, sublabel: `Email ${supplier.email}`, link: `mailto:${supplier.email}`, searchText, archived: supplier.archived });
-			if (supplier.phone) items.push({ id: `supplier-call:${supplier.id}`, name: supplier.name, sublabel: `Call ${supplier.phone}`, link: `tel:${supplier.phone}`, searchText, archived: supplier.archived });
-		}
-		return matchSection(`Suppliers`, items, (item) => ({
-			key: item.id,
-			label: item.name,
-			sublabel: item.sublabel,
-			section: `Suppliers` as const,
-			link: item.link,
-			searchText: item.searchText,
-			archived: item.archived,
-		}));
-	});
-
-	// Links to the asset's own entry on the Reference page (Item.svelte gives
-	// each entry's heading a matching id) rather than asset.external - the
-	// palette should take you to the household's own record, not the retailer.
-	const assetResults = $derived(
-		matchSection(`Assets`, assets, (asset) => ({
-			key: `asset:${asset.id}`,
-			label: asset.name,
-			section: `Assets` as const,
-			link: `${resolve(`/reference`)}#${asset.id}`,
-			searchText: [asset.brand, asset.model, asset.status, ...(asset.category ?? []), asset.content].filter(Boolean).join(` `),
-		})),
-	);
-
-	// Flattens the named/titled sub-items of each smallHuman tab - not raw
-	// measurements or narrative blocks - into individual results tagged with
-	// the tab id the page's own hash-routing already understands (small-human's
-	// activeTab reads page.url.hash, so #<tabId> lands directly on the right tab).
-	const smallHumanResults = $derived.by(() => {
-		if (!smallHuman) return [];
-		const items: { id: string; label: string; tab: string }[] = [
-			...(smallHuman.teeth?.teeth ?? []).map((t: any) => ({ id: `tooth:${t.fdi}`, label: t.name, tab: `teeth` })),
-			...(smallHuman.milestones?.items ?? []).map((m: any) => ({ id: `milestone:${m.id}`, label: m.title, tab: `milestones` })),
-			...(smallHuman.auslan?.signs ?? []).map((s: any) => ({ id: `sign:${s.id}`, label: s.name, tab: `auslan` })),
-			...(smallHuman.swimming?.skills ?? []).map((s: any) => ({ id: `swim:${s.id}`, label: s.title, tab: `swimming` })),
-			...(smallHuman.sleep?.items ?? []).map((s: any) => ({ id: `sleep:${s.id}`, label: s.title, tab: `sleep` })),
-			...(smallHuman.vaccinations?.items ?? []).map((v: any) => ({ id: `vax:${v.id}`, label: v.title, tab: `vaccinations` })),
-			...(smallHuman.activities ?? []).map((a: any) => ({ id: `activity:${a.id}`, label: a.title, tab: `activities` })),
-			...(smallHuman.clothing?.seasonal?.alerts ?? []).map((a: any) => ({ id: `clothing:${a.id}`, label: a.title, tab: `clothing-seasonal` })),
-			...(smallHuman.notes ?? []).flatMap((note: any) => {
-				if (note.__typename === `CarSeat`) return [{ id: `note:car-seat`, label: note.name, tab: `parenting-approach` }];
-				if (note.__typename === `ParentingApproachNote`) return (note.parentingApproachItems ?? []).map((i: any) => ({ id: `note:parenting:${i.id}`, label: i.title, tab: `parenting-approach` }));
-				if (note.__typename === `ToddlerSleepPrepNote`) return [{ id: `note:toddler-sleep-prep`, label: note.name, tab: `toddler-sleep-prep` }];
-				return [];
-			}),
-		];
-		return matchSection(`Small Human`, items, (item) => ({
-			key: item.id,
-			label: item.label,
-			section: `Small Human` as const,
-			link: `${resolve(`/small-human`)}#${item.tab}`,
-		}));
-	});
-
-	const taskResults = $derived(
-		matchSection(`Tasks`, searchTasks, (task) => ({
-			key: `task:${task.id}`,
-			label: task.name,
-			sublabel: task.dueLabel,
-			section: `Tasks` as const,
-			link: task.link || resolve(`/tasks`),
-		})),
-	);
-
-	const shoppingListResults = $derived(
-		matchSection(`Shopping List`, shoppingListItems, (item) => ({
-			key: `shopping:${item.id}`,
-			label: item.display,
-			sublabel: item.category,
-			section: `Shopping List` as const,
-			link: resolve(`/shopping-list`),
-		})),
-	);
-
-	const budgetResults = $derived(
-		matchSection(`Budget`, budgetItems, (item) => ({
-			key: `budget:${item.id}`,
-			label: item.description,
-			sublabel: item.bucket?.name,
-			section: `Budget` as const,
-			link: resolve(`/budget`),
-		})),
-	);
-
-	const scheduleResults = $derived.by(() => {
-		const combined = [...scheduleEvents.map((event) => ({ id: `event:${event.id}`, label: event.name })), ...icsEvents.map((event) => ({ id: `ics:${event.id}`, label: event.name }))];
-		return matchSection(`Schedule`, combined, (event) => ({
-			key: event.id,
-			label: event.label,
-			section: `Schedule` as const,
-			link: resolve(`/schedule`),
-		}));
-	});
+	// (see loadDeepSearchData) and shaped/filtered by the shared builders in
+	// $utils/searchResults (also used, unlimited, by the /search page).
+	const referenceResults = $derived(buildReferenceResults(resources, sectionTerm(`References`) ?? ``, SECTION_DISPLAY_LIMIT));
+	const supplierResults = $derived(buildSupplierResults(suppliers, sectionTerm(`Suppliers`) ?? ``, SECTION_DISPLAY_LIMIT));
+	const assetResults = $derived(buildAssetResults(assets, sectionTerm(`Assets`) ?? ``, SECTION_DISPLAY_LIMIT));
+	const smallHumanResults = $derived(buildSmallHumanResults(smallHuman, sectionTerm(`Small Human`) ?? ``, SECTION_DISPLAY_LIMIT));
+	const taskResults = $derived(buildTaskResults(searchTasks, sectionTerm(`Tasks`) ?? ``, SECTION_DISPLAY_LIMIT));
+	const shoppingListResults = $derived(buildShoppingListResults(shoppingListItems, sectionTerm(`Shopping List`) ?? ``, SECTION_DISPLAY_LIMIT));
+	const budgetResults = $derived(buildBudgetResults(budgetItems, sectionTerm(`Budget`) ?? ``, SECTION_DISPLAY_LIMIT));
+	const scheduleResults = $derived(buildScheduleResults(scheduleEvents, icsEvents, sectionTerm(`Schedule`) ?? ``, SECTION_DISPLAY_LIMIT));
 
 	const results = $derived([...recentResults, ...pageResults, ...contentResults, ...recipeResults, ...referenceResults, ...supplierResults, ...assetResults, ...smallHumanResults, ...taskResults, ...shoppingListResults, ...budgetResults, ...scheduleResults]);
+
+	// Every section here is capped at SECTION_DISPLAY_LIMIT (or, for recipes,
+	// RECIPE_DISPLAY_LIMIT) - this links to the unlimited /search page for the
+	// same term/scope so a busy query isn't stuck at "top 5 per section".
+	const viewAllHref = $derived.by(() => {
+		const searchTerm = deepSearchMatch ? deepSearchMatch.term : term;
+		if (!searchTerm) return null;
+		const params = new SvelteURLSearchParams({ q: searchTerm });
+		if (deepSearchMatch?.scope) params.set(`section`, deepSearchMatch.scope);
+		return `${resolve(`/search`)}?${params.toString()}`;
+	});
 
 	function escapeGqlString(value: string): string {
 		return value.replace(/\\/g, `\\\\`).replace(/"/g, `\\"`);
@@ -866,8 +726,21 @@
 			<span><kbd>esc</kbd> close</span>
 			{#if !term && !deepSearchMatch}
 				<span class="quick-add-tip"><kbd>/task</kbd> <kbd>/shop</kbd> quick add · <kbd>/s</kbd> search everything</span>
-			{:else if deepSearchMatch?.scope}
-				<span class="quick-add-tip">searching {deepSearchMatch.scope}</span>
+			{:else}
+				{#if deepSearchMatch?.scope}
+					<span class="quick-add-tip">searching {deepSearchMatch.scope}</span>
+				{/if}
+				{#if viewAllHref}
+					<!-- eslint-disable svelte/no-navigation-without-resolve -- resolve()'d base with a query string appended, same pattern as Result.link above -->
+					<a
+						class="view-all"
+						href={viewAllHref}
+						onclick={() => (open = false)}
+					>
+						View all results &rarr;
+					</a>
+					<!-- eslint-enable svelte/no-navigation-without-resolve -->
+				{/if}
 			{/if}
 		{/if}
 	</footer>
@@ -951,6 +824,16 @@
 
 	.quick-add-tip {
 		margin-left: auto;
+	}
+
+	.view-all {
+		margin-left: auto;
+		color: var(--purple_bright);
+		text-decoration: none;
+
+		&:hover {
+			text-decoration: underline;
+		}
 	}
 
 	.result {

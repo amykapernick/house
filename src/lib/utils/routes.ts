@@ -1,3 +1,6 @@
+import type { MenuItem } from '$types/global';
+import type { Result } from './searchResults';
+
 export type DiscoveredRoute = {
 	path: string;
 	label: string;
@@ -45,4 +48,17 @@ export function getDiscoverableRoutes(
 				sublabel: segments.length > 1 ? toLabel(segments[segments.length - 2]) : undefined,
 			};
 		});
+}
+
+// Shared by CommandPalette.svelte and the /search page so both build the
+// Pages section identically. menuItems currently never nests submenus, but
+// the `items` escape hatch is kept (typed loosely - MenuItem itself has no
+// `items` field) in case that changes.
+export function flattenPages(items: MenuItem[], isAuthenticated: boolean, sublabel?: string): Result[] {
+	return items.flatMap((item) => {
+		if (item.auth && !isAuthenticated) return [];
+		const nested = (item as MenuItem & { items?: MenuItem[] }).items;
+		if (nested) return flattenPages(nested, isAuthenticated, item.label);
+		return [{ key: `page:${item.link}`, label: item.label, sublabel, section: `Pages` as const, link: item.link, Icon: item.Icon }];
+	});
 }

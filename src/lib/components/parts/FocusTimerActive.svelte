@@ -148,6 +148,7 @@
 		align-self: start;
 
 		& :global(button) {
+
 			@include button_secondary;
 
 			--button_text: var(--purple_bright_text);
@@ -236,6 +237,7 @@
 
 	.toggle,
 	.compact_tog {
+
 		@include button_secondary;
 
 		--button_text: var(--purple_bright_text);
@@ -252,6 +254,7 @@
 	}
 
 	.stop {
+
 		@include button_text;
 
 		--button_text: var(--purple_bright_text);

@@ -18,6 +18,7 @@ const pages: { name: string; path: string; heading: string }[] = [
 	{ name: `reference`, path: `/reference`, heading: `Reference` },
 	{ name: `small-human`, path: `/small-human`, heading: `Small Human` },
 	{ name: `design-colours`, path: `/design/colours`, heading: `Colours` },
+	{ name: `search`, path: `/search`, heading: `Search` },
 ];
 
 for (const { name, path, heading } of pages) {
@@ -39,6 +40,15 @@ test(`budget renders totals and Edit/Discard never triggers a save`, async ({ pa
 	await page.getByRole(`button`, { name: `Discard` }).click();
 
 	await expect(page.getByRole(`button`, { name: `Edit` })).toBeVisible();
+});
+
+test(`search shows results for a query passed in the URL`, async ({ page }) => {
+	// "budget" always matches the static Budget nav entry (menuItems), unlike
+	// searching for real household data which could change/disappear -
+	// deterministic without relying on live data.
+	await page.goto(`/search?q=budget`);
+	await expect(page.getByRole(`heading`, { level: 2, name: `Pages` })).toBeVisible();
+	await expect(page.getByRole(`link`, { name: `Budget` })).toBeVisible();
 });
 
 test(`colours renders swatches and Edit/Discard never triggers a save`, async ({ page }) => {

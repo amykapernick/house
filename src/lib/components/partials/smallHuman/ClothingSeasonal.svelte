@@ -1,17 +1,17 @@
 <script lang="ts">
-	import type { ClothingSeasonal } from '$types/smallHuman';
+	import type { ClothingSeasonal, ClothingDaytime } from '$types/smallHuman';
 	import DebugJson from '$parts/DebugJson.svelte';
 
 	const {
-		seasonal,
+		clothing,
 		class: className = '',
 	}: {
-		seasonal: ClothingSeasonal;
+		clothing: { clothing_seasonal: ClothingSeasonal; clothing_daytime: ClothingDaytime };
 		class?: string;
 	} = $props();
 </script>
 
 <DebugJson
-	data={seasonal}
+	data={clothing}
 	class={className}
 />

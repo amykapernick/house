@@ -127,6 +127,7 @@ export const authOnlyRoutes: string[] = [
 	resolve(`/profile`),
 	resolve(`/content`),
 	resolve(`/design/colours`),
+	resolve(`/search`),
 ];
 
 export function routeRequiresAuth(pathname: string): boolean {

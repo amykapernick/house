@@ -112,6 +112,7 @@
 	}
 
 	.category {
+
 		@include subtitle;
 
 		grid-area: tags;

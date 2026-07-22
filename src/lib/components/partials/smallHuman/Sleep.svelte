@@ -64,26 +64,24 @@
 	<p>{sleep.environment.current_recommendation.challenge}</p>
 	<p>{sleep.environment.current_recommendation.strategy}</p>
 
-	<BaseCard>
-		<Stats
-			items={[
-				{
-					value: sleep.environment.current_recommendation.recommended_setup.sleep_sack_tog,
-					name: 'tog',
-				},
-				{
-					name: 'Layer',
-					// TODO: Pass js_layer to outfit component
-					Icon: Outfit,
-					note: sleep.environment.current_recommendation.recommended_setup.pj_layer,
-				},
-			]}
-		/>
-		<p>{sleep.environment.current_recommendation.recommended_setup.reasoning}</p>
-	</BaseCard>
+	<Stats
+		items={[
+			{
+				value: sleep.environment.current_recommendation.recommended_setup.sleep_sack_tog,
+				name: 'tog',
+				note: sleep.environment.current_recommendation.recommended_setup.reasoning,
+			},
+			{
+				name: 'Layer',
+				// TODO: Pass js_layer to outfit component
+				Icon: Outfit,
+				note: sleep.environment.current_recommendation.recommended_setup.pj_layer,
+			},
+		]}
+	/>
 </div>
 <h3>Sleep environment</h3>
-<BaseCard>
+<BaseCard colour="white">
 	<p>{sleep.environment.note}</p>
 	<dl class="temp_range">
 		<dt>Bedtime temp range</dt>
@@ -101,7 +99,7 @@
 		</tr>
 	</thead>
 	<tbody>
-		{#each sleep.environment.tog_reference as tog}
+		{#each sleep.environment.tog_reference as tog (tog.temp_range_c)}
 			<tr>
 				<td>{tog.temp_range_c}°C</td>
 				<td>{tog.tog}</td>
@@ -112,7 +110,7 @@
 </table>
 <h3>Notes</h3>
 <Cards>
-	{#each sleep.items as item}
+	{#each sleep.items as item (item.title)}
 		<Card title={item.title}>
 			<p>{item.detail}</p>
 			{#if item.tag}

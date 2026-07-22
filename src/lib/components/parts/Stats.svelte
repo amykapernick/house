@@ -35,7 +35,7 @@
 		>
 			<dt>{name}</dt>
 			<dd>{value}</dd>
-			{#if Icon}<Icon />{/if}
+			{#if Icon}<span class="icon"><Icon /></span>{/if}
 			{#if note}
 				<Tooltip label={note}>
 					<Info />
@@ -54,10 +54,16 @@
 		font-size: 0.75em;
 		font-weight: 700;
 
-		&:has(:global(svg)) {
+		&:has(.icon) {
 			& div {
 				grid-row: span 3;
 				align-items: center;
+
+				&:not(:has(.icon)) {
+					& dd {
+						font-size: 3em;
+					}
+				}
 			}
 
 			& dt {
@@ -85,14 +91,19 @@
 		text-align: center;
 		justify-items: center;
 
-		& > :global(svg) {
+		& .icon {
+			display: flex;
+			align-items: center;
+			justify-content: center;
 			order: -1;
-			width: 4em;
-			height: 4em;
+			width: 2em;
+			height: 2em;
 			margin-bottom: 0.5em;
-			padding: 0.7em;
+			padding: 0.2em;
 			border-radius: 50%;
 			background: var(--background);
+			font-size: 3em;
+			line-height: 1;
 		}
 
 		& :global(.tooltip-trigger) {

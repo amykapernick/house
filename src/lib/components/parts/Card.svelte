@@ -8,7 +8,7 @@
 		class: className = '',
 	}: {
 		children?: Snippet;
-		colour?: 'light' | 'dark';
+		colour?: 'light' | 'dark' | 'white';
 		class?: string;
 	} = $props();
 </script>
@@ -30,6 +30,10 @@
 			border: none;
 			background: var(--gradient_navy);
 			color: var(--dark_background_text);
+		}
+
+		&.white {
+			background: var(--white_true);
 		}
 
 		@media (width >= 50em) {
