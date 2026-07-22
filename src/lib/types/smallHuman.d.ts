@@ -31,18 +31,14 @@ export type {
 	SleepItem,
 	SleepEnvironment,
 	BedroomTempPattern,
-	TogReference,
 	TogRecommendation,
 	RecommendedSetup,
-	SleepSack,
 	Clothing,
 	ClothingSeasonal,
 	NoonarSeason,
 	SeasonalAlert,
 	ClothingDaytime,
 	SunSafety,
-	IndoorClothingRef,
-	OutdoorClothingRef,
 	RainSuit,
 	CurrentClothingRecommendation,
 	ClothingSet,
@@ -65,7 +61,5 @@ export type {
 	ToddlerSleepPrepNote,
 	ToddlerSleepPrepDetail,
 	ToddlerPrepStatus,
-	ReadingItem,
-	FoodPrinciples,
-	FoodPrincipleItem
+	ReadingItem
 } from './generated';
