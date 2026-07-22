@@ -71,7 +71,7 @@
 <h3 class="subtitle">Today - Indoors</h3>
 <p>{clothing_daytime.current_recommendation.indoor.summary}</p>
 <div class="chips">
-	{#each clothing_daytime.current_recommendation.indoor.layers as layer}
+	{#each clothing_daytime.current_recommendation.indoor.layers as layer (layer.position)}
 		<Outfit {layer} />
 	{/each}
 	{#if feetOutfit(clothing_daytime.current_recommendation.indoor)}
@@ -82,7 +82,7 @@
 <h3 class="subtitle">Today - Outdoors <em>(add to indoor layers)</em></h3>
 <p>{clothing_daytime.current_recommendation.outdoor.summary}</p>
 <div class="chips">
-	{#each clothing_daytime.current_recommendation.outdoor.layers as layer}
+	{#each clothing_daytime.current_recommendation.outdoor.layers as layer (layer.position)}
 		<Outfit {layer} />
 	{/each}
 	{#if feetOutfit(clothing_daytime.current_recommendation.outdoor)}
@@ -120,7 +120,7 @@
 
 <h3>Forecast</h3>
 <Cards>
-	{#each clothing_daytime.forecast as day, i}
+	{#each clothing_daytime.forecast as day, i (day.date)}
 		<Weather
 			temp={day.temp_low_c && day.temp_high_c ? [day.temp_low_c, day.temp_high_c] : null}
 			description={weather?.forecast?.[i]?.extendedText ?? ''}
