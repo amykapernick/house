@@ -1,14 +1,14 @@
 <script lang="ts">
+	import { format, parseISO } from 'date-fns';
 	import type { Resource } from '$types/resources';
+	import { DATE_FORMATS } from '$utils/dateFormats';
 	import OP from '$img/icons/1password.svg?component';
 
 	let { id, name, url, icon, login, description, archived, image, brand, model, external, ipAddress, ramStorage, content, email, phone, lastUsed }: Omit<Resource, 'category'> = $props();
 
-	// TODO: Date parsing, formatting and functions should always use date-fns and will be based on standard format of dates
-	// TODO: Write date format lookup
 	function formatDate(date?: string) {
 		if (!date) return null;
-		return new Date(date).toLocaleDateString('en-AU');
+		return format(parseISO(date), DATE_FORMATS.full);
 	}
 </script>
 
