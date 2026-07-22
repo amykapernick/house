@@ -73,23 +73,27 @@
 							feeding {
 								last_updated check_frequency
 								details { label value }
-								schedule {
-									source note
-									stages {
-										id title expected_age
-										breastfeeds { value unit note }
-										solid_meals { value unit note }
-										water { value unit note }
-										upcoming
-									}
-									upcoming
-								}
+								schedule { source note }
 								sources
 								principles {
 									note core_philosophy
 									current_and_ongoing { id title detail sources }
 									toddler_forward_look { id title detail sources }
 									sources
+								}
+								current {
+									id title expected_age
+									breastfeeds { value unit note }
+									solid_meals { value unit note }
+									water { value unit note }
+									upcoming
+								}
+								upcoming {
+									id title expected_age
+									breastfeeds { value unit note }
+									solid_meals { value unit note }
+									water { value unit note }
+									upcoming
 								}
 							}
 							teeth {

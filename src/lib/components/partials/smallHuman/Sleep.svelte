@@ -89,25 +89,6 @@
 	</dl>
 	<p>{sleep.environment.bedroom_temp_pattern.swing_note}</p>
 </BaseCard>
-<h3>TOG Reference</h3>
-<table>
-	<thead>
-		<tr>
-			<th>Room Temp</th>
-			<th>TOG</th>
-			<th>Layer</th>
-		</tr>
-	</thead>
-	<tbody>
-		{#each sleep.environment.tog_reference as tog (tog.temp_range_c)}
-			<tr>
-				<td>{tog.temp_range_c}°C</td>
-				<td>{tog.tog}</td>
-				<td>{tog.layer}</td>
-			</tr>
-		{/each}
-	</tbody>
-</table>
 <h3>Notes</h3>
 <Cards>
 	{#each sleep.items as item (item.title)}

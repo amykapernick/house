@@ -44,6 +44,8 @@
 		}
 	});
 
+	// TODO: Reorganise health history data so that different values can be fetched
+
 	type MetricCard = { key: string; label: string; unit: string | null; lines: LineChartLine[] };
 
 	// Small multiples, one chart per metric key - metrics have wildly different
@@ -127,6 +129,7 @@
 	{/if}
 
 	<div class="grid">
+		<!-- TODO: Remove device name from caption -->
 		{#each metricCards as card (card.key)}
 			<Chart
 				type="line"

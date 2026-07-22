@@ -21,87 +21,57 @@
 		const joined = value.length > 1 ? `${Math.min(...value)}-${Math.max(...value)}` : `${value[0]}`;
 		return unit ? `${joined} ${unit}` : joined;
 	}
-
-	const feedingStage = $derived({
-		current: feeding.schedule.stages.find((s) => s.id === feeding.schedule.upcoming?.[0]),
-		upcoming: feeding.schedule.stages.find((s) => s.id === feeding.schedule.upcoming?.[1]),
-	});
 </script>
 
 <div class={className}>
-	{#if feedingStage.current}
-		<h3>Current Stage - {feedingStage.current.title}</h3>
+	{#if feeding.current}
+		<h3>Current Stage - {feeding.current.title}</h3>
 		<Stats
 			items={[
 				{
 					name: 'Breastfeeds',
-					value: formatValueNote(feedingStage.current.breastfeeds),
+					value: formatValueNote(feeding.current.breastfeeds),
 					Icon: Breasts,
-					note: feedingStage.current.breastfeeds?.note,
+					note: feeding.current.breastfeeds?.note,
 				},
 				{
 					name: 'Solid Meals',
-					value: formatValueNote(feedingStage.current.solid_meals),
+					value: formatValueNote(feeding.current.solid_meals),
 					Icon: Food,
-					note: feedingStage.current.solid_meals?.note,
+					note: feeding.current.solid_meals?.note,
 				},
 				{
 					name: 'Water',
-					value: formatValueNote(feedingStage.current.water),
+					value: formatValueNote(feeding.current.water),
 					Icon: Water,
-					note: feedingStage.current.water?.note,
+					note: feeding.current.water?.note,
 				},
 			]}
 		/>
 	{/if}
-	{#if feedingStage.upcoming}
-		<h3>Upcoming Stage - {feedingStage.upcoming.title}</h3>
+	{#if feeding.upcoming}
+		<h3>Upcoming Stage - {feeding.upcoming.title}</h3>
 		<Stats
 			items={[
 				{
 					name: 'Breastfeeds',
-					value: formatValueNote(feedingStage.upcoming.breastfeeds),
+					value: formatValueNote(feeding.upcoming.breastfeeds),
 					Icon: Breasts,
-					note: feedingStage.current.breastfeeds?.note,
+					note: feeding.upcoming.breastfeeds?.note,
 				},
 				{
 					name: 'Solid Meals',
-					value: formatValueNote(feedingStage.upcoming.solid_meals),
+					value: formatValueNote(feeding.upcoming.solid_meals),
 					Icon: Food,
-					note: feedingStage.current.solid_meals?.note,
+					note: feeding.upcoming.solid_meals?.note,
 				},
 				{
 					name: 'Water',
-					value: formatValueNote(feedingStage.upcoming.water),
+					value: formatValueNote(feeding.upcoming.water),
 					Icon: Water,
-					note: feedingStage.current.water?.note,
+					note: feeding.upcoming.water?.note,
 				},
 			]}
 		/>
 	{/if}
-	<h3>Details</h3>
-	<dl>
-		{#each feeding.details as { label, value } (label)}
-			<dt>{label}</dt>
-			<dd>{value}</dd>
-		{/each}
-	</dl>
-	<h3>Food Principles</h3>
-	<p>{feeding.principles.core_philosophy}</p>
-	<p>{feeding.principles.note}</p>
-	<Cards>
-		{#each feeding.principles.current_and_ongoing as item (item.title)}
-			<Card title={item.title}>
-				<p>{item.detail}</p>
-			</Card>
-		{/each}
-	</Cards>
-	<h4>Toddler Forward Look</h4>
-	<Cards>
-		{#each feeding.principles.toddler_forward_look as item (item.title)}
-			<Card title={item.title}>
-				<p>{item.detail}</p>
-			</Card>
-		{/each}
-	</Cards>
 </div>

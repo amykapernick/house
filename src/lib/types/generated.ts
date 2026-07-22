@@ -380,18 +380,19 @@ export type EventDateRange = {
 
 export type Feeding = {
   check_frequency: Scalars['Int']['output'];
+  current: Maybe<FeedingStage>;
   details: Array<LabelValue>;
   last_updated: Scalars['String']['output'];
   principles: FoodPrinciples;
   schedule: FeedingSchedule;
   sources: Array<Scalars['String']['output']>;
+  upcoming: Maybe<FeedingStage>;
 };
 
 export type FeedingSchedule = {
   note: Scalars['String']['output'];
   source: Scalars['String']['output'];
   stages: Array<FeedingStage>;
-  upcoming: Array<Scalars['String']['output']>;
 };
 
 export type FeedingStage = {
