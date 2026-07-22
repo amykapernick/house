@@ -186,11 +186,11 @@
 	<section>
 		<h2>Card</h2>
 		<Cards>
-			<Card colour="light">
+			<Card theme="light">
 				<h3>Light Card</h3>
 				<p>Card content.</p>
 			</Card>
-			<Card colour="dark">
+			<Card theme="dark">
 				<h3>Dark Card</h3>
 				<p>Card content.</p>
 			</Card>

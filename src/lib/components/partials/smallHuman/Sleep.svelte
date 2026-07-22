@@ -73,7 +73,7 @@
 			},
 			{
 				name: 'Layer',
-				// TODO: Pass js_layer to outfit component
+				// TODO: Pass pjs_layer to outfit component
 				Icon: Outfit,
 				note: sleep.environment.current_recommendation.recommended_setup.pj_layer,
 			},
@@ -81,7 +81,7 @@
 	/>
 </div>
 <h3>Sleep environment</h3>
-<BaseCard colour="white">
+<BaseCard theme="white">
 	<p>{sleep.environment.note}</p>
 	<dl class="temp_range">
 		<dt>Bedtime temp range</dt>

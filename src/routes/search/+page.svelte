@@ -33,11 +33,13 @@
 	const RECIPE_MIN_CHARS = 2;
 	const RECIPE_DEBOUNCE_MS = 250;
 	const RECIPE_FETCH_COUNT = 50; // unlimited-ish - the palette only fetches 15/shows 5
-	const URL_SYNC_DEBOUNCE_MS = 250;
 
 	type SectionFilter = SearchSection | `All`;
 	const SECTION_OPTIONS: SectionFilter[] = [`All`, ...Object.values(SCOPE_TOKENS)];
 
+	// queryInput tracks the text field as the user types; query is only updated
+	// on form submit, so results (and the URL) don't change on every keystroke.
+	let queryInput = $state(page.url.searchParams.get(`q`) ?? ``);
 	let query = $state(page.url.searchParams.get(`q`) ?? ``);
 	let section = $state<SectionFilter>((page.url.searchParams.get(`section`) as SectionFilter) ?? `All`);
 
@@ -47,22 +49,23 @@
 		return section === `All` || section === s;
 	}
 
-	// Keeps the URL in sync with the input/section filter (debounced) so results
-	// stay linkable/shareable without a full navigation on every keystroke.
-	let urlSyncTimer: ReturnType<typeof setTimeout> | undefined;
+	function handleSubmit(event: SubmitEvent) {
+		event.preventDefault();
+		query = queryInput;
+	}
+
+	// Keeps the URL in sync with the committed query/section filter so results
+	// stay linkable/shareable - only fires on submit or a section change, not
+	// on every keystroke (queryInput isn't a dependency here).
 	$effect(() => {
 		const q = query;
 		const s = section;
-		clearTimeout(urlSyncTimer);
-		urlSyncTimer = setTimeout(() => {
-			const params = new SvelteURLSearchParams();
-			if (q) params.set(`q`, q);
-			if (s !== `All`) params.set(`section`, s);
-			const search = params.toString();
-			// eslint-disable-next-line svelte/no-navigation-without-resolve -- resolve() is used; the rule can't trace it through template-literal concatenation with the query string
-			goto(`${resolve(`/search`)}${search ? `?${search}` : ``}`, { replaceState: true, keepFocus: true, noScroll: true });
-		}, URL_SYNC_DEBOUNCE_MS);
-		return () => clearTimeout(urlSyncTimer);
+		const params = new SvelteURLSearchParams();
+		if (q) params.set(`q`, q);
+		if (s !== `All`) params.set(`section`, s);
+		const search = params.toString();
+		// eslint-disable-next-line svelte/no-navigation-without-resolve -- resolve() is used; the rule can't trace it through template-literal concatenation with the query string
+		goto(`${resolve(`/search`)}${search ? `?${search}` : ``}`, { replaceState: true, keepFocus: true, noScroll: true });
 	});
 
 	let contentEntries = $state<ContentEntryResult[]>([]);
@@ -347,13 +350,19 @@
 
 <section class="search">
 	<h1>Search</h1>
-	<input
-		type="text"
-		class="query"
-		bind:value={query}
-		placeholder="Search everything..."
-		aria-label="Search everything"
-	/>
+	<form
+		class="query-form"
+		onsubmit={handleSubmit}
+	>
+		<input
+			type="text"
+			class="query"
+			bind:value={queryInput}
+			placeholder="Search everything..."
+			aria-label="Search everything"
+		/>
+		<button type="submit">Search</button>
+	</form>
 	<div
 		class="sections"
 		role="group"
@@ -433,15 +442,21 @@
 		padding: 1em;
 	}
 
-	.query {
-		width: 100%;
+	/* Overrides global `form { padding, font-size }` (config/postcss - see
+	   forms.css) - that's sized for stacked modal-style forms, not this
+	   single-row search bar. */
+
+	.query-form {
+		display: flex;
+		gap: 0.5em;
 		margin: 1em 0;
-		padding: 0.75em 1em;
-		border: 1px solid var(--input_border);
-		border-radius: 0.5em;
-		background: var(--input_bg);
-		color: inherit;
-		font-size: 1.1em;
+		padding: 0;
+		font-size: 1em;
+	}
+
+	.query {
+		flex: 1;
+		margin: 0;
 	}
 
 	.sections {

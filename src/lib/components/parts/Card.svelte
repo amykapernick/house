@@ -4,16 +4,16 @@
 
 	const {
 		children,
-		colour = 'light',
+		theme = 'light',
 		class: className = '',
 	}: {
 		children?: Snippet;
-		colour?: 'light' | 'dark' | 'white';
+		theme?: 'light' | 'dark' | 'white';
 		class?: string;
 	} = $props();
 </script>
 
-<div class="card {className} {colour}">
+<div class="card {className} {theme}">
 	{@render children()}
 </div>
 

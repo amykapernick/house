@@ -19,41 +19,43 @@
 
 	const HOUSE_QUERY = `
 		query {
-			areas {
-				id
-				name
-				start
-				size
-				link
-				colour
-				info {
-					value
-					type
-				}
-			}
-			items {
-				id
-				type
-				state {
-					type
-					state
-				}
-				start
-				size
-				rotation
-				link
-				area {
+			house {
+				areas {
 					id
 					name
+					start
+					size
+					link
 					colour
+					info {
+						value
+						type
+					}
+				}
+				items {
+					id
+					type
+					state {
+						type
+						state
+					}
+					start
+					size
+					rotation
+					link
+					area {
+						id
+						name
+						colour
+					}
 				}
 			}
 		}
 	`;
 
 	function handleHouse(res: any) {
-		areas = res.areas ?? [];
-		items = res.items ?? [];
+		areas = res.house?.areas ?? [];
+		items = res.house?.items ?? [];
 		loading = false;
 	}
 
@@ -153,22 +155,24 @@
 			skipCache: true,
 			gqlQuery: `
 				query {
-					areas { id start size colour }
-					items(raw: true) {
-						id
-						type
-						area { id }
-						start
-						size
-						rotation
-						linkedItem { id type }
+					house {
+						areas { id start size colour }
+						items(raw: true) {
+							id
+							type
+							area { id }
+							start
+							size
+							rotation
+							linkedItem { id type }
+						}
 					}
 				}
 			`,
 		});
 
 		houseBoard = {
-			areas: (res.areas ?? []).map((a: any): DraftHouseArea => {
+			areas: (res.house?.areas ?? []).map((a: any): DraftHouseArea => {
 				const colour = a.colour === `transparent` ? null : a.colour;
 				return {
 					id: a.id,
@@ -181,7 +185,7 @@
 					originalColour: colour,
 				};
 			}),
-			items: (res.items ?? []).map((i: any): DraftHouseItem => {
+			items: (res.house?.items ?? []).map((i: any): DraftHouseItem => {
 				const area = i.area?.id ?? null;
 				const start: [number, number] = [i.start[0], i.start[1]];
 				const size: [number, number] | null = i.size ? [i.size[0], i.size[1]] : null;
@@ -285,9 +289,9 @@
 		saveError = ``;
 		const res = await fetchClientData({
 			skipCache: true,
-			gqlQuery: `query { availableHouseAreas { id name } }`,
+			gqlQuery: `query { house { availableHouseAreas { id name } } }`,
 		});
-		availableAreaEntities = res.availableHouseAreas ?? [];
+		availableAreaEntities = res.house?.availableHouseAreas ?? [];
 		areaPickerOpen = true;
 	}
 
@@ -379,9 +383,9 @@
 		saveError = ``;
 		const res = await fetchClientData({
 			skipCache: true,
-			gqlQuery: `query { availableHouseItems { id entityId friendlyName suggestedType suggestedArea } }`,
+			gqlQuery: `query { house { availableHouseItems { id entityId friendlyName suggestedType suggestedArea } } }`,
 		});
-		availableEntities = res.availableHouseItems ?? [];
+		availableEntities = res.house?.availableHouseItems ?? [];
 		pickerOpen = true;
 	}
 

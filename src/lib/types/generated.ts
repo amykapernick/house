@@ -229,7 +229,7 @@ export type ClothingExtras = {
 };
 
 export type ClothingLayer = {
-	material: Material;
+	material: Maybe<Material>;
 	position: LayerPosition;
 	sleeve: SleeveLength;
 	type: ClothingType;
@@ -247,18 +247,18 @@ export type ClothingSeasonal = {
 export type ClothingSet = {
 	extras: Maybe<ClothingExtras>;
 	feet: Maybe<FeetRecommendation>;
-	layers: Array<ClothingLayer>;
+	layers: Maybe<Array<ClothingLayer>>;
 	rain_suit: Maybe<Scalars[`Boolean`][`output`]>;
 	summary: Maybe<Scalars[`String`][`output`]>;
 };
 
 export type ClothingType =
   | `bodysuit`
-  | `fleece`
   | `jacket`
-  | `knit`
+  | `jumper`
   | `onesie`
   | `rainsuit`
+  | `sweater`
   | `tshirt`
   | `vest`;
 
@@ -331,30 +331,23 @@ export type CurrentClothingRecommendation = {
 	outdoor: ClothingSet;
 };
 
-export type Dashboard = {
-	binCollections: Array<BinCollection>;
-	sun: Maybe<SunTimes>;
-	uv: Maybe<UvIndex>;
-	weather: Maybe<Weather>;
-};
-
 export type DateRange = {
 	end: Maybe<Scalars[`String`][`output`]>;
 	start: Maybe<Scalars[`String`][`output`]>;
 };
 
 export type DayForecast = {
-	conditions: Scalars[`String`][`output`];
+	conditions: Maybe<Scalars[`String`][`output`]>;
 	date: Scalars[`String`][`output`];
 	day_label: Scalars[`String`][`output`];
-	feels_like_high_c: Scalars[`Float`][`output`];
-	feels_like_low_c: Scalars[`Float`][`output`];
-	indoor: ClothingSet;
-	outdoor: ClothingSet;
-	rain_expected: Scalars[`Boolean`][`output`];
-	temp_high_c: Scalars[`Float`][`output`];
-	temp_low_c: Scalars[`Float`][`output`];
-	uv_index: Scalars[`Float`][`output`];
+	feels_like_high_c: Maybe<Scalars[`Float`][`output`]>;
+	feels_like_low_c: Maybe<Scalars[`Float`][`output`]>;
+	indoor: Maybe<ClothingSet>;
+	outdoor: Maybe<ClothingSet>;
+	rain_expected: Maybe<Scalars[`Boolean`][`output`]>;
+	temp_high_c: Maybe<Scalars[`Float`][`output`]>;
+	temp_low_c: Maybe<Scalars[`Float`][`output`]>;
+	uv_index: Maybe<Scalars[`Float`][`output`]>;
 };
 
 export type DentalCare = {
@@ -478,6 +471,16 @@ export type HealthMetricPoint = {
 	value: Scalars[`Float`][`output`];
 };
 
+export type HomeAssistant = {
+	state: Maybe<HomeAssistantState>;
+	states: Array<HomeAssistantState>;
+};
+
+
+export type HomeAssistantStateArgs = {
+	entityId: Scalars[`ID`][`input`];
+};
+
 export type HomeAssistantState = {
 	entityId: Scalars[`ID`][`output`];
 	friendlyName: Maybe<Scalars[`String`][`output`]>;
@@ -485,6 +488,24 @@ export type HomeAssistantState = {
 	lastUpdated: Maybe<Scalars[`String`][`output`]>;
 	state: Scalars[`String`][`output`];
 	unitOfMeasurement: Maybe<Scalars[`String`][`output`]>;
+};
+
+export type House = {
+	areas: Maybe<Array<Maybe<Area>>>;
+	availableHouseAreas: Array<AvailableHouseArea>;
+	availableHouseItems: Array<AvailableHouseEntity>;
+	binCollections: Array<BinCollection>;
+	homeAssistant: Maybe<HomeAssistant>;
+	info: Maybe<Array<Maybe<Info>>>;
+	items: Maybe<Array<Maybe<Item>>>;
+	sun: Maybe<SunTimes>;
+	uv: Maybe<UvIndex>;
+	weather: Maybe<Weather>;
+};
+
+
+export type HouseItemsArgs = {
+	raw?: InputMaybe<Scalars[`Boolean`][`input`]>;
 };
 
 export type HouseAreaInput = {
@@ -607,9 +628,7 @@ export type Material =
   | `cotton`
   | `cotton_knit`
   | `fleece`
-  | `merino`
-  | `softshell`
-  | `waterproof`;
+  | `merino`;
 
 export type MealPlanDay = {
 	date: Scalars[`Date`][`output`];
@@ -1027,10 +1046,7 @@ export type Project = {
 
 export type Query = {
 	allergens: Array<Allergen>;
-	areas: Maybe<Array<Maybe<Area>>>;
 	assets: Maybe<Array<Maybe<Asset>>>;
-	availableHouseAreas: Array<AvailableHouseArea>;
-	availableHouseItems: Array<AvailableHouseEntity>;
 	budget: Maybe<Array<Maybe<BudgetItem>>>;
 	budgetBuckets: Maybe<Array<Maybe<BudgetBucket>>>;
 	budgetSpend: Maybe<Array<Maybe<BudgetSpendEntry>>>;
@@ -1044,14 +1060,10 @@ export type Query = {
 	contentEntries: Maybe<Array<Maybe<ContentEntry>>>;
 	contentIndex: Maybe<Array<Maybe<ContentGroup>>>;
 	contentPage: Maybe<ContentPage>;
-	dashboard: Maybe<Dashboard>;
 	events: Maybe<Array<Maybe<Event>>>;
 	habits: Maybe<Array<Maybe<Habit>>>;
-	homeAssistantState: Maybe<HomeAssistantState>;
-	homeAssistantStates: Array<HomeAssistantState>;
+	house: Maybe<House>;
 	icsEvents: Maybe<Array<Maybe<IcsEvent>>>;
-	info: Maybe<Array<Maybe<Info>>>;
-	items: Maybe<Array<Maybe<Item>>>;
 	me: Maybe<User>;
 	mealPlanByDay: Array<MealPlanDay>;
 	mealPlans: Maybe<MealPlanList>;
@@ -1113,16 +1125,6 @@ export type QueryContentIndexArgs = {
 export type QueryContentPageArgs = {
 	pageSlug: Scalars[`String`][`input`];
 	slug: Scalars[`String`][`input`];
-};
-
-
-export type QueryHomeAssistantStateArgs = {
-	entityId: Scalars[`ID`][`input`];
-};
-
-
-export type QueryItemsArgs = {
-	raw?: InputMaybe<Scalars[`Boolean`][`input`]>;
 };
 
 
@@ -1699,7 +1701,10 @@ export type Weather = {
 export type WeatherForecastDay = {
 	condition: Maybe<Scalars[`String`][`output`]>;
 	date: Scalars[`DateTime`][`output`];
+	extendedText: Maybe<Scalars[`String`][`output`]>;
 	precipitationChance: Maybe<Scalars[`Float`][`output`]>;
+	shortText: Maybe<Scalars[`String`][`output`]>;
 	tempHigh: Maybe<Scalars[`Float`][`output`]>;
 	tempLow: Maybe<Scalars[`Float`][`output`]>;
+	uvIndex: Maybe<Scalars[`Float`][`output`]>;
 };

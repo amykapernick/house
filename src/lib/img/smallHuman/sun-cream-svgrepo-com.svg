@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
+	 viewBox="0 0 394.475 394.475" xml:space="preserve">
+<g>
+	<path style="fill:#57C3FF;" d="M295.483,135.155v237.862c0,11.851-9.607,21.458-21.458,21.458H120.452
+		c-11.851,0-21.458-9.607-21.458-21.458V135.155c0-31.569,25.591-57.16,57.16-57.16h82.17
+		C269.892,77.995,295.483,103.586,295.483,135.155z"/>
+	<rect x="155.324" y="55.495" style="fill:#FFDE55;" width="83.83" height="22.5"/>
+	<rect x="155.324" y="55.495" style="fill:#E0BF36;" width="47.17" height="22.5"/>
+	<rect x="182.991" style="fill:#57C3FF;" width="83.832" height="22.499"/>
+	<rect x="175.622" y="0.005" style="fill:#57C3FF;" width="43.23" height="55.49"/>
+	<rect x="175.622" y="0.005" style="opacity:0.27;fill:#666666;enable-background:new    ;" width="17.73" height="55.49"/>
+	<g>
+		<circle style="fill:#FFDE55;" cx="197.237" cy="236.235" r="38.86"/>
+		<g>
+			<circle style="fill:#FFDE55;" cx="197.237" cy="169.902" r="12"/>
+			<circle style="fill:#FFDE55;" cx="197.237" cy="302.569" r="12"/>
+		</g>
+		<g>
+			<circle style="fill:#FFDE55;" cx="244.142" cy="189.33" r="12"/>
+			<circle style="fill:#FFDE55;" cx="150.333" cy="283.14" r="12"/>
+		</g>
+		<g>
+			<circle style="fill:#FFDE55;" cx="263.571" cy="236.235" r="12"/>
+			<circle style="fill:#FFDE55;" cx="130.904" cy="236.235" r="12"/>
+		</g>
+		<g>
+			<circle style="fill:#FFDE55;" cx="244.142" cy="283.14" r="12"/>
+			<circle style="fill:#FFDE55;" cx="150.333" cy="189.33" r="12"/>
+		</g>
+	</g>
+	<path style="opacity:0.14;fill:#666666;enable-background:new    ;" d="M204.152,77.995c-31.57,0-57.16,25.59-57.16,57.16v259.32
+		h-26.542c-11.851,0-21.458-9.607-21.458-21.458V135.155c0-31.569,25.591-57.16,57.16-57.16
+		C156.152,77.995,204.152,77.995,204.152,77.995z"/>
+</g>
+</svg>

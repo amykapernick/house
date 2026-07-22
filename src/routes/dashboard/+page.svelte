@@ -7,15 +7,15 @@
 	import AstroCard from '$partials/dashboard/AstroCard.svelte';
 	import UvGauge from '$partials/dashboard/UvGauge.svelte';
 	import BinDaysCard from '$partials/dashboard/BinDaysCard.svelte';
-	import type { Dashboard } from '$types/generated';
+	import type { House } from '$types/generated';
 
-	let dashboard = $state<Dashboard | null>(null);
+	let dashboard = $state<House | null>(null);
 	let loading = $state(true);
 
 	$effect(() => {
 		if ($isAuthenticated) {
 			function handle(res: any) {
-				dashboard = res.dashboard ?? null;
+				dashboard = res.house ?? null;
 				loading = false;
 			}
 			fetchClientData({
@@ -23,7 +23,7 @@
 				onStale: handle,
 				gqlQuery: `
 					query {
-						dashboard {
+						house {
 							weather {
 								condition
 								temperature

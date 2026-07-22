@@ -20,7 +20,7 @@
 	{#if toddlerSleepPrep.status === 'due'}
 		<Card
 			title={toddlerSleepPrep.alert_when_due.title}
-			colour={alertColours[toddlerSleepPrep.alert_when_due.level]}
+			theme={alertColours[toddlerSleepPrep.alert_when_due.level]}
 		>
 			<p>{toddlerSleepPrep.alert_when_due.detail}</p>
 		</Card>

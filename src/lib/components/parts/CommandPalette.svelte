@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
+	import { goto } from '$app/navigation';
 	import { addDays, format, isToday, isTomorrow, parseISO } from 'date-fns';
 	import { DATE_FORMATS } from '$utils/dateFormats';
 	import { SvelteMap, SvelteURLSearchParams } from 'svelte/reactivity';
@@ -614,6 +615,18 @@
 	}
 
 	function handleKeydown(event: KeyboardEvent) {
+		// Ctrl/Cmd+Enter jumps straight to the /search page for the current
+		// query (same destination as the footer's "View all results" link) -
+		// viewAllHref is null in quick-add mode (no search term then), so this
+		// is a no-op there rather than conflicting with quick-add's own Enter.
+		if ((event.ctrlKey || event.metaKey) && event.key === `Enter` && viewAllHref) {
+			event.preventDefault();
+			// eslint-disable-next-line svelte/no-navigation-without-resolve -- viewAllHref is resolve()'d with a query string appended, same as the <a> above
+			goto(viewAllHref);
+			open = false;
+			return;
+		}
+
 		if (quickAddMatch) {
 			if (event.key === `Enter`) {
 				event.preventDefault();
@@ -737,7 +750,7 @@
 						href={viewAllHref}
 						onclick={() => (open = false)}
 					>
-						View all results &rarr;
+						<kbd>ctrl</kbd>+<kbd>&crarr;</kbd> view all results &rarr;
 					</a>
 					<!-- eslint-enable svelte/no-navigation-without-resolve -->
 				{/if}

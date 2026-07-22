@@ -16,14 +16,10 @@
 	import Auslan from '$components/partials/smallHuman/Auslan.svelte';
 	import Feeding from '$components/partials/smallHuman/Feeding.svelte';
 	import Sleep from '$components/partials/smallHuman/Sleep.svelte';
-	import SleepEnvironment from '$components/partials/smallHuman/SleepEnvironment.svelte';
-	import ClothingSeasonal from '$components/partials/smallHuman/ClothingSeasonal.svelte';
-	import ClothingDaytime from '$components/partials/smallHuman/ClothingDaytime.svelte';
+	import ClothingSeasonal from '$components/partials/smallHuman/Clothing.svelte';
 	import Vaccinations from '$components/partials/smallHuman/Vaccinations.svelte';
 	import ParentingApproach from '$components/partials/smallHuman/ParentingApproach.svelte';
 	import Activities from '$components/partials/smallHuman/Activities.svelte';
-	import ToddlerSleepPrep from '$components/partials/smallHuman/ToddlerSleepPrep.svelte';
-	import FoodPrinciples from '$components/partials/smallHuman/FoodPrinciples.svelte';
 	import Sources from '$components/partials/smallHuman/Sources.svelte';
 	import Stats from '$parts/Stats.svelte';
 	import Card from '$parts/Card.svelte';
@@ -40,12 +36,14 @@
 
 	let data = $state<any>(null);
 	let allergens = $state<any[]>([]);
+	let weather = $state<any>(null);
 	let loading = $state(true);
 
 	$effect(() => {
 		if ($isAuthenticated) {
 			function handleSmallHuman(res: any) {
 				data = res.smallHuman ?? null;
+				weather = res.house ?? null;
 				loading = false;
 			}
 			fetchClientData({
@@ -53,6 +51,11 @@
 				onStale: handleSmallHuman,
 				gqlQuery: `
 					query {
+						house {
+							weather { condition temperature humidity forecast { shortText extendedText uvIndex } }
+							uv { value band }
+							sun { sunrise sunset }
+						}
 						smallHuman {
 							overview {
 								last_updated age_weeks age_months birth_month
@@ -416,7 +419,7 @@
 		{#each otherAlerts as alert (alert.id)}
 			<Card
 				{...alert}
-				colour={alertColours[alert.level]}
+				theme={alertColours[alert.level]}
 				onDismiss={() => askDismissAlert(alert)}
 			>
 				<p>{alert.detail}</p>
@@ -533,7 +536,12 @@
 			tabindex="0"
 		>
 			<h2>Clothing</h2>
-			<ClothingSeasonal clothing={{ clothing_seasonal, clothing_daytime }} />
+			<ClothingSeasonal
+				clothing={{ clothing_seasonal, clothing_daytime }}
+				weather={weather?.weather ?? null}
+				uv={weather?.uv ?? null}
+				sun={weather?.sun ?? null}
+			/>
 		</div>
 	{/if}
 	{#if activeTab === 'vaccinations'}
