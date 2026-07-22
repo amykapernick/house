@@ -14,6 +14,13 @@ const config: CodegenConfig = {
 					inputValue: false,
 					object: false,
 				},
+				// Date/DateTime are custom GraphQL scalars (household_api's src/graphql/scalars) -
+				// both serialize to plain ISO strings over the wire, so keep them typed as such here
+				// rather than the codegen default of `any`.
+				scalars: {
+					Date: `string`,
+					DateTime: `string`,
+				},
 			},
 		},
 	},

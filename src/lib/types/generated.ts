@@ -7,6 +7,10 @@ export type Scalars = {
 	Boolean: { input: boolean; output: boolean; }
 	Int: { input: number; output: number; }
 	Float: { input: number; output: number; }
+	/** Calendar date only, no time component - serialized as YYYY-MM-DD */
+	Date: { input: string; output: string; }
+	/** Full timestamp - serialized as an RFC3339 string with a timezone offset */
+	DateTime: { input: string; output: string; }
 };
 
 export type Activity = {
@@ -364,7 +368,7 @@ export type DentalCare = {
 export type ElevationPoint = {
 	moonElevation: Scalars[`Float`][`output`];
 	sunElevation: Scalars[`Float`][`output`];
-	time: Scalars[`String`][`output`];
+	time: Scalars[`DateTime`][`output`];
 };
 
 export type Event = {
@@ -470,7 +474,7 @@ export type HealthMetricHistory = {
 };
 
 export type HealthMetricPoint = {
-	date: Scalars[`String`][`output`];
+	date: Scalars[`Date`][`output`];
 	value: Scalars[`Float`][`output`];
 };
 
@@ -608,12 +612,12 @@ export type Material =
   | `waterproof`;
 
 export type MealPlanDay = {
-	date: Scalars[`String`][`output`];
+	date: Scalars[`Date`][`output`];
 	entries: Array<MealPlanEntry>;
 };
 
 export type MealPlanEntry = {
-	date: Scalars[`String`][`output`];
+	date: Scalars[`Date`][`output`];
 	entryType: Scalars[`String`][`output`];
 	id: Scalars[`ID`][`output`];
 	recipe: Maybe<RecipeSummary>;
@@ -655,7 +659,7 @@ export type MeasurementUnit =
   | `kg`;
 
 export type Milestone = {
-	achieved_date: Maybe<Scalars[`String`][`output`]>;
+	achieved_date: Maybe<Scalars[`Date`][`output`]>;
 	category: MilestoneCategory;
 	detail: Scalars[`String`][`output`];
 	expected_months: Maybe<Array<Scalars[`Float`][`output`]>>;
@@ -737,7 +741,7 @@ export type MutationCheckShoppingItemArgs = {
 
 
 export type MutationCompleteHabitArgs = {
-	completedAt?: InputMaybe<Scalars[`String`][`input`]>;
+	completedAt?: InputMaybe<Scalars[`Date`][`input`]>;
 	habitId: Scalars[`String`][`input`];
 };
 
@@ -1185,14 +1189,14 @@ export type ReadingItem = {
 export type Recipe = {
 	categories: Array<RecipeCategory>;
 	cookTime: Maybe<Scalars[`String`][`output`]>;
-	dateAdded: Maybe<Scalars[`String`][`output`]>;
-	dateUpdated: Maybe<Scalars[`String`][`output`]>;
+	dateAdded: Maybe<Scalars[`Date`][`output`]>;
+	dateUpdated: Maybe<Scalars[`DateTime`][`output`]>;
 	description: Maybe<Scalars[`String`][`output`]>;
 	id: Scalars[`ID`][`output`];
 	image: Maybe<Scalars[`String`][`output`]>;
 	ingredients: Array<RecipeIngredient>;
 	instructions: Array<RecipeInstruction>;
-	lastMade: Maybe<Scalars[`String`][`output`]>;
+	lastMade: Maybe<Scalars[`DateTime`][`output`]>;
 	name: Scalars[`String`][`output`];
 	notes: Array<RecipeNote>;
 	nutrition: Maybe<RecipeNutrition>;
@@ -1269,12 +1273,12 @@ export type RecipeNutrition = {
 export type RecipeSummary = {
 	categories: Array<RecipeCategory>;
 	cookTime: Maybe<Scalars[`String`][`output`]>;
-	dateAdded: Maybe<Scalars[`String`][`output`]>;
-	dateUpdated: Maybe<Scalars[`String`][`output`]>;
+	dateAdded: Maybe<Scalars[`Date`][`output`]>;
+	dateUpdated: Maybe<Scalars[`DateTime`][`output`]>;
 	description: Maybe<Scalars[`String`][`output`]>;
 	id: Scalars[`ID`][`output`];
 	image: Maybe<Scalars[`String`][`output`]>;
-	lastMade: Maybe<Scalars[`String`][`output`]>;
+	lastMade: Maybe<Scalars[`DateTime`][`output`]>;
 	name: Scalars[`String`][`output`];
 	orgURL: Maybe<Scalars[`String`][`output`]>;
 	performTime: Maybe<Scalars[`String`][`output`]>;
@@ -1580,7 +1584,7 @@ export type TogReference = {
 
 export type Tooth = {
 	erupted_age_months: Maybe<Scalars[`Int`][`output`]>;
-	erupted_date: Maybe<Scalars[`String`][`output`]>;
+	erupted_date: Maybe<Scalars[`Date`][`output`]>;
 	expected_months: Scalars[`String`][`output`];
 	fdi: Scalars[`Int`][`output`];
 	name: Scalars[`String`][`output`];
@@ -1694,7 +1698,7 @@ export type Weather = {
 
 export type WeatherForecastDay = {
 	condition: Maybe<Scalars[`String`][`output`]>;
-	date: Scalars[`String`][`output`];
+	date: Scalars[`DateTime`][`output`];
 	precipitationChance: Maybe<Scalars[`Float`][`output`]>;
 	tempHigh: Maybe<Scalars[`Float`][`output`]>;
 	tempLow: Maybe<Scalars[`Float`][`output`]>;
