@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { format, parseISO } from 'date-fns';
+	import { DATE_FORMATS } from '$lib/utils/dateFormats';
 	import type { ClothingSeasonal, ClothingDaytime, ClothingSet } from '$types/smallHuman';
 	import type { Weather as WeatherData, UvIndex, SunTimes } from '$types/generated';
 	import DebugJson from '$parts/DebugJson.svelte';
@@ -125,13 +127,14 @@
 			temp={day.temp_low_c && day.temp_high_c ? [day.temp_low_c, day.temp_high_c] : null}
 			description={weather?.forecast?.[i]?.extendedText ?? ''}
 			blurb={weather?.forecast?.[i]?.shortText ?? ''}
-			day={day.day_label}
+			day={format(parseISO(day.date), DATE_FORMATS.dayName)}
 			uv={weather?.forecast?.[i]?.uvIndex != null ? String(weather.forecast[i].uvIndex) : ''}
 			condition={weather?.condition}
 			compact={true}
 		/>
 	{/each}
 </Cards>
+<!-- TODO: add forecast clkothing to forecasts -->
 
 <h3 class="subtitle">Current Sizes</h3>
 

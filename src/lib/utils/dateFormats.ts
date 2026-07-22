@@ -7,5 +7,7 @@ export const DATE_FORMATS = {
 	full: `d MMM yyyy`,
 	/** e.g. "2026-07-03" - date-only key, for cache keys, API args and day comparisons */
 	iso: `yyyy-MM-dd`,
-	month: `MMM yyyy`
+	month: `MMM yyyy`,
+	/** e.g. "Wednesday" - full weekday name */
+	dayName: `EEEE`
 } as const;

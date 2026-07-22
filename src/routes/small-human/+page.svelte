@@ -151,8 +151,7 @@
 										outdoor { summary layers { position type sleeve weight material } feet extras { hat hat_reason beanie mittens sunscreen sunscreen_reason } rain_suit }
 									}
 									forecast {
-										date day_label temp_high_c temp_low_c feels_like_high_c feels_like_low_c
-										conditions rain_expected uv_index
+										date temp_high_c temp_low_c
 										indoor { summary layers { position type sleeve weight material } feet extras { hat hat_reason beanie mittens sunscreen sunscreen_reason } rain_suit }
 										outdoor { summary layers { position type sleeve weight material } feet extras { hat hat_reason beanie mittens sunscreen sunscreen_reason } rain_suit }
 									}
@@ -629,6 +628,7 @@
 		}
 
 		& h2 {
+
 			@include sr_only;
 		}
 	}

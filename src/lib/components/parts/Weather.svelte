@@ -30,6 +30,7 @@
 	} = $props();
 
 	// Matches the banding/colours UvGauge.svelte uses for the same 3-tier scale.
+	// TODO: Do we really need to fetch this from the API, or can it be programmatically determined here?
 	const UV_BAND_LABELS: Record<string, string> = {
 		low: `Low`,
 		moderate: `Moderate`,
@@ -75,7 +76,7 @@
 	:global(.card.weather) {
 		grid-column: 1 / -1;
 		grid-template-areas: 'icon temp temp uv desc' 'icon blurb day uv desc';
-		grid-template-columns: auto auto auto 1fr;
+		grid-template-columns: auto auto auto auto 1fr;
 		align-content: center;
 		width: 100%;
 		color: var(--text_secondary);

@@ -16,7 +16,7 @@
 	import Sunscreen from '$img/smallHuman/sun-cream-svgrepo-com.svg?component';
 	import type { ClothingLayer, ClothingType, SleeveLength } from '$types/generated';
 	import Tooltip from '$parts/Tooltip.svelte';
-	import Info from '$img/icons/info.svg';
+	import Info from '$img/icons/info.svg?component';
 	import Sweater from '$img/smallHuman/sweater-svgrepo-com.svg?component';
 
 	type OutfitExtra = 'rain' | 'hat' | 'beanie' | 'sunscreen' | 'mittens' | 'socks' | 'shoes' | 'boots';

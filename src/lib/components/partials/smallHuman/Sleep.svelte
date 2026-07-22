@@ -112,6 +112,7 @@
 
 	.temp_range {
 		& dt {
+
 			@include subtitle;
 		}
 
