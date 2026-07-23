@@ -24,7 +24,7 @@
 			max-width: unset;
 		}
 
-		& :global(h1) {
+		& :global(> h1) {
 			grid-column: 1;
 			grid-row: 1;
 			padding-right: 100px;

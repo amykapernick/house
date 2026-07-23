@@ -8,8 +8,10 @@
 	import { formatMinutes } from '$utils/formatMinutes';
 	import { getPageTitle } from '$utils/pageTitle';
 	import Skeleton from '$components/parts/Skeleton.svelte';
+	import Stats from '$parts/Stats.svelte';
 	import { compatibleUnits, convertQuantity, unitFamilyLabel, unitLabel, unitOptionLabel, unitRoot, unitsInFamily } from '$lib/utils/units';
 	import type { RecipeIngredientUnit } from '$lib/types/generated';
+	import Pill from '$components/parts/Pill.svelte';
 
 	let recipe = $state<any>(null);
 	let loading = $state(true);
@@ -19,6 +21,34 @@
 	let defaultUnitId = $state<Record<string, string>>({});
 	let checkedIngredients = $state<Record<number, boolean>>({});
 	let checkedSteps = $state<Record<number, boolean>>({});
+
+	const NUTRITION_LABELS: [key: string, name: string][] = [
+		['calories', 'Calories'],
+		['proteinContent', 'Protein'],
+		['carbohydrateContent', 'Carbs'],
+		['fatContent', 'Fat'],
+		['fiberContent', 'Fiber'],
+		['sugarContent', 'Sugar'],
+		['sodiumContent', 'Sodium'],
+	];
+
+	let nutritionItems = $derived(
+		NUTRITION_LABELS.filter(([key]) => recipe?.nutrition?.[key] != null).map(([key, name]) => ({
+			name,
+			value: recipe.nutrition[key],
+		})),
+	);
+
+	let metaItems = $derived.by(() => {
+		const items: { name: string; value: string }[] = [];
+		if (recipe?.prepTime) items.push({ name: 'Prep', value: formatMinutes(recipe.prepTime) });
+		if (recipe?.cookTime) items.push({ name: 'Cook', value: formatMinutes(recipe.cookTime) });
+		if (recipe?.totalTime) items.push({ name: 'Total', value: formatMinutes(recipe.totalTime) });
+		if (recipe?.performTime) items.push({ name: 'Perform', value: formatMinutes(recipe.performTime) });
+		if (recipe?.servings) items.push({ name: 'Servings', value: formatQuantity(recipe.servings * multiplier) });
+		if (recipe?.recipeYield) items.push({ name: 'Yield', value: recipe.recipeYield });
+		return items;
+	});
 
 	// Distinct unit families (mass, volume, ...) present across the recipe's ingredients,
 	// each with every configured unit that can be converted to/from it - powers the
@@ -36,6 +66,7 @@
 	});
 
 	const SCALE_PRESETS = [1, 2, 3];
+	let isCustomScale = $derived(!SCALE_PRESETS.includes(multiplier));
 
 	// Common cooking fractions, checked in descending order so eg. 0.75 matches ¾ before ½.
 	const FRACTIONS: [number, string][] = [
@@ -79,18 +110,21 @@
 		return ingredient.unit;
 	}
 
-	function scaledIngredientText(ingredient: any, i: number): string {
+	function scaledIngredientParts(ingredient: any, i: number): { text?: string; quantity?: string; unit?: string; food?: string; note?: string } {
+		if (ingredient.quantity == null) return { text: ingredient.display };
+
 		const unit = selectedUnit(ingredient, i);
 		const converting = unit && ingredient.unit && unit.id !== ingredient.unit.id;
-		if (multiplier === 1 && !converting) return ingredient.display;
-		if (ingredient.quantity == null) return ingredient.display;
 
 		const baseQuantity = converting ? (convertQuantity(ingredient.quantity, ingredient.unit, unit!, allUnits) ?? ingredient.quantity) : ingredient.quantity;
 		const quantity = baseQuantity * multiplier;
 		const unitText = unit ? unitLabel(unit, quantity) : ingredient.unit;
-		const parts = [formatQuantity(quantity), unitText, ingredient.food].filter(Boolean);
-		const text = parts.join(' ');
-		return ingredient.note ? `${text} (${ingredient.note})` : text;
+		return {
+			quantity: formatQuantity(quantity),
+			unit: unitText || undefined,
+			food: ingredient.food || undefined,
+			note: ingredient.note || undefined,
+		};
 	}
 
 	$effect(() => {
@@ -130,114 +164,122 @@
 {:else if !recipe}
 	<p>Recipe not found.</p>
 {:else}
-	<article>
-		{#if recipe.image}
-			<img
-				class="hero"
-				src={recipe.image}
-				alt={recipe.name}
+	<article class="recipe">
+		<header>
+			{#if recipe.image}
+				<img
+					class="hero"
+					src={recipe.image}
+					alt={recipe.name}
+				/>
+			{/if}
+
+			<h1>{recipe.name}</h1>
+
+			{#if recipe.description}
+				<p class="description">{recipe.description}</p>
+			{/if}
+
+			<Stats
+				items={metaItems}
+				class="meta"
 			/>
-		{/if}
 
-		<h1>{recipe.name}</h1>
-
-		{#if recipe.description}
-			<p class="description">{recipe.description}</p>
-		{/if}
-
-		<div class="meta-bar">
-			{#if recipe.prepTime}<div class="meta-item"><span class="label">Prep</span><span>{formatMinutes(recipe.prepTime)}</span></div>{/if}
-			{#if recipe.cookTime}<div class="meta-item"><span class="label">Cook</span><span>{formatMinutes(recipe.cookTime)}</span></div>{/if}
-			{#if recipe.totalTime}<div class="meta-item"><span class="label">Total</span><span>{formatMinutes(recipe.totalTime)}</span></div>{/if}
-			{#if recipe.performTime}<div class="meta-item"><span class="label">Perform</span><span>{formatMinutes(recipe.performTime)}</span></div>{/if}
-			{#if recipe.servings}<div class="meta-item"><span class="label">Servings</span><span>{formatQuantity(recipe.servings * multiplier)}</span></div>{/if}
-			{#if recipe.recipeYield}<div class="meta-item"><span class="label">Yield</span><span>{recipe.recipeYield}</span></div>{/if}
-		</div>
-
-		{#if recipe.tags?.length || recipe.categories?.length}
-			<div class="tag-bar">
-				{#each recipe.categories as cat (cat.slug)}
-					<span class="tag category">{cat.name}</span>
-				{/each}
-				{#each recipe.tags as tag (tag.slug)}
-					<span class="tag">{tag.name}</span>
-				{/each}
-			</div>
-		{/if}
-
-		<div class="columns">
-			<section class="ingredients">
-				<div class="ingredients-header">
-					<h2>Ingredients</h2>
-					<div class="scale-bar">
-						<!-- TODO: Style recipe scale -->
-						<span class="label">Scale</span>
-						{#each SCALE_PRESETS as preset (preset)}
-							<button
-								type="button"
-								class="scale-btn"
-								class:active={multiplier === preset}
-								onclick={() => (multiplier = preset)}>×{preset}</button
-							>
-						{/each}
+			<fieldset class="scale">
+				<div>
+					<legend>Scale</legend>
+					{#each SCALE_PRESETS as preset (preset)}
 						<input
-							type="number"
-							min="0.25"
-							step="0.25"
-							bind:value={multiplier}
-							class="scale-custom"
-							aria-label="Custom scale"
+							type="radio"
+							id="scale-{preset}"
+							name="scale"
+							value={preset}
+							bind:group={multiplier}
 						/>
-					</div>
+						<label for="scale-{preset}">× {preset}</label>
+					{/each}
+					<input
+						type="number"
+						min="0.5"
+						step="0.5"
+						max="10"
+						bind:value={multiplier}
+						id="scale-custom"
+						placeholder="4"
+						class:active={isCustomScale}
+					/>
+					<label
+						for="scale-custom"
+						class="sr-only">Custom Scale Modifier</label
+					>
 				</div>
-				<!-- TODO: Style recipe unit selection -->
-				{#if unitFamilies.length}
-					<div class="unit-defaults-bar">
-						<span class="label">Units</span>
+			</fieldset>
+			{#if unitFamilies.length}
+				<fieldset class="units">
+					<div>
+						<legend>Units</legend>
 						{#each unitFamilies as family (family.root)}
 							{@const fieldId = `unit-default-${family.root}`}
-							<div class="unit-default">
-								<label for={fieldId}>{unitFamilyLabel(family.root, allUnits)}</label>
-								<select
-									id={fieldId}
-									class="unit-select"
-									value={defaultUnitId[family.root] ?? ''}
-									onchange={(e) => {
-										const value = e.currentTarget.value;
-										if (value) defaultUnitId[family.root] = value;
-										else delete defaultUnitId[family.root];
-									}}
-								>
-									<option value="">As written</option>
-									{#each family.units as unit (unit.id)}
-										<option value={unit.id}>{unitOptionLabel(unit)}</option>
-									{/each}
-								</select>
-							</div>
+							<label for={fieldId}>{unitFamilyLabel(family.root, allUnits)}</label>
+							<select
+								id={fieldId}
+								value={defaultUnitId[family.root] ?? ''}
+								onchange={(e) => {
+									const value = e.currentTarget.value;
+									if (value) defaultUnitId[family.root] = value;
+									else delete defaultUnitId[family.root];
+								}}
+							>
+								<option value="">As written</option>
+								{#each family.units as unit (unit.id)}
+									<option value={unit.id}>{unitOptionLabel(unit)}</option>
+								{/each}
+							</select>
 						{/each}
 					</div>
-				{/if}
-				{#if recipe.ingredients?.length}
-					<ul>
-						{#each recipe.ingredients as ingredient, i (i)}
-							{#if ingredient.title}
-								<li class="section-title">{ingredient.title}</li>
-							{:else}
-								{@const options = ingredientUnitOptions(ingredient)}
-								<li class:checked={checkedIngredients[i]}>
-									<input
-										type="checkbox"
-										id="ingredient-{i}"
-										checked={checkedIngredients[i] ?? false}
-										onchange={() => (checkedIngredients[i] = !checkedIngredients[i])}
-										aria-label={`Mark ${ingredient.food ?? ingredient.display} as done`}
-									/>
-									<label
-										class="check-label"
-										for="ingredient-{i}"
-									>
-										<span>{scaledIngredientText(ingredient, i)}</span>
-									</label>
+				</fieldset>
+			{/if}
+
+			{#if recipe.tags?.length || recipe.categories?.length}
+				<ul class="tags">
+					{#each recipe.categories as cat (cat.slug)}
+						<li><Pill outline={true}>{cat.name}</Pill></li>
+					{/each}
+					{#each recipe.tags as tag (tag.slug)}
+						<li><Pill outline={true}>{tag.name}</Pill></li>
+					{/each}
+				</ul>
+			{/if}
+		</header>
+
+		<!-- TODO: Work out putting ingredients in columns on big screen sizes -->
+		<section class="ingredients">
+			<h2>Ingredients</h2>
+			{#if recipe.ingredients?.length}
+				<ul>
+					{#each recipe.ingredients as ingredient, i (i)}
+						{#if ingredient.title}
+							<li class="section">{ingredient.title}</li>
+						{:else}
+							{@const options = ingredientUnitOptions(ingredient)}
+							{@const parts = scaledIngredientParts(ingredient, i)}
+							<li>
+								<input
+									type="checkbox"
+									id="ingredient-{i}"
+								/>
+								<label for="ingredient-{i}">
+									<span class="sr-only">Mark ${ingredient.food ?? ingredient.display} as done </span>
+								</label>
+								<span class="ingredient">
+									{#if parts.text}
+										<span class="full">{parts.text}</span>
+									{:else}
+										{#if parts.quantity}<span class="qty">{parts.quantity}</span>{/if}
+										{#if parts.unit}<span class="unit">{parts.unit}</span>{/if}
+										{#if parts.food}<span class="food">{parts.food}</span>{/if}
+										{#if parts.note}<span class="note">({parts.note})</span>{/if}
+									{/if}
 									{#if options.length}
 										<!-- TODO: Style ingredient unit selection -->
 										<select
@@ -252,84 +294,54 @@
 											{/each}
 										</select>
 									{/if}
-								</li>
-							{/if}
-						{/each}
-					</ul>
-				{:else}
-					<p class="empty">No ingredients listed.</p>
-				{/if}
-			</section>
-
-			<section class="instructions">
-				<h2>Instructions</h2>
-				{#if recipe.instructions?.length}
-					<ol>
-						{#each recipe.instructions as step, i (i)}
-							<li class:checked={checkedSteps[i]}>
-								<input
-									type="checkbox"
-									id="step-{i}"
-									checked={checkedSteps[i] ?? false}
-									onchange={() => (checkedSteps[i] = !checkedSteps[i])}
-									aria-label={`Mark step ${i + 1} as done`}
-								/>
-								<label
-									class="check-label"
-									for="step-{i}"
-								>
-									<span>
-										{#if step.title}<strong>{step.title}</strong>{/if}
-										<p>{step.text}</p>
-									</span>
-								</label>
+								</span>
 							</li>
-						{/each}
-					</ol>
-				{:else}
-					<p class="empty">No instructions listed.</p>
-				{/if}
-			</section>
-		</div>
+						{/if}
+					{/each}
+				</ul>
+			{:else}
+				<p class="empty">No ingredients listed.</p>
+			{/if}
+		</section>
 
-		{#if recipe.nutrition && Object.values(recipe.nutrition).some((v) => v != null)}
-			<section class="nutrition">
-				<h2>Nutrition</h2>
-				<dl>
-					{#if recipe.nutrition.calories}<div>
-							<dt>Calories</dt>
-							<dd>{recipe.nutrition.calories}</dd>
-						</div>{/if}
-					{#if recipe.nutrition.proteinContent}<div>
-							<dt>Protein</dt>
-							<dd>{recipe.nutrition.proteinContent}</dd>
-						</div>{/if}
-					{#if recipe.nutrition.carbohydrateContent}<div>
-							<dt>Carbs</dt>
-							<dd>{recipe.nutrition.carbohydrateContent}</dd>
-						</div>{/if}
-					{#if recipe.nutrition.fatContent}<div>
-							<dt>Fat</dt>
-							<dd>{recipe.nutrition.fatContent}</dd>
-						</div>{/if}
-					{#if recipe.nutrition.fiberContent}<div>
-							<dt>Fiber</dt>
-							<dd>{recipe.nutrition.fiberContent}</dd>
-						</div>{/if}
-					{#if recipe.nutrition.sugarContent}<div>
-							<dt>Sugar</dt>
-							<dd>{recipe.nutrition.sugarContent}</dd>
-						</div>{/if}
-					{#if recipe.nutrition.sodiumContent}<div>
-							<dt>Sodium</dt>
-							<dd>{recipe.nutrition.sodiumContent}</dd>
-						</div>{/if}
-				</dl>
+		<section class="instructions">
+			<h2>Instructions</h2>
+			{#if recipe.instructions?.length}
+				<ol>
+					{#each recipe.instructions as step, i (i)}
+						<li class:checked={checkedSteps[i]}>
+							<input
+								type="checkbox"
+								id="step-{i}"
+							/>
+							<label for="step-{i}">
+								<span class="sr-only">Mark Step {i} as done</span>
+							</label>
+							<span>
+								{#if step.title}<strong>{step.title}</strong>{/if}
+								<p>{step.text}</p>
+							</span>
+						</li>
+					{/each}
+				</ol>
+			{:else}
+				<p>No instructions listed.</p>
+			{/if}
+		</section>
+
+		{#if recipe.tools?.length}
+			<section class="tools">
+				<h2>Tools</h2>
+				<ul>
+					{#each recipe.tools as tool, i (i)}
+						<li>{tool}</li>
+					{/each}
+				</ul>
 			</section>
 		{/if}
 
 		{#if recipe.notes?.length}
-			<section>
+			<section class="notes">
 				<h2>Notes</h2>
 				{#each recipe.notes as note, i (i)}
 					<div class="note">
@@ -340,18 +352,14 @@
 			</section>
 		{/if}
 
-		{#if recipe.tools?.length}
-			<section>
-				<h2>Tools</h2>
-				<ul class="tools">
-					{#each recipe.tools as tool, i (i)}
-						<li>{tool}</li>
-					{/each}
-				</ul>
+		{#if nutritionItems.length}
+			<section class="nutrition">
+				<h2>Nutrition</h2>
+				<Stats items={nutritionItems} />
 			</section>
 		{/if}
 
-		<div class="footer-meta">
+		<footer>
 			{#if recipe.orgURL}
 				<!-- eslint-disable svelte/no-navigation-without-resolve -- orgURL is the external source recipe page, not an internal route -->
 				<a
@@ -363,26 +371,19 @@
 			{/if}
 			{#if recipe.dateAdded}<span>Added: {format(parseISO(recipe.dateAdded), DATE_FORMATS.full)}</span>{/if}
 			{#if recipe.lastMade}<span>Last made: {format(parseISO(recipe.lastMade), DATE_FORMATS.full)}</span>{/if}
-		</div>
+		</footer>
 	</article>
 {/if}
 
 <style>
 	@import '@mixins';
 
-	.back {
-		display: inline-block;
-		margin-bottom: 1em;
-		color: var(--purple_bright);
-		font-size: 0.9em;
-		text-decoration: none;
-
-		&:hover {
-			text-decoration: underline;
-		}
+	:global(.main > .layout.layout) {
+		max-width: 1800px;
 	}
 
 	.hero {
+		grid-area: image;
 		width: 100%;
 		max-height: 400px;
 		margin-bottom: 1em;
@@ -390,317 +391,311 @@
 		object-fit: cover;
 	}
 
+	.recipe {
+		display: flex;
+		flex: 1 1 auto;
+		flex-wrap: wrap;
+
+		& header {
+			display: grid;
+			grid-column-gap: 20px;
+			row-gap: 20px;
+			grid-template-areas:
+				'image'
+				'title'
+				'desc'
+				'meta'
+				'scale'
+				'units'
+				'tags';
+			grid-template-columns: 1fr;
+			width: 100%;
+		}
+	}
+
 	h1 {
-		margin-bottom: 0.3em;
+		grid-area: title;
+		margin: 0;
 	}
 
 	.description {
-		margin: 0 0 1em;
-		color: var(--grey);
-		font-size: 1.1em;
+		grid-area: desc;
 	}
 
-	.meta-bar {
+	:global(.meta) {
+		grid-area: meta;
+	}
+
+	.tags {
 		display: flex;
+		grid-area: tags;
 		flex-wrap: wrap;
-		margin-bottom: 1em;
-		padding: 0.8em;
-		border-radius: 0.3em;
-		background: var(--blue_tint_bg);
-		gap: 1.5em;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		gap: 0.5em;
 	}
 
-	.meta-item {
-		display: flex;
-		flex-direction: column;
+	.scale {
+		grid-area: scale;
 
-		& .label {
-			color: var(--grey);
-			font-size: 0.75em;
-			font-weight: 600;
-			text-transform: uppercase;
+		& > div {
+			display: grid;
+			grid-template-columns: repeat(4, 1fr);
+			width: auto;
+			max-width: max-content;
 		}
-	}
 
-	.tag-bar {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.4em;
-		margin-bottom: 1.5em;
-	}
+		& legend {
+			grid-column: 1 / -1;
+		}
 
-	.tag {
-		padding: 0.15em 0.5em;
-		border: 1px solid currentColor;
-		border-radius: 0.2em;
-		color: var(--navy);
-		font-size: 0.8em;
+		& input[type='radio'] {
+			@include sr_only;
 
-		&.category {
+			&:checked {
+				& + label {
+					@include theme_gradient(purple_bright);
+
+					color: var(--purple_bright_text);
+				}
+			}
+		}
+
+		& label,
+		& input {
+			@include button;
+
+			grid-column: unset;
+			width: 6ch;
+			margin: 0;
+			padding-right: 0.2em;
+			padding-left: 0.2em;
+			border: 1px solid var(--purple_bright);
+			background: var(--transparent);
 			color: var(--purple_bright);
-			font-weight: 600;
+			font-weight: 700;
+			text-align: center;
+		}
+
+		& input[type='number'] {
+			&:focus,
+			&.active {
+				@include theme_gradient(purple_bright);
+
+				color: var(--purple_bright_text);
+			}
 		}
 	}
 
-	.columns {
-		display: grid;
-		grid-template-columns: 1fr 2fr;
-		gap: 2em;
-		margin-bottom: 2em;
+	.units {
+		grid-area: units;
 
-		@media (width <= 700px) {
-			grid-template-columns: 1fr;
+		& > div {
+			display: grid;
+			grid-template-columns: repeat(2, 1fr);
+			width: auto;
+			max-width: max-content;
+		}
+
+		& legend {
+			grid-column: 1 / -1;
+		}
+
+		& label {
+			grid-column: unset;
+			grid-row: 3;
+			margin: 0;
+			font-weight: 600;
+			justify-self: end;
+		}
+
+		/* TODO: Style all select fields */
+		& select {
+			grid-column: unset;
+			grid-row: 2;
+			width: max-content;
+			margin: 0;
+		}
+	}
+
+	.ingredients,
+	.instructions {
+		& li {
+			position: relative;
+			margin-left: 2em;
+
+			& input[type='checkbox'] {
+				position: absolute;
+				top: -0.1em;
+				left: -2.3em;
+				width: 1em;
+				height: 1em;
+				font-size: 1.4em;
+
+				& + label {
+					&::before {
+						content: '';
+						position: absolute;
+						inset: 0 0 0 -4em;
+					}
+				}
+
+				&:checked {
+					& + label {
+						& + span {
+							text-decoration: line-through;
+						}
+					}
+				}
+			}
+		}
+
+		& .section {
+			margin-left: 0;
+			font-size: 1.1em;
+			font-weight: 600;
 		}
 	}
 
 	.ingredients {
-		& .ingredients-header {
-			display: flex;
-			flex-wrap: wrap;
-			align-items: center;
-			justify-content: space-between;
-			gap: 0.5em;
-
-			& h2 {
-				margin: 0;
-			}
-		}
-
-		& .scale-bar {
-			display: flex;
-			align-items: center;
-			gap: 0.3em;
-
-			& .label {
-				margin-right: 0.2em;
-				color: var(--grey);
-				font-size: 0.75em;
-				font-weight: 600;
-				text-transform: uppercase;
-			}
-		}
-
-		& .scale-btn {
-			padding: 0.2em 0.6em;
-			border: 1px solid var(--grey_light);
-			border-radius: 0.3em;
-			background: var(--transparent);
-			font-size: 0.85em;
-			cursor: pointer;
-
-			&:hover {
-				border-color: var(--purple_bright);
-				color: var(--purple_bright);
-			}
-
-			&.active {
-				border-color: var(--purple_bright);
-				background: var(--purple_bright);
-				color: var(--white);
-			}
-		}
-
-		& .scale-custom {
-			width: 3.5em;
-			padding: 0.2em 0.4em;
-			border: 1px solid var(--grey_light);
-			border-radius: 0.3em;
-			font-size: 0.85em;
-		}
-
-		& .unit-defaults-bar {
-			display: flex;
-			flex-wrap: wrap;
-			align-items: center;
-			gap: 0.8em;
-			margin: 0.6em 0 0.8em;
-
-			& .label {
-				color: var(--grey);
-				font-size: 0.75em;
-				font-weight: 600;
-				text-transform: uppercase;
-			}
-		}
-
-		& .unit-default {
-			display: flex;
-			align-items: center;
-			gap: 0.3em;
-			font-size: 0.85em;
-
-			& label {
-				color: var(--grey);
-			}
-		}
-
 		& ul {
 			margin: 0;
-			padding: 0;
+			padding: 0 1.5em;
 			list-style: none;
 		}
 
 		& li {
-			display: flex;
-			flex-wrap: wrap;
-			align-items: center;
-			padding: 0.4em 0;
-			border-bottom: 1px solid var(--grey_light);
-			gap: 0.5em;
-
-			&.checked {
-				opacity: 0.6;
-
-				& .check-label span {
-					color: var(--grey);
-					text-decoration: line-through;
-				}
+			&:not(:last-child) {
+				margin-bottom: 0.7em;
 			}
+		}
+	}
 
-			& input {
-				display: inline-block;
-				flex-shrink: 0;
-				width: auto;
-				margin: 0;
-				padding: 0;
+	.ingredient {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		column-gap: 0.7ch;
+
+		& > * {
+			flex: 0 0 auto;
+		}
+
+		& .unit {
+			&:has(~ .unit-select) {
+				@include sr_only;
+
+				cursor: pointer;
 			}
 		}
 
-		& .check-label {
-			display: flex;
-			align-items: center;
-			gap: 0.5em;
-			cursor: pointer;
+		& .qty {
+			order: -1;
 		}
 
 		& .unit-select {
-			padding: 0.1em 0.3em;
-			border: 1px solid var(--grey_light);
-			border-radius: 0.3em;
-			background: var(--transparent);
-			color: var(--grey);
-			font-size: 0.8em;
-		}
-
-		& .section-title {
-			margin-top: 0.5em;
-			border-bottom: none;
-			color: var(--navy);
-			font-weight: 600;
+			z-index: 5;
+			order: -1;
+			width: max-content;
+			margin: 0 0.1em;
+			padding: 0;
+			border: none;
+			border-radius: 0.2em;
+			background: rgba(var(--input_bg), 0.5);
+			font: inherit;
+			line-height: inherit;
 		}
 	}
 
 	.instructions {
-		& ol {
-			margin: 0;
-			padding: 0 0 0 1.5em;
-		}
-
 		& li {
-			display: flex;
-			align-items: flex-start;
-			gap: 0.6em;
-			margin-bottom: 1em;
+			margin-left: 2em;
 
-			&.checked {
-				opacity: 0.6;
-
-				& span {
-					text-decoration: line-through;
-				}
-			}
-
-			& input {
-				display: inline-block;
-				flex-shrink: 0;
-				width: auto;
-				margin: 0.3em 0 0;
-				padding: 0;
+			& input[type='checkbox'] {
+				left: -2.8em;
 			}
 		}
-
-		& .check-label {
-			cursor: pointer;
-		}
-
-		& p {
-			margin: 0.2em 0 0;
-		}
 	}
 
-	.nutrition {
-		& dl {
-			display: grid;
-			grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-			gap: 0.5em;
-			margin: 0;
-		}
-
-		& div {
-			padding: 0.5em;
-			border-radius: 0.3em;
-			background: var(--blue_tint_bg);
-		}
-
-		& dt {
-			color: var(--grey);
-			font-size: 0.75em;
-			text-transform: uppercase;
-		}
-
-		& dd {
-			margin: 0;
-			font-size: 1.1em;
-		}
+	.nutrition,
+	footer {
+		width: 100%;
 	}
 
-	.note {
-		margin: 0.3em 0;
-		padding: 0.5em;
-		border-radius: 0.3em;
-		background: color-mix(in oklch, var(--orange) 8%, var(--transparent));
-
-		& p {
-			margin: 0.2em 0 0;
-		}
-	}
-
-	.tools {
+	footer {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 0.5em;
-		padding: 0;
-		list-style: none;
-
-		& li {
-			padding: 0.3em 0.7em;
-			border-radius: 0.3em;
-			background: var(--blue_tint_bg);
-			font-size: 0.9em;
-		}
-	}
-
-	.empty {
-		color: var(--grey);
-		font-style: italic;
-	}
-
-	.footer-meta {
-		display: flex;
-		flex-wrap: wrap;
-		margin-top: 2em;
-		padding-top: 1em;
-		border-top: 1px solid var(--grey_light);
-		color: var(--grey);
-		font-size: 0.85em;
-		gap: 1.5em;
+		justify-content: end;
+		padding-top: 2em;
+		border-top: 1px solid color-mix(in oklch, var(--background) 92%, var(--black));
+		color: var(--text_secondary);
+		font-size: 0.8em;
+		gap: 20px;
 
 		& a {
-			color: var(--purple_bright);
+			margin-right: auto;
 		}
 	}
 
-	section {
-		margin-bottom: 2em;
+	@media (width >= 35em) {
+		.recipe {
+			& header {
+				row-gap: 10px;
+				grid-template-areas:
+					'image image'
+					'title title'
+					'desc desc'
+					'meta meta'
+					'scale units'
+					'tags tags';
+				grid-template-columns: 1fr 1fr;
+			}
+		}
+	}
+
+	@media (width >= 40em) {
+		:global(.main > .layout.layout) {
+			padding-right: 0;
+			padding-left: 0;
+		}
+
+		.instructions,
+		.notes {
+			width: 70%;
+		}
+
+		.ingredients,
+		.tools {
+			width: 30%;
+		}
+	}
+
+	@media (width >= 50em) {
+		:global(.main > .layout.layout) {
+			padding-right: 20px;
+			padding-left: 20px;
+		}
+	}
+
+	@media (width >= 55em) {
+		.recipe {
+			& header {
+				grid-template-areas:
+					'image image image'
+					'title title title'
+					'desc desc desc'
+					'meta scale units '
+					'tags tags tags';
+				grid-template-columns: 1fr auto auto;
+			}
+		}
+	}
+
+	@media (width >= 60em) {
+		:global(.main > .layout.layout) {
+			padding-right: 50px;
+			padding-left: 50px;
+		}
 	}
 </style>

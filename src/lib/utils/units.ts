@@ -78,8 +78,22 @@ export function unitsInFamily(root: string, allUnits: RecipeIngredientUnit[]): R
 	return allUnits.filter((u) => resolveRoot(u, unitsByName)?.root === root);
 }
 
-/** Human-friendly label for a root (eg. "gram" -> "Gram"), based on whichever unit is actually named that. */
+// Root units vary by whatever Mealie's standardUnit chains happen to bottom out at (could be
+// "gram", "cup", or anything else configured), so the family is classified by measurement type
+// rather than showing that arbitrary base unit's own name.
+const UNIT_CATEGORIES: [string, string[]][] = [
+	[`Weight`, [`gram`, `kilogram`, `milligram`, `ounce`, `pound`]],
+	[`Volume`, [`milliliter`, `liter`, `cup`, `tablespoon`, `teaspoon`, `fluid ounce`, `pint`, `quart`, `gallon`]],
+	[`Length`, [`meter`, `centimeter`, `millimeter`, `inch`, `foot`]],
+];
+
+/** Human-friendly label for a root (eg. "gram"/"cup" -> "Weight"/"Volume"), falling back to the root unit's own name if not a recognised category. */
 export function unitFamilyLabel(root: string, allUnits: RecipeIngredientUnit[]): string {
+	const family = unitsInFamily(root, allUnits);
+	for (const [category, names] of UNIT_CATEGORIES) {
+		if (family.some((u) => u.name && names.includes(normalise(u.name)))) return category;
+	}
+
 	const rootUnit = allUnits.find((u) => u.name && normalise(u.name) === root);
 	const label = rootUnit?.name ?? root;
 	return label.charAt(0).toUpperCase() + label.slice(1);
@@ -113,5 +127,5 @@ export function unitLabel(unit: RecipeIngredientUnit, quantity: number): string 
 
 /** Label for a unit-picker option - not quantity-dependent, so always shown in full. */
 export function unitOptionLabel(unit: RecipeIngredientUnit): string {
-	return unit.abbreviation ? `${unit.name} (${unit.abbreviation})` : (unit.name ?? ``);
+	return unit.abbreviation ? unit.abbreviation : (unit.name ?? ``);
 }

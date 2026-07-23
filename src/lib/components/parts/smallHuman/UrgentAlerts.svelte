@@ -10,6 +10,7 @@
 	} = $props();
 </script>
 
+<!-- TODO: Alerts don't seem to be dismissable anymore -->
 {#if alerts.length}
 	<div class="urgent-alerts">
 		{#each alerts as alert (alert.id)}

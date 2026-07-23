@@ -81,8 +81,6 @@
 		grid-row: span 2;
 		grid-template-rows: subgrid;
 		justify-content: center;
-		width: auto;
-		max-width: max-content;
 		margin-bottom: 1em;
 		padding: 1em 2em;
 		border: 1px solid var(--border);
