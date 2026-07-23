@@ -105,6 +105,43 @@ sw.addEventListener(`periodicsync` as any, (event: any) => {
 	);
 });
 
+// --- Background Sync (task completion) ---
+// See completeTask.ts for the full picture. This handler deliberately does NOT
+// replay queued completions itself - a service worker has no way to mint a fresh
+// Clerk JWT (sessions expire in ~60s and are only refreshable from a live page
+// running the Clerk JS SDK), so it can't authenticate a completeTask mutation on
+// its own. All it can do is nudge any open page to run its own replay (which does
+// have a live/refreshable token) via postMessage - see +layout.svelte's message
+// listener. If no page is open, this is a no-op; the queue still gets drained the
+// next time the app is opened, via +layout.svelte's on-mount replay.
+sw.addEventListener(`sync` as any, (event: any) => {
+	if (event.tag !== `complete-task-sync`) return;
+
+	event.waitUntil(
+		sw.clients.matchAll().then((clients) => {
+			for (const client of clients) client.postMessage({ type: `replay-queued-completions` });
+		})
+	);
+});
+
+// --- Push Notifications (task reminders) ---
+sw.addEventListener(`push`, (event) => {
+	const data = event.data?.json() ?? {};
+
+	event.waitUntil(
+		sw.registration.showNotification(data.title ?? `Household`, {
+			body: data.body,
+			tag: data.tag,
+			data: { url: data.url ?? `/` },
+		})
+	);
+});
+
+sw.addEventListener(`notificationclick`, (event) => {
+	event.notification.close();
+	event.waitUntil(sw.clients.openWindow(event.notification.data?.url ?? `/`));
+});
+
 sw.addEventListener(`fetch`, (event) => {
 	if (event.request.method !== `GET`) return;
 

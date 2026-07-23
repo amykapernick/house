@@ -9,8 +9,7 @@
 	import TaskEventModal from './TaskEventModal.svelte';
 	import parseTasks from '$utils/calendar/parseTasks';
 	import parseEvents from '$utils/calendar/parseEvents';
-	import { getToken } from '$lib/auth';
-	import { getGraphqlUrl } from '$utils/fetchClientData';
+	import { completeTask } from '$utils/completeTask';
 	import type { ScheduleBlock, ScheduleSavePayload, RoutineDays, PaletteColour } from '$types/schedule';
 	import type { Task } from '$types/tasks';
 
@@ -48,21 +47,16 @@
 		completing = true;
 		completeError = ``;
 
-		const token = await getToken();
-		const res = await fetch(getGraphqlUrl(), {
-			method: `POST`,
-			headers: {
-				'Content-Type': `application/json`,
-				...(token ? { Authorization: `Bearer ${token}` } : {}),
-			},
-			body: JSON.stringify({
-				query: `mutation { completeTask(taskId: "${selectedTask.id}", platform: ${selectedTask.platform}) { success } }`,
-			}),
-		}).then((r) => r.json());
+		const result = await completeTask(selectedTask.id, selectedTask.platform);
 
 		completing = false;
 
-		if (!res?.data?.completeTask?.success) {
+		if (result.queued) {
+			completeError = `Offline - will complete when back online`;
+			return;
+		}
+
+		if (!result.success) {
 			completeError = `Couldn't mark this task complete. Try again.`;
 			return;
 		}

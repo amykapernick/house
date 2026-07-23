@@ -72,6 +72,7 @@ jobs:
           VITE_API_URL: ${{ secrets.API_URL }}
           VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
           VITE_WIDGET_ACCESS_TOKEN: ${{ secrets.WIDGET_ACCESS_TOKEN }}
+          SITE_TITLE: ${{ secrets.SITE_TITLE }}
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_BLACK_PEBBLE_05AC82803 }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}

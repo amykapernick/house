@@ -6,6 +6,7 @@
 	import type { CheckState } from '$parts/CheckboxButton.svelte';
 	import { getToken } from '$lib/auth';
 	import { getGraphqlUrl } from '$utils/fetchClientData';
+	import { completeTask as completeTaskRequest } from '$utils/completeTask';
 	import type { Task, TaskStatus } from '$types/tasks';
 
 	let {
@@ -35,6 +36,7 @@
 	let completed = $derived(StatusComplete[status]);
 	let saving = $state(false);
 	let actionError = $state('');
+	let queued = $state(false);
 
 	async function runMutation(query: string) {
 		const token = await getToken();
@@ -52,14 +54,18 @@
 		if (completed === 'complete' || saving || platform === 'github') return;
 		saving = true;
 		actionError = '';
+		queued = false;
 
-		const res = await runMutation(
-			`mutation { completeTask(taskId: "${id}", platform: ${platform}) { success } }`
-		);
+		const result = await completeTaskRequest(id, platform);
 
 		saving = false;
 
-		if (!res?.data?.completeTask?.success) {
+		if (result.queued) {
+			queued = true;
+			return;
+		}
+
+		if (!result.success) {
 			actionError = "Couldn't mark this task complete. Try again.";
 			return;
 		}
@@ -128,6 +134,8 @@
 		<a class="link" href={link} target="_blank" rel="noreferrer">Open in {platform}</a>
 	{/if}
 	{#if actionError}<p class="error">{actionError}</p>{/if}
+	<!-- TODO: add styling -->
+	{#if queued}<p class="pending-sync">Offline - will complete when back online</p>{/if}
 </div>
 
 <style>

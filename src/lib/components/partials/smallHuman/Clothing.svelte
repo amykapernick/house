@@ -119,6 +119,8 @@
 
 <h3>Tonight</h3>
 
+<!-- TODO: Add tonight clothing recommendation -->
+
 <h3>Forecast</h3>
 <Cards>
 	{#each daytime.forecast as day, i (day.date)}
@@ -144,6 +146,8 @@
 </Cards>
 
 <h3 class="subtitle">Current Sizes</h3>
+
+<!-- TODO: Add current sizes -->
 
 <style>
 	:global(.card.season) {

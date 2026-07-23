@@ -7,6 +7,8 @@
 	import { initClerk, isAuthenticated, clerkLoaded } from '$lib/auth';
 	import { routeRequiresAuth, menuItems } from '$lib/navigation';
 	import { recordPageVisit } from '$utils/recentPages';
+	import { isOnline } from '$utils/online';
+	import { replayQueuedCompletions } from '$utils/completeTask';
 	import Header from '$partials/Header.svelte';
 	import Footer from '$partials/Footer.svelte';
 	import Layout from '$layouts/Default.svelte';
@@ -47,6 +49,27 @@
 		const clerkPublishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 		if (clerkPublishableKey) {
 			await initClerk(clerkPublishableKey);
+		}
+
+		// Replays anything queued by completeTask.ts while offline. Only a live page
+		// can do this - a service worker has no way to mint a fresh Clerk token on its
+		// own (see completeTask.ts) - so this runs both once on load (covers "closed
+		// the tab while offline, reopened later") and on every online transition
+		// (covers "still had it open, connection dropped and came back"). Subscribing
+		// inside onMount (not at the component's top level) matters here specifically -
+		// adapter-static's `fallback: 'index.html'` prerenders this layout once during
+		// the build in Node, where `indexedDB` doesn't exist; onMount never runs there.
+		replayQueuedCompletions();
+		isOnline.subscribe((online) => {
+			if (online) replayQueuedCompletions();
+		});
+
+		// The service worker's `sync` handler can't authenticate a replay itself (see
+		// service-worker.ts) - it just nudges any open page via postMessage instead.
+		if (`serviceWorker` in navigator) {
+			navigator.serviceWorker.addEventListener(`message`, (event) => {
+				if (event.data?.type === `replay-queued-completions`) replayQueuedCompletions();
+			});
 		}
 	});
 

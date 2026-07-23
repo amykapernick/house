@@ -701,6 +701,7 @@ export type Mutation = {
   importRecipe: Maybe<Recipe>;
   markToothErupted: Maybe<Tooth>;
   saveArticle: Maybe<Scalars['String']['output']>;
+  savePushSubscription: Maybe<PushSubscriptionResult>;
   setBudgetSpend: Maybe<BudgetMutationResult>;
   updateAuslanSignStatus: Maybe<AuslanSign>;
   updateBudgetBucketPercentage: Maybe<BudgetMutationResult>;
@@ -854,6 +855,13 @@ export type MutationSaveArticleArgs = {
   excerpt?: InputMaybe<Scalars['String']['input']>;
   title: Scalars['String']['input'];
   url: Scalars['String']['input'];
+};
+
+
+export type MutationSavePushSubscriptionArgs = {
+  auth: Scalars['String']['input'];
+  endpoint: Scalars['String']['input'];
+  p256dh: Scalars['String']['input'];
 };
 
 
@@ -1011,6 +1019,10 @@ export type Project = {
   uuid: Maybe<Scalars['String']['output']>;
 };
 
+export type PushSubscriptionResult = {
+  success: Scalars['Boolean']['output'];
+};
+
 export type Query = {
   allergens: Array<Allergen>;
   assets: Maybe<Array<Maybe<Asset>>>;
@@ -1035,6 +1047,7 @@ export type Query = {
   mealPlanByDay: Array<MealPlanDay>;
   mealPlans: Maybe<MealPlanList>;
   projects: Maybe<Array<Maybe<Project>>>;
+  pushPublicKey: Maybe<Scalars['String']['output']>;
   recipe: Maybe<Recipe>;
   recipeTags: Array<RecipeTag>;
   recipeUnits: Array<RecipeIngredientUnit>;

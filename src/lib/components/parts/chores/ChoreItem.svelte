@@ -1,7 +1,6 @@
 <script lang="ts">
 	import CheckboxButton from '$parts/CheckboxButton.svelte';
-	import { getToken } from '$lib/auth';
-	import { getGraphqlUrl } from '$utils/fetchClientData';
+	import { completeTask } from '$utils/completeTask';
 	import { formatMinutes } from '$utils/formatMinutes';
 	import type { Chore } from '$types/chores';
 
@@ -17,27 +16,24 @@
 	let completed = $state(false);
 	let saving = $state(false);
 	let actionError = $state('');
+	let queued = $state(false);
 
 	async function completeChore() {
 		if (completed || saving) return;
 		saving = true;
 		actionError = '';
+		queued = false;
 
-		const token = await getToken();
-		const res = await fetch(getGraphqlUrl(), {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				...(token ? { 'Authorization': `Bearer ${token}` } : {}),
-			},
-			body: JSON.stringify({
-				query: `mutation { completeTask(taskId: "${id}", platform: todoist) { success } }`,
-			}),
-		}).then((r) => r.json());
+		const result = await completeTask(id, `todoist`);
 
 		saving = false;
 
-		if (!res?.data?.completeTask?.success) {
+		if (result.queued) {
+			queued = true;
+			return;
+		}
+
+		if (!result.success) {
 			actionError = "Couldn't mark this done. Try again.";
 			return;
 		}
@@ -59,6 +55,8 @@
 	{#if durationMinutes}<span class="duration">{formatMinutes(durationMinutes)}</span>{/if}
 	{#if upcoming && !completed}<span class="upcoming">Upcoming</span>{/if}
 	{#if actionError}<p class="error">{actionError}</p>{/if}
+	<!-- TODO: add styling -->
+	{#if queued}<p class="pending-sync">Offline - will complete when back online</p>{/if}
 </div>
 
 <style>

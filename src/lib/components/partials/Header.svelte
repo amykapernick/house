@@ -104,13 +104,9 @@
 	@import '@mixins';
 
 	.header {
-
 		@include container_spacing;
 
-		/* TODO: replace this with proper reference */
 		--header_background: light-dark(color-mix(in oklch, var(--background) 90%, var(--black)), color-mix(in oklch, var(--dark_background) 90%, var(--white)));
-
-		/* TODO: Replace with proper reference */
 		--header_border: light-dark(color-mix(in oklch, var(--background) 78%, var(--black)), color-mix(in oklch, var(--dark_background) 78%, var(--white)));
 
 		display: grid;
@@ -177,7 +173,6 @@
 			gap: 0.5em;
 
 			& .name {
-
 				@include sr_only;
 			}
 		}

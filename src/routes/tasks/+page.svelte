@@ -6,6 +6,7 @@
 	import { setCache } from '$utils/fetchClientData';
 	import { EVERYONE, isVisibleToUser } from '$utils/fetchFamilyMembers';
 	import { notificationPermission, requestNotificationPermission } from '$utils/notifications';
+	import { subscribeToPush } from '$utils/pushSubscription';
 	import TaskView from '$parts/tasks/TaskView.svelte';
 	import FamilyFilter from '$parts/FamilyFilter.svelte';
 	import Skeleton from '$parts/Skeleton.svelte';
@@ -24,6 +25,7 @@
 
 	async function enableReminders() {
 		permission = await requestNotificationPermission();
+		if (permission === `granted`) await subscribeToPush();
 	}
 
 	$effect(() => {
