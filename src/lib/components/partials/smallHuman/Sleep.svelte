@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { format, parseISO } from 'date-fns';
+	import { DATE_FORMATS } from '$lib/utils/dateFormats';
 	import type { Sleep } from '$types/smallHuman';
 	import DebugJson from '$parts/DebugJson.svelte';
 	import Chip from '$parts/Chip.svelte';
@@ -7,6 +9,7 @@
 	import BaseCard from '$parts/Card.svelte';
 	import Stats from '$components/parts/Stats.svelte';
 	import Outfit from '$components/parts/smallHuman/Outfit.svelte';
+	import OutfitIcon from '$components/parts/smallHuman/OutfitIcon.svelte';
 
 	const {
 		sleep,
@@ -16,7 +19,12 @@
 		class?: string;
 	} = $props();
 
-	const formatTempRange = (a, b) => {
+	// bedtime_temp/early_morning_temp are nullable - each tracker update only ever writes
+	// whichever one matches the time of day it ran, so one can be missing until an update has
+	// landed in both windows at least once.
+	const formatTempRange = (a: number | null | undefined, b: number | null | undefined) => {
+		if (a == null && b == null) return '—';
+		if (a == null || b == null) return `${a ?? b}°C`;
 		if (a > b) return `${b} - ${a}°C`;
 
 		return `${a} - ${b}°C`;
@@ -74,7 +82,7 @@
 			{
 				name: 'Layer',
 				// TODO: Pass pjs_layer to outfit component
-				Icon: Outfit,
+				Icon: OutfitIcon,
 				note: sleep.environment.current_recommendation.recommended_setup.pj_layer,
 			},
 		]}
@@ -85,10 +93,20 @@
 	<p>{sleep.environment.note}</p>
 	<dl class="temp_range">
 		<dt>Bedtime temp range</dt>
-		<dd>{formatTempRange(sleep.environment.bedroom_temp_pattern.bedtime_temp_c, sleep.environment.bedroom_temp_pattern.early_morning_temp_c)}</dd>
+		<dd>{formatTempRange(sleep.environment.bedroom_temp_pattern.bedtime_temp, sleep.environment.bedroom_temp_pattern.early_morning_temp)}</dd>
 	</dl>
 	<p>{sleep.environment.bedroom_temp_pattern.swing_note}</p>
 </BaseCard>
+{#if sleep.environment.forecast?.length}
+	<h3>Forecast</h3>
+	<!-- TODO: Check this data as tog seems to be 0 every night -->
+	<Stats
+		items={sleep.environment.forecast.map((night) => ({
+			name: format(parseISO(night.date), DATE_FORMATS.dayName),
+			value: String(night.sleep_sack_tog),
+		}))}
+	/>
+{/if}
 <h3>Notes</h3>
 <Cards>
 	{#each sleep.items as item (item.title)}
@@ -112,7 +130,6 @@
 
 	.temp_range {
 		& dt {
-
 			@include subtitle;
 		}
 

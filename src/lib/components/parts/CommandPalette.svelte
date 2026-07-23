@@ -360,7 +360,7 @@
 							items { id title status detail tag sources }
 							environment {
 								note
-								bedroom_temp_pattern { bedtime_temp_c early_morning_temp_c swing_note }
+								bedroom_temp_pattern { bedtime_temp early_morning_temp swing_note }
 								tog_reference { temp_range_c tog layer }
 								current_recommendation { challenge strategy recommended_setup { sleep_sack_tog pj_layer reasoning } sources }
 								current_sizes sleep_sacks_on_hand { tog sizes material note } size_watch
@@ -379,12 +379,12 @@
 								outdoor_reference { feels_like_c_min feels_like_c_max recommendation layers extras }
 								rain_suit { recommended trigger note }
 								current_recommendation {
-									generated_from_temp_c generated_from_feels_like_c last_updated
+									generated_from_temp generated_from_feels_like last_updated
 									indoor { summary layers { position type sleeve weight material } feet extras { hat hat_reason beanie mittens sunscreen sunscreen_reason } rain_suit }
 									outdoor { summary layers { position type sleeve weight material } feet extras { hat hat_reason beanie mittens sunscreen sunscreen_reason } rain_suit }
 								}
 								forecast {
-									date day_label temp_high_c temp_low_c feels_like_high_c feels_like_low_c
+									date day_label temp feels_like_high_c feels_like_low_c
 									conditions rain_expected uv_index
 									indoor { summary layers { position type sleeve weight material } feet extras { hat hat_reason beanie mittens sunscreen sunscreen_reason } rain_suit }
 									outdoor { summary layers { position type sleeve weight material } feet extras { hat hat_reason beanie mittens sunscreen sunscreen_reason } rain_suit }

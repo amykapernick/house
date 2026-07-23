@@ -6,6 +6,7 @@
     "predev": "npm run generate",
     "dev": "vite dev",
     "build": "vite build",
+    "postbuild": "node scripts/injectManifestApiUrl.mjs",
     "build:local": "npm run build",
     "preview": "vite preview",
     "start": "npm run dev",

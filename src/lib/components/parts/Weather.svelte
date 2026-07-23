@@ -1,6 +1,8 @@
 <script lang="ts">
+	import type { Component, Snippet } from 'svelte';
 	import Card from './Card.svelte';
 	import WeatherIcon from './WeatherIcon.svelte';
+	import { getUvBand } from '$utils/weather/uvBand';
 
 	let {
 		class: className = '',
@@ -9,33 +11,25 @@
 		day,
 		description,
 		uv,
-		uvBand,
 		condition,
 		sunrise,
 		sunset,
-		compact = false,
+		children,
 	}: {
 		class?: string;
 		temp: number | number[] | null;
 		blurb: string;
 		day: string;
 		description: string;
-		uv?: string;
-		/** From UvIndex.band - "low" | "moderate" | "high" */
-		uvBand?: string | null;
+		uv?: number | string | null;
 		condition?: string | null;
 		sunrise?: string | null;
 		sunset?: string | null;
-		compact?: Boolean;
+		children?: Snippet;
 	} = $props();
 
-	// Matches the banding/colours UvGauge.svelte uses for the same 3-tier scale.
-	// TODO: Do we really need to fetch this from the API, or can it be programmatically determined here?
-	const UV_BAND_LABELS: Record<string, string> = {
-		low: `Low`,
-		moderate: `Moderate`,
-		high: `High`,
-	};
+	let uvValue = $derived(uv != null && uv !== `` ? Number(uv) : null);
+	let uvBand = $derived(uvValue != null && !Number.isNaN(uvValue) ? getUvBand(uvValue) : null);
 
 	const formatTemp = (t: number | number[]): string => {
 		if (Array.isArray(t)) return `${t[0]}°C/${t[1]}°C`;
@@ -45,18 +39,16 @@
 </script>
 
 <Card
-	class={`${className} weather ${compact && 'compact'}`}
+	class={`${className} weather`}
 	theme="white"
 >
-	{#if !compact}
-		<span class="icon"
-			><WeatherIcon
-				{condition}
-				{sunrise}
-				{sunset}
-			/></span
-		>
-	{/if}
+	<span class="icon"
+		><WeatherIcon
+			{condition}
+			{sunrise}
+			{sunset}
+		/></span
+	>
 	<h3 class="sr-only">Weather</h3>
 	<span class="temp">{temp != null ? formatTemp(temp) : '—'}</span>
 	<span class="blurb">{blurb} •</span>
@@ -64,10 +56,18 @@
 
 	<span class="desc">{description}</span>
 
-	<div class="uv">
-		<h4 class="subtitle">UV Index</h4>
-		<span class={uvBand ? `${uvBand}` : ``}><span class="label">UV</span>{uv}<span class="band">{uvBand ? ` (${UV_BAND_LABELS[uvBand] ?? uvBand})` : ``}</span> </span>
-	</div>
+	{#if uv}
+		<div class="uv">
+			<h4 class="subtitle">UV Index</h4>
+			<span style={uvBand ? `--uv-colour: ${uvBand.colour}` : ``}>
+				{uv}
+				<span class="band">{uvBand ? ` (${uvBand.label})` : ``}</span>
+			</span>
+		</div>
+	{/if}
+	{#if children}
+		<div class="children">{@render children()}</div>
+	{/if}
 </Card>
 
 <style>
@@ -75,19 +75,13 @@
 
 	:global(.card.weather) {
 		grid-column: 1 / -1;
-		grid-template-areas: 'icon temp temp uv desc' 'icon blurb day uv desc';
+		grid-template-areas: 'icon temp temp uv desc' 'icon blurb day uv desc' 'child child child child child';
 		grid-template-columns: auto auto auto auto 1fr;
 		align-content: center;
 		width: 100%;
 		color: var(--text_secondary);
 		font-size: 0.9em;
 		gap: 0;
-
-		&.compact {
-			grid-template-areas: 'day day temp' 'blurb uv temp' 'desc desc desc';
-			grid-template-columns: 1fr auto;
-			width: auto;
-		}
 	}
 
 	.icon {
@@ -107,11 +101,21 @@
 	.blurb {
 		display: block;
 		grid-area: blurb;
+		margin-right: 0.6ch;
+	}
+
+	.day {
+		grid-area: day;
 	}
 
 	.desc {
 		grid-area: desc;
 		align-self: center;
+	}
+
+	.children {
+		grid-area: child;
+		margin-top: 1em;
 	}
 
 	.uv {
@@ -126,24 +130,9 @@
 		}
 
 		& span {
+			color: var(--uv-colour, inherit);
 			font-size: 1.2em;
 			font-weight: 700;
-		}
-
-		& .label {
-			display: none;
-		}
-
-		& .low {
-			color: var(--success);
-		}
-
-		& .moderate {
-			color: var(--warning);
-		}
-
-		& .high {
-			color: var(--error);
 		}
 	}
 

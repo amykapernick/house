@@ -35,7 +35,7 @@
 							sunElevation moonElevation moonAzimuth southernHemisphere
 							path { time sunElevation moonElevation }
 						}
-							uv { value band }
+							uv { value }
 							binCollections { binType nextDate }
 						}
 					}

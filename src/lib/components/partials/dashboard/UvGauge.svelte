@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { UvIndex } from '$types/generated';
+	import { getUvBand } from '$utils/weather/uvBand';
 
 	let {
 		uv,
@@ -42,13 +43,14 @@
 
 	let needleAngle = $derived(uv ? angleFor(uv.value) : -90);
 	let needleTip = $derived(polar(R - 25, needleAngle));
+	let uvBand = $derived(uv ? getUvBand(uv.value) : null);
 </script>
 
 <div class="uv-gauge {className}">
 	{#if !uv}
 		<p class="empty">No UV entity found - tag one with the house_app label in Home Assistant.</p>
 	{:else}
-		<svg viewBox="0 0 200 115" class="gauge" role="img" aria-label="UV index {uv.value}, {uv.band}">
+		<svg viewBox="0 0 200 115" class="gauge" role="img" aria-label="UV index {uv.value}, {uvBand?.label}">
 			{#each BANDS as band (band.colour)}
 				<path d={bandPath(band.from, band.to)} fill="none" stroke="var(--{band.colour})" stroke-width="16" />
 			{/each}

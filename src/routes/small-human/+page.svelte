@@ -52,8 +52,8 @@
 				gqlQuery: `
 					query {
 						house {
-							weather { condition temperature humidity forecast { shortText extendedText uvIndex } }
-							uv { value band }
+							weather { condition temperature humidity forecast { condition shortText extendedText uvIndex } }
+							uv { value }
 							sun { sunrise sunset }
 						}
 						smallHuman {
@@ -121,8 +121,9 @@
 								items { id title status detail tag sources }
 								environment {
 									note
-									bedroom_temp_pattern { bedtime_temp_c early_morning_temp_c swing_note }
+									bedroom_temp_pattern { bedtime_temp early_morning_temp swing_note }
 									current_recommendation { challenge strategy recommended_setup { sleep_sack_tog pj_layer reasoning } sources }
+									forecast { date sleep_sack_tog }
 									current_sizes size_watch
 								}
 							}
@@ -137,12 +138,12 @@
 									sun_safety { uv_threshold_for_coverage note sources }
 									rain_suit { recommended trigger note }
 									current_recommendation {
-										generated_from_temp_c generated_from_feels_like_c last_updated
+										generated_from_temp generated_from_feels_like last_updated
 										indoor { summary layers { position type sleeve weight material } feet extras { hat hat_reason beanie mittens sunscreen sunscreen_reason } rain_suit }
 										outdoor { summary layers { position type sleeve weight material } feet extras { hat hat_reason beanie mittens sunscreen sunscreen_reason } rain_suit }
 									}
 									forecast {
-										date temp_high_c temp_low_c
+										date temp
 										indoor { summary layers { position type sleeve weight material } feet extras { hat hat_reason beanie mittens sunscreen sunscreen_reason } rain_suit }
 										outdoor { summary layers { position type sleeve weight material } feet extras { hat hat_reason beanie mittens sunscreen sunscreen_reason } rain_suit }
 									}
@@ -391,8 +392,6 @@
 	{@const { overview, alerts, growth, teeth, swimming, milestones, auslan, feeding, sleep, clothing, vaccinations, notes, activities, sources } = data}
 	{@const car_seat = notes.find((n: any) => n.__typename === 'CarSeat')}
 	{@const parenting_approach = notes.find((n: any) => n.__typename === 'ParentingApproachNote')?.parentingApproachItems ?? []}
-	{@const clothing_seasonal = clothing.seasonal}
-	{@const clothing_daytime = clothing.daytime}
 	{@const urgentAlerts = alerts.filter((a: Alert) => a.level === 'urgent')}
 	{@const otherAlerts = alerts.filter((a: Alert) => a.level !== 'urgent')}
 
@@ -531,10 +530,8 @@
 		>
 			<h2>Clothing</h2>
 			<ClothingSeasonal
-				clothing={{ clothing_seasonal, clothing_daytime }}
-				weather={weather?.weather ?? null}
-				uv={weather?.uv ?? null}
-				sun={weather?.sun ?? null}
+				{clothing}
+				{weather}
 			/>
 		</div>
 	{/if}
@@ -619,7 +616,6 @@
 		}
 
 		& h2 {
-
 			@include sr_only;
 		}
 	}

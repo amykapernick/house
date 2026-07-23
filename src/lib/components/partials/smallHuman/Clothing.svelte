@@ -2,33 +2,33 @@
 	import { format, parseISO } from 'date-fns';
 	import { DATE_FORMATS } from '$lib/utils/dateFormats';
 	import type { ClothingSeasonal, ClothingDaytime, ClothingSet } from '$types/smallHuman';
-	import type { Weather as WeatherData, UvIndex, SunTimes } from '$types/generated';
+	import type { Weather as WeatherData, SunTimes } from '$types/generated';
 	import DebugJson from '$parts/DebugJson.svelte';
 	import Card from '$components/parts/Card.svelte';
 	import Cards from '$components/parts/Cards.svelte';
 	import Weather from '$components/parts/Weather.svelte';
 	import IconChip from '$components/parts/IconChip.svelte';
 	import Outfit from '$components/parts/smallHuman/Outfit.svelte';
+	import Plus from '$img/icons/f-add-colored.svg?component';
 
 	const {
 		clothing,
-		weather = null,
-		uv = null,
-		sun = null,
+		weather: weatherData = null,
 		class: className = '',
 	}: {
-		clothing: { clothing_seasonal: ClothingSeasonal; clothing_daytime: ClothingDaytime };
+		clothing: { seasonal: ClothingSeasonal; daytime: ClothingDaytime };
 		weather?: WeatherData | null;
-		uv?: UvIndex | null;
 		sun?: SunTimes | null;
 		class?: string;
 	} = $props();
 
-	const { clothing_seasonal, clothing_daytime } = $derived(clothing);
+	const { seasonal, daytime } = $derived(clothing);
+
+	const { weather, sun } = $derived(weatherData);
 
 	const formatWeeksCountdown = (weeks) => {
 		const suffix = weeks > 1 ? 'weeks' : 'week';
-		return `in ${clothing_seasonal.noongar_season.weeks_until_next} ${suffix}`;
+		return `in ${seasonal.noongar_season.weeks_until_next} ${suffix}`;
 	};
 
 	// Bare feet get no chip. Shoes recommended alongside a rain suit become boots instead.
@@ -41,13 +41,12 @@
 
 <Cards>
 	<Weather
-		temp={weather?.temperature ?? clothing_daytime.current_recommendation.generated_from_temp_c}
+		temp={weather?.temperature ?? daytime.current_recommendation.generated_from_temp}
 		description={weather?.forecast?.[0]?.extendedText ?? ''}
 		blurb={weather?.forecast?.[0]?.shortText ?? ''}
 		day="Today"
 		uv={weather?.forecast?.[0]?.uvIndex ?? ''}
-		uvBand={uv?.band}
-		condition={weather?.condition}
+		condition={weather?.forecast?.[0]?.condition}
 		sunrise={sun?.sunrise}
 		sunset={sun?.sunset}
 	/>
@@ -56,64 +55,64 @@
 		class="season"
 	>
 		<h3 class="subtitle">Current Season</h3>
-		<span class="period"><strong>{clothing_seasonal.noongar_season.current}</strong> • {clothing_seasonal.noongar_season.current_period}</span>
-		<p>{clothing_seasonal.noongar_season.current_description}</p>
+		<span class="period"><strong>{seasonal.noongar_season.current}</strong> • {seasonal.noongar_season.current_period}</span>
+		<p>{seasonal.noongar_season.current_description}</p>
 	</Card>
 	<Card
 		theme="white"
 		class="season"
 	>
-		<h3 class="subtitle">Next Season • {formatWeeksCountdown(clothing_seasonal.noongar_season.weeks_until_next)}</h3>
-		<span class="period"><strong>{clothing_seasonal.noongar_season.next}</strong> • {clothing_seasonal.noongar_season.next_period}</span>
-		<p>{clothing_seasonal.noongar_season.next_description}</p>
+		<h3 class="subtitle">Next Season • {formatWeeksCountdown(seasonal.noongar_season.weeks_until_next)}</h3>
+		<span class="period"><strong>{seasonal.noongar_season.next}</strong> • {seasonal.noongar_season.next_period}</span>
+		<p>{seasonal.noongar_season.next_description}</p>
 	</Card>
 	<div></div>
 </Cards>
 
 <h3 class="subtitle">Today - Indoors</h3>
-<p>{clothing_daytime.current_recommendation.indoor.summary}</p>
+<p>{daytime.current_recommendation.indoor.summary}</p>
 <div class="chips">
-	{#each clothing_daytime.current_recommendation.indoor.layers as layer (layer.position)}
+	{#each daytime.current_recommendation.indoor.layers as layer (layer.position)}
 		<Outfit {layer} />
 	{/each}
-	{#if feetOutfit(clothing_daytime.current_recommendation.indoor)}
-		<Outfit outfit={feetOutfit(clothing_daytime.current_recommendation.indoor)} />
+	{#if feetOutfit(daytime.current_recommendation.indoor)}
+		<Outfit outfit={feetOutfit(daytime.current_recommendation.indoor)} />
 	{/if}
 </div>
 
 <h3 class="subtitle">Today - Outdoors <em>(add to indoor layers)</em></h3>
-<p>{clothing_daytime.current_recommendation.outdoor.summary}</p>
+<p>{daytime.current_recommendation.outdoor.summary}</p>
 <div class="chips">
-	{#each clothing_daytime.current_recommendation.outdoor.layers as layer (layer.position)}
+	{#each daytime.current_recommendation.outdoor.layers as layer (layer.position)}
 		<Outfit {layer} />
 	{/each}
-	{#if feetOutfit(clothing_daytime.current_recommendation.outdoor)}
-		<Outfit outfit={feetOutfit(clothing_daytime.current_recommendation.outdoor)} />
+	{#if feetOutfit(daytime.current_recommendation.outdoor)}
+		<Outfit outfit={feetOutfit(daytime.current_recommendation.outdoor)} />
 	{/if}
 </div>
 
 <h3 class="subtitle">Recommended Extras</h3>
 
 <div class="chips">
-	{#if clothing_daytime.current_recommendation.outdoor.rain_suit}
+	{#if daytime.current_recommendation.outdoor.rain_suit}
 		<Outfit outfit="rain" />
 	{/if}
-	{#if clothing_daytime.current_recommendation.outdoor.extras?.hat}
+	{#if daytime.current_recommendation.outdoor.extras?.hat}
 		<Outfit
 			outfit="hat"
-			label={clothing_daytime.current_recommendation.outdoor.extras.hat_reason ?? undefined}
+			label={daytime.current_recommendation.outdoor.extras.hat_reason ?? undefined}
 		/>
 	{/if}
-	{#if clothing_daytime.current_recommendation.outdoor.extras?.beanie}
+	{#if daytime.current_recommendation.outdoor.extras?.beanie}
 		<Outfit outfit="beanie" />
 	{/if}
-	{#if clothing_daytime.current_recommendation.outdoor.extras?.mittens}
+	{#if daytime.current_recommendation.outdoor.extras?.mittens}
 		<Outfit outfit="mittens" />
 	{/if}
-	{#if clothing_daytime.current_recommendation.outdoor.extras?.sunscreen}
+	{#if daytime.current_recommendation.outdoor.extras?.sunscreen}
 		<Outfit
 			outfit="sunscreen"
-			label={clothing_daytime.current_recommendation.outdoor.extras.sunscreen_reason ?? undefined}
+			label={daytime.current_recommendation.outdoor.extras.sunscreen_reason ?? undefined}
 		/>
 	{/if}
 </div>
@@ -122,19 +121,27 @@
 
 <h3>Forecast</h3>
 <Cards>
-	{#each clothing_daytime.forecast as day, i (day.date)}
+	{#each daytime.forecast as day, i (day.date)}
 		<Weather
-			temp={day.temp_low_c && day.temp_high_c ? [day.temp_low_c, day.temp_high_c] : null}
+			temp={day.temp ?? null}
 			description={weather?.forecast?.[i]?.extendedText ?? ''}
 			blurb={weather?.forecast?.[i]?.shortText ?? ''}
 			day={format(parseISO(day.date), DATE_FORMATS.dayName)}
 			uv={weather?.forecast?.[i]?.uvIndex != null ? String(weather.forecast[i].uvIndex) : ''}
-			condition={weather?.condition}
-			compact={true}
-		/>
+			condition={weather?.forecast?.[i]?.condition}
+		>
+			<div class="layers">
+				{#each day.indoor?.layers ?? [] as layer, j (j)}
+					<Outfit {layer} />
+				{/each}
+				<span class="plus"><Plus /></span>
+				{#each day?.outdoor?.layers ?? [] as layer, k (k)}
+					<Outfit {layer} />
+				{/each}
+			</div>
+		</Weather>
 	{/each}
 </Cards>
-<!-- TODO: add forecast clkothing to forecasts -->
 
 <h3 class="subtitle">Current Sizes</h3>
 
@@ -182,5 +189,17 @@
 		display: flex;
 		gap: 1em;
 		flex-wrap: wrap;
+	}
+
+	.layers {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5em;
+
+		& .plus {
+			align-self: center;
+			margin: 0 0.2em;
+			font-size: 3em;
+		}
 	}
 </style>

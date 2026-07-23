@@ -29,11 +29,79 @@ sw.addEventListener(`install`, (event) => {
 
 sw.addEventListener(`activate`, (event) => {
 	event.waitUntil(
-		caches.keys().then(async (keys) => {
-			for (const key of keys) {
-				if (key !== CACHE_NAME) await caches.delete(key);
+		Promise.all([
+			caches.keys().then(async (keys) => {
+				for (const key of keys) {
+					if (key !== CACHE_NAME) await caches.delete(key);
+				}
+			}),
+			updateWidgets(),
+		])
+	);
+});
+
+// --- Windows 11 Widgets Board (Household Schedule widget) ---
+// See CLAUDE.md's "Windows Widget" section for the full flow. `widget.definition.data`
+// requires auth (WIDGET_ACCESS_TOKEN, checked server-side in household_api's
+// /widget-schedule function) since the caller here has no signed-in Clerk session to
+// mint a JWT from - Microsoft's own reference implementation just does a plain
+// `fetch(dataUrl)`, but that fetch call is ours to write, so we attach the token as a
+// header instead of leaving it sitting in the public manifest.json data URL.
+const WIDGET_TOKEN = import.meta.env.VITE_WIDGET_ACCESS_TOKEN as string | undefined;
+const widgetAuthHeaders = WIDGET_TOKEN ? { Authorization: `Bearer ${btoa(WIDGET_TOKEN)}` } : {};
+
+async function renderWidget(widget: any) {
+	const templateUrl = widget.definition.msAcTemplate;
+	const dataUrl = widget.definition.data;
+
+	const template = await (await fetch(templateUrl)).text();
+	const data = await (await fetch(dataUrl, { headers: widgetAuthHeaders })).text();
+
+	await (sw as any).widgets.updateByTag(widget.definition.tag, { template, data });
+}
+
+async function updateWidgets() {
+	if (!(`widgets` in sw)) return;
+
+	const widget = await (sw as any).widgets.getByTag(`household-schedule`);
+	if (!widget) return;
+
+	await renderWidget(widget);
+}
+
+sw.addEventListener(`widgetinstall` as any, (event: any) => {
+	event.waitUntil(
+		(async () => {
+			const tags = await (sw.registration as any).periodicSync.getTags();
+			if (!tags.includes(event.widget.definition.tag)) {
+				await (sw.registration as any).periodicSync.register(event.widget.definition.tag, {
+					minInterval: event.widget.definition.update * 1000,
+				});
 			}
-		})
+
+			await renderWidget(event.widget);
+		})()
+	);
+});
+
+sw.addEventListener(`widgetuninstall` as any, (event: any) => {
+	event.waitUntil(
+		(async () => {
+			if (event.widget.instances.length === 1 && `update` in event.widget.definition) {
+				await (sw.registration as any).periodicSync.unregister(event.widget.definition.tag);
+			}
+		})()
+	);
+});
+
+sw.addEventListener(`periodicsync` as any, (event: any) => {
+	event.waitUntil(
+		(async () => {
+			const widget = await (sw as any).widgets.getByTag(event.tag);
+			if (widget && `update` in widget.definition) {
+				await renderWidget(widget);
+			}
+		})()
 	);
 });
 

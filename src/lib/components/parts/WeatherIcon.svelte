@@ -10,7 +10,7 @@
 	import MoonCloudHail from '$img/weather/moon-cloud-hail-colored.svg?component';
 	import SunCloudLight from '$img/weather/sun-cloud-light-colored.svg?component';
 	import MoonCloudLight from '$img/weather/moon-cloud-light-colored.svg?component';
-	import CloudDrop from '$img/weather/cloud-drop-colored.svg?component';
+	import CloudDrop from '$img/weather/cloud-hail-colored.svg';
 	import RainHail from '$img/weather/rain-hail-colored.svg?component';
 	import SunCloudSnow from '$img/weather/sun-cloud-snow-55-colored.svg?component';
 	import MoonCloudSnow from '$img/weather/moon-cloud-snow-62-colored.svg?component';
@@ -46,21 +46,21 @@
 	// "sunny" and "clear-night" both mean a clear sky - which of the two HA happens to report
 	// isn't trusted over the actual sunrise/sunset-derived isDay, so they share one pair.
 	const CONDITION_ICONS: Record<string, { day: any; night: any }> = {
-		sunny: { day: Sun, night: Moon },
+		'sunny': { day: Sun, night: Moon },
 		'clear-night': { day: Sun, night: Moon },
-		partlycloudy: { day: CloudSun, night: CloudMoon },
-		cloudy: { day: CloudForecast, night: CloudForecast },
-		fog: { day: SunFog, night: MoonFog },
-		hail: { day: SunCloudHail, night: MoonCloudHail },
-		lightning: { day: SunCloudLight, night: MoonCloudLight },
+		'partlycloudy': { day: CloudSun, night: CloudMoon },
+		'cloudy': { day: CloudForecast, night: CloudForecast },
+		'fog': { day: SunFog, night: MoonFog },
+		'hail': { day: SunCloudHail, night: MoonCloudHail },
+		'lightning': { day: SunCloudLight, night: MoonCloudLight },
 		'lightning-rainy': { day: SunCloudLight, night: MoonCloudLight },
-		rainy: { day: CloudDrop, night: CloudDrop },
-		pouring: { day: RainHail, night: RainHail },
-		snowy: { day: SunCloudSnow, night: MoonCloudSnow },
+		'rainy': { day: CloudDrop, night: CloudDrop },
+		'pouring': { day: RainHail, night: RainHail },
+		'snowy': { day: SunCloudSnow, night: MoonCloudSnow },
 		'snowy-rainy': { day: Snow, night: Snow },
-		windy: { day: Hurricane, night: Hurricane },
+		'windy': { day: Hurricane, night: Hurricane },
 		'windy-variant': { day: Hurricane, night: Hurricane },
-		exceptional: { day: Hurricane, night: Hurricane },
+		'exceptional': { day: Hurricane, night: Hurricane },
 	};
 
 	let Icon = $derived.by(() => {

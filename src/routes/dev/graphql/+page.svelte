@@ -141,6 +141,10 @@
 <style>
 	@import '@mixins';
 
+	:global(.main > .layout.layout) {
+		max-width: unset;
+	}
+
 	.console {
 		display: flex;
 		flex-direction: column;
@@ -180,7 +184,6 @@
 	}
 
 	.run {
-
 		@include button;
 
 		margin-left: auto;
