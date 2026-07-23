@@ -115,8 +115,10 @@ export type AvailableHouseEntity = {
 };
 
 export type BedroomTempPattern = {
-  bedtime_temp_c: Scalars['Float']['output'];
-  early_morning_temp_c: Scalars['Float']['output'];
+  bedtime_outdoor_temp: Maybe<Scalars['Float']['output']>;
+  bedtime_temp: Maybe<Scalars['Float']['output']>;
+  early_morning_outdoor_temp: Maybe<Scalars['Float']['output']>;
+  early_morning_temp: Maybe<Scalars['Float']['output']>;
   swing_note: Scalars['String']['output'];
 };
 
@@ -322,8 +324,8 @@ export type CreateTaskResult = {
 };
 
 export type CurrentClothingRecommendation = {
-  generated_from_feels_like_c: Maybe<Scalars['Float']['output']>;
-  generated_from_temp_c: Maybe<Scalars['Float']['output']>;
+  generated_from_feels_like: Maybe<Scalars['Float']['output']>;
+  generated_from_temp: Maybe<Scalars['Float']['output']>;
   indoor: ClothingSet;
   last_updated: Maybe<Scalars['String']['output']>;
   outdoor: ClothingSet;
@@ -338,8 +340,7 @@ export type DayForecast = {
   date: Scalars['String']['output'];
   indoor: Maybe<ClothingSet>;
   outdoor: Maybe<ClothingSet>;
-  temp_high_c: Maybe<Scalars['Float']['output']>;
-  temp_low_c: Maybe<Scalars['Float']['output']>;
+  temp: Maybe<Array<Scalars['Float']['output']>>;
 };
 
 export type DentalCare = {
@@ -943,6 +944,11 @@ export type MutationUpdateTaskStatusArgs = {
   taskId: Scalars['String']['input'];
 };
 
+export type NightForecast = {
+  date: Scalars['String']['output'];
+  sleep_sack_tog: Scalars['Float']['output'];
+};
+
 export type NoonarSeason = {
   current: Scalars['String']['output'];
   current_description: Scalars['String']['output'];
@@ -1376,6 +1382,7 @@ export type SleepEnvironment = {
   bedroom_temp_pattern: BedroomTempPattern;
   current_recommendation: TogRecommendation;
   current_sizes: Array<Scalars['String']['output']>;
+  forecast: Maybe<Array<NightForecast>>;
   note: Scalars['String']['output'];
   size_watch: Scalars['String']['output'];
 };
@@ -1596,7 +1603,6 @@ export type UserIds = {
 };
 
 export type UvIndex = {
-  band: Scalars['String']['output'];
   value: Scalars['Float']['output'];
 };
 
