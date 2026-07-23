@@ -33,15 +33,20 @@
 	let swipeIsVertical: boolean | null = null;
 
 	onMount(async () => {
+		// Registered before Clerk init, not after - the two are independent (the SW's
+		// install/fetch/cache logic doesn't touch auth), and blocking registration on
+		// `await initClerk(...)` meant a slow/cold Clerk init - or a crawler whose visit
+		// ends before Clerk finishes - could mean the service worker never registered at
+		// all on a fresh visit. Only register in production - registering during `vite
+		// dev` fights with its own module reloading and just causes confusing
+		// stale-asset issues.
+		if (import.meta.env.PROD && `serviceWorker` in navigator) {
+			navigator.serviceWorker.register(`/service-worker.js`);
+		}
+
 		const clerkPublishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 		if (clerkPublishableKey) {
 			await initClerk(clerkPublishableKey);
-		}
-
-		// Only register in production - registering during `vite dev` fights with
-		// its own module reloading and just causes confusing stale-asset issues.
-		if (import.meta.env.PROD && `serviceWorker` in navigator) {
-			navigator.serviceWorker.register(`/service-worker.js`);
 		}
 	});
 
