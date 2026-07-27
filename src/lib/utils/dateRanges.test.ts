@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { getWeekRange, getPlanningRange, getDashboardMealPlanRange, getNextSaturday } from './dateRanges';
+import { getWeekRange, getPlanningRange, getDashboardMealPlanRange, getNextSaturday, getDefaultEventSearchRange } from './dateRanges';
 
 describe(`getWeekRange`, () => {
 	beforeEach(() => {
@@ -134,5 +134,24 @@ describe(`getDashboardMealPlanRange`, () => {
 		vi.setSystemTime(new Date(`2027-01-01T12:00:00Z`));
 
 		expect(getDashboardMealPlanRange()).toEqual({ start: `2026-12-30`, end: `2027-01-08` });
+	});
+});
+
+describe(`getDefaultEventSearchRange`, () => {
+	beforeEach(() => {
+		vi.useFakeTimers();
+	});
+
+	afterEach(() => {
+		vi.useRealTimers();
+	});
+
+	it(`spans 6 months back through 12 months forward from now`, () => {
+		vi.setSystemTime(new Date(`2026-07-09T12:00:00Z`));
+
+		expect(getDefaultEventSearchRange()).toEqual({
+			start: `2026-01-09T12:00:00.000Z`,
+			end: `2027-07-09T12:00:00.000Z`,
+		});
 	});
 });

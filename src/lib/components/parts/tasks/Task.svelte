@@ -8,25 +8,18 @@
 	import { getGraphqlUrl } from '$utils/fetchClientData';
 	import { completeTask as completeTaskRequest } from '$utils/completeTask';
 	import type { Task, TaskStatus } from '$types/tasks';
+	import Notion from '$img/icons/notion.svg?component';
+	import Todoist from '$img/icons/todoist.svg?component';
+	import GitHub from '$img/icons/github-fill.svg?component';
 
-	let {
-		id,
-		name,
-		status,
-		due,
-		assigned,
-		platform,
-		link,
-		onUpdate,
-		class: className = '',
-	}: Task & { onUpdate?: (id: string, status: TaskStatus) => void; class?: string } = $props();
+	let { id, name, status, due, assigned, platform, link, onUpdate, class: className = '' }: Task & { onUpdate?: (id: string, status: TaskStatus) => void; class?: string } = $props();
 
 	const StatusComplete: Record<TaskStatus, CheckState> = {
 		'Not Started': 'incomplete',
 		'In Progress': 'partial',
-		Ongoing: 'partial',
-		Paused: 'partial',
-		Done: 'complete',
+		'Ongoing': 'partial',
+		'Paused': 'partial',
+		'Done': 'complete',
 	};
 
 	// Notion tasks can carry any of these; Todoist only ever reports Done/Not Started,
@@ -44,7 +37,7 @@
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
-				...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+				...(token ? { Authorization: `Bearer ${token}` } : {}),
 			},
 			body: JSON.stringify({ query }),
 		}).then((r) => r.json());
@@ -82,9 +75,7 @@
 		saving = true;
 		actionError = '';
 
-		const res = await runMutation(
-			`mutation { updateTaskStatus(taskId: "${id}", status: "${newStatus}") { success } }`
-		);
+		const res = await runMutation(`mutation { updateTaskStatus(taskId: "${id}", status: "${newStatus}") { success } }`);
 
 		saving = false;
 
@@ -121,17 +112,32 @@
 			{/each}
 		</select>
 	{:else}
-		<span class="status" data-status={status.replaceAll(' ', '-').toLowerCase()}>{status}</span>
+		<span
+			class="status"
+			data-status={status.replaceAll(' ', '-').toLowerCase()}>{status}</span
+		>
 	{/if}
 	{#if due}
 		<span class="due">{format(due, DATE_FORMATS.short)}</span>
 	{/if}
 	{#if assigned}
-		<Assigned class="assigned" assignees={assigned} />
+		<Assigned
+			class="assigned"
+			assignees={assigned}
+		/>
 	{/if}
 	{#if link}
 		<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- link is the external Notion/Todoist task page, not an internal route -->
-		<a class="link" href={link} target="_blank" rel="noreferrer">Open in {platform}</a>
+		<a
+			class="link"
+			href={link}
+			target="_blank"
+			rel="noreferrer"
+		>
+			<span class="sr-only">Open in {platform}</span>
+			<!-- TODO: select correct icon per platform -->
+			<Notion />
+		</a>
 	{/if}
 	{#if actionError}<p class="error">{actionError}</p>{/if}
 	<!-- TODO: add styling -->

@@ -277,8 +277,8 @@
 									{:else}
 										{#if parts.quantity}<span class="qty">{parts.quantity}</span>{/if}
 										{#if parts.unit}<span class="unit">{parts.unit}</span>{/if}
-										{#if parts.food}<span class="food">{parts.food}</span>{/if}
-										{#if parts.note}<span class="note">({parts.note})</span>{/if}
+										{#if parts.food}<span>{parts.food}</span>{/if}
+										{#if parts.note}<span>({parts.note})</span>{/if}
 									{/if}
 									{#if options.length}
 										<!-- TODO: Style ingredient unit selection -->
@@ -345,7 +345,7 @@
 				<h2>Notes</h2>
 				{#each recipe.notes as note, i (i)}
 					<div class="note">
-						{#if note.title}<strong>{note.title}</strong>{/if}
+						{#if note.title}<h3>{note.title}</h3>{/if}
 						<p>{note.text}</p>
 					</div>
 				{/each}
@@ -618,6 +618,20 @@
 		}
 	}
 
+	.note {
+		margin-left: auto;
+		padding: 1em 1.5em;
+		border-radius: 0.8em;
+		background: var(--sidebar_bg);
+		color: var(--text_secondary);
+
+		& h3 {
+			margin: 0;
+			color: var(--text_primary);
+			font-weight: 700;
+		}
+	}
+
 	.nutrition,
 	footer {
 		width: 100%;
@@ -627,6 +641,7 @@
 		display: flex;
 		flex-wrap: wrap;
 		justify-content: end;
+		margin-top: 3em;
 		padding-top: 2em;
 		border-top: 1px solid color-mix(in oklch, var(--background) 92%, var(--black));
 		color: var(--text_secondary);

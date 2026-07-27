@@ -42,4 +42,41 @@ describe(`parseEvents`, () => {
 
 		expect(result.type).toBe(`event`);
 	});
+
+	it(`parses date-only start/end at local midnight, not UTC midnight (see the calendar-spilling-into-2-days bug)`, () => {
+		// vitest runs pinned to TZ=UTC (see vitest.config.ts), where UTC
+		// midnight and local midnight are the same instant - which is exactly
+		// how this bug hid from every other test in this file. Overriding TZ
+		// for just this test reproduces a positive-offset timezone (e.g.
+		// Australia) where they aren't: `new Date('2026-07-28')` parses as UTC
+		// midnight, which reads back as ~10-11am *local* time, tricking
+		// @event-calendar/core's exclusive-end-date heuristic into bumping the
+		// event's end forward by an extra day (the "spills into 2 days"
+		// symptom). parseISO parses a bare date at local midnight instead, so
+		// getHours()/getDate() below must land exactly on midnight of the
+		// intended local calendar day.
+		const originalTZ = process.env.TZ;
+		process.env.TZ = `Australia/Sydney`;
+
+		try {
+			const [result] = parseEvents([{ id: `1`, name: `Event`, dates: { start: `2026-07-27`, end: `2026-07-28` } }]);
+
+			expect(result.start.getHours()).toBe(0);
+			expect(result.start.getDate()).toBe(27);
+			expect(result.end.getHours()).toBe(0);
+			expect(result.end.getDate()).toBe(28);
+		} finally {
+			process.env.TZ = originalTZ;
+		}
+	});
+
+	it(`carries platform through so Notion-sourced events can be told apart from calendar-sourced ones`, () => {
+		const [notionEvent, calendarEvent] = parseEvents([
+			{ id: `1`, name: `Conference`, dates: { start: `2026-07-09` }, platform: `notion` },
+			{ id: `2`, name: `Dentist`, dates: { start: `2026-07-09` }, platform: `calendar` },
+		]);
+
+		expect(notionEvent.platform).toBe(`notion`);
+		expect(calendarEvent.platform).toBe(`calendar`);
+	});
 });

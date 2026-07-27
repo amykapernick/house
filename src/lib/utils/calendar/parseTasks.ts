@@ -1,3 +1,4 @@
+import { parseISO } from 'date-fns';
 import type { TaskEvent } from '$types/calendar';
 import type { Task } from '$types/tasks';
 
@@ -19,8 +20,11 @@ const parseTasks = (tasks: Task[]): TaskEvent[] => {
 			platform: task.platform,
 			resource: task.assigned,
 			allDay: task.allDay ?? false,
-			start: new Date(task.due),
-			end: new Date(task.end ?? task.due),
+			// parseISO, not `new Date` - see parseEvents.ts for why a bare
+			// date-only string needs local-midnight (not UTC-midnight) parsing
+			// to avoid @event-calendar/core spilling allDay tasks into an extra day.
+			start: parseISO(task.due as unknown as string),
+			end: parseISO((task.end ?? task.due) as unknown as string),
 			colour: task.assigned.length === 1 ? task.assigned[0].colour : EVERYONE_COLOUR,
 		}));
 

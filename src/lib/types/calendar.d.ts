@@ -36,6 +36,7 @@ export type MealEvent = EventBase & {
 export type Event = (
 	EventBase & {
 		type: `event`
+		platform?: `notion` | `calendar`
 	}
 	| TaskEvent
 	| MealEvent

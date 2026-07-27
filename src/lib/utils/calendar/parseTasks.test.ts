@@ -52,6 +52,22 @@ describe(`parseTasks`, () => {
 		expect(result.end).toEqual(new Date(`2026-07-10`));
 	});
 
+	it(`parses a date-only due/end at local midnight, not UTC midnight (see parseEvents.test.ts for why)`, () => {
+		const originalTZ = process.env.TZ;
+		process.env.TZ = `Australia/Sydney`;
+
+		try {
+			const [result] = parseTasks([task({ due: `2026-07-27` as unknown as Date, end: `2026-07-28` })]);
+
+			expect(result.start.getHours()).toBe(0);
+			expect(result.start.getDate()).toBe(27);
+			expect(result.end.getHours()).toBe(0);
+			expect(result.end.getDate()).toBe(28);
+		} finally {
+			process.env.TZ = originalTZ;
+		}
+	});
+
 	it(`always tags the result as type "task"`, () => {
 		const [result] = parseTasks([task()]);
 

@@ -166,11 +166,10 @@ export function buildBudgetResults(items: any[], term: string, limit?: number): 
 	}), limit);
 }
 
-export function buildScheduleResults(events: any[], icsEvents: any[], term: string, limit?: number): Result[] {
-	const combined = [...events.map((event) => ({ id: `event:${event.id}`, label: event.name })), ...icsEvents.map((event) => ({ id: `ics:${event.id}`, label: event.name }))];
-	return filterResults(term, combined, (event) => ({
-		key: event.id,
-		label: event.label,
+export function buildScheduleResults(events: any[], term: string, limit?: number): Result[] {
+	return filterResults(term, events, (event) => ({
+		key: `event:${event.id}`,
+		label: event.name,
 		section: `Schedule` as const,
 		link: resolve(`/schedule`),
 	}), limit);

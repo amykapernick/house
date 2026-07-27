@@ -3,6 +3,7 @@
   "version": "3.0.0",
   "private": true,
   "scripts": {
+    "postinstall": "patch-package",
     "predev": "npm run generate",
     "dev": "vite dev",
     "build": "vite build",
@@ -67,6 +68,7 @@
     "graphql": "^16.14.2",
     "happy-dom": "^20.10.6",
     "pa11y": "^9.1.1",
+    "patch-package": "^8.0.1",
     "postcss": "^8.5.15",
     "postcss-advanced-variables": "^5.0.0",
     "postcss-hexrgba": "^2.1.0",

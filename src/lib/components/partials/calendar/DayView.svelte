@@ -9,7 +9,6 @@
 	let {
 		tasks = [],
 		events = [],
-		icalEvents = [],
 		scheduleBlocks = [],
 		colours = [],
 		showSchedule = true,
@@ -17,7 +16,6 @@
 	}: {
 		tasks: Task[];
 		events: any[];
-		icalEvents: any[];
 		scheduleBlocks: ScheduleBlock[];
 		colours?: PaletteColour[];
 		showSchedule?: boolean;
@@ -45,7 +43,7 @@
 	}
 
 	let calendarEvents = $derived.by(() => {
-		const items = [...parseTasks(tasks), ...parseEvents(events), ...parseEvents(icalEvents)].map((event) => ({
+		const items = [...parseTasks(tasks), ...parseEvents(events)].map((event) => ({
 			id: event.id,
 			title: event.title,
 			start: new Date(event.start),

@@ -1,4 +1,4 @@
-:root {
+:root, *::before, *::after {
 	--navy: var(--blue_navy);
 	--navy_text: var(--blue_navy_text);
 	--neutral_light: var(--white);

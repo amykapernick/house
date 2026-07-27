@@ -17,6 +17,8 @@
 	import FocusTimer from '$parts/FocusTimer.svelte';
 	import OnlineStatus from '$parts/OnlineStatus.svelte';
 	import { focusTimerState } from '$utils/focusTimer';
+	import Timer from '$img/icons/stopwatch-fill.svg?component';
+	import Search from '$img/icons/search-1.svg?component';
 
 	let { children } = $props();
 
@@ -157,10 +159,9 @@
 	type="button"
 	class="palette_trigger"
 	onclick={openCommandPalette}
-	aria-label="Open command palette"
-	title="Open command palette (Cmd/Ctrl+K)"
 >
-	🔍
+	<Search />
+	<span class="sr-only">Open Command Palette</span>
 </button>
 
 <!-- TODO: Add a controls section -->
@@ -169,11 +170,10 @@
 		type="button"
 		class="focus_timer_trigger"
 		onclick={() => (focusTimerOpen = !focusTimerOpen)}
-		aria-label="Toggle focus timer"
 		aria-expanded={focusTimerOpen}
-		title="Toggle focus timer"
 	>
-		⏱️
+		<Timer />
+		<span class="sr-only">Toggle focus timer panel</span>
 	</button>
 {/if}
 
@@ -207,11 +207,11 @@
 
 	.main {
 		grid-area: main;
-		margin-bottom: 5em;
+
+		/* margin-bottom: 5em; */
 	}
 
 	.palette_trigger {
-
 		@include button_icon;
 
 		position: fixed;
@@ -224,7 +224,6 @@
 	}
 
 	.focus_timer_trigger {
-
 		@include button_icon;
 
 		position: fixed;
@@ -247,8 +246,6 @@
 
 		.main {
 			max-height: 100vh;
-			margin-bottom: 50px;
-			padding-bottom: 50px;
 			overflow-y: auto;
 		}
 	}

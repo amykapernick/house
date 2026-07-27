@@ -9,6 +9,7 @@
 	import { isAuthenticated, getToken } from '$lib/auth';
 	import fetchClientData, { getGraphqlUrl, setCache } from '$utils/fetchClientData';
 	import { EVERYONE, isVisibleToUser } from '$utils/fetchFamilyMembers';
+	import { computePaddedRange, needsRefetch, type DateRange } from '$utils/calendar/paddedRange';
 	import type { ScheduleBlock, ScheduleSavePayload, RoutineDays, PaletteColour } from '$types/schedule';
 	import type { Task, TaskStatus } from '$types/tasks';
 	import { getPageTitle } from '$utils/pageTitle';
@@ -20,10 +21,11 @@
 
 	let tasks = $state<Task[]>([]);
 	let events = $state<any[]>([]);
-	let icalEvents = $state<any[]>([]);
 	let selectedUserSlug = $state(EVERYONE);
 
-	let visibleIcalEvents = $derived(icalEvents.filter((event) => isVisibleToUser(event.family, selectedUserSlug)));
+	// Notion events carry no family data and always bypass the filter (same as
+	// the calendar page) - only calendar-platform events get narrowed by person.
+	let visibleEvents = $derived(events.filter((event) => event.platform === `notion` || isVisibleToUser(event.family, selectedUserSlug)));
 
 	let visibleBlocks = $derived(
 		blocks.filter((block) => isVisibleToUser(block.family ? [block.family] : [], selectedUserSlug))
@@ -42,7 +44,6 @@
 	function loadCalendarItems() {
 		function handleCalendar(res: any) {
 			tasks = res.tasks ?? [];
-			events = res.events ?? [];
 		}
 		fetchClientData({
 			cacheKey: 'calendar',
@@ -66,26 +67,32 @@
 						link
 						platform
 					}
-					events {
-						name
-						dates {
-							start
-							end
-						}
-						status
-						id
-					}
 				}
 			`,
 		}).then(handleCalendar);
+	}
 
-		function handleIcs(res: any) { icalEvents = res.icsEvents ?? []; }
+	// Not reactive state - just tracks what's already been fetched so
+	// handleRangeChange can skip a refetch when navigation stays inside it.
+	let lastFetchedEventsRange: DateRange | null = null;
+
+	// Padded window (~3x the visible range), same reasoning as the calendar
+	// page: stepping prev/next a day usually stays inside already-fetched data.
+	// skipCache since the padding+containment check here already is the cache -
+	// unlike `blocks` below (a cheap PocketBase read, refetched unconditionally
+	// on every nav), calendar events are a heavier per-calendar Home Assistant
+	// round trip and shouldn't be re-hit on every single day click.
+	function loadEvents(visible: DateRange) {
+		const padded = computePaddedRange(visible);
+		lastFetchedEventsRange = padded;
+
+		function handleEvents(res: any) { events = res.events ?? []; }
 		fetchClientData({
-			cacheKey: 'icsEvents',
-			onStale: handleIcs,
+			skipCache: true,
+			onStale: handleEvents,
 			gqlQuery: `
 				query {
-					icsEvents {
+					events(start: "${padded.start.toISOString()}", end: "${padded.end.toISOString()}") {
 						id
 						name
 						dates {
@@ -98,10 +105,11 @@
 						family {
 							slug
 						}
+						platform
 					}
 				}
 			`,
-		}).then(handleIcs);
+		}).then(handleEvents);
 	}
 
 	function handleTaskCompleted(taskId: string) {
@@ -111,7 +119,7 @@
 	// Keep the shared cache in sync so a revisit within the TTL doesn't show the pre-update status.
 	function handleTaskUpdate(id: string, status: TaskStatus) {
 		tasks = tasks.map((task) => (task.id === id ? { ...task, status } : task));
-		setCache(`calendar`, { tasks, events });
+		setCache(`calendar`, { tasks });
 	}
 
 	function loadColours() {
@@ -173,6 +181,11 @@
 
 	function handleRangeChange(start: Date, end: Date) {
 		loadSchedule(toDateStr(start), toDateStr(end));
+
+		const visible = { start, end };
+		if (needsRefetch(visible, lastFetchedEventsRange)) {
+			loadEvents(visible);
+		}
 	}
 
 	$effect(() => {
@@ -252,8 +265,7 @@
 		blocks={visibleBlocks}
 		{colours}
 		tasks={visibleTasks}
-		{events}
-		icalEvents={visibleIcalEvents}
+		events={visibleEvents}
 		readOnly={selectedUserSlug === EVERYONE}
 		onRangeChange={handleRangeChange}
 		onSave={handleSave}

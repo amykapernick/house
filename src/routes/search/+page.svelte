@@ -9,6 +9,7 @@
 	import fetchTasksData from '$utils/tasksData';
 	import { CONTENT_CACHE_TTL, contentEntriesQuery, contentIndexQuery } from '$utils/content';
 	import { getDiscoverableRoutes, flattenPages } from '$utils/routes';
+	import { getDefaultEventSearchRange } from '$utils/dateRanges';
 	import { SCOPE_TOKENS, type SearchSection } from '$utils/commandPaletteSearch';
 	import {
 		type Result,
@@ -78,7 +79,6 @@
 	let shoppingListItems = $state<any[]>([]);
 	let budgetItems = $state<any[]>([]);
 	let scheduleEvents = $state<any[]>([]);
-	let icsEvents = $state<any[]>([]);
 	let dataLoading = $state(true);
 
 	let recipeResults = $state<Result[]>([]);
@@ -155,7 +155,7 @@
 	const taskResults = $derived(sectionActive(`Tasks`) ? buildTaskResults(searchTasks, term) : []);
 	const shoppingListResults = $derived(sectionActive(`Shopping List`) ? buildShoppingListResults(shoppingListItems, term) : []);
 	const budgetResults = $derived(sectionActive(`Budget`) ? buildBudgetResults(budgetItems, term) : []);
-	const scheduleResults = $derived(sectionActive(`Schedule`) ? buildScheduleResults(scheduleEvents, icsEvents, term) : []);
+	const scheduleResults = $derived(sectionActive(`Schedule`) ? buildScheduleResults(scheduleEvents, term) : []);
 
 	// Grouped rather than flattened - unlike the palette's single flat list,
 	// a full page can afford (and benefits from) a heading per section.
@@ -309,36 +309,27 @@
 			budgetItems = res.budget ?? [];
 		});
 
-		const calendarPromise = fetchClientData({
-			cacheKey: `calendar`,
+		// No natural "visible range" here (unlike the calendar/schedule pages), so
+		// this uses a broad fixed default window instead of a padded/live one -
+		// see getDefaultEventSearchRange.
+		const eventsRange = getDefaultEventSearchRange();
+		const eventsPromise = fetchClientData({
+			cacheKey: `search-events`,
 			onStale: (res) => {
 				scheduleEvents = res.events ?? [];
 			},
 			gqlQuery: `
 				query {
-					tasks { id name assigned { name slug profile colour } status due end allDay estimate link platform }
-					events { name dates { start end } status id }
+					events(start: "${eventsRange.start}", end: "${eventsRange.end}") {
+						id name dates { start end } status allDay colour family { slug } platform
+					}
 				}
 			`,
 		}).then((res) => {
 			scheduleEvents = res.events ?? [];
 		});
 
-		const icsEventsPromise = fetchClientData({
-			cacheKey: `icsEvents`,
-			onStale: (res) => {
-				icsEvents = res.icsEvents ?? [];
-			},
-			gqlQuery: `
-				query {
-					icsEvents { id name dates { start end } status allDay colour family { slug } }
-				}
-			`,
-		}).then((res) => {
-			icsEvents = res.icsEvents ?? [];
-		});
-
-		Promise.allSettled([contentPromise, resourcesPromise, suppliersPromise, assetsPromise, smallHumanPromise, tasksPromise, shoppingListPromise, budgetPromise, calendarPromise, icsEventsPromise]).then(() => {
+		Promise.allSettled([contentPromise, resourcesPromise, suppliersPromise, assetsPromise, smallHumanPromise, tasksPromise, shoppingListPromise, budgetPromise, eventsPromise]).then(() => {
 			dataLoading = false;
 		});
 	});

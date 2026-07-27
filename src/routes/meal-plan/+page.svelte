@@ -21,54 +21,27 @@
 	let loading = $state(true);
 	let weekOffset = $state(0);
 
-	// Evening (5pm-11pm) calendar events, shown under each day so meal
-	// planning accounts for what's already on that evening. `events`/`icsEvents`
-	// don't take date-range args server-side, so - matching the schedule and
-	// calendar pages - they're fetched once, unfiltered, and reuse the same
-	// `calendar`/`icsEvents` cache keys those pages already populate.
+	// Evening (5pm-11pm) calendar events, shown under each day so meal planning
+	// accounts for what's already on that evening. Windowed to whatever week(s)
+	// are currently being planned (same range currentRange() already computes
+	// for the meal plan query itself) rather than reusing the calendar/schedule
+	// pages' own cache keys, since `events` now takes required date-range args.
 	let calendarEvents = $state<any[]>([]);
-	let icalEvents = $state<any[]>([]);
 
 	function fetchCalendarEvents() {
-		function handleCalendar(res: any) {
+		const range = currentRange();
+		const start = new Date(range.start).toISOString();
+		const end = new Date(range.end).toISOString();
+
+		function handleEvents(res: any) {
 			calendarEvents = res.events ?? [];
 		}
 		fetchClientData({
-			cacheKey: `calendar`,
-			onStale: handleCalendar,
+			cacheKey: `meal-plan-events-${range.start}-${range.end}`,
+			onStale: handleEvents,
 			gqlQuery: `
 				query {
-					tasks {
-						id
-						name
-						assigned { name slug profile colour }
-						status
-						due
-						end
-						allDay
-						estimate
-						link
-						platform
-					}
-					events {
-						name
-						dates { start end }
-						status
-						id
-					}
-				}
-			`,
-		}).then(handleCalendar);
-
-		function handleIcs(res: any) {
-			icalEvents = res.icsEvents ?? [];
-		}
-		fetchClientData({
-			cacheKey: `icsEvents`,
-			onStale: handleIcs,
-			gqlQuery: `
-				query {
-					icsEvents {
+					events(start: "${start}", end: "${end}") {
 						id
 						name
 						dates { start end }
@@ -76,12 +49,16 @@
 						allDay
 						colour
 						family { slug }
+						platform
 					}
 				}
 			`,
-		}).then(handleIcs);
+		}).then(handleEvents);
 	}
 
+	// currentRange() reads weekOffset/planningMode/planningWeeks, so this effect
+	// re-fetches evening events whenever the viewed week(s) change too, not just
+	// on the initial mount.
 	$effect(() => {
 		if ($isAuthenticated) {
 			fetchCalendarEvents();
@@ -93,7 +70,7 @@
 	// `allDay` flag) also naturally excludes genuinely all-day/date-only
 	// events, which parse to midnight.
 	let eveningEventsByDate = $derived.by(() => {
-		const parsed = [...parseEvents(calendarEvents), ...parseEvents(icalEvents)];
+		const parsed = parseEvents(calendarEvents);
 		const map = new SvelteMap<string, typeof parsed>();
 
 		for (const event of parsed) {

@@ -1,4 +1,4 @@
-import { addWeeks, subDays, addDays, format } from 'date-fns';
+import { addWeeks, subDays, addDays, subMonths, addMonths, format } from 'date-fns';
 import { DATE_FORMATS } from './dateFormats';
 
 // "This week" for meal-planning purposes runs from yesterday through +6 days
@@ -47,5 +47,18 @@ export function getDashboardMealPlanRange(): { start: string; end: string } {
 	return {
 		start: format(subDays(today, 2), DATE_FORMATS.iso),
 		end: format(addDays(today, 7), DATE_FORMATS.iso),
+	};
+}
+
+// Broad default window for global search (cmd-K palette, /search) - unlike the
+// calendar/schedule pages, these have no natural "visible range" to derive a
+// window from, so approximate the old ICS-era default (6 months back, 12
+// months forward) instead.
+export function getDefaultEventSearchRange(): { start: string; end: string } {
+	const now = new Date();
+
+	return {
+		start: subMonths(now, 6).toISOString(),
+		end: addMonths(now, 12).toISOString(),
 	};
 }

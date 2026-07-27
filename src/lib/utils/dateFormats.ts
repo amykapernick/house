@@ -9,5 +9,13 @@ export const DATE_FORMATS = {
 	iso: `yyyy-MM-dd`,
 	month: `MMM yyyy`,
 	/** e.g. "Wednesday" - full weekday name */
-	dayName: `EEEE`
+	dayName: `EEEE`,
+	/** e.g. "Wed" - short weekday name, for calendar column headers */
+	weekdayShort: `EEE`,
+	/** e.g. "05" - zero-padded day number, for calendar column headers */
+	dayNumber: `dd`,
+	/** e.g. "November" - full month name, no day or year */
+	monthName: `MMMM`,
+	/** e.g. "24 November" - day and full month name, no year */
+	dayMonth: `d MMMM`
 } as const;

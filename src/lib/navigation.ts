@@ -30,6 +30,7 @@ import BudgetColour from '$img/icons/analytics-2.svg?component'
 import HealthColour from '$img/icons/phone-heartbeat-2.svg?component'
 import DashboardIconColour from '$img/icons/layout-11-3.svg?component'
 
+// TODO: Render both versions of icons so can show/hide different versions as needed
 export const menuItems: MenuItem[] = [
 	{
 		label: `Home`,

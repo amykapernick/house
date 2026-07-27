@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { isAuthenticated } from '$lib/auth';
-	import { format, parseISO, startOfDay, endOfDay } from 'date-fns';
+	import { format, parseISO, startOfDay, endOfDay, subDays, addDays } from 'date-fns';
 	import { DATE_FORMATS } from '$utils/dateFormats';
 	import { SvelteMap } from 'svelte/reactivity';
 	import fetchClientData from '$utils/fetchClientData';
@@ -31,7 +31,6 @@
 	let upcomingLoading = $state(true);
 
 	let dayEvents = $state<any[]>([]);
-	let icalEvents = $state<any[]>([]);
 	let scheduleBlocks = $state<ScheduleBlock[]>([]);
 	let colours = $state<PaletteColour[]>([]);
 	let showSchedule = $state(true);
@@ -41,7 +40,9 @@
 	let habitsLoading = $state(true);
 
 	let visibleTasks = $derived(upcomingTasks.filter((task) => isVisibleToUser(task.assigned, currentUserSlug)));
-	let visibleIcalEvents = $derived(icalEvents.filter((event) => isVisibleToUser(event.family, currentUserSlug)));
+	// Notion events carry no family data and always bypass the filter, same as
+	// the calendar/schedule pages - only calendar-platform events get narrowed.
+	let visibleDayEvents = $derived(dayEvents.filter((event) => event.platform === `notion` || isVisibleToUser(event.family, currentUserSlug)));
 	let visibleScheduleBlocks = $derived(
 		scheduleBlocks.filter((block) => isVisibleToUser(block.family ? [block.family] : [], currentUserSlug))
 	);
@@ -93,6 +94,11 @@
 	$effect(() => {
 		if ($isAuthenticated) {
 			const today = format(new Date(), DATE_FORMATS.iso);
+			// ±1 day around "today" rather than exactly startOfDay/endOfDay, so an
+			// event near midnight isn't dropped by a timezone mismatch between the
+			// browser and wherever Home Assistant computes its own day boundary.
+			const eventsStart = startOfDay(subDays(new Date(), 1)).toISOString();
+			const eventsEnd = endOfDay(addDays(new Date(), 1)).toISOString();
 
 			function handleUpcoming(res: any) {
 				upcomingTasks = res.tasks ?? [];
@@ -122,22 +128,7 @@
 								colour
 							}
 						}
-						events {
-							id
-							name
-							dates { start end }
-						}
-					}
-				`,
-			}).then(handleUpcoming);
-
-			function handleIcs(res: any) { icalEvents = res.icsEvents ?? []; }
-			fetchClientData({
-				cacheKey: 'icsEvents',
-				onStale: handleIcs,
-				gqlQuery: `
-					query {
-						icsEvents {
+						events(start: "${eventsStart}", end: "${eventsEnd}") {
 							id
 							name
 							dates { start end }
@@ -145,10 +136,11 @@
 							allDay
 							colour
 							family { slug }
+							platform
 						}
 					}
 				`,
-			}).then(handleIcs);
+			}).then(handleUpcoming);
 
 			// The `colours` collection has one row per theme variant of a name
 			// (base/Light/Dark) - keep only the base row per name, matching the
@@ -294,7 +286,7 @@
 		{#if dayLoading}
 			<Skeleton rows={3} />
 		{:else}
-			<DayView tasks={visibleTasks} events={dayEvents} icalEvents={visibleIcalEvents} scheduleBlocks={visibleScheduleBlocks} {colours} {showSchedule} />
+			<DayView tasks={visibleTasks} events={visibleDayEvents} scheduleBlocks={visibleScheduleBlocks} {colours} {showSchedule} />
 		{/if}
 	</section>
 

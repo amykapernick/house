@@ -358,10 +358,14 @@ export type ElevationPoint = {
 };
 
 export type Event = {
+  allDay: Maybe<Scalars['Boolean']['output']>;
   cfp: Maybe<EventDateRange>;
+  colour: Maybe<Scalars['String']['output']>;
   dates: Maybe<EventDateRange>;
+  family: Maybe<Array<Maybe<User>>>;
   id: Maybe<Scalars['String']['output']>;
   name: Scalars['String']['output'];
+  platform: Maybe<Platform>;
   status: Maybe<Scalars['String']['output']>;
   url: Maybe<Scalars['String']['output']>;
 };
@@ -505,21 +509,6 @@ export type HouseItemInput = {
 export type HouseMutationResult = {
   id: Maybe<Scalars['String']['output']>;
   success: Scalars['Boolean']['output'];
-};
-
-export type IcsEvent = {
-  allDay: Maybe<Scalars['Boolean']['output']>;
-  colour: Maybe<Scalars['String']['output']>;
-  dates: Maybe<IcsEventDateRange>;
-  family: Maybe<Array<Maybe<User>>>;
-  id: Maybe<Scalars['String']['output']>;
-  name: Maybe<Scalars['String']['output']>;
-  status: Maybe<Scalars['String']['output']>;
-};
-
-export type IcsEventDateRange = {
-  end: Maybe<Scalars['String']['output']>;
-  start: Maybe<Scalars['String']['output']>;
 };
 
 export type Info = {
@@ -999,6 +988,7 @@ export type ParentingApproachNote = {
 };
 
 export type Platform =
+  | 'calendar'
   | 'github'
   | 'notion'
   | 'todoist';
@@ -1042,7 +1032,6 @@ export type Query = {
   events: Maybe<Array<Maybe<Event>>>;
   habits: Maybe<Array<Maybe<Habit>>>;
   house: Maybe<House>;
-  icsEvents: Maybe<Array<Maybe<IcsEvent>>>;
   me: Maybe<User>;
   mealPlanByDay: Array<MealPlanDay>;
   mealPlans: Maybe<MealPlanList>;
@@ -1105,6 +1094,12 @@ export type QueryContentIndexArgs = {
 export type QueryContentPageArgs = {
   pageSlug: Scalars['String']['input'];
   slug: Scalars['String']['input'];
+};
+
+
+export type QueryEventsArgs = {
+  end?: InputMaybe<Scalars['String']['input']>;
+  start?: InputMaybe<Scalars['String']['input']>;
 };
 
 

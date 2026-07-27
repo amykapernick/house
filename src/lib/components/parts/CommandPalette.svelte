@@ -8,6 +8,7 @@
 	import { getRecentPages } from '$utils/recentPages';
 	import { CONTENT_CACHE_TTL, contentEntriesQuery, contentIndexQuery } from '$utils/content';
 	import { getDiscoverableRoutes, flattenPages } from '$utils/routes';
+	import { getDefaultEventSearchRange } from '$utils/dateRanges';
 	import fetchTasksData from '$utils/tasksData';
 	import { parseDeepSearch, type SearchSection } from '$utils/commandPaletteSearch';
 	import {
@@ -94,7 +95,6 @@
 	let shoppingListItems = $state<any[]>([]);
 	let budgetItems = $state<any[]>([]);
 	let scheduleEvents = $state<any[]>([]);
-	let icsEvents = $state<any[]>([]);
 	let quickAddSubmitting = $state(false);
 	let quickAddError = $state(``);
 	let quickAddSuccess = $state(``);
@@ -185,7 +185,7 @@
 	const taskResults = $derived(buildTaskResults(searchTasks, sectionTerm(`Tasks`) ?? ``, SECTION_DISPLAY_LIMIT));
 	const shoppingListResults = $derived(buildShoppingListResults(shoppingListItems, sectionTerm(`Shopping List`) ?? ``, SECTION_DISPLAY_LIMIT));
 	const budgetResults = $derived(buildBudgetResults(budgetItems, sectionTerm(`Budget`) ?? ``, SECTION_DISPLAY_LIMIT));
-	const scheduleResults = $derived(buildScheduleResults(scheduleEvents, icsEvents, sectionTerm(`Schedule`) ?? ``, SECTION_DISPLAY_LIMIT));
+	const scheduleResults = $derived(buildScheduleResults(scheduleEvents, sectionTerm(`Schedule`) ?? ``, SECTION_DISPLAY_LIMIT));
 
 	const results = $derived([...recentResults, ...pageResults, ...contentResults, ...recipeResults, ...referenceResults, ...supplierResults, ...assetResults, ...smallHumanResults, ...taskResults, ...shoppingListResults, ...budgetResults, ...scheduleResults]);
 
@@ -450,33 +450,24 @@
 			budgetItems = res.budget ?? [];
 		});
 
+		// No natural "visible range" here (unlike the calendar/schedule pages), so
+		// this uses a broad fixed default window instead of a padded/live one -
+		// see getDefaultEventSearchRange.
+		const eventsRange = getDefaultEventSearchRange();
 		fetchClientData({
-			cacheKey: `calendar`,
+			cacheKey: `search-events`,
 			onStale: (res) => {
 				scheduleEvents = res.events ?? [];
 			},
 			gqlQuery: `
 				query {
-					tasks { id name assigned { name slug profile colour } status due end allDay estimate link platform }
-					events { name dates { start end } status id }
+					events(start: "${eventsRange.start}", end: "${eventsRange.end}") {
+						id name dates { start end } status allDay colour family { slug } platform
+					}
 				}
 			`,
 		}).then((res) => {
 			scheduleEvents = res.events ?? [];
-		});
-
-		fetchClientData({
-			cacheKey: `icsEvents`,
-			onStale: (res) => {
-				icsEvents = res.icsEvents ?? [];
-			},
-			gqlQuery: `
-				query {
-					icsEvents { id name dates { start end } status allDay colour family { slug } }
-				}
-			`,
-		}).then((res) => {
-			icsEvents = res.icsEvents ?? [];
 		});
 	}
 

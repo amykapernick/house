@@ -18,7 +18,6 @@
 		colours = [],
 		tasks = [],
 		events = [],
-		icalEvents = [],
 		readOnly = false,
 		onRangeChange,
 		onSave,
@@ -29,7 +28,6 @@
 		colours?: PaletteColour[];
 		tasks?: Task[];
 		events?: any[];
-		icalEvents?: any[];
 		readOnly?: boolean;
 		onRangeChange?: (start: Date, end: Date) => void;
 		onSave?: (payload: ScheduleSavePayload) => Promise<void>;
@@ -133,7 +131,7 @@
 		}));
 
 		const taskEvents = parseTasks(tasks);
-		const otherEvents = [...parseEvents(events), ...parseEvents(icalEvents)];
+		const otherEvents = parseEvents(events);
 
 		const readOnlyEvents = [...taskEvents, ...otherEvents].map((event) => ({
 			id: event.id,

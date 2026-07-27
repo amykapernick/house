@@ -16,7 +16,7 @@
 		display: grid;
 		width: 90vw;
 		max-width: min(100vw, 1200px);
-		margin: 0 auto;
+		margin: 0 auto 5em;
 		padding: 5em 5vw 4em;
 		overflow-x: hidden;
 
@@ -30,9 +30,13 @@
 			padding-right: 100px;
 		}
 
+		@media (width >= 45em) {
+			padding-top: 7em;
+		}
+
 		@media (width >= 50em) {
 			width: 100%;
-			padding: 2em 5%;
+			padding: 2em 5% 4em;
 		}
 	}
 </style>

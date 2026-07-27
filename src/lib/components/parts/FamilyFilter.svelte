@@ -95,13 +95,12 @@
 	}
 
 	input[type='radio'] {
-
 		@include sr_only;
 
 		&:checked {
 			& + label {
-				border-color: var(--purple_solid_flat);
-				background: linear-gradient(color-mix(in oklch, var(--background) 60%, var(--white)) 0%, color-mix(in oklch, var(--background) 70%, var(--brown)) 100%);
+				border-color: light-dark(var(--purple_solid_flat), color-mix(in oklch, var(--dark_purple_bright) 89%, var(--white)));
+				background: light-dark(linear-gradient(color-mix(in oklch, var(--background) 60%, var(--white)) 0%, color-mix(in oklch, var(--background) 70%, var(--brown)) 100%), linear-gradient(color-mix(in oklch, var(--dark_background) 60%, var(--white)) 0%, color-mix(in oklch, var(--dark_background) 40%, var(--white)) 100%));
 			}
 		}
 	}
@@ -112,7 +111,7 @@
 		padding: 0.6em 1.2em;
 		border: 1px solid var(--border);
 		border-radius: 2em;
-		color: var(--black);
+		color: light-dark(var(--black), color-mix(in oklch, var(--white) 92%, var(--black)));
 		gap: 1ch;
 		cursor: pointer;
 

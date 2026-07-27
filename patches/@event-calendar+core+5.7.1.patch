@@ -1,0 +1,68 @@
+diff --git a/node_modules/@event-calendar/core/src/lib/components/BaseEvent.svelte b/node_modules/@event-calendar/core/src/lib/components/BaseEvent.svelte
+index f0bd10c..41b95a5 100644
+--- a/node_modules/@event-calendar/core/src/lib/components/BaseEvent.svelte
++++ b/node_modules/@event-calendar/core/src/lib/components/BaseEvent.svelte
+@@ -32,7 +32,7 @@
+         event.textColor ?? getEventTextColor(chunk.resource ?? findFirstResource(event, resources)) ?? eventTextColor
+     );
+     let style = $derived(entries(styles(
+-        {'background-color': bgColor, 'color': txtColor}
++        {'--event_background': bgColor, '--event_colour': txtColor}
+     )).map(entry => `${entry[0]}:${entry[1]}`).concat(event.styles).join(';'));
+ 
+     // Class
+diff --git a/node_modules/@event-calendar/core/src/lib/components/DayHeader.svelte b/node_modules/@event-calendar/core/src/lib/components/DayHeader.svelte
+index 4559417..5de1f17 100644
+--- a/node_modules/@event-calendar/core/src/lib/components/DayHeader.svelte
++++ b/node_modules/@event-calendar/core/src/lib/components/DayHeader.svelte
+@@ -1,14 +1,20 @@
+ <script>
+     import {getContext} from 'svelte';
+-    import {contentFrom, toISOString} from '#lib';
++    import {contentFrom, isFunction, toISOString, toLocalDate} from '#lib';
+ 
+     let {date, alPrefix = ''} = $props();
+ 
+-    let {intlDayHeader, intlDayHeaderAL} = $derived(getContext('state'));
++    let {intlDayHeader, intlDayHeaderAL, options: {dayHeaderContent}} = $derived(getContext('state'));
++
++    let content = $derived(
++        isFunction(dayHeaderContent)
++            ? dayHeaderContent({date: toLocalDate(date), text: intlDayHeader.format(date)})
++            : (dayHeaderContent ?? intlDayHeader.format(date))
++    );
+ </script>
+ 
+ <time
+     datetime="{toISOString(date, 10)}"
+     aria-label="{alPrefix}{intlDayHeaderAL.format(date)}"
+-    {@attach contentFrom(intlDayHeader.format(date))}
++    {@attach contentFrom(content)}
+ ></time>
+diff --git a/node_modules/@event-calendar/core/src/plugins/list/Event.svelte b/node_modules/@event-calendar/core/src/plugins/list/Event.svelte
+index 04bab5c..7c680bb 100644
+--- a/node_modules/@event-calendar/core/src/plugins/list/Event.svelte
++++ b/node_modules/@event-calendar/core/src/plugins/list/Event.svelte
+@@ -8,8 +8,8 @@
+ 
+     // Style
+     let styles = $derived(style => {
+-        delete style['background-color'];
+-        delete style['color'];
++        delete style['--event_background'];
++        delete style['--event_colour'];
+         return style;
+     });
+ </script>
+diff --git a/node_modules/@event-calendar/core/src/storage/options.js b/node_modules/@event-calendar/core/src/storage/options.js
+index ddaa205..3be2500 100644
+--- a/node_modules/@event-calendar/core/src/storage/options.js
++++ b/node_modules/@event-calendar/core/src/storage/options.js
+@@ -16,6 +16,7 @@ function createOptions(plugins) {
+         dateIncrement: undefined,
+         datesSet: undefined,
+         dayCellContent: undefined,
++        dayHeaderContent: undefined,
+         dayHeaderFormat: {
+             weekday: 'short',
+             month: 'numeric',
