@@ -95,6 +95,7 @@
 	}
 
 	input[type='radio'] {
+
 		@include sr_only;
 
 		&:checked {

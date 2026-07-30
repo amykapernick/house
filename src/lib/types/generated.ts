@@ -309,6 +309,11 @@ export type ContentPageLink = {
   title: Maybe<Scalars['String']['output']>;
 };
 
+export type CreateFreezerItemResult = {
+  item: Maybe<FreezerItem>;
+  success: Scalars['Boolean']['output'];
+};
+
 export type CreateHabitResult = {
   success: Scalars['Boolean']['output'];
 };
@@ -411,6 +416,7 @@ export type FreezerItem = {
   recipes: Array<FreezerRecipeLink>;
   serves: Maybe<Scalars['Float']['output']>;
   type: Maybe<Scalars['String']['output']>;
+  upcoming: Scalars['Boolean']['output'];
 };
 
 export type FreezerRecipeLink = {
@@ -687,6 +693,7 @@ export type Mutation = {
   completeTask: Maybe<CompleteTaskResult>;
   createBudgetItem: Maybe<BudgetMutationResult>;
   createColour: Maybe<ColourMutationResult>;
+  createFreezerItem: Maybe<CreateFreezerItemResult>;
   createHabit: Maybe<CreateHabitResult>;
   createHouseArea: Maybe<HouseMutationResult>;
   createHouseItem: Maybe<HouseMutationResult>;
@@ -711,6 +718,9 @@ export type Mutation = {
   updateBudgetItem: Maybe<BudgetMutationResult>;
   updateColour: Maybe<ColourMutationResult>;
   updateDefaultRoutine: Maybe<ScheduleMutationResult>;
+  updateFreezerItemRecipes: Maybe<UpdateFreezerItemRecipesResult>;
+  updateFreezerItemServes: Maybe<UpdateFreezerItemServesResult>;
+  updateFreezerItemUpcoming: Maybe<UpdateFreezerItemUpcomingResult>;
   updateHouseArea: Maybe<HouseMutationResult>;
   updateHouseItem: Maybe<HouseMutationResult>;
   updateMe: Maybe<User>;
@@ -752,6 +762,11 @@ export type MutationCreateBudgetItemArgs = {
 
 export type MutationCreateColourArgs = {
   input: ColourInput;
+};
+
+
+export type MutationCreateFreezerItemArgs = {
+  name: Scalars['String']['input'];
 };
 
 
@@ -908,6 +923,24 @@ export type MutationUpdateDefaultRoutineArgs = {
   tuesday: Array<RoutineDayBlockInput>;
   user: Scalars['String']['input'];
   wednesday: Array<RoutineDayBlockInput>;
+};
+
+
+export type MutationUpdateFreezerItemRecipesArgs = {
+  id: Scalars['ID']['input'];
+  recipeNames: Array<Scalars['String']['input']>;
+};
+
+
+export type MutationUpdateFreezerItemServesArgs = {
+  id: Scalars['ID']['input'];
+  serves: Scalars['Float']['input'];
+};
+
+
+export type MutationUpdateFreezerItemUpcomingArgs = {
+  id: Scalars['ID']['input'];
+  upcoming: Scalars['Boolean']['input'];
 };
 
 
@@ -1603,6 +1636,18 @@ export type TrackerData = {
 
 export type TrackerDataAlertsArgs = {
   orderBy?: InputMaybe<AlertOrderBy>;
+};
+
+export type UpdateFreezerItemRecipesResult = {
+  success: Scalars['Boolean']['output'];
+};
+
+export type UpdateFreezerItemServesResult = {
+  success: Scalars['Boolean']['output'];
+};
+
+export type UpdateFreezerItemUpcomingResult = {
+  success: Scalars['Boolean']['output'];
 };
 
 export type UpdateUserInput = {

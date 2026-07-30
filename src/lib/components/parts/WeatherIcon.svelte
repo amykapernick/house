@@ -10,7 +10,7 @@
 	import MoonCloudHail from '$img/weather/moon-cloud-hail-colored.svg?component';
 	import SunCloudLight from '$img/weather/sun-cloud-light-colored.svg?component';
 	import MoonCloudLight from '$img/weather/moon-cloud-light-colored.svg?component';
-	import CloudDrop from '$img/weather/cloud-hail-colored.svg';
+	import CloudDrop from '$img/weather/cloud-hail-colored.svg?component';
 	import RainHail from '$img/weather/rain-hail-colored.svg?component';
 	import SunCloudSnow from '$img/weather/sun-cloud-snow-55-colored.svg?component';
 	import MoonCloudSnow from '$img/weather/moon-cloud-snow-62-colored.svg?component';

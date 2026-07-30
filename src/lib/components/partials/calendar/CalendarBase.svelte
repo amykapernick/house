@@ -108,6 +108,7 @@
 		}
 
 		& :global(.ec-title) {
+
 			@include sr_only;
 		}
 
@@ -169,6 +170,7 @@
 		}
 
 		& :global(:is(.ec-sidebar, .ec-col-head)) {
+
 			@include subtitle;
 
 			padding: 0.2em;

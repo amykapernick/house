@@ -123,6 +123,7 @@
 	@import '@mixins';
 
 	.header {
+
 		@include container_spacing;
 
 		--header_background: light-dark(color-mix(in oklch, var(--background) 90%, var(--black)), color-mix(in oklch, var(--dark_background) 90%, var(--white)));
@@ -170,6 +171,7 @@
 	}
 
 	.collapse {
+
 		@include button_text;
 
 		@include button_icon;
@@ -200,6 +202,7 @@
 			gap: 0.5em;
 
 			& .name {
+
 				@include sr_only;
 			}
 		}

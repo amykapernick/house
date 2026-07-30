@@ -33,6 +33,7 @@
 >
 	<h2>{season} recipes</h2>
 
+	<!-- TODO: Add any recipes that are linked to things in the freezer -->
 	{#if loading}
 		<Skeleton rows={3} />
 	{:else if recipes.length === 0}

@@ -127,7 +127,7 @@
 		/>
 	{/if}
 	{#if link}
-		<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- link is the external Notion/Todoist task page, not an internal route -->
+		<!-- eslint-disable svelte/no-navigation-without-resolve -- link is the external Notion/Todoist task page, not an internal route -->
 		<a
 			class="link"
 			href={link}
@@ -138,6 +138,7 @@
 			<!-- TODO: select correct icon per platform -->
 			<Notion />
 		</a>
+		<!-- eslint-enable svelte/no-navigation-without-resolve -->
 	{/if}
 	{#if actionError}<p class="error">{actionError}</p>{/if}
 	<!-- TODO: add styling -->

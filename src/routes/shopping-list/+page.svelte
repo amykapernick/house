@@ -2,10 +2,11 @@
 	import { isAuthenticated, getToken } from '$lib/auth';
 	import fetchClientData, { setCache, getGraphqlUrl } from '$utils/fetchClientData';
 	import { resolve } from '$app/paths';
-	import { SvelteSet } from 'svelte/reactivity';
+	import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 	import CheckboxButton from '$parts/CheckboxButton.svelte';
 	import Skeleton from '$parts/Skeleton.svelte';
 	import EmptyState from '$parts/EmptyState.svelte';
+	import FreezerRecipesModal from '$partials/shoppingList/FreezerRecipesModal.svelte';
 	import { getPageTitle } from '$utils/pageTitle';
 
 	type SubGroup = { name: string; items: any[] };
@@ -17,9 +18,18 @@
 	let loading = $state(true);
 	let showChecked = $state(false);
 	let checking = new SvelteSet<string>();
+	let updatingServes = new SvelteSet<string>();
+	let updatingUpcoming = new SvelteSet<string>();
 	let newItemText = $state('');
 	let adding = $state(false);
+	let addingToFreezer = $state(false);
 	let addError = $state('');
+
+	let freezerModalOpen = $state(false);
+	let editingFreezerItem = $state<any | null>(null);
+	let freezerModalRecipes = $state<any[]>([]);
+	let savingFreezerRecipes = $state(false);
+	let freezerModalError = $state('');
 
 	function fetchList(skipCache = false) {
 		loading = true;
@@ -51,7 +61,7 @@
 						}
 					}
 					freezerItems {
-						id name serves type
+						id name serves type upcoming
 						recipes { name slug }
 					}
 				}
@@ -95,6 +105,127 @@
 		fetchList(true);
 	}
 
+	async function addFreezerItem() {
+		const name = newItemText.trim();
+		if (!name) return;
+
+		addingToFreezer = true;
+		addError = '';
+
+		const token = await getToken();
+		const res = await fetch(getGraphqlUrl(), {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				...(token ? { Authorization: `Bearer ${token}` } : {}),
+			},
+			body: JSON.stringify({
+				query: `mutation { createFreezerItem(name: ${JSON.stringify(name)}) { success item { id name serves type upcoming recipes { name slug } } } }`,
+			}),
+		}).then((r) => r.json());
+
+		addingToFreezer = false;
+
+		if (res?.errors || !res?.data?.createFreezerItem?.success) {
+			addError = 'Failed to add freezer item.';
+			return;
+		}
+
+		newItemText = '';
+		freezerItems = [...freezerItems, res.data.createFreezerItem.item];
+		setCache('shopping-list', { shoppingList: { items, storeGroups }, freezerItems });
+	}
+
+	async function adjustFreezerServes(item: any, delta: number) {
+		const newServes = Math.max(0, (item.serves ?? 0) + delta);
+		if (newServes === item.serves) return;
+
+		updatingServes.add(item.id);
+
+		const token = await getToken();
+		const res = await fetch(getGraphqlUrl(), {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				...(token ? { Authorization: `Bearer ${token}` } : {}),
+			},
+			body: JSON.stringify({
+				query: `mutation { updateFreezerItemServes(id: "${item.id}", serves: ${newServes}) { success } }`,
+			}),
+		}).then((r) => r.json());
+
+		updatingServes.delete(item.id);
+
+		if (res?.errors || !res?.data?.updateFreezerItemServes?.success) return;
+
+		freezerItems = freezerItems.map((i) => (i.id === item.id ? { ...i, serves: newServes } : i));
+		setCache('shopping-list', { shoppingList: { items, storeGroups }, freezerItems });
+	}
+
+	async function toggleFreezerUpcoming(item: any) {
+		const newUpcoming = !item.upcoming;
+		updatingUpcoming.add(item.id);
+
+		const token = await getToken();
+		const res = await fetch(getGraphqlUrl(), {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				...(token ? { Authorization: `Bearer ${token}` } : {}),
+			},
+			body: JSON.stringify({
+				query: `mutation { updateFreezerItemUpcoming(id: "${item.id}", upcoming: ${newUpcoming}) { success } }`,
+			}),
+		}).then((r) => r.json());
+
+		updatingUpcoming.delete(item.id);
+
+		if (res?.errors || !res?.data?.updateFreezerItemUpcoming?.success) return;
+
+		freezerItems = freezerItems.map((i) => (i.id === item.id ? { ...i, upcoming: newUpcoming } : i));
+		setCache('shopping-list', { shoppingList: { items, storeGroups }, freezerItems });
+	}
+
+	function openFreezerRecipeEditor(item: any) {
+		editingFreezerItem = item;
+		freezerModalRecipes = [...(item.recipes ?? [])];
+		freezerModalError = '';
+		freezerModalOpen = true;
+	}
+
+	async function saveFreezerRecipes() {
+		if (!editingFreezerItem) return;
+
+		savingFreezerRecipes = true;
+		freezerModalError = '';
+
+		const recipeNames = freezerModalRecipes.map((r) => r.name);
+		const token = await getToken();
+		const res = await fetch(getGraphqlUrl(), {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				...(token ? { Authorization: `Bearer ${token}` } : {}),
+			},
+			body: JSON.stringify({
+				query: `mutation { updateFreezerItemRecipes(id: "${editingFreezerItem.id}", recipeNames: ${JSON.stringify(recipeNames)}) { success } }`,
+			}),
+		}).then((r) => r.json());
+
+		savingFreezerRecipes = false;
+
+		if (res?.errors || !res?.data?.updateFreezerItemRecipes?.success) {
+			freezerModalError = 'Failed to save recipes.';
+			return;
+		}
+
+		const updatedRecipes = freezerModalRecipes;
+		const itemId = editingFreezerItem.id;
+		freezerItems = freezerItems.map((i) => (i.id === itemId ? { ...i, recipes: updatedRecipes } : i));
+		setCache('shopping-list', { shoppingList: { items, storeGroups }, freezerItems });
+		freezerModalOpen = false;
+	}
+
 	async function toggleItem(item: any) {
 		const newChecked = !item.checked;
 		checking.add(item.id);
@@ -129,6 +260,33 @@
 		// device/tab reading the same cache key) doesn't show the pre-toggle state.
 		setCache('shopping-list', { shoppingList: { items, storeGroups }, freezerItems });
 	}
+
+	// Items flagged as needing to be eaten soon float to the top.
+	let sortedFreezerItems = $derived(
+		[...freezerItems].sort((a, b) => Number(b.upcoming) - Number(a.upcoming))
+	);
+
+	const FREEZER_TYPE_ORDER = ['Meal', 'Component', 'Ingredient'];
+
+	// Subsections by Type, mirroring the shopping list's store/sub-group grouping.
+	let freezerGroups = $derived.by(() => {
+		const groups = new SvelteMap<string, any[]>();
+		for (const item of sortedFreezerItems) {
+			const type = item.type ?? 'Uncategorised';
+			if (!groups.has(type)) groups.set(type, []);
+			groups.get(type)!.push(item);
+		}
+		return [...groups.entries()]
+			.map(([name, groupItems]) => ({ name, items: groupItems }))
+			.sort((a, b) => {
+				const aIndex = FREEZER_TYPE_ORDER.indexOf(a.name);
+				const bIndex = FREEZER_TYPE_ORDER.indexOf(b.name);
+				if (aIndex === -1 && bIndex === -1) return a.name.localeCompare(b.name);
+				if (aIndex === -1) return 1;
+				if (bIndex === -1) return -1;
+				return aIndex - bIndex;
+			});
+	});
 
 	let uncheckedItems = $derived(items.filter((i) => !i.checked));
 	let checkedItems = $derived(items.filter((i) => i.checked));
@@ -171,12 +329,17 @@
 		type="text"
 		placeholder="Add an item..."
 		bind:value={newItemText}
-		disabled={adding}
-		aria-label="Add an item to the shopping list"
+		disabled={adding || addingToFreezer}
+		aria-label="Add an item to the shopping list or freezer"
 	/>
 	<button
 		type="submit"
-		disabled={adding || !newItemText.trim()}>{adding ? 'Adding…' : 'Add'}</button
+		disabled={adding || addingToFreezer || !newItemText.trim()}>{adding ? 'Adding…' : 'Add to list'}</button
+	>
+	<button
+		type="button"
+		disabled={adding || addingToFreezer || !newItemText.trim()}
+		onclick={addFreezerItem}>{addingToFreezer ? 'Adding…' : 'Add to freezer'}</button
 	>
 </form>
 {#if addError}<p class="error">{addError}</p>{/if}
@@ -236,13 +399,30 @@
 		open
 	>
 		<summary><h2>Freezer</h2></summary>
-		<ul>
-			{#each freezerItems as item (item.id)}
-				{@render freezerRow(item)}
-			{/each}
-		</ul>
+		{#each freezerGroups as group (group.name)}
+			<details
+				class="sub-group"
+				open
+			>
+				<summary><h3>{group.name}</h3></summary>
+				<ul>
+					{#each group.items as item (item.id)}
+						{@render freezerRow(item)}
+					{/each}
+				</ul>
+			</details>
+		{/each}
 	</details>
 {/if}
+
+<FreezerRecipesModal
+	bind:open={freezerModalOpen}
+	itemName={editingFreezerItem?.name ?? ''}
+	bind:recipes={freezerModalRecipes}
+	saving={savingFreezerRecipes}
+	error={freezerModalError}
+	onSave={saveFreezerRecipes}
+/>
 
 {#snippet itemRow(item: any)}
 	<li class:checked={item.checked}>
@@ -272,14 +452,11 @@
 	</li>
 {/snippet}
 
-<!-- TODO: Allow  editing a freezer item via the modal -->
 {#snippet freezerRow(item: any)}
-	<li>
+	<li class:upcoming={item.upcoming}>
 		<span class="item-row">
 			<span class="item-display">
 				{item.name}
-				{#if item.type}<span class="type-badge">{item.type}</span>{/if}
-				{#if item.serves}<span class="serves">Serves {item.serves}</span>{/if}
 			</span>
 			{#if item.recipes?.length}
 				<span class="item-recipes">
@@ -295,6 +472,38 @@
 					{/each}
 				</span>
 			{/if}
+			<button
+				type="button"
+				class="edit-recipes"
+				onclick={() => openFreezerRecipeEditor(item)}>{item.recipes?.length ? 'Edit recipes' : 'Link recipe'}</button
+			>
+			<span class="upcoming-toggle">
+				<input
+					type="checkbox"
+					id={`freezer-upcoming-${item.id}`}
+					checked={item.upcoming}
+					disabled={updatingUpcoming.has(item.id)}
+					onchange={() => toggleFreezerUpcoming(item)}
+				/>
+				<label for={`freezer-upcoming-${item.id}`}>Eat soon</label>
+			</span>
+		</span>
+		<span class="serves-control">
+			<button
+				type="button"
+				class="serves-btn"
+				disabled={updatingServes.has(item.id) || !item.serves}
+				onclick={() => adjustFreezerServes(item, -1)}
+				aria-label={`Decrease serves of ${item.name}`}>−</button
+			>
+			<span class="serves-value">{item.serves ?? 0}</span>
+			<button
+				type="button"
+				class="serves-btn"
+				disabled={updatingServes.has(item.id)}
+				onclick={() => adjustFreezerServes(item, 1)}
+				aria-label={`Increase serves of ${item.name}`}>+</button
+			>
 		</span>
 	</li>
 {/snippet}
@@ -451,6 +660,11 @@
 				text-decoration: line-through;
 			}
 		}
+
+		&.upcoming {
+			border-left: 3px solid var(--warning);
+			background: var(--warning_bg);
+		}
 	}
 
 	:global(.check-btn) {
@@ -488,19 +702,62 @@
 		cursor: default;
 	}
 
-	.type-badge {
-		margin-left: 0.5em;
-		padding: 0.1em 0.5em;
-		border-radius: 0.2em;
-		background: color-mix(in oklch, var(--navy) 15%, var(--transparent));
-		color: var(--navy);
-		font-size: 0.75em;
-		text-transform: uppercase;
+	.edit-recipes {
+		@include button_text;
 	}
 
-	.serves {
-		margin-left: 0.5em;
+	.upcoming-toggle {
+		display: flex;
+		align-items: center;
 		color: var(--grey);
-		font-size: 0.8em;
+		font-size: 0.75em;
+		gap: 0.3em;
+
+		& input {
+			cursor: pointer;
+		}
+
+		& label {
+			cursor: pointer;
+		}
+	}
+
+	.serves-control {
+		display: flex;
+		flex-shrink: 0;
+		align-items: center;
+		gap: 0.4em;
+	}
+
+	.serves-btn {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 1.6em;
+		height: 1.6em;
+		border: 1px solid var(--grey_light);
+		border-radius: 50%;
+		background: none;
+		color: var(--navy);
+		font-size: 0.9em;
+		line-height: 1;
+		cursor: pointer;
+
+		&:disabled {
+			opacity: 0.4;
+			cursor: default;
+		}
+
+		&:not(:disabled):hover {
+			border-color: var(--purple_bright);
+			color: var(--purple_bright);
+		}
+	}
+
+	.serves-value {
+		min-width: 1.2em;
+		color: var(--grey);
+		font-size: 0.85em;
+		text-align: center;
 	}
 </style>

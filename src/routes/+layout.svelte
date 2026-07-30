@@ -215,6 +215,7 @@
 	}
 
 	.palette_trigger {
+
 		@include button_icon;
 
 		position: fixed;
@@ -227,6 +228,7 @@
 	}
 
 	.focus_timer_trigger {
+
 		@include button_icon;
 
 		position: fixed;

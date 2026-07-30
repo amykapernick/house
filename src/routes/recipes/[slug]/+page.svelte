@@ -451,10 +451,12 @@
 		}
 
 		& input[type='radio'] {
+
 			@include sr_only;
 
 			&:checked {
 				& + label {
+
 					@include theme_gradient(purple_bright);
 
 					color: var(--purple_bright_text);
@@ -464,6 +466,7 @@
 
 		& label,
 		& input {
+
 			@include button;
 
 			grid-column: unset;
@@ -481,6 +484,7 @@
 		& input[type='number'] {
 			&:focus,
 			&.active {
+
 				@include theme_gradient(purple_bright);
 
 				color: var(--purple_bright_text);
@@ -584,6 +588,7 @@
 
 		& .unit {
 			&:has(~ .unit-select) {
+
 				@include sr_only;
 
 				cursor: pointer;

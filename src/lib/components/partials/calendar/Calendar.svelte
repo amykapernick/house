@@ -12,8 +12,8 @@
 	import fetchFamilyMembers, { EVERYONE, isVisibleToUser, type FamilyMember } from '$utils/fetchFamilyMembers';
 	import formatCalendarTitle from '$utils/calendar/formatCalendarTitle';
 	import formatEventTimeRange from '$utils/calendar/formatEventTimeRange';
-	import notionIcon from '$img/icons/notion.svg?src';
-	import todoistIcon from '$img/icons/todoist.svg?src';
+	import notionIcon from '$img/icons/notion.svg?component';
+	import todoistIcon from '$img/icons/todoist.svg?component';
 	import type { Task } from '$types/tasks';
 
 	// Matches Task.svelte's own external "open in platform" link - github tasks

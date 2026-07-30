@@ -38,6 +38,7 @@
 	@import '@mixins';
 
 	.mark-read {
+
 		@include button_secondary;
 
 		margin: 1.5em 0 0;

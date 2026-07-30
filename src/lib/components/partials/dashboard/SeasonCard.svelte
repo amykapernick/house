@@ -14,7 +14,7 @@
 	>
 		<h3>{season.name}</h3>
 		<ul class="months">
-			{#each season.months as month}
+			{#each season.months as month (month)}
 				<li>
 					<Pill>{month}</Pill>
 				</li>

@@ -616,6 +616,7 @@
 		}
 
 		& h2 {
+
 			@include sr_only;
 		}
 	}

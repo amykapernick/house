@@ -80,6 +80,7 @@
 	}
 
 	.label {
+
 		@include sr_only;
 	}
 
@@ -115,6 +116,7 @@
 				}
 
 				& .label {
+
 					@include remove_sr_only;
 				}
 			}

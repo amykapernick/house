@@ -1,4 +1,4 @@
-export type UvBand = 'low' | 'moderate' | 'high';
+export type UvBand = `low` | `moderate` | `high`;
 
 export type UvBandInfo = {
 	band: UvBand;

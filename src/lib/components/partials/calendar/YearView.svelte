@@ -95,7 +95,9 @@
 										<button
 											type="button"
 											class="event"
-											style="--event_background: {event.backgroundColor}; --event_colour: {event.textColor}"
+											style="
+
+--event_background: {event.backgroundColor}; --event_colour: {event.textColor}"
 											onclick={() => onEventClick?.(event)}
 										>
 											{event.title}

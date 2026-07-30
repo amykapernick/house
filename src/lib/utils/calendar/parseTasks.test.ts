@@ -63,7 +63,8 @@ describe(`parseTasks`, () => {
 			expect(result.start.getDate()).toBe(27);
 			expect(result.end.getHours()).toBe(0);
 			expect(result.end.getDate()).toBe(28);
-		} finally {
+		}
+		finally {
 			process.env.TZ = originalTZ;
 		}
 	});
