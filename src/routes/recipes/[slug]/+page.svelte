@@ -180,6 +180,8 @@
 				<p class="description">{recipe.description}</p>
 			{/if}
 
+			<!-- TODO: Show serves in freezer -->
+
 			<Stats
 				items={metaItems}
 				class="meta"
@@ -253,6 +255,8 @@
 		</header>
 
 		<!-- TODO: Work out putting ingredients in columns on big screen sizes -->
+		<!-- TODO: Show relevant freezer ingredients next to matched ingredients -->
+		<!-- TODO: Show freezer components at top of ingredients list -->
 		<section class="ingredients">
 			<h2>Ingredients</h2>
 			{#if recipe.ingredients?.length}
@@ -377,10 +381,6 @@
 
 <style>
 	@import '@mixins';
-
-	:global(.main > .layout.layout) {
-		max-width: 1800px;
-	}
 
 	.hero {
 		grid-area: image;
@@ -670,11 +670,6 @@
 	}
 
 	@media (width >= 40em) {
-		:global(.main > .layout.layout) {
-			padding-right: 0;
-			padding-left: 0;
-		}
-
 		.instructions,
 		.notes {
 			width: 70%;
@@ -683,13 +678,6 @@
 		.ingredients,
 		.tools {
 			width: 30%;
-		}
-	}
-
-	@media (width >= 50em) {
-		:global(.main > .layout.layout) {
-			padding-right: 20px;
-			padding-left: 20px;
 		}
 	}
 
@@ -704,13 +692,6 @@
 					'tags tags tags';
 				grid-template-columns: 1fr auto auto;
 			}
-		}
-	}
-
-	@media (width >= 60em) {
-		:global(.main > .layout.layout) {
-			padding-right: 50px;
-			padding-left: 50px;
 		}
 	}
 </style>

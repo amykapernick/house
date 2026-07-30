@@ -13,6 +13,7 @@
 
 	let items = $state<any[]>([]);
 	let storeGroups = $state<StoreGroup[]>([]);
+	let freezerItems = $state<any[]>([]);
 	let loading = $state(true);
 	let showChecked = $state(false);
 	let checking = new SvelteSet<string>();
@@ -25,6 +26,7 @@
 		function handleList(res: any) {
 			items = res.shoppingList?.items ?? [];
 			storeGroups = res.shoppingList?.storeGroups ?? [];
+			freezerItems = res.freezerItems ?? [];
 			loading = false;
 		}
 		fetchClientData({
@@ -47,6 +49,10 @@
 								items { id display checked quantity note category labels source link recipes { id name slug } }
 							}
 						}
+					}
+					freezerItems {
+						id name serves type
+						recipes { name slug }
 					}
 				}
 			`,
@@ -121,7 +127,7 @@
 
 		// Keep the shared cache in sync so a revisit within the TTL (or another
 		// device/tab reading the same cache key) doesn't show the pre-toggle state.
-		setCache('shopping-list', { shoppingList: { items, storeGroups } });
+		setCache('shopping-list', { shoppingList: { items, storeGroups }, freezerItems });
 	}
 
 	let uncheckedItems = $derived(items.filter((i) => !i.checked));
@@ -152,6 +158,8 @@
 
 <h1>Shopping List</h1>
 
+<!-- TODO: Create a component for input + button/s using the autocomplete component as a basis -->
+<!-- TODO: Allow adding freezer item with plain text "{ingredient} * {qty} #{type} @{recipe}" where type and recipe autocomplete the options when typing (type immediately after #, recipe after 3 characters) -->
 <form
 	class="quick-add"
 	onsubmit={(e) => {
@@ -222,6 +230,20 @@
 	{/each}
 {/if}
 
+{#if freezerItems.length}
+	<details
+		class="store"
+		open
+	>
+		<summary><h2>Freezer</h2></summary>
+		<ul>
+			{#each freezerItems as item (item.id)}
+				{@render freezerRow(item)}
+			{/each}
+		</ul>
+	</details>
+{/if}
+
 {#snippet itemRow(item: any)}
 	<li class:checked={item.checked}>
 		<CheckboxButton
@@ -243,6 +265,33 @@
 							href={resolve(`/recipes/[slug]`, { slug: recipe.slug })}
 							class="recipe-tag">{recipe.name}</a
 						>
+					{/each}
+				</span>
+			{/if}
+		</span>
+	</li>
+{/snippet}
+
+<!-- TODO: Allow  editing a freezer item via the modal -->
+{#snippet freezerRow(item: any)}
+	<li>
+		<span class="item-row">
+			<span class="item-display">
+				{item.name}
+				{#if item.type}<span class="type-badge">{item.type}</span>{/if}
+				{#if item.serves}<span class="serves">Serves {item.serves}</span>{/if}
+			</span>
+			{#if item.recipes?.length}
+				<span class="item-recipes">
+					{#each item.recipes as recipe (recipe.name)}
+						{#if recipe.slug}
+							<a
+								href={resolve(`/recipes/[slug]`, { slug: recipe.slug })}
+								class="recipe-tag">{recipe.name}</a
+							>
+						{:else}
+							<span class="recipe-tag recipe-tag-unlinked">{recipe.name}</span>
+						{/if}
 					{/each}
 				</span>
 			{/if}
@@ -432,5 +481,26 @@
 		&:hover {
 			text-decoration: underline;
 		}
+	}
+
+	.recipe-tag-unlinked {
+		color: var(--grey);
+		cursor: default;
+	}
+
+	.type-badge {
+		margin-left: 0.5em;
+		padding: 0.1em 0.5em;
+		border-radius: 0.2em;
+		background: color-mix(in oklch, var(--navy) 15%, var(--transparent));
+		color: var(--navy);
+		font-size: 0.75em;
+		text-transform: uppercase;
+	}
+
+	.serves {
+		margin-left: 0.5em;
+		color: var(--grey);
+		font-size: 0.8em;
 	}
 </style>

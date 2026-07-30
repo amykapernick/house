@@ -179,7 +179,10 @@
 
 <Header />
 <main class="main">
-	<Layout>
+	<Layout
+		wide={page.data.layoutWidth === 'wide'}
+		full={page.data.layoutWidth === 'full'}
+	>
 		{@render children()}
 	</Layout>
 </main>

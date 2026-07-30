@@ -12,6 +12,10 @@ declare global {
 				token: string | null
 			}
 		}
+		interface PageData {
+			/** Read by the root +layout.svelte to size $layouts/Default.svelte - see its `wide`/`full` props. */
+			layoutWidth?: `wide` | `full`
+		}
 	}
 }
 

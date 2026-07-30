@@ -405,6 +405,19 @@ export type FeetRecommendation =
   | 'shoes'
   | 'socks';
 
+export type FreezerItem = {
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  recipes: Array<FreezerRecipeLink>;
+  serves: Maybe<Scalars['Float']['output']>;
+  type: Maybe<Scalars['String']['output']>;
+};
+
+export type FreezerRecipeLink = {
+  name: Scalars['String']['output'];
+  slug: Maybe<Scalars['String']['output']>;
+};
+
 export type Growth = {
   check_frequency: Scalars['Int']['output'];
   last_updated: Scalars['String']['output'];
@@ -476,6 +489,7 @@ export type House = {
   availableHouseAreas: Array<AvailableHouseArea>;
   availableHouseItems: Array<AvailableHouseEntity>;
   binCollections: Array<BinCollection>;
+  currentSeason: Maybe<Season>;
   homeAssistant: Maybe<HomeAssistant>;
   info: Maybe<Array<Maybe<Info>>>;
   items: Maybe<Array<Maybe<Item>>>;
@@ -1030,6 +1044,7 @@ export type Query = {
   contentIndex: Maybe<Array<Maybe<ContentGroup>>>;
   contentPage: Maybe<ContentPage>;
   events: Maybe<Array<Maybe<Event>>>;
+  freezerItems: Maybe<Array<FreezerItem>>;
   habits: Maybe<Array<Maybe<Habit>>>;
   house: Maybe<House>;
   me: Maybe<User>;
@@ -1316,6 +1331,14 @@ export type ScheduleBlock = {
 
 export type ScheduleMutationResult = {
   success: Scalars['Boolean']['output'];
+};
+
+export type Season = {
+  colour: Maybe<Scalars['String']['output']>;
+  description: Maybe<Scalars['String']['output']>;
+  months: Array<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+  subtitle: Maybe<Scalars['String']['output']>;
 };
 
 export type SeasonalAlert = {

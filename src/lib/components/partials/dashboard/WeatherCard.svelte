@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { format, parseISO } from 'date-fns';
 	import type { Weather } from '$types/generated';
+	import WeatherIcon from '$components/parts/WeatherIcon.svelte';
 
 	let {
 		weather,
@@ -10,30 +11,11 @@
 		class?: string;
 	} = $props();
 
-	// Home Assistant's fixed weather condition enum (see the `weather` integration docs) -
-	// anything not in this map (a future condition, or an integration reporting something
-	// non-standard) falls back to DEFAULT_ICON rather than showing nothing.
-	const CONDITION_ICONS: Record<string, string> = {
-		'clear-night': '🌙',
-		cloudy: '☁️',
-		exceptional: '⚠️',
-		fog: '🌫️',
-		hail: '🌨️',
-		lightning: '⚡',
-		'lightning-rainy': '⛈️',
-		partlycloudy: '⛅',
-		pouring: '🌧️',
-		rainy: '🌦️',
-		snowy: '❄️',
-		'snowy-rainy': '🌨️',
-		sunny: '☀️',
-		windy: '💨',
-		'windy-variant': '💨',
-	};
-	const DEFAULT_ICON = '🌡️';
-
-	const iconFor = (condition: string | null | undefined) => (condition && CONDITION_ICONS[condition]) || DEFAULT_ICON;
 	const formatTemp = (value: number | null | undefined) => (value == null ? '—' : `${Math.round(value)}°C`);
+
+	// Today's BOM shortText/extendedText are proper prose ("Sunny.") - prefer them over the
+	// raw condition enum (eg. "partlycloudy") straight off the Home Assistant entity state.
+	let conditionText = $derived(weather?.forecast?.[0]?.shortText ?? weather?.forecast?.[0]?.extendedText ?? weather?.condition);
 
 	let now = $state(new Date());
 	$effect(() => {
@@ -64,9 +46,14 @@
 		<p class="empty">No weather entity found - tag one with the house_app label in Home Assistant.</p>
 	{:else}
 		<div class="current">
-			<span class="icon" aria-hidden="true">{iconFor(weather.condition)}</span>
+			<span
+				class="icon"
+				aria-hidden="true"
+			>
+				<WeatherIcon condition={weather.condition} />
+			</span>
 			<div class="details">
-				<p class="condition">{weather.condition}, {formatTemp(weather.temperature)}</p>
+				<p class="condition">{conditionText}, {formatTemp(weather.temperature)}</p>
 				{#if weather.humidity != null}<p class="humidity">{weather.humidity}% Humidity</p>{/if}
 				<p class="time">{format(now, 'hh:mm a')}</p>
 				<p class="date">{format(now, 'd-MMM')}</p>
@@ -78,10 +65,18 @@
 				{#each weather.forecast as day (day.date)}
 					<li>
 						<span class="day">{format(parseISO(day.date), 'EEE')}</span>
-						<span class="icon" aria-hidden="true">{iconFor(day.condition)}</span>
+						<span
+							class="icon"
+							aria-hidden="true"
+						>
+							<WeatherIcon condition={day.condition} />
+						</span>
 						<span class="temp low">{formatTemp(day.tempLow)}</span>
 						<span class="bar-track">
-							<span class="bar" style={barStyle(day.tempLow, day.tempHigh)}></span>
+							<span
+								class="bar"
+								style={barStyle(day.tempLow, day.tempHigh)}
+							></span>
 						</span>
 						<span class="temp high">{formatTemp(day.tempHigh)}</span>
 					</li>
@@ -110,8 +105,8 @@
 		gap: 1em;
 
 		& .icon {
+			flex-shrink: 0;
 			font-size: 3em;
-			line-height: 1;
 		}
 
 		& .details {
@@ -153,6 +148,16 @@
 
 		& .day {
 			color: var(--grey);
+		}
+
+		& .icon {
+			width: 1.5em;
+			height: 1.5em;
+
+			& :global(svg) {
+				width: 100%;
+				height: 100%;
+			}
 		}
 
 		& .temp {

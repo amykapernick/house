@@ -16,8 +16,8 @@
 	// with a generic icon/colour rather than being dropped.
 	const BIN_STYLES: { pattern: RegExp; icon: string; colour: string }[] = [
 		{ pattern: /general bin/i, icon: '🗑️', colour: 'blue' },
-		{ pattern: /recycling bin/i, icon: '♻️', colour: 'yellow' },
-		{ pattern: /green waste/i, icon: '🌳', colour: 'green' },
+		{ pattern: /recycling bin/i, icon: '♻️', colour: 'yellow_bright' },
+		{ pattern: /green waste/i, icon: '🌳', colour: 'green_base' },
 		{ pattern: /hard rubbish/i, icon: '🚛', colour: 'grey' },
 	];
 	const DEFAULT_STYLE = { icon: '🗑️', colour: 'purple' };
@@ -34,7 +34,10 @@
 			{#each bins as bin (bin.binType)}
 				{@const style = styleFor(bin.binType)}
 				<li style="background: var(--{style.colour}); color: var(--{style.colour}_text);">
-					<span class="icon" aria-hidden="true">{style.icon}</span>
+					<span
+						class="icon"
+						aria-hidden="true">{style.icon}</span
+					>
 					<div>
 						<p class="type">{bin.binType}</p>
 						<p class="date">{formatDate(bin.nextDate)}</p>

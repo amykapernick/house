@@ -11,9 +11,15 @@
 	import ProfileMenu from '$components/parts/ProfileMenu.svelte';
 	import Moon from '$img/icons/moon.svg?component';
 	import Sun from '$img/icons/u2600-sunrays.svg?component';
+	import CollapseIcon from '$img/icons/double-arrow-right-outline.svg?component';
 	import { theme, setTheme, type Theme } from '$utils/theme';
+	import { sidebarCollapsed, setSidebarCollapsed } from '$utils/sidebarCollapsed';
 
 	let { class: className = '' }: { class?: string } = $props();
+
+	function toggleSidebar() {
+		setSidebarCollapsed(!$sidebarCollapsed);
+	}
 
 	// The switch's two options are positional (index 0/1, see Switch.svelte's
 	// CSS-driven thumb) - this order is what ties that position back to an
@@ -56,7 +62,10 @@
 	});
 </script>
 
-<header class="header {className}">
+<header
+	class="header {className}"
+	class:collapsed={$sidebarCollapsed}
+>
 	<a
 		href={resolve('/')}
 		class="title"
@@ -84,7 +93,17 @@
 		class="nav"
 		{menuItems}
 		isAuthenticated={$isAuthenticated}
+		collapsed={$sidebarCollapsed}
 	/>
+	<button
+		type="button"
+		class="collapse"
+		onclick={toggleSidebar}
+		aria-expanded={!$sidebarCollapsed}
+	>
+		<CollapseIcon class="icon" />
+		<span class="sr-only">{$sidebarCollapsed ? 'Expand sidebar' : 'Minimise sidebar'}</span>
+	</button>
 	{#if $isAuthenticated}
 		<ProfileMenu
 			class="profile"
@@ -150,6 +169,14 @@
 		grid-area: profile;
 	}
 
+	.collapse {
+		@include button_text;
+
+		@include button_icon;
+
+		display: none;
+	}
+
 	@media (width >= 50em) {
 		.header {
 			position: static;
@@ -180,14 +207,28 @@
 
 	@media (width >= 60em) {
 		.header {
-			grid-template-areas:
-				'title toggle'
-				'menu menu'
-				'profile profile';
-			grid-template-columns: 1fr auto;
-			grid-template-rows: auto 1fr auto;
-			justify-items: start;
-			max-width: 250px;
+			&:not(.collapsed) {
+				grid-template-areas:
+					'title toggle'
+					'menu menu'
+					'profile profile';
+				grid-template-columns: 1fr auto;
+				grid-template-rows: auto 1fr auto;
+				justify-items: start;
+				max-width: 250px;
+
+				& .collapse {
+					left: 15.5em;
+					transform: rotate(180deg);
+				}
+			}
+		}
+
+		.collapse {
+			display: flex;
+			position: absolute;
+			top: 0;
+			left: 6em;
 		}
 	}
 </style>

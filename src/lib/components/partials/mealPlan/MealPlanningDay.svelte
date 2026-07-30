@@ -87,6 +87,7 @@
 					{/if}
 				</div>
 				{#if item.recipe}
+					<!-- TODO: Show relevant freezer items on recipes, including serves, eg. Marinated Chicken *2, Shepherds Pie *4 -->
 					<span class="recipe-name">{item.recipe.name}</span>
 					{#if item.recipe.totalTime || item.recipe.servings}
 						<span class="recipe-meta">

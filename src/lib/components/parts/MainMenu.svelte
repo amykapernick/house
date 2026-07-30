@@ -6,32 +6,35 @@
 		menuItems,
 		isAuthenticated,
 		children,
+		collapsed = false,
 		class: className = '',
 	}: {
 		menuItems: MenuItem[];
 		isAuthenticated: boolean;
 		children?: Snippet;
+		collapsed?: boolean;
 		class?: string;
 	} = $props();
-
 </script>
 
-<nav class={className}>
+<nav
+	class={className}
+	class:collapsed
+>
 	<ul class="menu">
 		{#each menuItems.filter(({ auth }) => !auth || isAuthenticated) as { label, link, Icon } (label)}
 			<li>
-					<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- link is already resolve()d in navigation.ts -->
-					<a href={link}>
-						<Icon />
-						<span class="label">{label}</span>
-						
-					</a>
+				<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- link is already resolve()d in navigation.ts -->
+				<a href={link}>
+					<Icon />
+					<span class="label">{label}</span>
+				</a>
 			</li>
 		{/each}
 		{#if children}
 			{@render children()}
 		{/if}
-	</ul> 
+	</ul>
 </nav>
 
 <style>
@@ -46,7 +49,7 @@
 		grid-area: menu;
 		overflow-x: auto;
 		border: 1px solid var(--header_border);
-		background: var(--header_background); 
+		background: var(--header_background);
 		font-size: 1.2em;
 		font-weight: 700;
 	}
@@ -77,11 +80,10 @@
 	}
 
 	.label {
-
 		@include sr_only;
 	}
 
-	@media(width >= 50em) {
+	@media (width >= 50em) {
 		nav {
 			position: static;
 			overflow: hidden auto;
@@ -97,23 +99,24 @@
 		}
 	}
 
-	@media(width >= 60em) {
-		.label {
+	@media (width >= 60em) {
+		.nav {
+			&:not(.collapsed) {
+				& .menu {
+					& a {
+						display: flex;
+						align-items: center;
+						padding: 0.2em 0.5em;
+						border-radius: 10px;
+						font-size: inherit;
+						font-weight: inherit;
+						gap: 0.5em;
+					}
+				}
 
-			@include remove_sr_only;
-
-			
-		}
-
-		.menu {
-			& a {
-				display: flex;
-				align-items: center;
-				padding: 0.2em 0.5em;
-				border-radius: 10px;
-				font-size: inherit;
-				font-weight: inherit;
-				gap: 0.5em;
+				& .label {
+					@include remove_sr_only;
+				}
 			}
 		}
 	}

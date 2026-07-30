@@ -81,9 +81,11 @@
 <style>
 	@import '@mixins';
 
-	:global(.main > .layout.layout) {
+	/* Layout width itself comes from the `wide` layoutWidth (see +page.ts) - this only adds
+	   the full-bleed (edge-to-edge, no auto-centering margin) treatment on top of it. */
+
+	:global(.main > .layout.wide) {
 		width: 100%;
-		max-width: 1800px;
 		margin-right: 0;
 		margin-left: 0;
 	}
@@ -244,15 +246,18 @@
 		}
 	}
 
+	/* wide's own schedule already sets 50em/60em padding to the same 20px/50px this page
+	   wants, so only the 40em step (wide uses 0 there) still needs overriding. */
+
 	@media (width >= 40em) {
-		:global(.main > .layout.layout) {
+		:global(.main > .layout.wide) {
 			padding-right: 20px;
 			padding-left: 20px;
 		}
 	}
 
 	@media (height >= 900px) {
-		:global(.main > .layout.layout) {
+		:global(.main > .layout.wide) {
 			overflow: hidden;
 		}
 
@@ -264,11 +269,6 @@
 	}
 
 	@media (width >= 50em) {
-		:global(.main > .layout.layout) {
-			padding-right: 20px;
-			padding-left: 20px;
-		}
-
 		.calendar-container {
 			& :global(.ec-toolbar) {
 				position: absolute;
@@ -283,7 +283,7 @@
 		}
 
 		@media (height >= 900px) {
-			:global(.main > .layout.layout) {
+			:global(.main > .layout.wide) {
 				margin-bottom: 0;
 				padding-bottom: 2em;
 			}
@@ -293,13 +293,6 @@
 					height: calc(100vh - 15em);
 				}
 			}
-		}
-	}
-
-	@media (width >= 60em) {
-		:global(.main > .layout.layout) {
-			padding-right: 50px;
-			padding-left: 50px;
 		}
 	}
 

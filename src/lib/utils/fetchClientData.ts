@@ -54,6 +54,13 @@ export function peekCache(key: string, ttl: number = DEFAULT_CACHE_TTL): any | n
 	return getCached(key, ttl);
 }
 
+// Falls back to whatever's cached regardless of ttl, so an upstream failure resolves with
+// stale data (a caller may already be showing via onStale) rather than blanking a card out.
+function getStaleFallback(cacheKey: string | undefined): any | null {
+	if (!cacheKey) return null;
+	return getCached(cacheKey, Infinity);
+}
+
 export function setCache(key: string, data: any) {
 	try {
 		const timestamp = Date.now();
@@ -130,6 +137,11 @@ const fetchClientData = async (props: FetchClientDataProps) => {
 
 		if (res?.errors) {
 			console.log({ ...res });
+			// The proxy itself responds 200 with an `errors` array on an upstream timeout/abort
+			// (see api/graphql/+server.ts) rather than throwing, so this needs its own stale
+			// fallback rather than relying on the catch block below.
+			const stale = getStaleFallback(cacheKey);
+			if (stale) return stale;
 			return {};
 		}
 
@@ -144,13 +156,9 @@ const fetchClientData = async (props: FetchClientDataProps) => {
 	catch (err) {
 		console.error(err);
 		// The request itself failed (offline, DNS, timeout, etc.) rather than the
-		// API responding with an error - fall back to whatever's cached regardless
-		// of ttl, rather than resolving with {} and blanking out data a caller may
-		// already be showing via onStale.
-		if (cacheKey) {
-			const stale = getCached(cacheKey, Infinity);
-			if (stale) return stale;
-		}
+		// API responding with an error.
+		const stale = getStaleFallback(cacheKey);
+		if (stale) return stale;
 		return {};
 	}
 };

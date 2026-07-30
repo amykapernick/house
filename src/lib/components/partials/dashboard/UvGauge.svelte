@@ -14,8 +14,8 @@
 	// (green 0-3, yellow 3-6, red 6+, scale 0-15).
 	const MAX_SCALE = 15;
 	const BANDS: { from: number; to: number; colour: string }[] = [
-		{ from: 0, to: 3, colour: 'green' },
-		{ from: 3, to: 6, colour: 'yellow' },
+		{ from: 0, to: 3, colour: 'green_base' },
+		{ from: 3, to: 6, colour: 'yellow_bright' },
 		{ from: 6, to: MAX_SCALE, colour: 'red' },
 	];
 
@@ -50,13 +50,39 @@
 	{#if !uv}
 		<p class="empty">No UV entity found - tag one with the house_app label in Home Assistant.</p>
 	{:else}
-		<svg viewBox="0 0 200 115" class="gauge" role="img" aria-label="UV index {uv.value}, {uvBand?.label}">
+		<svg
+			viewBox="0 0 200 115"
+			class="gauge"
+			role="img"
+			aria-label="UV index {uv.value}, {uvBand?.label}"
+		>
 			{#each BANDS as band (band.colour)}
-				<path d={bandPath(band.from, band.to)} fill="none" stroke="var(--{band.colour})" stroke-width="16" />
+				<path
+					d={bandPath(band.from, band.to)}
+					fill="none"
+					stroke="var(--{band.colour})"
+					stroke-width="16"
+				/>
 			{/each}
-			<line x1={CX} y1={CY} x2={needleTip[0]} y2={needleTip[1]} class="needle" />
-			<circle cx={CX} cy={CY} r="6" class="pivot" />
-			<text x={CX} y={CY - 24} class="value" text-anchor="middle">{uv.value.toFixed(1)}</text>
+			<line
+				x1={CX}
+				y1={CY}
+				x2={needleTip[0]}
+				y2={needleTip[1]}
+				class="needle"
+			/>
+			<circle
+				cx={CX}
+				cy={CY}
+				r="6"
+				class="pivot"
+			/>
+			<text
+				x={CX}
+				y={CY - 24}
+				class="value"
+				text-anchor="middle">{uv.value.toFixed(1)}</text
+			>
 		</svg>
 		<p class="caption">UV Index</p>
 	{/if}

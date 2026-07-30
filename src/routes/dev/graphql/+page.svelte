@@ -141,10 +141,6 @@
 <style>
 	@import '@mixins';
 
-	:global(.main > .layout.layout) {
-		max-width: unset;
-	}
-
 	.console {
 		display: flex;
 		flex-direction: column;
