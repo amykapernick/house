@@ -29,7 +29,7 @@
 	// svelte-ignore state_referenced_locally
 	let options = $state({
 		locale: 'en-AU',
-		firstDay: 1,
+		firstDay: 1 as const,
 		nowIndicator: true,
 		slotDuration: '00:30',
 		scrollTime: '08:00',

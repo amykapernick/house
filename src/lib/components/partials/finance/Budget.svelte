@@ -4,8 +4,10 @@
 	import type { BudgetBucket } from '$types/budgetBucket';
 	import type { BudgetSpendEntry } from '$types/budgetSpend';
 	import { compareValues, type SortDirection } from '$utils/sortable';
+	import { formatCurrency } from '$utils/currency';
 	import monthlyAmount from '$utils/monthlyAmount';
 	import { monthComparison } from '$utils/budgetSpendComparison';
+	import SortableTh from '$parts/SortableTh.svelte';
 
 	const PERIODS = [`Week`, `Fortnight`, `Month`, `Year`] as const;
 
@@ -30,8 +32,6 @@
 		onChange?: () => void;
 		class?: string;
 	} = $props();
-
-	const formatCurrency = (value: number) => value.toLocaleString('en-AU', { style: 'currency', currency: 'AUD' });
 
 	// This month's actual spend per item, read-only regardless of edit mode -
 	// there's no in-place way to edit actual spend here, that's what the
@@ -119,36 +119,44 @@
 	}
 </script>
 
-{#snippet sortableHeader(key: SortKey, label: string, alignRight = false)}
-	<th
-		aria-sort={sortKey === key ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none'}
-		class:amount={alignRight}
-	>
-		<button
-			type="button"
-			onclick={() => toggleSort(key)}
-		>
-			{label}
-			<span
-				class="sort-icon"
-				class:active={sortKey === key}
-				aria-hidden="true"
-			>
-				{sortKey === key ? (sortDir === 'asc' ? '▲' : '▼') : '⇅'}
-			</span>
-		</button>
-	</th>
-{/snippet}
-
 <div class={className}>
 	<table class="budget">
 		<thead>
 			<tr>
-				{@render sortableHeader('description', 'Description')}
-				{@render sortableHeader('bucket', 'Bucket')}
-				{@render sortableHeader('tags', 'Tags')}
-				{@render sortableHeader('amount', 'Budgeted', true)}
-				{#if !income}{@render sortableHeader('actual', 'Actual', true)}{/if}
+				<SortableTh
+					label="Description"
+					active={sortKey === 'description'}
+					direction={sortDir}
+					onclick={() => toggleSort('description')}
+				/>
+				<SortableTh
+					label="Bucket"
+					active={sortKey === 'bucket'}
+					direction={sortDir}
+					onclick={() => toggleSort('bucket')}
+				/>
+				<SortableTh
+					label="Tags"
+					active={sortKey === 'tags'}
+					direction={sortDir}
+					onclick={() => toggleSort('tags')}
+				/>
+				<SortableTh
+					label="Budgeted"
+					active={sortKey === 'amount'}
+					direction={sortDir}
+					alignRight
+					onclick={() => toggleSort('amount')}
+				/>
+				{#if !income}
+					<SortableTh
+						label="Actual"
+						active={sortKey === 'actual'}
+						direction={sortDir}
+						alignRight
+						onclick={() => toggleSort('actual')}
+					/>
+				{/if}
 				{#if editing}<th class="actions"></th>{/if}
 			</tr>
 		</thead>
@@ -215,7 +223,7 @@
 						<td>{bucket?.name}</td>
 						<td>{tags}</td>
 						<td class="amount">
-							{itemIncome ? '+' : ''}{amountPerMonth != null ? amountPerMonth.toLocaleString('en-AU', { style: 'currency', currency: 'AUD' }) : ''}
+							{itemIncome ? '+' : ''}{amountPerMonth != null ? formatCurrency(amountPerMonth) : ''}
 						</td>
 						{#if !income}
 							<td
@@ -244,30 +252,6 @@
 	@import '@mixins';
 
 	.budget {
-		width: 100%;
-		border-collapse: collapse;
-
-		& th,
-		& td {
-			padding: 10px;
-			border-bottom: 1px solid var(--grey_light);
-			text-align: left;
-		}
-
-		& th {
-			padding: 0;
-			background: var(--navy);
-			color: var(--navy_text);
-
-			&.amount button {
-				justify-content: flex-end;
-			}
-
-			&.actions {
-				background: var(--navy);
-			}
-		}
-
 		& tr[data-income='true'] td.amount {
 			color: var(--green);
 			font-weight: 600;
@@ -277,39 +261,6 @@
 			color: var(--red);
 			font-weight: 600;
 		}
-	}
-
-	th button {
-		display: flex;
-		align-items: center;
-		gap: 0.4em;
-		width: 100%;
-		padding: 10px;
-		border: none;
-		background: none;
-		color: inherit;
-		font: inherit;
-		font-weight: inherit;
-		text-align: inherit;
-		cursor: pointer;
-
-		&:hover {
-			background: color-mix(in oklch, var(--navy) 80%, var(--white_true));
-		}
-	}
-
-	.sort-icon {
-		opacity: 0.5;
-		font-size: 0.75em;
-
-		&.active {
-			opacity: 1;
-		}
-	}
-
-	.amount {
-		text-align: right;
-		font-variant-numeric: tabular-nums;
 	}
 
 	.edit-amount {

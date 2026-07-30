@@ -36,9 +36,8 @@
 
 <style>
 	@import '@mixins';
-	
-	.mark-read {
 
+	.mark-read {
 		@include button_secondary;
 
 		margin: 1.5em 0 0;
@@ -50,17 +49,13 @@
 	}
 
 	.content {
-		max-width: 70ch;
+		max-width: 100%;
+		overflow: hidden;
 		line-height: 1.6;
 
 		& :global(h2) {
-			margin-top: 2em;
 			padding-bottom: 0.2em;
 			border-bottom: 2px solid var(--navy);
-		}
-
-		& :global(h3) {
-			margin-top: 1.5em;
 		}
 
 		& :global(img) {

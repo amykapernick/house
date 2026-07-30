@@ -6,6 +6,8 @@
 	import { bucketTotals } from '$utils/budgetTotals';
 	import { monthComparison } from '$utils/budgetSpendComparison';
 	import { compareValues, type SortDirection } from '$utils/sortable';
+	import { formatCurrency } from '$utils/currency';
+	import SortableTh from '$parts/SortableTh.svelte';
 
 	let {
 		buckets = $bindable([]),
@@ -22,8 +24,6 @@
 		onChange?: () => void;
 		class?: string;
 	} = $props();
-
-	const formatCurrency = (value: number) => value.toLocaleString('en-AU', { style: 'currency', currency: 'AUD' });
 
 	// This month's actual spend per bucket, read-only regardless of edit mode -
 	// there's no in-place way to edit actual spend here, that's what the
@@ -84,35 +84,43 @@
 	}
 </script>
 
-{#snippet sortableHeader(key: SortKey, label: string, alignRight = false)}
-	<th
-		aria-sort={sortKey === key ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none'}
-		class:amount={alignRight}
-	>
-		<button
-			type="button"
-			onclick={() => toggleSort(key)}
-		>
-			{label}
-			<span
-				class="sort-icon"
-				class:active={sortKey === key}
-				aria-hidden="true"
-			>
-				{sortKey === key ? (sortDir === 'asc' ? '▲' : '▼') : '⇅'}
-			</span>
-		</button>
-	</th>
-{/snippet}
-
 <table class="buckets {className}">
 	<thead>
 		<tr>
-			{@render sortableHeader('name', 'Bucket')}
-			{@render sortableHeader('percentage', 'Percentage', true)}
-			{@render sortableHeader('income', 'Income', true)}
-			{@render sortableHeader('expenses', 'Expenses', true)}
-			{@render sortableHeader('actual', 'Actual', true)}
+			<SortableTh
+				label="Bucket"
+				active={sortKey === 'name'}
+				direction={sortDir}
+				onclick={() => toggleSort('name')}
+			/>
+			<SortableTh
+				label="Percentage"
+				active={sortKey === 'percentage'}
+				direction={sortDir}
+				alignRight
+				onclick={() => toggleSort('percentage')}
+			/>
+			<SortableTh
+				label="Income"
+				active={sortKey === 'income'}
+				direction={sortDir}
+				alignRight
+				onclick={() => toggleSort('income')}
+			/>
+			<SortableTh
+				label="Expenses"
+				active={sortKey === 'expenses'}
+				direction={sortDir}
+				alignRight
+				onclick={() => toggleSort('expenses')}
+			/>
+			<SortableTh
+				label="Actual"
+				active={sortKey === 'actual'}
+				direction={sortDir}
+				alignRight
+				onclick={() => toggleSort('actual')}
+			/>
 		</tr>
 	</thead>
 	<tbody>
@@ -170,74 +178,10 @@
 
 <style>
 	.buckets {
-		width: 100%;
-		border-collapse: collapse;
-
-		& th,
-		& td {
-			padding: 10px;
-			border-bottom: 1px solid var(--grey_light);
-			text-align: left;
-		}
-
-		& th {
-			padding: 0;
-			background: var(--navy);
-			color: var(--navy_text);
-
-			&.amount button {
-				justify-content: flex-end;
-			}
-		}
-
-		& tbody tr:nth-child(even) {
-			background: var(--background);
-			color: var(--background_text);
-		}
-
-		& tfoot td {
-			border-top: 2px solid var(--grey);
-			border-bottom: none;
-			font-weight: 700;
-		}
-
 		& td[data-over-budget='true'] {
 			color: var(--red);
 			font-weight: 600;
 		}
-	}
-
-	th button {
-		display: flex;
-		align-items: center;
-		gap: 0.4em;
-		width: 100%;
-		padding: 10px;
-		border: none;
-		background: none;
-		color: inherit;
-		font: inherit;
-		font-weight: inherit;
-		text-align: inherit;
-		cursor: pointer;
-
-		&:hover {
-			background: color-mix(in oklch, var(--navy) 80%, var(--white_true));
-		}
-	}
-
-	.sort-icon {
-		opacity: 0.5;
-		font-size: 0.75em;
-
-		&.active {
-			opacity: 1;
-		}
-	}
-
-	.amount {
-		text-align: right;
-		font-variant-numeric: tabular-nums;
 	}
 
 	.edit-percentage {

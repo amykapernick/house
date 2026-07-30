@@ -3,6 +3,7 @@
 	import { SvelteDate } from 'svelte/reactivity';
 	import { parseISO, setHours } from 'date-fns';
 	import CalendarBase from './CalendarBase.svelte';
+	import YearView from './YearView.svelte';
 	import TaskEventModal from './TaskEventModal.svelte';
 	import parseTasks from '$utils/calendar/parseTasks';
 	import parseEvents from '$utils/calendar/parseEvents';
@@ -69,7 +70,35 @@
 	}
 
 	let currentView = $state('timeGridWeek');
+	let showYearView = $state(false);
+	let yearViewYear = $state(new Date().getFullYear());
 	let familyMembers = $state<FamilyMember[]>([]);
+
+	// Shared by optionsOverride.eventClick (info.event, the @event-calendar/core
+	// shape) and YearView's onEventClick (a YearViewEvent, same extendedProps
+	// shape) - both funnel task clicks into the same TaskEventModal.
+	function handleEventClick(event: { id: string; title: string; start?: Date; extendedProps?: Record<string, unknown> }) {
+		const { link, type, status, platform } = event.extendedProps as { type: string; link?: string; status?: unknown; platform?: unknown };
+		if (type === 'task') {
+			completeError = ``;
+			selectedTask = {
+				id: event.id,
+				title: event.title,
+				due: event.start,
+				status: status as string,
+				platform: platform as `notion` | `todoist`,
+				link: link as string,
+			};
+			taskModalOpen = true;
+			return;
+		}
+		if (!link) return;
+		if (type === 'meal') {
+			window.location.href = link;
+		} else {
+			window.open(link, '_blank');
+		}
+	}
 
 	$effect(() => {
 		if ($isAuthenticated) {
@@ -220,38 +249,27 @@
 			}
 			return { html: `<span class="event">${timeHtml}${info.event.title}</span>` };
 		},
-		eventClick: (info: any) => {
-			const { link, type, status, platform } = info.event.extendedProps;
-			if (type === 'task') {
-				completeError = ``;
-				selectedTask = {
-					id: info.event.id,
-					title: info.event.title,
-					due: info.event.start,
-					status,
-					platform,
-					link,
-				};
-				taskModalOpen = true;
-				return;
-			}
-			if (!link) return;
-			if (type === 'meal') {
-				window.location.href = link;
-			} else {
-				window.open(link, '_blank');
-			}
-		},
+		eventClick: (info: any) => handleEventClick(info.event),
 	};
 </script>
 
-<CalendarBase
-	class={className}
-	plugins={[TimeGrid, DayGrid, List, Interaction]}
-	events={calendarEvents}
-	{resources}
-	{optionsOverride}
-/>
+<div class="view-switcher">
+	<button type="button" class:active={showYearView} onclick={() => (showYearView = !showYearView)}>
+		{showYearView ? 'Back to Calendar' : 'Year'}
+	</button>
+</div>
+
+{#if showYearView}
+	<YearView {tasks} events={sourceEvents} bind:year={yearViewYear} bind:title {onRangeChange} onEventClick={handleEventClick} />
+{:else}
+	<CalendarBase
+		class={className}
+		plugins={[TimeGrid, DayGrid, List, Interaction]}
+		events={calendarEvents}
+		{resources}
+		{optionsOverride}
+	/>
+{/if}
 
 {#if selectedTask}
 	<TaskEventModal

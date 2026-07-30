@@ -10,8 +10,9 @@ table {
 		content: '';
 		position: absolute;
 		border: 1px solid color-mix(in oklch, var(--background) 78%, var(--black));
-		inset: 0;
 		border-radius: 0.8em;
+		pointer-events: none;
+		inset: 0;
 	}
 }
 
@@ -19,7 +20,16 @@ thead {
 	background: var(--navy);
 	color: var(--navy_text);
 	text-align: left;
+
+	& .sort {
+		border: none;
+		background: none;
+		font: inherit;
+
+	}
 }
+
+
 
 tbody {
 	& tr:nth-child(2n) {
@@ -29,4 +39,15 @@ tbody {
 
 td, th {
 	padding: 0.5em 0.8em;
+}
+
+.amount {
+	text-align: right;
+	font-variant-numeric: tabular-nums;
+}
+
+tfoot {
+	border-top: 2px solid var(--grey);
+	background: light-dark(var(--white_true), color-mix(in oklch, var(--dark_background) 85%, var(--white)));
+	font-weight: 700;
 }
