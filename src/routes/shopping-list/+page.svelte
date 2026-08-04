@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { isAuthenticated, getToken } from '$lib/auth';
 	import fetchClientData, { setCache, getGraphqlUrl } from '$utils/fetchClientData';
+	import { SHOPPING_LIST_QUERY } from '$lib/queries/shoppingList';
 	import { resolve } from '$app/paths';
 	import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 	import CheckboxButton from '$parts/CheckboxButton.svelte';
@@ -43,29 +44,7 @@
 			cacheKey: 'shopping-list',
 			skipCache,
 			onStale: handleList,
-			gqlQuery: `
-				query {
-					shoppingList {
-						items {
-							id display checked quantity note
-							category labels source link
-							recipes { id name slug }
-						}
-						storeGroups {
-							name
-							items { id display checked quantity note category labels source link recipes { id name slug } }
-							subGroups {
-								name
-								items { id display checked quantity note category labels source link recipes { id name slug } }
-							}
-						}
-					}
-					freezerItems {
-						id name serves type upcoming
-						recipes { name slug }
-					}
-				}
-			`,
+			gqlQuery: SHOPPING_LIST_QUERY,
 		}).then(handleList);
 	}
 
@@ -316,6 +295,11 @@
 
 <h1>Shopping List</h1>
 
+<a
+	href={resolve('/shopping-list/cart')}
+	class="cart-link">Shopping cart</a
+>
+
 <!-- TODO: Create a component for input + button/s using the autocomplete component as a basis -->
 <!-- TODO: Allow adding freezer item with plain text "{ingredient} * {qty} #{type} @{recipe}" where type and recipe autocomplete the options when typing (type immediately after #, recipe after 3 characters) -->
 <form
@@ -510,6 +494,17 @@
 
 <style>
 	@import '@mixins';
+
+	.cart-link {
+		display: inline-block;
+		margin-bottom: 1em;
+		color: var(--purple_bright);
+		font-size: 0.9em;
+
+		&:hover {
+			text-decoration: underline;
+		}
+	}
 
 	.quick-add {
 		display: flex;

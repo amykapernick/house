@@ -101,6 +101,11 @@ export type AuslanSign = {
   tip: Scalars['String']['output'];
 };
 
+export type Author = {
+  books: Maybe<Array<Maybe<Book>>>;
+  name: Maybe<Scalars['String']['output']>;
+};
+
 export type AvailableHouseArea = {
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
@@ -125,6 +130,20 @@ export type BedroomTempPattern = {
 export type BinCollection = {
   binType: Scalars['String']['output'];
   nextDate: Scalars['String']['output'];
+};
+
+export type Book = {
+  asin: Maybe<Scalars['String']['output']>;
+  audiobookShelf: Maybe<Scalars['String']['output']>;
+  author: Maybe<Array<Maybe<Scalars['String']['output']>>>;
+  calibre: Maybe<Scalars['String']['output']>;
+  format: Maybe<Array<Maybe<Scalars['String']['output']>>>;
+  id: Maybe<Scalars['String']['output']>;
+  isbn: Maybe<Scalars['String']['output']>;
+  name: Maybe<Scalars['String']['output']>;
+  series: Maybe<Scalars['String']['output']>;
+  seriesNumber: Maybe<Scalars['Float']['output']>;
+  thumbnail: Maybe<Scalars['String']['output']>;
 };
 
 export type BudgetBucket = {
@@ -1063,6 +1082,8 @@ export type PushSubscriptionResult = {
 export type Query = {
   allergens: Array<Allergen>;
   assets: Maybe<Array<Maybe<Asset>>>;
+  authors: Maybe<Array<Maybe<Author>>>;
+  books: Maybe<Array<Maybe<Book>>>;
   budget: Maybe<Array<Maybe<BudgetItem>>>;
   budgetBuckets: Maybe<Array<Maybe<BudgetBucket>>>;
   budgetSpend: Maybe<Array<Maybe<BudgetSpendEntry>>>;
@@ -1091,6 +1112,7 @@ export type Query = {
   recipes: Maybe<RecipeList>;
   resources: Maybe<Array<Maybe<Resource>>>;
   schedule: Array<ScheduleBlock>;
+  series: Maybe<Array<Maybe<Series>>>;
   shoppingList: Maybe<ShoppingList>;
   smallHuman: Maybe<TrackerData>;
   suppliers: Maybe<Array<Maybe<Supplier>>>;
@@ -1381,6 +1403,11 @@ export type SeasonalAlert = {
   title: Scalars['String']['output'];
   type: AlertType;
   weeks_ahead: Scalars['Int']['output'];
+};
+
+export type Series = {
+  books: Maybe<Array<Maybe<Book>>>;
+  name: Maybe<Scalars['String']['output']>;
 };
 
 export type ShoppingItem = {
