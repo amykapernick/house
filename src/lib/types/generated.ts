@@ -21,6 +21,15 @@ export type Activity = {
   title: Scalars['String']['output'];
 };
 
+export type AddBookInput = {
+  author?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  isbn: Scalars['String']['input'];
+  name?: InputMaybe<Scalars['String']['input']>;
+  series?: InputMaybe<Scalars['String']['input']>;
+  seriesNumber?: InputMaybe<Scalars['Float']['input']>;
+  thumbnail?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type AddRecipesToShoppingListResult = {
   success: Scalars['Boolean']['output'];
 };
@@ -104,6 +113,8 @@ export type AuslanSign = {
 export type Author = {
   books: Maybe<Array<Maybe<Book>>>;
   name: Maybe<Scalars['String']['output']>;
+  series: Maybe<Array<Maybe<Series>>>;
+  slug: Maybe<Scalars['String']['output']>;
 };
 
 export type AvailableHouseArea = {
@@ -706,6 +717,7 @@ export type Milestones = {
 };
 
 export type Mutation = {
+  addBook: Maybe<Book>;
   addRecipesToShoppingList: Maybe<AddRecipesToShoppingListResult>;
   checkShoppingItem: Maybe<CheckShoppingItemResult>;
   completeHabit: Maybe<CompleteTaskResult>;
@@ -747,6 +759,11 @@ export type Mutation = {
   updateMilestoneStatus: Maybe<Milestone>;
   updateSwimSkillStatus: Maybe<SwimSkill>;
   updateTaskStatus: Maybe<CompleteTaskResult>;
+};
+
+
+export type MutationAddBookArgs = {
+  input: AddBookInput;
 };
 
 
@@ -1406,8 +1423,10 @@ export type SeasonalAlert = {
 };
 
 export type Series = {
+  authors: Maybe<Array<Maybe<Author>>>;
   books: Maybe<Array<Maybe<Book>>>;
   name: Maybe<Scalars['String']['output']>;
+  slug: Maybe<Scalars['String']['output']>;
 };
 
 export type ShoppingItem = {

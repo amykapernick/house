@@ -43,6 +43,22 @@ test(`content sub-page (via /content, first course-style entry) has no automatic
 	test.skip(true, `No course-style content entry with sub-pages was found to test.`);
 });
 
+test(`book author detail (via /reference/books/authors) has no automatically detectable accessibility violations`, async ({ page }) => {
+	await page.goto(`/reference/books/authors`);
+	const firstAuthor = page.locator(`a.author-card`).first();
+	await firstAuthor.waitFor();
+	await firstAuthor.click();
+	await runAxeScan(page, `book-author-detail`);
+});
+
+test(`book series detail (via /reference/books/series) has no automatically detectable accessibility violations`, async ({ page }) => {
+	await page.goto(`/reference/books/series`);
+	const firstSeries = page.locator(`a.series-card`).first();
+	await firstSeries.waitFor();
+	await firstSeries.click();
+	await runAxeScan(page, `book-series-detail`);
+});
+
 // Archived content only exists for digest-style entries that have at least
 // one version marked Archived (see findEntry.ts) - not guaranteed to exist,
 // so this skips rather than fails when the live content database has none.

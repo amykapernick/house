@@ -45,6 +45,8 @@ export const routes: A11yRoute[] = [
 	{ name: `reference`, path: `/reference`, auth: true },
 	{ name: `reference-house`, path: `/reference/house`, auth: true },
 	{ name: `reference-books`, path: `/reference/books`, auth: true },
+	{ name: `reference-books-authors`, path: `/reference/books/authors`, auth: true },
+	{ name: `reference-books-series`, path: `/reference/books/series`, auth: true },
 	{ name: `small-human`, path: `/small-human`, auth: true },
 	{ name: `health`, path: `/health`, auth: true },
 	{ name: `dashboard`, path: `/dashboard`, auth: true },

@@ -1,4 +1,7 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
+	import { slugifyHeading } from '$utils/markdown';
+
 	type BookSummary = {
 		id?: string | null;
 		name?: string | null;
@@ -10,6 +13,12 @@
 	};
 
 	let { book }: { book: BookSummary } = $props();
+
+	const authors = $derived(
+		(book.author ?? [])
+			.filter((name): name is string => !!name)
+			.map((name) => ({ name, slug: slugifyHeading(name) }))
+	);
 </script>
 
 <div class="card">
@@ -24,11 +33,17 @@
 	{/if}
 	<div class="info">
 		<h2>{book.name}</h2>
-		{#if book.author?.length}
-			<p class="author">{book.author.join(`, `)}</p>
+		{#if authors.length}
+			<p class="author">
+				{#each authors as author, i (author.slug)}
+					{i > 0 ? `, ` : ``}<a href={resolve('/reference/books/authors/[slug]', { slug: author.slug })}>{author.name}</a>
+				{/each}
+			</p>
 		{/if}
 		{#if book.series}
-			<p class="series">{book.series}{#if book.seriesNumber} #{book.seriesNumber}{/if}</p>
+			<p class="series">
+				<a href={resolve('/reference/books/series/[slug]', { slug: slugifyHeading(book.series) })}>{book.series}</a>{#if book.seriesNumber} #{book.seriesNumber}{/if}
+			</p>
 		{/if}
 		{#if book.format?.length}
 			<ul class="formats">
@@ -75,6 +90,16 @@
 		margin: 0 0 0.3em;
 		color: var(--grey);
 		font-size: 0.85em;
+
+		& a {
+			color: inherit;
+			text-decoration: none;
+
+			&:hover {
+				color: var(--purple_bright);
+				text-decoration: underline;
+			}
+		}
 	}
 
 	.formats {
