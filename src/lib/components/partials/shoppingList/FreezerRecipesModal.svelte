@@ -113,9 +113,8 @@
 		padding: 0;
 		list-style: none;
 		gap: 0.4em;
-	}
 
-	.linked-recipes li {
+	& li {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
@@ -123,6 +122,7 @@
 		border: 1px solid var(--grey_light);
 		border-radius: 0.3em;
 		gap: 0.5em;
+	}
 	}
 
 	.remove {

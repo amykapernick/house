@@ -12,6 +12,7 @@
 		scheduleBlocks = [],
 		colours = [],
 		showSchedule = true,
+		onDateChange,
 		class: className = '',
 	}: {
 		tasks: Task[];
@@ -19,6 +20,7 @@
 		scheduleBlocks: ScheduleBlock[];
 		colours?: PaletteColour[];
 		showSchedule?: boolean;
+		onDateChange?: (date: Date) => void;
 		class?: string;
 	} = $props();
 
@@ -62,9 +64,7 @@
 			start: new Date(block.start),
 			end: new Date(block.end),
 			allDay: false,
-			backgroundColor: block.colour
-				? (block.colour.startsWith('#') ? block.colour : `var(--${block.colour})`)
-				: `var(--${DEFAULT_COLOUR_NAME})`,
+			backgroundColor: block.colour ? (block.colour.startsWith('#') ? block.colour : `var(--${block.colour})`) : `var(--${DEFAULT_COLOUR_NAME})`,
 			textColor: textColourFor(block.colour),
 			extendedProps: { type: 'block' },
 		}));
@@ -78,7 +78,13 @@
 		selectable: false,
 		slotMinTime: '06:00:00',
 		slotMaxTime: '22:00:00',
-		headerToolbar: { start: 'title', center: '', end: '' },
+		headerToolbar: { start: 'title', center: 'today,prev,next', end: '' },
+		// Fires on every navigation (prev/next/today), not just the initial
+		// mount - lets the dashboard refetch events/schedule for whichever day
+		// is now visible instead of always showing "today"'s data.
+		datesSet: (info: any) => {
+			onDateChange?.(info.start);
+		},
 		eventContent: (info: any) => {
 			const { type } = info.event.extendedProps;
 			let icon = '●';
@@ -90,10 +96,9 @@
 	};
 </script>
 
-<CalendarBase class="day_view {className}" plugins={[TimeGrid, Interaction]} events={calendarEvents} {optionsOverride} />
-
-<style>
-	:global(.calendar-container.day_view) {
-		height: 32em;
-	}
-</style>
+<CalendarBase
+	class="day_view {className}"
+	plugins={[TimeGrid, Interaction]}
+	events={calendarEvents}
+	{optionsOverride}
+/>

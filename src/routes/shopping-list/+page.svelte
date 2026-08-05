@@ -698,6 +698,7 @@
 	}
 
 	.edit-recipes {
+
 		@include button_text;
 	}
 

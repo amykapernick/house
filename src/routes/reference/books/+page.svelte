@@ -44,18 +44,12 @@
 	const filteredBooks = $derived.by(() => {
 		const query = search.trim().toLowerCase();
 		if (!query) return books;
-		return books.filter((book) =>
-			[book.name, book.series, ...(book.author ?? [])]
-				.filter(Boolean)
-				.some((value) => value!.toLowerCase().includes(query))
-		);
+		return books.filter((book) => [book.name, book.series, ...(book.author ?? [])].filter(Boolean).some((value) => value!.toLowerCase().includes(query)));
 	});
 
 	const totalPages = $derived(Math.max(1, Math.ceil(filteredBooks.length / perPage)));
 
-	const pagedBooks = $derived(
-		filteredBooks.slice((page - 1) * perPage, page * perPage)
-	);
+	const pagedBooks = $derived(filteredBooks.slice((page - 1) * perPage, page * perPage));
 
 	$effect(() => {
 		search;
@@ -96,7 +90,10 @@
 			gqlQuery: addBookMutation({
 				isbn: draftIsbn.trim(),
 				name: draftName.trim(),
-				author: draftAuthor.split(`,`).map((a) => a.trim()).filter(Boolean),
+				author: draftAuthor
+					.split(`,`)
+					.map((a) => a.trim())
+					.filter(Boolean),
 				series: draftSeries.trim() || undefined,
 				seriesNumber: draftSeriesNumber ? Number(draftSeriesNumber) : undefined,
 				thumbnail: draftThumbnail.trim() || undefined,
@@ -122,7 +119,11 @@
 
 <h1>Books</h1>
 
-<button type="button" class="add" onclick={openAddModal}>Add book</button>
+<button
+	type="button"
+	class="add"
+	onclick={openAddModal}>Add book</button
+>
 
 <AddBookModal
 	bind:open={addModalOpen}
@@ -142,7 +143,10 @@
 	<a href={resolve('/reference/books/series')}>Browse by series</a>
 </nav>
 
-<form class="search" onsubmit={(e) => e.preventDefault()}>
+<form
+	class="search"
+	onsubmit={(e) => e.preventDefault()}
+>
 	<input
 		type="text"
 		placeholder="Search books..."
@@ -164,7 +168,11 @@
 		{/each}
 	</div>
 
-	<Pagination currentPage={page} {totalPages} onPageChange={(p) => (page = p)} />
+	<Pagination
+		currentPage={page}
+		{totalPages}
+		onPageChange={(p) => (page = p)}
+	/>
 {/if}
 
 <style>

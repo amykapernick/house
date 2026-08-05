@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onDestroy } from 'svelte';
+	import { onDestroy, tick } from 'svelte';
 	import { BrowserMultiFormatReader } from '@zxing/browser';
 	import type { IScannerControls } from '@zxing/browser';
 	import Modal from '$parts/Modal.svelte';
@@ -49,6 +49,7 @@
 	async function startScan() {
 		scanError = ``;
 		scanning = true;
+		await tick();
 
 		try {
 			const reader = new BrowserMultiFormatReader();

@@ -14,20 +14,21 @@
 
 	let { book }: { book: BookSummary } = $props();
 
-	const authors = $derived(
-		(book.author ?? [])
-			.filter((name): name is string => !!name)
-			.map((name) => ({ name, slug: slugifyHeading(name) }))
-	);
+	const authors = $derived((book.author ?? []).filter((name): name is string => !!name).map((name) => ({ name, slug: slugifyHeading(name) })));
 </script>
 
 <div class="card">
 	{#if book.thumbnail}
-		<img
-			src={book.thumbnail}
-			alt={book.name}
-			loading="lazy"
-		/>
+		<div
+			class="image"
+			style={`--image-url: url(${book.thumbnail})`}
+		>
+			<img
+				src={book.thumbnail}
+				alt={book.name}
+				loading="lazy"
+			/>
+		</div>
 	{:else}
 		<div class="no-image"></div>
 	{/if}
@@ -42,7 +43,8 @@
 		{/if}
 		{#if book.series}
 			<p class="series">
-				<a href={resolve('/reference/books/series/[slug]', { slug: slugifyHeading(book.series) })}>{book.series}</a>{#if book.seriesNumber} #{book.seriesNumber}{/if}
+				<a href={resolve('/reference/books/series/[slug]', { slug: slugifyHeading(book.series) })}>{book.series}</a>{#if book.seriesNumber}
+					#{book.seriesNumber}{/if}
 			</p>
 		{/if}
 		{#if book.format?.length}
@@ -61,17 +63,31 @@
 		border: 1px solid var(--grey_light);
 		border-radius: 0.5em;
 
-		& img {
-			display: block;
-			width: 100%;
-			height: 180px;
-			object-fit: cover;
-		}
-
 		& .no-image {
 			width: 100%;
 			height: 180px;
 			background: color-mix(in oklch, var(--purple_bright) 8%, var(--transparent));
+		}
+	}
+
+	.image {
+		position: relative;
+		height: 180px;
+
+		&::before {
+			content: '';
+			position: absolute;
+			z-index: -1;
+			background: var(--image-url) center / cover;
+			inset: 0;
+			filter: blur(8px) brightness(0.6);
+		}
+
+		& img {
+			display: block;
+			width: 100%;
+			height: 100%;
+			object-fit: contain;
 		}
 	}
 
