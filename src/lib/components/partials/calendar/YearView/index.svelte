@@ -14,6 +14,7 @@
 		title = $bindable(''),
 		onRangeChange,
 		onEventClick,
+		onBack,
 		class: className = '',
 	}: {
 		tasks: Task[];
@@ -22,6 +23,7 @@
 		title?: string;
 		onRangeChange?: (start: Date, end: Date) => void;
 		onEventClick?: (event: YearViewEvent) => void;
+		onBack?: () => void;
 		class?: string;
 	} = $props();
 
@@ -76,6 +78,7 @@
 		<button type="button" onclick={prevYear} aria-label="Previous year">Previous</button>
 		<button type="button" onclick={goToday}>Today</button>
 		<button type="button" onclick={nextYear} aria-label="Next year">Next</button>
+		<button type="button" onclick={onBack}>Back to Calendar</button>
 	</div>
 	<div class={styles['year-grid']}>
 		{#each months as month (month.index)}

@@ -12,8 +12,8 @@
 	import fetchFamilyMembers, { EVERYONE, isVisibleToUser, type FamilyMember } from '$utils/fetchFamilyMembers';
 	import formatCalendarTitle from '$utils/calendar/formatCalendarTitle';
 	import formatEventTimeRange from '$utils/calendar/formatEventTimeRange';
-	import notionIcon from '$img/icons/notion.svg?raw';
-	import todoistIcon from '$img/icons/todoist.svg?raw';
+	import notionIcon from '$img/icons/notion.svg?src';
+	import todoistIcon from '$img/icons/todoist.svg?src';
 	import type { Task } from '$types/tasks';
 
 	// Matches Task.svelte's own external "open in platform" link - github tasks
@@ -217,7 +217,7 @@
 		headerToolbar: {
 			start: 'title',
 			center: 'today,prev,next',
-			end: 'dayGridMonth,timeGridWeek,timeGridDay,resourceTimeGridDay,resourceTimelineWeek,listMonth',
+			end: 'dayGridMonth,timeGridWeek,timeGridDay,resourceTimeGridDay,resourceTimelineWeek,listMonth,year',
 		},
 		buttonText: {
 			today: 'Today',
@@ -232,6 +232,17 @@
 			// left-to-right, one row per person (a Gantt-style timeline).
 			resourceTimelineWeek: 'Timeline',
 			listMonth: 'List',
+		},
+		// Year isn't an @event-calendar/core view - YearView is a separate,
+		// hand-built component - so it's wired in via customButtons rather than
+		// the dayGridMonth/timeGridWeek/etc view-switch mechanism used for the
+		// rest of the "end" group. Still renders as a plain .ec-button inside
+		// the same .ec-button-group, picking up that styling for free.
+		customButtons: {
+			year: {
+				text: 'Year',
+				click: () => (showYearView = true),
+			},
 		},
 		eventContent: (info: any) => {
 			const { type, link, platform } = info.event.extendedProps;
@@ -253,14 +264,8 @@
 	};
 </script>
 
-<div class="view-switcher">
-	<button type="button" class:active={showYearView} onclick={() => (showYearView = !showYearView)}>
-		{showYearView ? 'Back to Calendar' : 'Year'}
-	</button>
-</div>
-
 {#if showYearView}
-	<YearView {tasks} events={sourceEvents} bind:year={yearViewYear} bind:title {onRangeChange} onEventClick={handleEventClick} />
+	<YearView {tasks} events={sourceEvents} bind:year={yearViewYear} bind:title {onRangeChange} onEventClick={handleEventClick} onBack={() => (showYearView = false)} />
 {:else}
 	<CalendarBase
 		class={className}
