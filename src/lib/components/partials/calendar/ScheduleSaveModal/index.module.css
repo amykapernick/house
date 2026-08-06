@@ -1,0 +1,30 @@
+.scope_fieldset {
+	display: flex;
+	flex-direction: column;
+	margin: 0 0 1em;
+	padding: 0;
+	border: none;
+	gap: 0.5em;
+}
+
+.scope_option {
+	display: flex;
+	align-items: center;
+	gap: 0.4em;
+}
+
+.date_range {
+	display: flex;
+	gap: 1em;
+	margin-bottom: 1em;
+
+	& .field {
+		display: flex;
+		flex-direction: column;
+		gap: 0.25em;
+	}
+}
+
+.error {
+	color: var(--red);
+}

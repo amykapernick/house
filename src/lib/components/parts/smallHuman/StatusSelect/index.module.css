@@ -1,0 +1,30 @@
+/* TODO: kept :global() rather than hashed - this component reaches into
+   $parts/Select's rendered root via a combination of a forwarded "status"
+   class (passed by callers such as Milestone.svelte/Auslan.svelte) and
+   Select's own "select" class, plus a dynamic status-value class, to colour
+   the select by state (see #641). A fragile string contract; should become
+   an explicit prop instead. */
+
+:global(.status.select) {
+	padding: 0.5em 1em;
+	border: none;
+	border-radius: 2em;
+	background: var(--purple_bright_bg);
+	color: var(--purple_bright);
+	font-size: 0.8em;
+}
+
+:global(.status.select:is(.in_progress, .recognises)) {
+	background: var(--info_bg);
+	color: var(--info);
+}
+
+:global(.status.select:is(.done, .signing_occasionally)) {
+	background: var(--success_bg);
+	color: var(--success);
+}
+
+:global(.status.select:is(.watch, .coming_soon)) {
+	background: var(--warning_bg);
+	color: var(--warning);
+}

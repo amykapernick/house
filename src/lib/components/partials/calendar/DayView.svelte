@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { TimeGrid, Interaction } from '@event-calendar/core';
-	import CalendarBase from './CalendarBase.svelte';
+	import CalendarBase from './CalendarBase/index.svelte';
 	import parseTasks from '$utils/calendar/parseTasks';
 	import parseEvents from '$utils/calendar/parseEvents';
 	import type { Task } from '$types/tasks';

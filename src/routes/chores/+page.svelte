@@ -4,8 +4,8 @@
 	import { isAuthenticated } from '$lib/auth';
 	import fetchChoresData from '$utils/choresData';
 	import { setCache } from '$utils/fetchClientData';
-	import ChoreList from '$parts/chores/ChoreList.svelte';
-	import Skeleton from '$parts/Skeleton.svelte';
+	import ChoreList from '$parts/chores/ChoreList/index.svelte';
+	import Skeleton from '$parts/Skeleton/index.svelte';
 	import type { Chore } from '$types/chores';
 	import { getPageTitle } from '$utils/pageTitle';
 

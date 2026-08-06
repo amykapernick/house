@@ -1,0 +1,29 @@
+.header {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 0.5em;
+	margin: 0 0 0.5em;
+}
+
+.label {
+	margin: 0;
+	font-size: 1em;
+	text-transform: capitalize;
+}
+
+.total-duration {
+	flex-shrink: 0;
+	color: var(--grey);
+	font-size: 0.75em;
+}
+
+.chores {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.item {
+	margin: 0.3em 0;
+}

@@ -1,0 +1,82 @@
+.astro-card {
+	display: flex;
+	flex-direction: column;
+	gap: 1em;
+
+	& p {
+		margin: 0;
+	}
+}
+
+.empty {
+	color: var(--grey);
+}
+
+.times-top {
+	display: flex;
+	justify-content: space-around;
+	text-align: center;
+
+	& .value {
+		font-size: 1.4em;
+	}
+}
+
+.times-row {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	text-align: center;
+}
+
+.label {
+	color: var(--grey);
+}
+
+.value {
+	font-weight: 600;
+}
+
+.moon-phase-icon {
+	display: inline-block;
+	font-size: 1.4em;
+}
+
+.chart {
+	width: 100%;
+	height: auto;
+}
+
+.horizon {
+	stroke-width: 1;
+	stroke: var(--grey_light);
+}
+
+.guide {
+	stroke-width: 1;
+	stroke: var(--grey_light);
+}
+
+.night-fill {
+	fill: var(--blue_navy);
+}
+
+.day-fill {
+	fill: var(--blue_light);
+}
+
+.curve {
+	stroke-width: 2;
+	stroke: var(--grey);
+}
+
+.sun-marker {
+	fill: var(--yellow);
+}
+
+.moon-marker {
+	font-size: 26px;
+
+	&.below-horizon {
+		opacity: 0.4;
+	}
+}

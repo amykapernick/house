@@ -1,0 +1,18 @@
+@import '@mixins';
+
+.overview {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(100px, max-content));
+	gap: 1em;
+}
+
+.temp_range {
+	& dt {
+
+		@include subtitle;
+	}
+
+	& dd {
+		font-weight: 700;
+	}
+}

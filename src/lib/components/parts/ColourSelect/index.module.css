@@ -1,0 +1,7 @@
+.swatch {
+	display: inline-block;
+	width: 0.9em;
+	height: 0.9em;
+	margin-right: 0.5em;
+	border-radius: 50%;
+}

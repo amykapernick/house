@@ -8,9 +8,9 @@
 	import { extractToc, splitTrackableChunks } from '$utils/markdown';
 	import { CONTENT_CACHE_TTL, contentEntriesQuery, contentPageQuery } from '$utils/content';
 	import { getReadAnchors, markAnchorRead, unmarkAnchorRead } from '$utils/readProgress';
-	import TableOfContents from '$components/parts/content/TableOfContents.svelte';
-	import TrackableContent from '$components/parts/content/TrackableContent.svelte';
-	import Skeleton from '$components/parts/Skeleton.svelte';
+	import TableOfContents from '$components/parts/content/TableOfContents/index.svelte';
+	import TrackableContent from '$components/parts/content/TrackableContent/index.svelte';
+	import Skeleton from '$components/parts/Skeleton/index.svelte';
 	import type { ContentEntry, ContentPage } from '$types/generated';
 	import { getPageTitle } from '$utils/pageTitle';
 
@@ -116,6 +116,7 @@
 	<TrackableContent {chunks} {readAnchors} onToggleRead={handleToggleRead} />
 {/if}
 
+<!-- TODO: migrate to CSS Modules (see #641) -->
 <style>
 	.back {
 		display: inline-block;

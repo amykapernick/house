@@ -1,0 +1,32 @@
+.chore-item {
+	display: flex;
+	align-items: center;
+	gap: 0.5em;
+}
+
+:global(.checkbox) {
+	flex-shrink: 0;
+}
+
+.name {
+	flex: 1;
+}
+
+.duration {
+	flex-shrink: 0;
+	color: var(--grey);
+	font-size: 0.75em;
+}
+
+.upcoming {
+	flex-shrink: 0;
+	color: var(--orange);
+	font-size: 0.75em;
+	font-weight: 700;
+}
+
+.error {
+	margin: 0;
+	color: var(--red);
+	font-size: 0.8em;
+}

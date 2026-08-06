@@ -1,0 +1,99 @@
+@import '@mixins';
+
+.search {
+	display: grid;
+	grid-template-columns: 1fr auto;
+	width: 100%;
+	margin: 0.1em 0 1em;
+	border: 1px solid var(--input_border);
+	border-radius: 0.5em;
+	background: var(--input_bg);
+	box-shadow: none;
+	color: light-dark(var(--black), color-mix(in oklch, var(--white) 92%, var(--black)));
+	line-height: 1.5;
+
+	&:focus-within {
+		border-color: var(--purple_bright);
+		outline: 2px dotted var(--green);
+	}
+
+	& input {
+		margin: 0;
+		border: none;
+		background: inherit;
+
+		&:focus {
+			outline: none;
+		}
+	}
+
+	& button[type='submit'] {
+
+		@include button_icon;
+
+		@include button_secondary;
+
+		height: 100%;
+		border: none;
+		border-radius: inherit;
+		border-top-left-radius: 0;
+		border-bottom-left-radius: 0;
+		font-size: 1.5em;
+
+		& :global(svg) {
+			width: 1em;
+			height: auto;
+		}
+	}
+}
+
+.results {
+	grid-column: 1 / -1;
+	max-height: 200px;
+	margin: 0.3em 0 0;
+	padding: 0;
+	overflow-y: auto;
+	border-top: 1.2px solid var(--purple_bright);
+	border-radius: 0 0 0.5em 0.5em;
+	background: var(--white_true);
+	list-style: none;
+
+	& button {
+
+		@include button_text;
+
+		display: flex;
+		align-items: center;
+		width: 100%;
+		padding: 0.5em 1em;
+		border-radius: 0;
+		color: inherit;
+		gap: 10px;
+
+		&:hover {
+			background: var(--gradient_nav_active_bg);
+			text-decoration: none;
+		}
+	}
+
+	& li:last-of-type {
+		& button {
+			border-radius: 0 0 0.5em 0.5em;
+		}
+	}
+
+	& .name {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	& :global(.tag) {
+		font-size: 0.7em;
+	}
+
+	& .hint {
+		padding: 0.5em 1em;
+		color: var(--grey);
+	}
+}

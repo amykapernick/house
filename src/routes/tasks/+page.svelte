@@ -7,9 +7,9 @@
 	import { EVERYONE, isVisibleToUser } from '$utils/fetchFamilyMembers';
 	import { notificationPermission, requestNotificationPermission } from '$utils/notifications';
 	import { subscribeToPush } from '$utils/pushSubscription';
-	import TaskView from '$parts/tasks/TaskView.svelte';
-	import FamilyFilter from '$parts/FamilyFilter.svelte';
-	import Skeleton from '$parts/Skeleton.svelte';
+	import TaskView from '$parts/tasks/TaskView/index.svelte';
+	import FamilyFilter from '$parts/FamilyFilter/index.svelte';
+	import Skeleton from '$parts/Skeleton/index.svelte';
 	import type { Task, TaskStatus } from '$types/tasks';
 	import { getPageTitle } from '$utils/pageTitle';
 
@@ -61,6 +61,7 @@
 	<TaskView tasks={visibleTasks} onUpdate={handleTaskUpdate} />
 {/if}
 
+<!-- TODO: migrate to CSS Modules (see #641) -->
 <style>
 	.enable_reminders {
 		margin-bottom: 1em;

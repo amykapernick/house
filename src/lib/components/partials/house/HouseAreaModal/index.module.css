@@ -1,0 +1,26 @@
+@import '@mixins';
+
+.entity_label {
+	margin: 0 0 1em;
+	font-weight: 600;
+}
+
+.field {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25em;
+	margin-bottom: 1em;
+}
+
+.field-row {
+	display: flex;
+	gap: 1em;
+
+	& .field {
+		flex: 1;
+	}
+}
+
+.error {
+	color: var(--red);
+}

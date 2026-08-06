@@ -1,0 +1,159 @@
+@import '@mixins';
+
+.day {
+	min-height: 150px;
+	padding: 0.8em;
+	border: 1px solid var(--grey_light);
+	border-radius: 0.3em;
+
+	&.today {
+		border-color: var(--purple_bright);
+		background: var(--purple_bright_tint_bg);
+	}
+
+	& h2 {
+		display: flex;
+		flex-direction: column;
+		margin: 0 0 0.5em;
+		font-size: 0.85em;
+	}
+}
+
+.date {
+	color: var(--grey);
+	font-size: 0.85em;
+	font-weight: 400;
+}
+
+.entries {
+	min-height: 60px;
+}
+
+.empty {
+	color: var(--grey);
+	font-size: 0.8em;
+	font-style: italic;
+}
+
+.meal {
+	margin-bottom: 0.5em;
+	padding: 0.4em;
+	border-radius: 0.3em;
+	background: color-mix(in oklch, var(--blue) 6%, var(--transparent));
+	cursor: grab;
+
+	&.draft {
+		border: 1px dashed var(--purple_bright);
+	}
+}
+
+.meal-header {
+	display: flex;
+	align-items: center;
+	gap: 0.4em;
+}
+
+.meal-type {
+	color: var(--grey);
+	font-size: 0.65em;
+	font-weight: 600;
+	text-transform: uppercase;
+}
+
+.new-badge {
+	color: var(--purple_bright);
+	font-size: 0.6em;
+	font-weight: 600;
+	text-transform: uppercase;
+}
+
+.edit-btn {
+	flex-shrink: 0;
+	margin-left: auto;
+	padding: 0;
+	border: none;
+	background: none;
+	color: var(--grey);
+	font-size: 0.75em;
+	line-height: 1;
+	cursor: pointer;
+
+	&:hover {
+		color: var(--purple_bright);
+	}
+}
+
+.add-meal {
+	width: 100%;
+	margin-top: 0.3em;
+	padding: 0.4em;
+	border: 1px dashed var(--grey_light);
+	border-radius: 0.3em;
+	background: var(--transparent);
+	color: var(--grey);
+	font-size: 0.75em;
+	cursor: pointer;
+
+	&:hover {
+		border-color: var(--purple_bright);
+		color: var(--purple_bright);
+	}
+}
+
+.remove-btn {
+	margin-left: auto;
+	padding: 0;
+	border: none;
+	background: none;
+	color: var(--grey);
+	font-size: 0.9em;
+	line-height: 1;
+	cursor: pointer;
+
+	&:hover {
+		color: var(--red);
+	}
+}
+
+.recipe-name {
+	display: block;
+	font-size: 0.85em;
+	font-weight: 600;
+	line-height: 1.2;
+}
+
+.recipe-meta {
+	display: block;
+	color: var(--grey);
+	font-size: 0.7em;
+}
+
+.meal-text {
+	margin: 0.2em 0 0;
+	color: var(--grey);
+	font-size: 0.8em;
+}
+
+.evening-events {
+	margin: 0.6em 0 0;
+	padding: 0.5em 0 0;
+	border-top: 1px dashed var(--grey_light);
+	font-size: 0.75em;
+	list-style: none;
+
+	& li {
+		display: flex;
+		justify-content: space-between;
+		gap: 0.5em;
+		margin-bottom: 0.2em;
+	}
+}
+
+.event-title {
+	color: var(--navy);
+}
+
+.event-time {
+	flex-shrink: 0;
+	color: var(--grey);
+}

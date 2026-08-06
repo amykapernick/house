@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Swimming, MilestoneStatus } from '$types/smallHuman';
-	import Cards from '$parts/Cards.svelte';
-	import Milestone from '$parts/smallHuman/Milestone.svelte';
+	import Cards from '$parts/Cards/index.svelte';
+	import Milestone from '$parts/smallHuman/Milestone/index.svelte';
 
 	const {
 		swimming,

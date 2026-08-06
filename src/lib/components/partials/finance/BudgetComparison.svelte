@@ -4,7 +4,7 @@
 	import type { BudgetBucket } from '$types/budgetBucket';
 	import type { BudgetSpendEntry } from '$types/budgetSpend';
 	import { monthComparison } from '$utils/budgetSpendComparison';
-	import Stats from '$parts/Stats.svelte';
+	import Stats from '$parts/Stats/index.svelte';
 
 	let {
 		budget,

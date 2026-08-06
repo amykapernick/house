@@ -1,0 +1,38 @@
+.slider {
+	display: grid;
+	grid-template-columns: 1fr auto;
+	align-items: center;
+	gap: 1em;
+	margin: 0.1em 0 1em;
+
+	& input[type='range'] {
+		flex: 1;
+		margin: 0;
+	}
+
+	& .number {
+		display: flex;
+		gap: 0.4em;
+		align-items: baseline;
+	}
+
+	& input[type='number'] {
+		width: calc(3ch + 0.2em + 3ch);
+		margin: 0;
+		padding: 0.1em 0.4em;
+		border-width: 0;
+		border-bottom-width: 1px;
+		border-radius: 0;
+		background: none;
+		text-align: right;
+		appearance: none;
+
+	}
+
+	& .unit {
+		position: relative;
+		left: -2.5ch;
+		color: var(--neutral);
+		font-size: 0.85em;
+	}
+}

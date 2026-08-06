@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { SleepEnvironment } from '$types/smallHuman';
-	import DebugJson from '$parts/DebugJson.svelte';
+	import DebugJson from '$parts/DebugJson/index.svelte';
 
 	const {
 		environment,

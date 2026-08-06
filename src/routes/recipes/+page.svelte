@@ -4,12 +4,12 @@
 	import { resolve } from '$app/paths';
 	import { goto } from '$app/navigation';
 	import { importRecipeMutation } from '$utils/recipes';
-	import RecipeCard from '$components/parts/recipes/RecipeCard.svelte';
-	import Pagination from '$components/parts/Pagination.svelte';
-	import TagCloud from '$components/parts/recipes/TagCloud.svelte';
-	import Skeleton from '$components/parts/Skeleton.svelte';
-	import EmptyState from '$components/parts/EmptyState.svelte';
-	import ImportRecipeModal from '$components/parts/recipes/ImportRecipeModal.svelte';
+	import RecipeCard from '$components/parts/recipes/RecipeCard/index.svelte';
+	import Pagination from '$components/parts/Pagination/index.svelte';
+	import TagCloud from '$components/parts/recipes/TagCloud/index.svelte';
+	import Skeleton from '$components/parts/Skeleton/index.svelte';
+	import EmptyState from '$components/parts/EmptyState/index.svelte';
+	import ImportRecipeModal from '$components/parts/recipes/ImportRecipeModal/index.svelte';
 	import { getPageTitle } from '$utils/pageTitle';
 
 	let recipes = $state<any[]>([]);
@@ -256,6 +256,7 @@
 	<Pagination currentPage={page} {totalPages} onPageChange={goToPage} />
 {/if}
 
+<!-- TODO: migrate to CSS Modules (see #641) -->
 <style>
 	@import '@mixins';
 

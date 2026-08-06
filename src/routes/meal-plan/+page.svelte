@@ -10,12 +10,12 @@
 	import { DATE_FORMATS } from '$utils/dateFormats';
 	import { SvelteMap } from 'svelte/reactivity';
 	import parseEvents from '$utils/calendar/parseEvents';
-	import MealPlanEntryModal from '$lib/components/partials/mealPlan/MealPlanEntryModal.svelte';
-	import MealPlanningPalette from '$lib/components/partials/mealPlan/MealPlanningPalette.svelte';
-	import MealPlanningDay from '$lib/components/partials/mealPlan/MealPlanningDay.svelte';
-	import DayColumn from '$lib/components/partials/mealPlan/DayColumn.svelte';
+	import MealPlanEntryModal from '$lib/components/partials/mealPlan/MealPlanEntryModal/index.svelte';
+	import MealPlanningPalette from '$lib/components/partials/mealPlan/MealPlanningPalette/index.svelte';
+	import MealPlanningDay from '$lib/components/partials/mealPlan/MealPlanningDay/index.svelte';
+	import DayColumn from '$lib/components/partials/mealPlan/DayColumn/index.svelte';
 	import { getPageTitle } from '$utils/pageTitle';
-	import Skeleton from '$parts/Skeleton.svelte';
+	import Skeleton from '$parts/Skeleton/index.svelte';
 
 	let days = $state<any[]>([]);
 	let loading = $state(true);
@@ -541,6 +541,7 @@
 	onDelete={modalMode === `edit` ? handleDelete : undefined}
 />
 
+<!-- TODO: migrate to CSS Modules (see #641) -->
 <style>
 	@import '@mixins';
 

@@ -1,0 +1,31 @@
+.chip {
+	display: inline-block;
+	position: relative;
+	min-width: 7em;
+	padding: 0.7em 1em;
+	border: 1.5px solid currentColor;
+	border-radius: 0.7em;
+	background: var(--navy_bg);
+	color: var(--navy);
+	font-weight: 600;
+	text-align: center;
+
+	& :global(.tooltip-trigger) {
+		position: absolute;
+		top: 0.5em;
+		right: 0.5em;
+		color: var(--navy);
+
+		& :global(svg) {
+			width: 1em;
+			height: 1em;
+		}
+	}
+}
+
+.icon {
+	display: flex;
+	justify-content: center;
+	margin: 0 auto 0.4em;
+	font-size: 3em;
+}

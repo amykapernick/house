@@ -1,0 +1,68 @@
+/* TODO: kept :global() rather than hashed - Task.svelte, HabitCheckItem.svelte,
+   ChoreItem.svelte, and AllergenCheckItem.svelte all reach in from outside via
+   :global(.checkbox) to grid-place this component's own root (see #641). A
+   fragile string contract; should become an explicit prop instead. */
+
+:global(.checkbox) {
+	padding: 0;
+	border: none;
+	background: none;
+	font: inherit;
+	cursor: pointer;
+}
+
+.flat {
+	font-size: 1.2em;
+
+	&:disabled {
+		cursor: default;
+	}
+
+	&.incomplete {
+		color: var(--grey);
+	}
+
+	&.partial {
+		color: var(--orange);
+	}
+
+	&.complete {
+		color: var(--green);
+
+		& :global(svg) {
+			padding: 0.15em;
+			border: 1px solid currentColor;
+			border-radius: 50%;
+		}
+	}
+}
+
+.boxed {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 1.6em;
+	height: 1.6em;
+	transition: all 0.15s;
+	border: 2px solid var(--grey_light);
+	border-radius: 0.3em;
+	background: var(--transparent);
+	color: var(--grey);
+	font-size: 0.85em;
+
+	&:hover:not(:disabled) {
+		border-color: var(--purple_bright);
+		color: var(--purple_bright);
+	}
+
+	&.complete {
+		border-color: var(--green);
+		background: var(--green);
+		color: var(--green_text);
+	}
+
+	&:disabled {
+		opacity: 0.5;
+		cursor: wait;
+	}
+}

@@ -13,7 +13,7 @@ declare global {
 			}
 		}
 		interface PageData {
-			/** Read by the root +layout.svelte to size $layouts/Default.svelte - see its `wide`/`full` props. */
+			/** Read by the root +layout.svelte to size $layouts/Default/index.svelte - see its `wide`/`full` props. */
 			layoutWidth?: `wide` | `full`
 		}
 	}

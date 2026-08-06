@@ -1,0 +1,15 @@
+.circular_progress {
+	flex-shrink: 0;
+	transform: rotate(-90deg);
+}
+
+.track {
+	stroke-dasharray: 2 4;
+	stroke: rgb(255 255 255 / 30%);
+}
+
+.value {
+	transition: stroke-dashoffset 0.3s linear;
+	stroke-linecap: round;
+	stroke: currentColor;
+}

@@ -89,6 +89,7 @@
 	{/if}
 {/if}
 
+<!-- TODO: migrate to CSS Modules (see #641) -->
 <style>
 	.shared-title {
 		margin-bottom: 0.2em;

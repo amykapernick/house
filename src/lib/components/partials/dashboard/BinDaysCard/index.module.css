@@ -1,0 +1,38 @@
+.bin-days {
+	display: flex;
+
+	& ul {
+		display: flex;
+		flex-wrap: wrap;
+		width: 100%;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		gap: 1em;
+
+		& li {
+			display: flex;
+			flex: 1 1 200px;
+			align-items: center;
+			padding: 1em;
+			border-radius: 0.6em;
+			gap: 0.8em;
+
+			& p {
+				margin: 0;
+			}
+
+			& .type {
+				font-weight: 700;
+			}
+		}
+	}
+}
+
+.empty {
+	color: var(--grey);
+}
+
+.icon {
+	font-size: 1.6em;
+}

@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { onDestroy } from 'svelte';
 	import { beforeNavigate } from '$app/navigation';
-	import Colours from '$partials/design/Colours.svelte';
-	import ColourModal from '$partials/design/ColourModal.svelte';
-	import Skeleton from '$parts/Skeleton.svelte';
+	import Colours from '$partials/design/Colours/index.svelte';
+	import ColourModal from '$partials/design/ColourModal/index.svelte';
+	import Skeleton from '$parts/Skeleton/index.svelte';
 	import { isAuthenticated, getToken } from '$lib/auth';
 	import fetchClientData, { getGraphqlUrl, clearCache } from '$utils/fetchClientData';
 	import buildColoursCss from '$styles/config/buildColoursCss.js';
@@ -341,6 +341,7 @@
 	/>
 {/if}
 
+<!-- TODO: migrate to CSS Modules (see #641) -->
 <style>
 	.colours-toolbar {
 		display: flex;

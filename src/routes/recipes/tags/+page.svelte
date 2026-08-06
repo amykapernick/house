@@ -3,7 +3,7 @@
 	import fetchClientData from '$utils/fetchClientData';
 	import { resolve } from '$app/paths';
 	import { getPageTitle } from '$utils/pageTitle';
-	import Skeleton from '$parts/Skeleton.svelte';
+	import Skeleton from '$parts/Skeleton/index.svelte';
 
 	let tags = $state<any[]>([]);
 	let loading = $state(true);
@@ -66,6 +66,7 @@
 	</div>
 {/if}
 
+<!-- TODO: migrate to CSS Modules (see #641) -->
 <style>
 	@import '@mixins';
 

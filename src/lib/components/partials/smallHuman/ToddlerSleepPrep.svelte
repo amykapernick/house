@@ -1,8 +1,8 @@
 <script lang="ts">
 	import type { ToddlerSleepPrepDetail, AlertType } from '$types/smallHuman';
 	import type { Colour } from '$types/global';
-	import Card from '$parts/Card.svelte';
-	import Pill from '$parts/Pill.svelte';
+	import Card from '$parts/Card/index.svelte';
+	import Pill from '$parts/Pill/index.svelte';
 
 	const {
 		toddlerSleepPrep,

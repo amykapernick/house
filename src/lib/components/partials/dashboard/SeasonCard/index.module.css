@@ -1,0 +1,40 @@
+.season {
+	display: grid;
+	grid-template-columns: 1fr auto;
+	grid-template-rows: auto auto 1fr;
+	padding: 1em;
+	border-radius: 1em;
+
+	& h3 {
+		margin-top: 0;
+		margin-bottom: 0.5em;
+	}
+
+	& p {
+		grid-column: 1 / -1;
+	}
+}
+
+.months {
+	display: flex;
+	flex-wrap: wrap;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	gap: 1em;
+
+	& li {
+		margin: 0;
+		padding: 0;
+	}
+}
+
+.description {
+	grid-column: 1 / -1;
+	margin-top: 1em;
+
+	& summary {
+		list-style: none;
+		cursor: pointer;
+	}
+}

@@ -24,7 +24,7 @@ test(`screenshot home (signed out)`, async ({ page }) => {
 // from their index page, mirroring tests/a11y/axe-public.spec.ts.
 test(`screenshot recipe detail (via /recipes)`, async ({ page }) => {
 	await page.goto(`/recipes`);
-	const firstRecipe = page.locator(`a.card`).first();
+	const firstRecipe = page.locator(`a[href^="/recipes/"]`).first();
 	await firstRecipe.waitFor();
 	await firstRecipe.click();
 	await captureRouteAtAllWidths(page, `recipe-detail`);
@@ -37,3 +37,14 @@ test(`screenshot recipe tag detail (via /recipes/tags)`, async ({ page }) => {
 	await firstTag.click();
 	await captureRouteAtAllWidths(page, `recipe-tag-detail`);
 });
+
+// /dev/* pages aren't in routes.ts (excluded from a11y coverage as internal
+// dev-only tools) but they do render real component markup behind an
+// `import.meta.env.DEV` check - meaningful to capture here since this tool
+// always targets the vite dev server, never a preview/production build.
+for (const devRoute of [`components`, `graphql`, `typography`]) {
+	test(`screenshot dev/${devRoute}`, async ({ page }) => {
+		await page.goto(`/dev/${devRoute}`);
+		await captureRouteAtAllWidths(page, `dev-${devRoute}`);
+	});
+}

@@ -2,10 +2,10 @@
 	import { format, startOfWeek, endOfWeek } from 'date-fns';
 	import { DATE_FORMATS } from '$utils/dateFormats';
 	import { SvelteMap } from 'svelte/reactivity';
-	import ScheduleView from '$partials/calendar/ScheduleView.svelte';
-	import FamilyFilter from '$parts/FamilyFilter.svelte';
-	import TaskList from '$parts/tasks/List.svelte';
-	import Skeleton from '$parts/Skeleton.svelte';
+	import ScheduleView from '$partials/calendar/ScheduleView/index.svelte';
+	import FamilyFilter from '$parts/FamilyFilter/index.svelte';
+	import TaskList from '$parts/tasks/List/index.svelte';
+	import Skeleton from '$parts/Skeleton/index.svelte';
 	import { isAuthenticated, getToken } from '$lib/auth';
 	import fetchClientData, { getGraphqlUrl, setCache } from '$utils/fetchClientData';
 	import { EVERYONE, isVisibleToUser } from '$utils/fetchFamilyMembers';

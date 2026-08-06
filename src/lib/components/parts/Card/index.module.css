@@ -1,0 +1,28 @@
+/* TODO: kept fully :global() rather than hashed - smallHuman/Card.svelte and
+   Vaccinations.svelte both pass a literal "card"/"dark"/"white" class into
+   this component from outside specifically so their own :global(.card)
+   selectors can restyle it (see #641). A fragile string contract; should
+   become an explicit prop instead. */
+
+:global(.card) {
+	position: relative;
+	width: auto;
+	padding: 0.7em;
+	border: 1px solid var(--border);
+	border-radius: 0.5em;
+	background: light-dark(linear-gradient(var(--white_true), color-mix(in oklch, var(--background) 55%, var(--white_true))), linear-gradient(color-mix(in oklch, var(--dark_background) 85%, var(--white)), color-mix(in oklch, var(--dark_background) 90%, var(--white))));
+
+	&:global(.dark) {
+		border: none;
+		background: var(--gradient_navy);
+		color: var(--dark_background_text);
+	}
+
+	&:global(.white) {
+		background: var(--white_true);
+	}
+
+	@media (width >= 50em) {
+		padding: 1em;
+	}
+}

@@ -1,0 +1,20 @@
+.root {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5em;
+}
+
+@supports (grid-template-areas: '.') {
+	.root {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+		justify-content: stretch;
+		justify-items: stretch;
+	}
+}
+
+@media (width >= 50em) {
+	.root {
+		gap: 1em;
+	}
+}

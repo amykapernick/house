@@ -2,13 +2,13 @@
 	import { format, startOfWeek } from 'date-fns';
 	import { DATE_FORMATS } from '$utils/dateFormats';
 	import { beforeNavigate } from '$app/navigation';
-	import Budget from '$partials/finance/Budget.svelte';
-	import BudgetBuckets from '$partials/finance/BudgetBuckets.svelte';
-	import BudgetCharts from '$partials/finance/BudgetCharts.svelte';
+	import Budget from '$partials/finance/Budget/index.svelte';
+	import BudgetBuckets from '$partials/finance/BudgetBuckets/index.svelte';
+	import BudgetCharts from '$partials/finance/BudgetCharts/index.svelte';
 	import BudgetComparison from '$partials/finance/BudgetComparison.svelte';
-	import BudgetCheckIn from '$partials/finance/BudgetCheckIn.svelte';
-	import Modal from '$parts/Modal.svelte';
-	import Skeleton from '$parts/Skeleton.svelte';
+	import BudgetCheckIn from '$partials/finance/BudgetCheckIn/index.svelte';
+	import Modal from '$parts/Modal/index.svelte';
+	import Skeleton from '$parts/Skeleton/index.svelte';
 	import { isAuthenticated, getToken } from '$lib/auth';
 	import fetchClientData, { getGraphqlUrl } from '$utils/fetchClientData';
 	import type { BudgetItem } from '$types/budget';
@@ -253,6 +253,7 @@
 	</Modal>
 {/if}
 
+<!-- TODO: migrate to CSS Modules (see #641) -->
 <style>
 	.budget-toolbar {
 		display: flex;

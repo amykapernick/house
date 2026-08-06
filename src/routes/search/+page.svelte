@@ -26,9 +26,9 @@
 		buildScheduleResults,
 	} from '$utils/searchResults';
 	import { getPageTitle } from '$utils/pageTitle';
-	import Skeleton from '$parts/Skeleton.svelte';
-	import EmptyState from '$parts/EmptyState.svelte';
-	import ContentIcon from '$parts/ContentIcon.svelte';
+	import Skeleton from '$parts/Skeleton/index.svelte';
+	import EmptyState from '$parts/EmptyState/index.svelte';
+	import ContentIcon from '$parts/ContentIcon/index.svelte';
 	import RecipeIcon from '$img/icons/recipe-book-47.svg?component';
 
 	const RECIPE_MIN_CHARS = 2;
@@ -424,6 +424,7 @@
 	{/if}
 </section>
 
+<!-- TODO: migrate to CSS Modules (see #641) -->
 <style>
 	@import '@mixins';
 

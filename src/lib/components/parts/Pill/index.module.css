@@ -1,0 +1,18 @@
+.root {
+	display: flex;
+	justify-content: start;
+	width: auto;
+	max-width: max-content;
+	padding: 0.5em 1em;
+	border-radius: 2em;
+	background: var(--pill_background);
+	color: var(--pill_colour);
+	font-size: 0.8em;
+	font-weight: 700;
+
+	&.outline {
+		border: 1px solid currentColor;
+		background: none;
+		font-weight: 600;
+	}
+}

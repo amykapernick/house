@@ -1,0 +1,21 @@
+.focus_timer {
+	display: grid;
+	position: fixed;
+	z-index: 50;
+	top: auto;
+	right: max(20px, 5vw);
+	bottom: 120px;
+	grid-template-columns: auto 1fr auto;
+	max-width: 400px;
+	padding: 1em;
+	border-radius: 1em;
+	background: linear-gradient(var(--white_true), color-mix(in oklch, var(--background) 55%, var(--white_true)));
+	box-shadow: var(--shadow_card);
+	row-gap: 10px;
+
+	&.has-active {
+		right: 4em;
+		bottom: 4.5em;
+		padding: 0;
+	}
+}

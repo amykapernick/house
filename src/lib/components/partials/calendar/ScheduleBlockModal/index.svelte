@@ -1,0 +1,46 @@
+<script lang="ts">
+	import Modal from '$parts/Modal/index.svelte';
+	import type { ModalAction } from '$parts/Modal/index.svelte';
+	import ColourSelect from '$parts/ColourSelect/index.svelte';
+	import type { PaletteColour } from '$types/schedule';
+	import styles from './index.module.css';
+
+	let {
+		open = $bindable(false),
+		mode,
+		label = $bindable(''),
+		colour = $bindable('purple_bright'),
+		colours = [],
+		onSave,
+		onDelete,
+		class: className = '',
+	}: {
+		open?: boolean;
+		mode: `create` | `edit`;
+		label?: string;
+		colour?: string;
+		colours?: PaletteColour[];
+		onSave: () => void;
+		onDelete?: () => void;
+		class?: string;
+	} = $props();
+
+	let colourNames = $derived(colours.map((c) => c.name));
+
+	let modalActions: ModalAction[] = $derived([
+		{ label: `Cancel`, onclick: () => (open = false), style: `secondary`, variant: `danger` },
+		...(mode === `edit` && onDelete ? [{ label: `Delete`, onclick: onDelete, style: `secondary`, variant: `danger` } as ModalAction] : []),
+		{ label: mode === `create` ? `Add` : `Save`, onclick: onSave, variant: `success`, disabled: !label.trim() },
+	]);
+</script>
+
+<Modal bind:open class={className} title={mode === `create` ? `New block` : `Edit block`} actions={modalActions}>
+	<div class={styles.field}>
+		<label for="block-label">Label</label>
+		<input type="text" id="block-label" bind:value={label} placeholder="e.g. Admin tasks" />
+	</div>
+	<div class={styles.field}>
+		Colour
+		<ColourSelect id="block-colour" bind:value={colour} colours={colourNames} />
+	</div>
+</Modal>

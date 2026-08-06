@@ -2,12 +2,12 @@
 	import { isAuthenticated } from '$lib/auth';
 	import fetchClientData from '$utils/fetchClientData';
 	import { getPageTitle } from '$utils/pageTitle';
-	import Skeleton from '$parts/Skeleton.svelte';
-	import WeatherCard from '$partials/dashboard/WeatherCard.svelte';
-	import AstroCard from '$partials/dashboard/AstroCard.svelte';
-	import UvGauge from '$partials/dashboard/UvGauge.svelte';
-	import BinDaysCard from '$partials/dashboard/BinDaysCard.svelte';
-	import SeasonCard from '$partials/dashboard/SeasonCard.svelte';
+	import Skeleton from '$parts/Skeleton/index.svelte';
+	import WeatherCard from '$partials/dashboard/WeatherCard/index.svelte';
+	import AstroCard from '$partials/dashboard/AstroCard/index.svelte';
+	import UvGauge from '$partials/dashboard/UvGauge/index.svelte';
+	import BinDaysCard from '$partials/dashboard/BinDaysCard/index.svelte';
+	import SeasonCard from '$partials/dashboard/SeasonCard/index.svelte';
 	import type { House } from '$types/generated';
 
 	let dashboard = $state<House | null>(null);
@@ -83,6 +83,7 @@
 	</div>
 {/if}
 
+<!-- TODO: migrate to CSS Modules (see #641) -->
 <style>
 	.grid {
 		display: grid;

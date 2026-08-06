@@ -1,0 +1,27 @@
+@import '@mixins';
+
+:global(.chip) {
+	position: relative;
+	border: var(--border);
+	background: var(--white);
+	color: var(--black);
+	font-weight: 700;
+
+	& :global(.tooltip-trigger) {
+		position: absolute;
+		right: 0.5em;
+		bottom: 0.2em;
+		color: var(--navy);
+
+		& :global(svg) {
+			width: 1em;
+			height: 1em;
+		}
+	}
+
+	& h3 {
+		margin: 0;
+
+		@include subtitle;
+	}
+}

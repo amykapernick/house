@@ -1,0 +1,58 @@
+@import '@mixins';
+
+.content {
+	display: grid;
+	grid-template-areas: 'tip tip tip tip' 'note note note note' 'video link . status';
+	grid-template-columns: auto auto 1fr auto;
+	grid-template-rows: auto 1fr auto;
+	height: 100%;
+
+	/* TODO: kept :global() rather than hashed - this component passes the
+	   literal "status" class down to StatusSelect (or a plain <span>), which
+	   this rule then reaches back out to via :global() to position it in the
+	   grid (see #641). A fragile string contract; should become an explicit
+	   prop instead. */
+
+	& :global(.status) {
+		grid-area: status;
+		align-self: center;
+		margin: 0 1ch 0 0;
+	}
+}
+
+.video_link {
+
+	@include button_icon;
+
+	grid-area: video;
+	margin-right: 1ch;
+}
+
+.video {
+	max-width: 100%;
+	max-height: 70vh;
+}
+
+.note {
+	grid-area: note;
+}
+
+.tip {
+	grid-area: tip;
+}
+
+.note,
+.tip {
+	margin: 0 0 0.7em;
+	font-size: 0.9em;
+}
+
+.sign_link {
+
+	@include button;
+
+	@include button_icon;
+
+	grid-area: link;
+	margin-right: 1ch;
+}

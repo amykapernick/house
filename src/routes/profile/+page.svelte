@@ -2,8 +2,8 @@
 	import { SvelteMap } from 'svelte/reactivity';
 	import { clerk, clerkLoaded, isAuthenticated, getToken } from '$lib/auth';
 	import fetchClientData, { setCache, getGraphqlUrl } from '$utils/fetchClientData';
-	import ColourSelect from '$parts/ColourSelect.svelte';
-	import Skeleton from '$parts/Skeleton.svelte';
+	import ColourSelect from '$parts/ColourSelect/index.svelte';
+	import Skeleton from '$parts/Skeleton/index.svelte';
 	import type { PaletteColour } from '$types/schedule';
 	import { getPageTitle } from '$utils/pageTitle';
 
@@ -190,6 +190,7 @@
 	</form>
 {/if}
 
+<!-- TODO: migrate to CSS Modules (see #641) -->
 <style>
 	.account {
 		margin: 1em 0;

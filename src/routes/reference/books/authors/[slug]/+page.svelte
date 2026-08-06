@@ -3,9 +3,9 @@
 	import { isAuthenticated } from '$lib/auth';
 	import fetchClientData from '$utils/fetchClientData';
 	import { resolve } from '$app/paths';
-	import BookCard from '$components/parts/books/BookCard.svelte';
-	import Skeleton from '$components/parts/Skeleton.svelte';
-	import EmptyState from '$components/parts/EmptyState.svelte';
+	import BookCard from '$components/parts/books/BookCard/index.svelte';
+	import Skeleton from '$components/parts/Skeleton/index.svelte';
+	import EmptyState from '$components/parts/EmptyState/index.svelte';
 	import { getPageTitle } from '$utils/pageTitle';
 	import type { Author } from '$types/generated';
 
@@ -84,6 +84,7 @@
 	{/if}
 {/if}
 
+<!-- TODO: migrate to CSS Modules (see #641) -->
 <style>
 	.breadcrumb {
 		display: flex;

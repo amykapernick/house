@@ -1,0 +1,65 @@
+@import '@mixins';
+
+.container {
+	position: fixed;
+	top: 5em;
+	right: 1em;
+}
+
+.toc-toggle {
+
+	@include button_icon;
+
+	margin-left: auto;
+}
+
+.toc {
+	position: absolute;
+	right: 0;
+	width: 80vw;
+	max-width: 400px;
+	margin: 10px 0 20px;
+	padding: 15px 20px;
+	border-radius: 0.5em;
+	background: var(--gradient_navy);
+	color: var(--navy_text);
+	font-weight: 600;
+
+	& ol {
+		margin: 0;
+		padding: 0;
+	}
+
+	& li {
+		display: flex;
+		align-items: center;
+		gap: 0.4em;
+
+		/* justify-content: space-between; */
+		&.chapter {
+			margin-left: 0.5em;
+			list-style: circle;
+		}
+	}
+
+	& a {
+		color: inherit;
+	}
+}
+
+.read-mark {
+	order: -1;
+	height: 1em;
+
+	& :global(svg) {
+		width: auto;
+		height: 1em;
+	}
+}
+
+@media (width >= 50em) {
+	.toc {
+		width: max-content;
+		max-width: 500px;
+	}
+}

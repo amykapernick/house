@@ -1,12 +1,12 @@
 <script lang="ts">
 	import type { Feeding, ValueNote } from '$types/smallHuman';
-	import Stats from '$parts/Stats.svelte';
-	import DebugJson from '$parts/DebugJson.svelte';
+	import Stats from '$parts/Stats/index.svelte';
+	import DebugJson from '$parts/DebugJson/index.svelte';
 	import Breasts from '$img/smallHuman/breasts.svg?component';
 	import Water from '$img/icons/glass-water.svg?component';
 	import Food from '$img/icons/soup.svg?component';
-	import Card from '$components/parts/smallHuman/Card.svelte';
-	import Cards from '$components/parts/Cards.svelte';
+	import Card from '$components/parts/smallHuman/Card/index.svelte';
+	import Cards from '$components/parts/Cards/index.svelte';
 
 	const {
 		feeding,

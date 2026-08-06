@@ -1,0 +1,77 @@
+.card {
+	overflow: hidden;
+	border: 1px solid var(--grey_light);
+	border-radius: 0.5em;
+
+	& .no-image {
+		width: 100%;
+		height: 180px;
+		background: color-mix(in oklch, var(--purple_bright) 8%, var(--transparent));
+	}
+}
+
+.image {
+	position: relative;
+	height: 180px;
+
+	&::before {
+		content: '';
+		position: absolute;
+		z-index: -1;
+		background: var(--image-url) center / cover;
+		inset: 0;
+		filter: blur(8px) brightness(0.6);
+	}
+
+	& img {
+		display: block;
+		width: 100%;
+		height: 100%;
+		object-fit: contain;
+	}
+}
+
+.info {
+	padding: 0.8em;
+
+	& h2 {
+		margin: 0 0 0.3em;
+		font-size: 1em;
+		line-height: 1.3;
+	}
+}
+
+.author,
+.series {
+	margin: 0 0 0.3em;
+	color: var(--grey);
+	font-size: 0.85em;
+
+	& a {
+		color: inherit;
+		text-decoration: none;
+
+		&:hover {
+			color: var(--purple_bright);
+			text-decoration: underline;
+		}
+	}
+}
+
+.formats {
+	display: flex;
+	flex-wrap: wrap;
+	margin: 0.5em 0 0;
+	padding: 0;
+	list-style: none;
+	gap: 4px;
+
+	& li {
+		padding: 0.1em 0.4em;
+		border: 1px solid var(--blue);
+		border-radius: 0.2em;
+		background: var(--blue);
+		color: var(--blue_text);
+		font-size: 0.7em;
+	}
+}

@@ -4,9 +4,9 @@
 	import { isAuthenticated } from '$lib/auth';
 	import fetchClientData from '$utils/fetchClientData';
 	import Chart from '$components/parts/graph/Chart.svelte';
-	import type { LineChartLine } from '$components/parts/graph/LineChart.svelte';
-	import Skeleton from '$parts/Skeleton.svelte';
-	import EmptyState from '$parts/EmptyState.svelte';
+	import type { LineChartLine } from '$components/parts/graph/LineChart/index.svelte';
+	import Skeleton from '$parts/Skeleton/index.svelte';
+	import EmptyState from '$parts/EmptyState/index.svelte';
 	import type { Colour } from '$types/global';
 	import { getPageTitle } from '$utils/pageTitle';
 
@@ -143,6 +143,7 @@
 	</div>
 {/if}
 
+<!-- TODO: migrate to CSS Modules (see #641) -->
 <style>
 	.range_filter {
 		display: flex;

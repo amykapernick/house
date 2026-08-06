@@ -1,0 +1,87 @@
+@import '@mixins';
+
+.root {
+	display: block;
+	position: fixed;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	grid-area: menu;
+	overflow-x: auto;
+	border: 1px solid var(--header_border);
+	background: var(--header_background);
+	font-size: 1.2em;
+	font-weight: 700;
+}
+
+.menu {
+	display: flex;
+	justify-content: start;
+	margin: 0;
+	padding: 0 0.1em;
+
+	& li {
+		position: relative;
+		margin: 10px;
+	}
+
+	& a {
+		padding: 10px;
+		color: light-dark(var(--black), var(--navy));
+		font-size: inherit;
+		font-weight: inherit;
+
+		&:hover {
+			--gradient_base: var(--background);
+
+			background: light-dark(linear-gradient(rgb(242 231 212) 0%, rgb(226 208 180) 100%), linear-gradient(rgb(42 51 70) 0%, rgb(51 62 86) 100%));
+		}
+	}
+}
+
+.label {
+
+	@include sr_only;
+}
+
+@media (width >= 50em) {
+	.root {
+		position: static;
+		overflow: hidden auto;
+		border: none;
+		font-size: 1em;
+	}
+
+	.menu {
+		display: block;
+		justify-content: start;
+		margin: 0;
+		padding: 0;
+	}
+}
+
+@media (width >= 60em) {
+
+	/* TODO: `.nav` only matches because Header/index.svelte happens to pass
+	   class="nav" into this component - a coincidental string contract, not
+	   an owned relationship. Kept as an explicit :global() escape to
+	   preserve current behaviour under CSS Modules (see #641); should
+	   become an explicit prop on this component instead. */
+
+	:global(.nav):not(.collapsed) {
+		& .menu a {
+			display: flex;
+			align-items: center;
+			padding: 0.2em 0.5em;
+			border-radius: 10px;
+			font-size: inherit;
+			font-weight: inherit;
+			gap: 0.5em;
+		}
+
+		& .label {
+
+			@include remove_sr_only;
+		}
+	}
+}

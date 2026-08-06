@@ -1,0 +1,15 @@
+.board {
+	gap: 10px;
+	display: grid;
+	grid-template-columns: repeat(var(--columns), minmax(100px, 1fr));
+}
+
+.list {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.item {
+	margin: 0.3em 0;
+}

@@ -8,29 +8,29 @@
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import type { Colour } from '$types/global';
-	import Allergens from '$parts/smallHuman/Allergens.svelte';
-	import Growth from '$parts/smallHuman/Growth.svelte';
-	import Teeth from '$components/partials/smallHuman/Teeth.svelte';
+	import Allergens from '$parts/smallHuman/Allergens/index.svelte';
+	import Growth from '$parts/smallHuman/Growth/index.svelte';
+	import Teeth from '$components/partials/smallHuman/Teeth/index.svelte';
 	import Swimming from '$components/partials/smallHuman/Swimming.svelte';
 	import Milestones from '$components/partials/smallHuman/Milestones.svelte';
 	import Auslan from '$components/partials/smallHuman/Auslan.svelte';
 	import Feeding from '$components/partials/smallHuman/Feeding.svelte';
-	import Sleep from '$components/partials/smallHuman/Sleep.svelte';
-	import ClothingSeasonal from '$components/partials/smallHuman/Clothing.svelte';
-	import Vaccinations from '$components/partials/smallHuman/Vaccinations.svelte';
+	import Sleep from '$components/partials/smallHuman/Sleep/index.svelte';
+	import ClothingSeasonal from '$components/partials/smallHuman/Clothing/index.svelte';
+	import Vaccinations from '$components/partials/smallHuman/Vaccinations/index.svelte';
 	import ParentingApproach from '$components/partials/smallHuman/ParentingApproach.svelte';
 	import Activities from '$components/partials/smallHuman/Activities.svelte';
-	import Sources from '$components/partials/smallHuman/Sources.svelte';
-	import Stats from '$parts/Stats.svelte';
-	import Card from '$parts/Card.svelte';
-	import Cards from '$parts/Cards.svelte';
-	import Tabs from '$parts/Tabs.svelte';
-	import Modal from '$parts/Modal.svelte';
-	import type { ModalAction } from '$parts/Modal.svelte';
+	import Sources from '$components/partials/smallHuman/Sources/index.svelte';
+	import Stats from '$parts/Stats/index.svelte';
+	import Card from '$parts/Card/index.svelte';
+	import Cards from '$parts/Cards/index.svelte';
+	import Tabs from '$parts/Tabs/index.svelte';
+	import Modal from '$parts/Modal/index.svelte';
+	import type { ModalAction } from '$parts/Modal/index.svelte';
 	import type { Alert, AlertType, MilestoneStatus, SignStatus } from '$types/generated';
-	import UrgentAlerts from '$parts/smallHuman/UrgentAlerts.svelte';
-	import Skeleton from '$parts/Skeleton.svelte';
-	import EmptyState from '$parts/EmptyState.svelte';
+	import UrgentAlerts from '$parts/smallHuman/UrgentAlerts/index.svelte';
+	import Skeleton from '$parts/Skeleton/index.svelte';
+	import EmptyState from '$parts/EmptyState/index.svelte';
 	import { getPageTitle } from '$utils/pageTitle';
 	import { SvelteSet } from 'svelte/reactivity';
 
@@ -593,6 +593,7 @@
 	<p class="confirm-note">This permanently removes the alert - it won't reappear.</p>
 </Modal>
 
+<!-- TODO: migrate to CSS Modules (see #641) -->
 <style>
 	@import '@mixins';
 

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Auslan, SignStatus } from '$types/smallHuman';
-	import Cards from '$parts/Cards.svelte';
-	import AuslanSign from '$parts/smallHuman/Auslan.svelte';
+	import Cards from '$parts/Cards/index.svelte';
+	import AuslanSign from '$parts/smallHuman/Auslan/index.svelte';
 
 	const {
 		auslan,

@@ -1,0 +1,12 @@
+.progress-bar-chart {
+	display: flex;
+	flex-direction: column;
+
+	& progress {
+		display: block;
+		width: 100%;
+		height: 0.8em;
+		margin: 0.2em 0 1em;
+		accent-color: var(--purple_bright);
+	}
+}

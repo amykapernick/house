@@ -1,0 +1,37 @@
+.uv-gauge {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.3em;
+}
+
+.empty {
+	color: var(--grey);
+}
+
+.gauge {
+	width: 100%;
+	max-width: 220px;
+	height: auto;
+}
+
+.needle {
+	stroke-width: 3;
+	stroke-linecap: round;
+	stroke: var(--background_text);
+}
+
+.pivot {
+	fill: var(--background_text);
+}
+
+.value {
+	fill: var(--background_text);
+	font-size: 22px;
+	font-weight: 700;
+}
+
+.caption {
+	margin: 0;
+	color: var(--grey);
+}

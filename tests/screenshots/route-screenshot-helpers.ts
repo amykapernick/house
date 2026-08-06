@@ -15,7 +15,23 @@ export async function captureRouteAtAllWidths(page: Page, name: string): Promise
 	for (const width of WIDTHS) {
 		await page.setViewportSize({ width, height: 1000 });
 		await page.screenshot({ path: path.join(OUT_DIR, `${name}-${width}w.png`), fullPage: true });
+		// Migration safety net for #641 (CSS Modules migration) - diffs each
+		// capture against a locally-stored baseline so a style-only refactor
+		// gets caught automatically instead of relying purely on manual review.
+		await expect(page).toHaveScreenshot(`${name}-${width}w.png`, { fullPage: true });
 	}
+}
+
+export async function waitForSignedIn(page: Page): Promise<void> {
+	// Clerk resolves the existing session asynchronously after mount -
+	// isAuthenticated ($lib/auth.ts) starts false and flips true once
+	// $clerk.session populates, so Header renders its signed-out state (a
+	// "Sign in" button) for a brief window on every navigation. Screenshotting
+	// during that window - easy to hit on the authenticated spec, since it's
+	// the only project that ever expects the signed-in Header - caught a
+	// stale "Sign in" button and skeleton-loading content instead of the
+	// real page (see #641's migration safety net).
+	await expect(page.getByRole(`button`, { name: `Sign in` })).toHaveCount(0, { timeout: 10000 });
 }
 
 async function waitForContentReady(page: Page): Promise<void> {

@@ -9,13 +9,13 @@
 	import { recordPageVisit } from '$utils/recentPages';
 	import { isOnline } from '$utils/online';
 	import { replayQueuedCompletions } from '$utils/completeTask';
-	import Header from '$partials/Header.svelte';
-	import Footer from '$partials/Footer.svelte';
-	import Layout from '$layouts/Default.svelte';
-	import CommandPalette from '$parts/CommandPalette.svelte';
-	import TaskReminderBanner from '$parts/TaskReminderBanner.svelte';
-	import FocusTimer from '$parts/FocusTimer.svelte';
-	import OnlineStatus from '$parts/OnlineStatus.svelte';
+	import Header from '$partials/Header/index.svelte';
+	import Footer from '$partials/Footer/index.svelte';
+	import Layout from '$layouts/Default/index.svelte';
+	import CommandPalette from '$parts/CommandPalette/index.svelte';
+	import TaskReminderBanner from '$parts/TaskReminderBanner/index.svelte';
+	import FocusTimer from '$parts/FocusTimer/index.svelte';
+	import OnlineStatus from '$parts/OnlineStatus/index.svelte';
 	import { focusTimerState } from '$utils/focusTimer';
 	import Timer from '$img/icons/stopwatch-fill.svg?component';
 	import Search from '$img/icons/search-1.svg?component';
@@ -195,6 +195,7 @@
 <FocusTimer bind:open={focusTimerOpen} />
 <TaskReminderBanner />
 
+<!-- TODO: migrate to CSS Modules (see #641) -->
 <style>
 	@import '@mixins';
 

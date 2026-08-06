@@ -4,10 +4,10 @@
 	import { SHOPPING_LIST_QUERY } from '$lib/queries/shoppingList';
 	import { resolve } from '$app/paths';
 	import { SvelteMap, SvelteSet } from 'svelte/reactivity';
-	import CheckboxButton from '$parts/CheckboxButton.svelte';
-	import Skeleton from '$parts/Skeleton.svelte';
-	import EmptyState from '$parts/EmptyState.svelte';
-	import FreezerRecipesModal from '$partials/shoppingList/FreezerRecipesModal.svelte';
+	import CheckboxButton from '$parts/CheckboxButton/index.svelte';
+	import Skeleton from '$parts/Skeleton/index.svelte';
+	import EmptyState from '$parts/EmptyState/index.svelte';
+	import FreezerRecipesModal from '$partials/shoppingList/FreezerRecipesModal/index.svelte';
 	import { getPageTitle } from '$utils/pageTitle';
 
 	type SubGroup = { name: string; items: any[] };
@@ -492,6 +492,7 @@
 	</li>
 {/snippet}
 
+<!-- TODO: migrate to CSS Modules (see #641) -->
 <style>
 	@import '@mixins';
 

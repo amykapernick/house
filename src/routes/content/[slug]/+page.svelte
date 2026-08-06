@@ -8,12 +8,12 @@
 	import { CONTENT_CACHE_TTL, DIGEST_PAGE_SLUG, ARTICLE_PAGE_SLUG, contentEntriesQuery, contentIndexQuery, contentDigestQuery, contentArticleQuery, contentIndexCacheKey, contentDigestCacheKey, contentArticleCacheKey } from '$utils/content';
 	import { getReadAnchors, markAnchorRead, unmarkAnchorRead } from '$utils/readProgress';
 	import { extractToc, splitTrackableChunks } from '$utils/markdown';
-	import ContentIcon from '$components/parts/ContentIcon.svelte';
-	import TableOfContents from '$components/parts/content/TableOfContents.svelte';
-	import TrackableContent from '$components/parts/content/TrackableContent.svelte';
-	import ContentGroups from '$components/parts/content/ContentGroups.svelte';
-	import Skeleton from '$components/parts/Skeleton.svelte';
-	import EmptyState from '$components/parts/EmptyState.svelte';
+	import ContentIcon from '$components/parts/ContentIcon/index.svelte';
+	import TableOfContents from '$components/parts/content/TableOfContents/index.svelte';
+	import TrackableContent from '$components/parts/content/TrackableContent/index.svelte';
+	import ContentGroups from '$components/parts/content/ContentGroups/index.svelte';
+	import Skeleton from '$components/parts/Skeleton/index.svelte';
+	import EmptyState from '$components/parts/EmptyState/index.svelte';
 	import type { ContentEntry, ContentGroup, ContentPage } from '$types/generated';
 	import { getPageTitle } from '$utils/pageTitle';
 
@@ -179,6 +179,7 @@
 	<ContentGroups {groups} slug={$page.params.slug ?? ``} />
 {/if}
 
+<!-- TODO: migrate to CSS Modules (see #641) -->
 <style>
 	h1 {
 		display: flex;

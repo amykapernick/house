@@ -37,4 +37,5 @@ test-results/
 pa11y-report/
 blob-report/
 tests/screenshots/output/
+tests/screenshots/baselines/
 issues.md

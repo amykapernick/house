@@ -16,7 +16,7 @@ for (const route of routes.filter((r) => r.auth)) {
 // from their index page instead of a hardcoded URL.
 test(`content entry (via /content) has no automatically detectable accessibility violations`, async ({ page }) => {
 	await page.goto(`/content`);
-	const firstEntry = page.locator(`.card .title`).first();
+	const firstEntry = page.getByRole(`main`).getByRole(`listitem`).locator(`a`).first();
 	await firstEntry.waitFor();
 	await firstEntry.click();
 	await runAxeScan(page, `content-entry`);
@@ -26,11 +26,11 @@ test(`content sub-page (via /content, first course-style entry) has no automatic
 	page,
 }) => {
 	await page.goto(`/content`);
-	const entryCount = await page.locator(`.card .title`).count();
+	const entryCount = await page.getByRole(`main`).getByRole(`listitem`).locator(`a`).count();
 
 	for (let i = 0; i < entryCount; i++) {
 		await page.goto(`/content`);
-		await page.locator(`.card .title`).nth(i).click();
+		await page.getByRole(`main`).getByRole(`listitem`).locator(`a`).nth(i).click();
 
 		const pageLink = page.locator(`.list a`).first();
 		if (await pageLink.count()) {
@@ -64,7 +64,7 @@ test(`book series detail (via /reference/books/series) has no automatically dete
 // so this skips rather than fails when the live content database has none.
 test(`content archive entry (via /content/archive) has no automatically detectable accessibility violations`, async ({ page }) => {
 	await page.goto(`/content/archive`);
-	const firstEntry = page.locator(`.card .title`).first();
+	const firstEntry = page.getByRole(`main`).getByRole(`listitem`).locator(`a`).first();
 
 	if (!(await firstEntry.count())) {
 		test.skip(true, `No archived content entry was found to test.`);

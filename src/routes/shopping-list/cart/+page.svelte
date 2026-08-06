@@ -5,9 +5,9 @@
 	import { SHOPPING_LIST_QUERY } from '$lib/queries/shoppingList';
 	import { resolve } from '$app/paths';
 	import { SvelteSet } from 'svelte/reactivity';
-	import Skeleton from '$parts/Skeleton.svelte';
-	import EmptyState from '$parts/EmptyState.svelte';
-	import CheckboxButton from '$parts/CheckboxButton.svelte';
+	import Skeleton from '$parts/Skeleton/index.svelte';
+	import EmptyState from '$parts/EmptyState/index.svelte';
+	import CheckboxButton from '$parts/CheckboxButton/index.svelte';
 	import { getPageTitle } from '$utils/pageTitle';
 	import { formatCurrency } from '$utils/currency';
 	import { getCartItems, addCartItem, removeCartItem, clearCartItems, type CartItem } from '$utils/shoppingCart';
@@ -252,6 +252,7 @@
 	</details>
 {/if}
 
+<!-- TODO: migrate to CSS Modules (see #641) -->
 <style>
 	@import '@mixins';
 

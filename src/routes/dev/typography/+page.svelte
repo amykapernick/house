@@ -1,6 +1,6 @@
 <script lang="ts">
-	import Select from '$components/parts/Select.svelte';
-	import Slider from '$components/parts/Slider.svelte';
+	import Select from '$components/parts/Select/index.svelte';
+	import Slider from '$components/parts/Slider/index.svelte';
 	import { getPageTitle } from '$utils/pageTitle';
 
 	let sliderValue = $state(50);
@@ -88,6 +88,7 @@
 {/if}
 
 
+<!-- TODO: migrate to CSS Modules (see #641) -->
 <style>
 	@import '@mixins';
 

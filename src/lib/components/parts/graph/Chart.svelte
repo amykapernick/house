@@ -1,10 +1,10 @@
 <script lang="ts">
-	import BarChart from './BarChart.svelte';
-	import LineChart from './LineChart.svelte';
-	import PieChart from './PieChart.svelte';
-	import type { BarChartGroup } from './BarChart.svelte';
-	import type { LineChartLine } from './LineChart.svelte';
-	import type { PieSlice } from './PieChart.svelte';
+	import BarChart from './BarChart/index.svelte';
+	import LineChart from './LineChart/index.svelte';
+	import PieChart from './PieChart/index.svelte';
+	import type { BarChartGroup } from './BarChart/index.svelte';
+	import type { LineChartLine } from './LineChart/index.svelte';
+	import type { PieSlice } from './PieChart/index.svelte';
 
 	type BarProps = {
 		type: 'bar';

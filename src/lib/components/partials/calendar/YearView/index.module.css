@@ -1,0 +1,21 @@
+/* TODO: Style the year view - currently bare structural markup only
+   (month/weekday/day-cell/event grid). */
+
+.year-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(16em, 1fr));
+}
+
+.weekday-row,
+.day-grid {
+	display: grid;
+	grid-template-columns: repeat(7, 1fr);
+}
+
+.event {
+	display: block;
+	width: 100%;
+	background: var(--event_background);
+	color: var(--event_colour);
+	text-align: left;
+}

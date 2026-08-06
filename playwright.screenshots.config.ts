@@ -1,5 +1,6 @@
 import path from 'node:path';
 import { defineConfig, devices } from '@playwright/test';
+import 'dotenv/config';
 
 /**
  * Separate from playwright.config.ts on purpose: these specs screenshot
@@ -24,6 +25,11 @@ export default defineConfig({
 		baseURL,
 		trace: `off`,
 	},
+	// Baseline images for the toHaveScreenshot() calls in
+	// route-screenshot-helpers.ts (see #641's migration safety net) - kept
+	// out of tests/screenshots/output/ (the raw manual-review dump) and out
+	// of git, since these are full-page captures of real household data.
+	snapshotPathTemplate: `tests/screenshots/baselines/{arg}{ext}`,
 	projects: [
 		{
 			name: `setup`,

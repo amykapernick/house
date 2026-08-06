@@ -13,35 +13,35 @@
 	import Moon from '$img/icons/moon.svg?component';
 	import Sun from '$img/icons/u2600-sunrays.svg?component';
 
-	import Pill from '$parts/Pill.svelte';
-	import Tabs from '$parts/Tabs.svelte';
-	import Card from '$parts/Card.svelte';
-	import Cards from '$parts/Cards.svelte';
-	import Switch from '$parts/Switch.svelte';
-	import Modal from '$parts/Modal.svelte';
-	import type { ModalAction } from '$parts/Modal.svelte';
-	import TableOfContents from '$parts/content/TableOfContents.svelte';
-	import Autocomplete from '$parts/Autocomplete.svelte';
-	import SegmentedToggle from '$parts/SegmentedToggle.svelte';
-	import CommandPalette from '$parts/CommandPalette.svelte';
-	import ColourSelect from '$parts/ColourSelect.svelte';
-	import HabitView from '$parts/habits/HabitView.svelte';
-	import ChoreList from '$parts/chores/ChoreList.svelte';
-	import IconChip from '$parts/IconChip.svelte';
-	import Toast from '$parts/Toast.svelte';
-	import EmptyState from '$parts/EmptyState.svelte';
-	import DropdownMenu from '$parts/DropdownMenu.svelte';
-	import Skeleton from '$parts/Skeleton.svelte';
-	import Tooltip from '$parts/Tooltip.svelte';
-	import DataTable from '$parts/DataTable.svelte';
-	import Stepper from '$parts/Stepper.svelte';
-	import FamilyFilter from '$parts/FamilyFilter.svelte';
-	import PieChart from '$components/parts/graph/PieChart.svelte';
-	import BarChart from '$components/parts/graph/BarChart.svelte';
-	import ProgressBarChart from '$parts/ProgressBarChart.svelte';
-	import LineChart from '$components/parts/graph/LineChart.svelte';
-	import Milestone from '$parts/smallHuman/Milestone.svelte';
-	import StatusSelect from '$parts/smallHuman/StatusSelect.svelte';
+	import Pill from '$parts/Pill/index.svelte';
+	import Tabs from '$parts/Tabs/index.svelte';
+	import Card from '$parts/Card/index.svelte';
+	import Cards from '$parts/Cards/index.svelte';
+	import Switch from '$parts/Switch/index.svelte';
+	import Modal from '$parts/Modal/index.svelte';
+	import type { ModalAction } from '$parts/Modal/index.svelte';
+	import TableOfContents from '$parts/content/TableOfContents/index.svelte';
+	import Autocomplete from '$parts/Autocomplete/index.svelte';
+	import SegmentedToggle from '$parts/SegmentedToggle/index.svelte';
+	import CommandPalette from '$parts/CommandPalette/index.svelte';
+	import ColourSelect from '$parts/ColourSelect/index.svelte';
+	import HabitView from '$parts/habits/HabitView/index.svelte';
+	import ChoreList from '$parts/chores/ChoreList/index.svelte';
+	import IconChip from '$parts/IconChip/index.svelte';
+	import Toast from '$parts/Toast/index.svelte';
+	import EmptyState from '$parts/EmptyState/index.svelte';
+	import DropdownMenu from '$parts/DropdownMenu/index.svelte';
+	import Skeleton from '$parts/Skeleton/index.svelte';
+	import Tooltip from '$parts/Tooltip/index.svelte';
+	import DataTable from '$parts/DataTable/index.svelte';
+	import Stepper from '$parts/Stepper/index.svelte';
+	import FamilyFilter from '$parts/FamilyFilter/index.svelte';
+	import PieChart from '$components/parts/graph/PieChart/index.svelte';
+	import BarChart from '$components/parts/graph/BarChart/index.svelte';
+	import ProgressBarChart from '$parts/ProgressBarChart/index.svelte';
+	import LineChart from '$components/parts/graph/LineChart/index.svelte';
+	import Milestone from '$parts/smallHuman/Milestone/index.svelte';
+	import StatusSelect from '$parts/smallHuman/StatusSelect/index.svelte';
 
 	const themeOptions: ['light', 'dark'] = ['light', 'dark'];
 	function handleThemeToggle(index: number) {
@@ -479,6 +479,7 @@
 	</section>
 {/if}
 
+<!-- TODO: migrate to CSS Modules (see #641) -->
 <style>
 	.example {
 		list-style: none;

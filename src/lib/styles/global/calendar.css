@@ -1,0 +1,193 @@
+.ec {
+	--ec-bg-color: var(--transparent);
+
+	color: inherit;
+	font: inherit;
+}
+
+.ec-main {
+	max-height: calc(100vh - 10em);
+	border: 1px solid var(--border);
+	border-radius: 1em;
+	box-shadow: var(--shadow_card);
+
+	/* TODO: Style scrollbar */
+	& .ec-toolbar {
+		flex-wrap: wrap;
+		justify-content: flex-end;
+		font-size: 0.7em;
+		gap: 10px;
+
+		& .ec-button-group {
+			display: flex;
+			justify-content: start;
+			width: max-content;
+			overflow: hidden;
+			border: 1px solid currentColor;
+			border-radius: 0.5em;
+			color: var(--purple_bright);
+			gap: 0;
+
+			& .ec-button {
+				padding: 0.5em 1em;
+				border: inherit;
+				border-width: 0;
+				background: var(--transparent);
+				color: var(--purple_bright);
+				color: inherit;
+				font-size: 1em;
+				font-weight: 600;
+				cursor: pointer;
+
+				&:hover {
+					text-decoration: underline;
+				}
+
+				&:focus {
+					outline-offset: -2px;
+				}
+
+				&:not(:first-of-type), &.ec-today {
+					border-left-width: 1px;
+					border-radius: 0;
+				}
+
+				&.ec-active {
+					background: var(--purple_bright);
+					color: var(--purple_bright_text);
+				}
+			}
+
+			& .ec-prev {
+				order: -1;
+			}
+		}
+	}
+
+	& .ec-header {
+		background: var(--page_bg);
+	}
+
+	& .ec-sidebar, & .ec-col-head {
+
+		@include subtitle;
+
+		padding: 0.2em;
+		font-size: 0.7em;
+	}
+
+	& .ec-col-head {
+		& .date {
+			display: block;
+			color: var(--black);
+			font-size: 1.4em;
+		}
+	}
+
+	/* @event-calendar/core's time-grid views (week/day) have no built-in
+	   cap on stacked all-day events, unlike the month view's dayMaxEvents
+	   popup - so this row grows to fit every all-day event/task for the
+	   day, pushing the time grid down. Cap it to ~4 rows and let the rest
+	   scroll. Sized in em (not px) off each row's own layout - .ec-event's
+	   title (1.5em against its 0.85em font) plus its padding/gap - so it
+	   tracks the calendar's font-size rather than a fixed pixel guess. */
+
+	& .ec-all-day {
+		max-block-size: 7.6em;
+		overflow: hidden auto;
+
+		/* TODO: Style scrollbar */
+		& .ec-sidebar {
+			color: var(--page_bg);
+		}
+	}
+
+	& .ec-event {
+		padding: 0.2em 0.4em;
+		overflow: visible;
+		background-color: var(--event_background, var(--ec-event-bg-color));
+		color: var(--event_colour, var(--ec-event-text-color));
+
+		& .event {
+			position: relative;
+			border-radius: inherit;
+		}
+
+		& .ec-event-body {
+			overflow: visible;
+			border-radius: inherit;
+			background: inherit;
+
+			& .event {
+				&::before {
+					content: '';
+					position: absolute;
+					z-index: -5;
+					border-radius: inherit;
+					opacity: 0.4;
+					background: var(--event_background);
+					inset: -0.2em -0.4em;
+				}
+			}
+		}
+
+		& .event, & .task {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+
+			& .event-time {
+				order: 2;
+			}
+
+			& .platform {
+				order: -1;
+				margin-right: 0.6ch;
+			}
+		}
+	}
+}
+
+.ec-title {
+
+	@include sr_only;
+}
+
+@media (height >= 900px) {
+	.ec-main {
+		height: calc(100vh - 25em);
+	}
+}
+
+@media (width >= 50em) {
+	.ec-toolbar {
+		position: absolute;
+		top: 5.5em;
+		right: 2em;
+	}
+
+	.ec-sidebar, .ec-col-head {
+		padding: 0.2em;
+		font-size: 1em;
+	}
+
+	@media (height >= 900px) {
+		.ec-main {
+			height: calc(100vh - 15em);
+		}
+	}
+}
+
+@media (width >= 70em) {
+	.ec-toolbar {
+		top: 4.5em;
+		font-size: 0.8em;
+	}
+}
+
+@media (width >= 80em) {
+	.ec-toolbar {
+		top: 3.5em;
+		font-size: 1em;
+	}
+}

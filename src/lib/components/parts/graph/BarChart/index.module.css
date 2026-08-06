@@ -1,0 +1,63 @@
+.chart-wrap {
+	width: 100%;
+}
+
+.chart {
+	width: 100%;
+	height: auto;
+	overflow: visible;
+}
+
+.axis {
+	stroke-width: 1.5;
+	stroke: var(--grey);
+}
+
+.gridline {
+	stroke-width: 1;
+	stroke-dasharray: 4 4;
+	stroke: var(--grey_light);
+}
+
+.tick-label {
+	fill: var(--grey);
+	font-size: 11px;
+}
+
+.bar {
+	cursor: pointer;
+}
+
+.tooltip-bg {
+	opacity: 0.85;
+	fill: var(--black);
+}
+
+.tooltip-text {
+	fill: var(--white);
+	font-size: 12px;
+	font-weight: 600;
+}
+
+.legend {
+	display: flex;
+	flex-wrap: wrap;
+	margin: 0.5em 0 0;
+	padding: 0;
+	font-size: 0.85em;
+	list-style: none;
+	gap: 0.3em 1em;
+
+& li {
+	display: flex;
+	align-items: center;
+	gap: 0.5em;
+}
+}
+
+.swatch {
+	flex-shrink: 0;
+	width: 0.8em;
+	height: 0.8em;
+	border-radius: 0.15em;
+}

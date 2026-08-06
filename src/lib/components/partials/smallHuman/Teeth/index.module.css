@@ -1,0 +1,85 @@
+/* TODO: kept :global() rather than hashed - this component builds a raw CSS
+   string (toothDetailsStyle) that hardcodes the literal ".teeth"/
+   ".teeth_details" selectors and injects it into <svelte:head> via {@html},
+   entirely outside CSS Modules' hashing (see #641). A fragile string
+   contract; should become an explicit prop/data-attribute instead. */
+
+:global(.teeth) {
+	--tooth: var(--background);
+
+	max-width: 400px;
+	max-height: 70vh;
+	float: right;
+	color: var(--background_text);
+
+	& :global(svg) {
+		width: auto;
+		height: auto;
+	}
+
+	& figcaption {
+		font-size: 0.7em;
+	}
+}
+
+:global(.teeth_details) {
+	display: grid;
+	grid-template-areas: 'details';
+	place-items: start start;
+
+	& p {
+		visibility: hidden;
+		grid-area: details;
+		padding: 0.2em 0.5em;
+		border: 2px solid var(--navy);
+		border-radius: 0.4em;
+		background: color-mix(in oklch, var(--navy) 10%, var(--white_true));
+		color: var(--navy);
+	}
+
+	& span {
+		display: block;
+		margin-left: 1em;
+	}
+
+	& .name {
+		margin-left: 0;
+		font-weight: 600;
+	}
+}
+
+:global(svg *[class*='t_']) {
+	opacity: 0.2;
+	cursor: pointer;
+
+	&:hover,
+	&:focus,
+	&:focus-within {
+		opacity: 1;
+	}
+}
+
+.upcoming {
+	width: auto;
+	max-width: max-content;
+	padding: 1em;
+	border: 1px solid var(--border);
+	border-radius: 0.8em;
+	background: var(--white_true);
+
+	& :global(dd) {
+		color: var(--text_secondary);
+		font-size: 0.9em;
+	}
+
+	& :global(dd:not(:last-of-type)) {
+		width: calc(100% + 2em);
+		margin: 0 0 1em -1em;
+		padding: 0 0 1em 2.5em;
+		border-bottom: 1px solid color-mix(in oklch, var(--background) 92%, var(--black));
+	}
+}
+
+figcaption {
+	font-size: 0.7em;
+}

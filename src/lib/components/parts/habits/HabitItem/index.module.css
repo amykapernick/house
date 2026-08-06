@@ -1,0 +1,154 @@
+@import '@mixins';
+
+.habit {
+	background: var(--transparent);
+}
+
+.name {
+	display: flex;
+	position: relative;
+	align-items: center;
+	min-width: 200px;
+	padding: 0.3em 0.5em 0.3em 2.8em;
+	gap: 0.5ch;
+
+	& :global(button::before) {
+		content: '';
+		display: block;
+		position: absolute;
+		inset: 0 4em 0 2em;
+	}
+}
+
+.label {
+	display: flex;
+	flex: 1;
+	flex-wrap: wrap;
+	align-items: baseline;
+	font-weight: 600;
+	gap: 0 1ch;
+	word-wrap: break-word;
+	word-break: break-word;
+	white-space: wrap;
+}
+
+.due {
+	color: var(--purple_solid_flat);
+	font-size: 0.8em;
+	font-weight: 400;
+}
+
+.emoji {
+	position: relative;
+	cursor: default;
+	-webkit-touch-callout: none;
+	user-select: none;
+	user-select: none;
+}
+
+/* TODO: Use new css anchoring */
+.tooltip {
+	position: absolute;
+	z-index: 1;
+	bottom: 100%;
+	left: 50%;
+	padding: 0.2em 0.6em;
+	transform: translateX(-50%);
+	transition: opacity 0.15s ease;
+	border-radius: 0.2em;
+	opacity: 0;
+	background: var(--black);
+	color: var(--white);
+	font-size: 0.75em;
+	font-weight: 400;
+	white-space: nowrap;
+	pointer-events: none;
+}
+
+.emoji:hover .tooltip,
+.emoji:focus .tooltip,
+.tooltip.visible {
+	opacity: 1;
+}
+
+.streak {
+	font-size: 0.9em;
+}
+
+.day {
+	width: 2.5em;
+	text-align: center;
+}
+
+.day-complete {
+
+	@include button_icon;
+
+	@include button_text;
+
+	display: block;
+	width: auto;
+	height: auto;
+	margin: 0 auto;
+	padding: 0;
+	font-size: 1em;
+
+	& .status {
+		outline: 2px solid var(--navy);
+		outline-offset: -2px;
+	}
+}
+
+.day,
+.days-column {
+	padding: 0.5em 1em 0.5em 0;
+}
+
+.days-list {
+	display: flex;
+	flex-wrap: wrap;
+	margin: 0;
+	padding: 0;
+	font-size: 0.9em;
+
+	/* padding: 0.3em 0.5em; */
+	list-style: none;
+	gap: 0.2em;
+
+	& li {
+
+		/* font-size: 0.9em; */
+	}
+
+	& .status {
+		margin: 0;
+	}
+}
+
+.status {
+	display: block;
+	width: 1em;
+	height: 1em;
+	margin: 0 auto;
+	border-radius: 0.2em;
+	background: rgb(236 226 240);
+	font-size: 1.5em;
+
+	&[data-done='true'] {
+		background: var(--success);
+	}
+
+	&[data-missed='true'] {
+		background: var(--error);
+	}
+}
+
+.error {
+	position: absolute;
+	top: 100%;
+	left: 0;
+	margin: 0;
+	color: var(--red);
+	font-size: 0.8em;
+	white-space: nowrap;
+}

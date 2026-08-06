@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { startOfWeek, endOfWeek } from 'date-fns';
 	import CalendarView from '$partials/calendar/Calendar.svelte';
-	import FamilyFilter from '$parts/FamilyFilter.svelte';
-	import Skeleton from '$parts/Skeleton.svelte';
+	import FamilyFilter from '$parts/FamilyFilter/index.svelte';
+	import Skeleton from '$parts/Skeleton/index.svelte';
 	import { isAuthenticated } from '$lib/auth';
 	import fetchClientData from '$utils/fetchClientData';
 	import { EVERYONE } from '$utils/fetchFamilyMembers';

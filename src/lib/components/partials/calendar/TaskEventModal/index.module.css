@@ -1,0 +1,17 @@
+@import '@mixins';
+
+.due_label {
+	margin: 0 0 1em;
+	color: var(--grey);
+	font-size: 0.9em;
+}
+
+.error {
+	color: var(--red);
+}
+
+.external {
+	display: inline-block;
+	margin-bottom: 1em;
+	color: var(--purple_bright);
+}

@@ -7,11 +7,11 @@
 	import { resolve } from '$app/paths';
 	import { formatMinutes } from '$utils/formatMinutes';
 	import { getPageTitle } from '$utils/pageTitle';
-	import Skeleton from '$components/parts/Skeleton.svelte';
-	import Stats from '$parts/Stats.svelte';
+	import Skeleton from '$components/parts/Skeleton/index.svelte';
+	import Stats from '$parts/Stats/index.svelte';
 	import { compatibleUnits, convertQuantity, unitFamilyLabel, unitLabel, unitOptionLabel, unitRoot, unitsInFamily } from '$lib/utils/units';
 	import type { RecipeIngredientUnit } from '$lib/types/generated';
-	import Pill from '$components/parts/Pill.svelte';
+	import Pill from '$components/parts/Pill/index.svelte';
 
 	let recipe = $state<any>(null);
 	let loading = $state(true);
@@ -379,6 +379,7 @@
 	</article>
 {/if}
 
+<!-- TODO: migrate to CSS Modules (see #641) -->
 <style>
 	@import '@mixins';
 

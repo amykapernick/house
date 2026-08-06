@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { ParentingApproachItem } from '$types/smallHuman';
-	import Cards from '$parts/Cards.svelte';
-	import Card from '$parts/smallHuman/Card.svelte';
+	import Cards from '$parts/Cards/index.svelte';
+	import Card from '$parts/smallHuman/Card/index.svelte';
 
 	const {
 		items,

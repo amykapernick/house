@@ -1,0 +1,76 @@
+.root {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(100px, max-content));
+	column-gap: 1em;
+	color: var(--text_secondary);
+	font-size: 0.75em;
+	font-weight: 700;
+
+	&:has(.icon) {
+		& .item {
+			grid-row: span 3;
+			align-items: center;
+
+			&:not(:has(.icon)) {
+				& dd {
+					font-size: 3em;
+				}
+			}
+		}
+
+		& dt {
+			grid-row: 3;
+			order: 2;
+			color: var(--text_secondary);
+			font-weight: 400;
+		}
+	}
+}
+
+.item {
+	display: grid;
+	position: relative;
+	grid-row: span 2;
+	grid-template-rows: subgrid;
+	justify-content: center;
+	margin-bottom: 1em;
+	padding: 1em 2em;
+	border: 1px solid var(--border);
+	border-radius: 0.8em;
+	background: light-dark(var(--white_true), color-mix(in oklch, var(--dark_background) 85%, var(--white)));
+	text-align: center;
+	justify-items: center;
+
+	& .icon {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		order: -1;
+		width: 2em;
+		height: 2em;
+		margin-bottom: 0.5em;
+		padding: 0.2em;
+		border-radius: 50%;
+		background: var(--background);
+		font-size: 3em;
+		line-height: 1;
+	}
+
+	& :global(.tooltip-trigger) {
+		position: absolute;
+		top: 1em;
+		right: 1em;
+		color: var(--navy);
+
+		& :global(svg) {
+			width: 1em;
+			height: 1em;
+		}
+	}
+
+	& dd {
+		margin: 0;
+		color: var(--navy);
+		font-size: 1.5em;
+	}
+}

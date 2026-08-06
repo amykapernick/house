@@ -31,6 +31,7 @@
 	<div bind:this={container}></div>
 </section>
 
+<!-- TODO: migrate to CSS Modules (see #641) -->
 <style>
 	.sign-in {
 		display: flex;

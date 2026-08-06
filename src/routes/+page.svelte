@@ -9,19 +9,19 @@
 	import { prefetchRecipes } from '$utils/prefetchRecipes';
 	import { getDashboardMealPlanRange } from '$utils/dateRanges';
 	import { resolve } from '$app/paths';
-	import RecipeCard from '$components/parts/recipes/RecipeCard.svelte';
-	import Skeleton from '$components/parts/Skeleton.svelte';
-	import EmptyState from '$components/parts/EmptyState.svelte';
-	import Switch from '$parts/Switch.svelte';
-	import HabitCheckItem from '$parts/habits/HabitCheckItem.svelte';
-	import AllergenCheckItem from '$parts/smallHuman/AllergenCheckItem.svelte';
+	import RecipeCard from '$components/parts/recipes/RecipeCard/index.svelte';
+	import Skeleton from '$components/parts/Skeleton/index.svelte';
+	import EmptyState from '$components/parts/EmptyState/index.svelte';
+	import Switch from '$parts/Switch/index.svelte';
+	import HabitCheckItem from '$parts/habits/HabitCheckItem/index.svelte';
+	import AllergenCheckItem from '$parts/smallHuman/AllergenCheckItem/index.svelte';
 	import DayView from '$partials/calendar/DayView.svelte';
 	import { getPageTitle } from '$utils/pageTitle';
 	import { EVERYONE, isVisibleToUser, fetchCurrentUserSlug } from '$utils/fetchFamilyMembers';
 	import type { Habit } from '$types/habits';
 	import type { Task } from '$types/tasks';
 	import type { ScheduleBlock, PaletteColour } from '$types/schedule';
-	import Pill from '$components/parts/Pill.svelte';
+	import Pill from '$components/parts/Pill/index.svelte';
 
 	let meals = $state<any[]>([]);
 	let loading = $state(true);
@@ -409,15 +409,12 @@
 			data-widget="calendar"
 		>
 			<h2 class="sr-only">Today</h2>
-			<span class="schedule-toggle">
-				<span>Schedule</span>
-				<Switch
-					name="Schedule visibility"
-					value={showSchedule ? 1 : 0}
-					toggleFunction={(index) => (showSchedule = index === 1)}
-					options={[{ label: 'Hide schedule' }, { label: 'Show schedule' }]}
-				/>
-			</span>
+			<Switch
+				name="Schedule visibility"
+				value={showSchedule ? 1 : 0}
+				toggleFunction={(index) => (showSchedule = index === 1)}
+				options={[{ label: 'Schedule' }, { label: 'Calendar' }]}
+			/>
 			<a href={resolve('/calendar')}>View calendar</a>
 
 			{#if dayLoading}
@@ -473,6 +470,7 @@
 	/>
 {/if}
 
+<!-- TODO: migrate to CSS Modules (see #641) -->
 <style>
 	@import '@mixins';
 

@@ -1,0 +1,45 @@
+/* TODO: .tooltip-trigger kept :global() rather than hashed - Chip.svelte,
+   MetaCard.svelte, Stats.svelte, and smallHuman/Outfit.svelte all reach in
+   from outside via :global(.tooltip-trigger) to position their own tooltip
+   icon overlay (see #641). A fragile string contract; should become an
+   explicit prop instead. */
+
+:global(.tooltip-trigger) {
+	display: inline-block;
+	position: relative;
+	cursor: default;
+	user-select: none;
+	user-select: none;
+	-webkit-touch-callout: none;
+}
+
+.tooltip {
+	position: absolute;
+	z-index: 1;
+	bottom: 100%;
+	left: 50%;
+
+	/* TODO: Fix overflowing tooltip */
+
+	/* width: 40vw; */
+	max-width: 300px;
+	margin-bottom: 0.3em;
+	padding: 0.2em 0.6em;
+	transform: translateX(-50%);
+	transition: opacity 0.15s ease;
+	border-radius: 0.2em;
+	opacity: 0;
+	background: var(--black);
+	color: var(--white);
+	font-size: 0.75em;
+	font-weight: 400;
+
+	/* white-space: nowrap; */
+	pointer-events: none;
+}
+
+:global(.tooltip-trigger):hover .tooltip,
+:global(.tooltip-trigger):focus-within .tooltip,
+.tooltip.visible {
+	opacity: 1;
+}

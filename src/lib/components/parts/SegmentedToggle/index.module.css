@@ -1,0 +1,39 @@
+@import '@mixins';
+
+.segments {
+	display: flex;
+	justify-content: start;
+	width: max-content;
+	overflow: hidden;
+	border: 1px solid currentColor;
+	border-radius: 0.5em;
+	color: var(--purple_bright);
+	gap: 0;
+
+	& input {
+
+		@include sr_only;
+
+		&:checked {
+			& + label {
+				background: var(--purple_bright);
+				color: var(--purple_bright_text);
+			}
+		}
+	}
+
+	& label {
+		padding: 0.5em 1em;
+		border-left-width: 0;
+		color: inherit;
+		cursor: pointer;
+
+		&:not(:first-of-type) {
+			border-left: inherit;
+		}
+
+		&:hover {
+			text-decoration: underline;
+		}
+	}
+}

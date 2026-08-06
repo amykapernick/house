@@ -1,0 +1,75 @@
+@import '@mixins';
+
+.root {
+	max-width: 90vw;
+	max-height: 90vh;
+	padding: 2em 1.5em;
+	border: 1px solid var(--border);
+	border-radius: 1em;
+	border-radius: 0.5em;
+	background: light-dark(linear-gradient(var(--white_true), color-mix(in oklch, var(--background) 55%, var(--white_true))), linear-gradient(color-mix(in oklch, var(--dark_background) 85%, var(--white)), color-mix(in oklch, var(--dark_background) 90%, var(--white))));
+	box-shadow: var(--shadow_popover);
+
+	&::backdrop {
+		background: rgb(0 0 0 / 70%);
+	}
+
+	& h2 {
+		margin: 0 0 0.5em;
+	}
+}
+
+.close {
+
+	@include button_secondary(purple_bright);
+
+	@include button_icon;
+
+	position: absolute;
+	top: 0.5em;
+	right: 0.5em;
+}
+
+.actions {
+	display: flex;
+	gap: 0.5em;
+	justify-content: space-between;
+	margin-top: 1em;
+
+	& button {
+		&.danger {
+
+			@include button(error);
+		}
+
+		&.warning {
+
+			@include button(warning);
+		}
+
+		&.success {
+
+			@include button(success);
+		}
+
+		&.secondary {
+
+			@include button_secondary;
+
+			&.danger {
+
+				@include button_secondary(error);
+			}
+
+			&.warning {
+
+				@include button_secondary(warning);
+			}
+
+			&.success {
+
+				@include button_secondary(success);
+			}
+		}
+	}
+}

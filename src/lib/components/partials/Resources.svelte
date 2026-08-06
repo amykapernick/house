@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Resource } from '$types/resources';
-	import Card from '$parts/resources/Card.svelte';
+	import Card from '$parts/resources/Card/index.svelte';
 
 	let { items, class: className = '' }: { items: Resource[]; class?: string } = $props();
 

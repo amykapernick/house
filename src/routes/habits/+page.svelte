@@ -6,10 +6,10 @@
 	import { setCache, getGraphqlUrl } from '$utils/fetchClientData';
 	import fetchFamilyMembers, { EVERYONE, isVisibleToUser } from '$utils/fetchFamilyMembers';
 	import type { FamilyMember } from '$utils/fetchFamilyMembers';
-	import HabitView from '$parts/habits/HabitView.svelte';
-	import FamilyFilter from '$parts/FamilyFilter.svelte';
-	import AddHabitModal from '$parts/habits/AddHabitModal.svelte';
-	import Skeleton from '$parts/Skeleton.svelte';
+	import HabitView from '$parts/habits/HabitView/index.svelte';
+	import FamilyFilter from '$parts/FamilyFilter/index.svelte';
+	import AddHabitModal from '$parts/habits/AddHabitModal/index.svelte';
+	import Skeleton from '$parts/Skeleton/index.svelte';
 	import type { Habit } from '$types/habits';
 	import { getPageTitle } from '$utils/pageTitle';
 
@@ -128,6 +128,7 @@
 	onSave={handleAddHabit}
 />
 
+<!-- TODO: migrate to CSS Modules (see #641) -->
 <style>
 	.add {
 

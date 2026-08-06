@@ -1,5 +1,5 @@
 <script lang="ts">
-	import ContentEntries from '$components/partials/content/ContentEntries.svelte';
+	import ContentEntries from '$components/partials/content/ContentEntries/index.svelte';
 	import { getPageTitle } from '$utils/pageTitle';
 </script>
 

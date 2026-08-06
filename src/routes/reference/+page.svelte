@@ -2,14 +2,14 @@
 	import { tick } from 'svelte';
 	import { page } from '$app/state';
 	import Resources from '$partials/Resources.svelte';
-	import Skeleton from '$parts/Skeleton.svelte';
+	import Skeleton from '$parts/Skeleton/index.svelte';
 	import { isAuthenticated } from '$lib/auth';
 	import fetchClientData from '$utils/fetchClientData';
 	import type { Resource } from '$types/resources';
 	import type { Asset } from '$types/assets';
 	import type { Supplier } from '$types/suppliers';
 	import { getPageTitle } from '$utils/pageTitle';
-	import Card from '$components/parts/resources/Card.svelte';
+	import Card from '$components/parts/resources/Card/index.svelte';
 
 	let resources = $state<Resource[]>([]);
 	let assets = $state<Asset[]>([]);
@@ -160,6 +160,7 @@
 	</details>
 {/if}
 
+<!-- TODO: migrate to CSS Modules (see #641) -->
 <style>
 	.references {
 		display: grid;

@@ -1,0 +1,80 @@
+@import '@mixins';
+
+.habit_view {
+
+	/* TODO: Fix overflow scrolling */
+	max-width: 100%;
+
+	& :global(.switcher) {
+		width: max-content;
+		margin-left: auto;
+	}
+}
+
+.table-scroll {
+	max-width: 100%;
+	overflow-x: auto;
+}
+
+.table {
+	width: 100%;
+	border-collapse: collapse;
+	border-radius: 1em;
+	background: light-dark(var(--white_true), color-mix(in oklch, var(--dark_background) 85%, var(--white)));
+
+	& th {
+		padding: 1em 0.2em;
+		color: var(--black);
+		font-size: 0.8em;
+		font-weight: 600;
+		text-align: center;
+	}
+}
+
+.member {
+	border-top: 1px solid color-mix(in oklch, var(--background) 92%, var(--black));
+	background: var(--feature_colour);
+	font-weight: 700;
+
+	& td {
+		padding: 0;
+	}
+}
+
+.toggle {
+
+	@include button_text;
+
+	--button_text: inherit;
+
+	display: flex;
+	width: 100%;
+	padding: 0.8em;
+	border-radius: 0;
+	font-size: inherit;
+	gap: 0.8em;
+
+	&:hover {
+		--button_background: var(--purple_bright);
+		--button_text: var(--purple_bright_text);
+
+		text-decoration: none;
+	}
+}
+
+.chevron {
+	display: inline-block;
+	transform: rotate(-90deg);
+	transition: transform 0.15s ease;
+
+	&.open {
+		transform: rotate(0);
+	}
+}
+
+.avatar {
+	width: 1.3em;
+	height: 1.3em;
+	border-radius: 50%;
+	object-fit: cover;
+}

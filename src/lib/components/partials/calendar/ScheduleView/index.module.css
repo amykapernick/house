@@ -1,0 +1,15 @@
+.schedule_toolbar {
+	display: flex;
+	align-items: center;
+	gap: 1em;
+	margin-bottom: 0.5em;
+}
+
+.unsaved {
+	color: var(--orange);
+}
+
+.hint {
+	color: var(--grey);
+	font-style: italic;
+}

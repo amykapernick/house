@@ -1,0 +1,28 @@
+@import '@mixins';
+
+.mark-read {
+
+	@include button_secondary;
+
+	margin: 1.5em 0 0;
+
+	&.read {
+		--button_text: var(--green);
+		--button_border: var(--green);
+	}
+}
+
+.content {
+	max-width: 100%;
+	overflow: hidden;
+	line-height: 1.6;
+
+	& :global(h2) {
+		padding-bottom: 0.2em;
+		border-bottom: 2px solid var(--navy);
+	}
+
+	& :global(img) {
+		max-width: 100%;
+	}
+}

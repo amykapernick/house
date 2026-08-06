@@ -1,0 +1,95 @@
+/* TODO: .habit-check kept :global() rather than hashed - src/routes/+page.svelte
+   (the dashboard) reaches in from outside via :global(.habit-check) to
+   restyle this component's grid layout inside its due-soon widget (see
+   #641). A fragile string contract; should become an explicit prop instead. */
+
+:global(.habit-check) {
+	display: grid;
+	grid-template-areas:
+		'checkbox label streak'
+		'checkbox due streak';
+	grid-template-columns: auto 1fr auto;
+	grid-template-rows: auto 1fr;
+	gap: 0.2ch 0.5ch;
+	width: auto;
+
+	& :global(button::before) {
+		content: '';
+		display: block;
+		position: absolute;
+		inset: 0 4em 0 2em;
+	}
+
+	& :global(.checkbox) {
+		grid-area: checkbox;
+	}
+}
+
+.label {
+	display: flex;
+	grid-area: label;
+	flex: 1;
+	flex-wrap: wrap;
+	align-items: baseline;
+	font-weight: 600;
+	word-wrap: break-word;
+	word-break: break-word;
+	white-space: wrap;
+	gap: 0 1ch;
+}
+
+.due {
+	grid-area: due;
+	color: var(--purple_solid_flat);
+	font-size: 0.8em;
+	font-weight: 400;
+}
+
+.streak {
+	grid-area: streak;
+	align-self: center;
+	font-size: 0.9em;
+}
+
+.emoji {
+	position: relative;
+	cursor: default;
+	-webkit-touch-callout: none;
+	user-select: none;
+}
+
+/* TODO: Use new css anchoring */
+.tooltip {
+	position: absolute;
+	z-index: 1;
+	bottom: 100%;
+	left: 50%;
+	padding: 0.2em 0.6em;
+	transform: translateX(-50%);
+	transition: opacity 0.15s ease;
+	border-radius: 0.2em;
+	opacity: 0;
+	background: var(--black);
+	color: var(--white);
+	font-size: 0.75em;
+	font-weight: 400;
+	white-space: nowrap;
+	pointer-events: none;
+}
+
+.emoji:hover .tooltip,
+.emoji:focus .tooltip,
+.tooltip.visible {
+	opacity: 1;
+}
+
+.error {
+	position: absolute;
+	top: 100%;
+	left: 0;
+	grid-column: 1 / -1;
+	margin: 0;
+	color: var(--red);
+	font-size: 0.8em;
+	white-space: nowrap;
+}

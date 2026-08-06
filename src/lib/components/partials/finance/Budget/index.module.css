@@ -1,0 +1,59 @@
+@import '@mixins';
+
+.budget {
+	& tr[data-income='true'] td:global(.amount) {
+		color: var(--green);
+		font-weight: 600;
+	}
+
+	& td[data-over-budget='true'] {
+		color: var(--red);
+		font-weight: 600;
+	}
+}
+
+.edit-amount {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.4em;
+
+	& input[type='number'] {
+		width: 7em;
+	}
+
+	& select {
+		width: auto;
+	}
+}
+
+.income-toggle {
+	display: flex;
+	align-items: center;
+	gap: 0.3em;
+	font-size: 0.85em;
+	white-space: nowrap;
+
+	& input {
+		width: auto;
+	}
+}
+
+.actions {
+	text-align: center;
+
+	& button {
+		padding: 0.2em 0.5em;
+		border: none;
+		background: none;
+		color: var(--red);
+		font-size: 1.1em;
+		cursor: pointer;
+	}
+}
+
+.add-item {
+	margin-top: 0.75em;
+
+	@include button_secondary;
+}

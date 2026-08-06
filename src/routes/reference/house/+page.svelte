@@ -1,9 +1,9 @@
 <script lang="ts">
-	import HouseMap from '$partials/HouseMap.svelte';
-	import HouseAreaModal from '$partials/house/HouseAreaModal.svelte';
-	import HouseItemModal from '$partials/house/HouseItemModal.svelte';
-	import EntityPickerModal from '$components/parts/house/EntityPickerModal.svelte';
-	import Skeleton from '$components/parts/Skeleton.svelte';
+	import HouseMap from '$partials/HouseMap/index.svelte';
+	import HouseAreaModal from '$partials/house/HouseAreaModal/index.svelte';
+	import HouseItemModal from '$partials/house/HouseItemModal/index.svelte';
+	import EntityPickerModal from '$components/parts/house/EntityPickerModal/index.svelte';
+	import Skeleton from '$components/parts/Skeleton/index.svelte';
 	import { isAuthenticated, getToken } from '$lib/auth';
 	import fetchClientData, { getGraphqlUrl, clearCache } from '$utils/fetchClientData';
 	import { beforeNavigate } from '$app/navigation';
@@ -626,6 +626,7 @@
 	onDelete={itemModalMode === `edit` ? deleteItemFromModal : undefined}
 />
 
+<!-- TODO: migrate to CSS Modules (see #641) -->
 <style>
 	.toolbar {
 		display: flex;

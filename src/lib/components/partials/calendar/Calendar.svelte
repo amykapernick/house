@@ -2,9 +2,9 @@
 	import { TimeGrid, DayGrid, List, Interaction } from '@event-calendar/core';
 	import { SvelteDate } from 'svelte/reactivity';
 	import { parseISO, setHours } from 'date-fns';
-	import CalendarBase from './CalendarBase.svelte';
-	import YearView from './YearView.svelte';
-	import TaskEventModal from './TaskEventModal.svelte';
+	import CalendarBase from './CalendarBase/index.svelte';
+	import YearView from './YearView/index.svelte';
+	import TaskEventModal from './TaskEventModal/index.svelte';
 	import parseTasks from '$utils/calendar/parseTasks';
 	import parseEvents from '$utils/calendar/parseEvents';
 	import { completeTask } from '$utils/completeTask';
@@ -12,8 +12,8 @@
 	import fetchFamilyMembers, { EVERYONE, isVisibleToUser, type FamilyMember } from '$utils/fetchFamilyMembers';
 	import formatCalendarTitle from '$utils/calendar/formatCalendarTitle';
 	import formatEventTimeRange from '$utils/calendar/formatEventTimeRange';
-	import notionIcon from '$img/icons/notion.svg?component';
-	import todoistIcon from '$img/icons/todoist.svg?component';
+	import notionIcon from '$img/icons/notion.svg?raw';
+	import todoistIcon from '$img/icons/todoist.svg?raw';
 	import type { Task } from '$types/tasks';
 
 	// Matches Task.svelte's own external "open in platform" link - github tasks

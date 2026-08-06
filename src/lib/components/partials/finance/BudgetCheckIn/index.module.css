@@ -1,0 +1,64 @@
+@import '@mixins';
+
+.root {
+	max-width: 100%;
+	overflow-x: auto;
+}
+
+.check-in {
+	width: 100%;
+	border-collapse: collapse;
+
+	& th,
+	& td {
+		padding: 10px;
+		border-bottom: 1px solid var(--grey_light);
+		text-align: left;
+	}
+
+	& th {
+		background: var(--navy);
+		color: var(--navy_text);
+
+		&:global(.amount) {
+			text-align: right;
+		}
+	}
+
+	& tbody tr:nth-child(even) {
+		background: var(--background);
+		color: var(--background_text);
+	}
+}
+
+:global(.amount) {
+	text-align: right;
+	font-variant-numeric: tabular-nums;
+
+	& input {
+		width: 7em;
+		text-align: right;
+	}
+}
+
+.actions {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.5em;
+
+	& button {
+
+		@include button_secondary;
+	}
+}
+
+.saved {
+	color: var(--green);
+	font-size: 0.85em;
+}
+
+.error {
+	color: var(--red);
+	font-size: 0.85em;
+}

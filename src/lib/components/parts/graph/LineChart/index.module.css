@@ -1,0 +1,64 @@
+.chart-wrap {
+	width: 100%;
+	color: light-dark(color-mix(in oklch, var(--background) 92%, var(--black)), color-mix(in oklch, var(--dark_background) 80%, var(--white)));
+	font-size: 0.8em;
+}
+
+.chart {
+	width: 100%;
+	height: auto;
+	overflow: visible;
+}
+
+.axis {
+	stroke-width: 1.5;
+	stroke: currentColor;
+}
+
+.axis-tick {
+	stroke-width: 1;
+	stroke: currentColor;
+}
+
+.axis-label {
+	fill: currentColor;
+	font-size: 0.6em;
+	font-weight: 600;
+}
+
+.axis-label,
+.tick-label {
+	color: light-dark(color-mix(in oklch, var(--grey) 84%, var(--black)), color-mix(in oklch, var(--grey_light) 85%, var(--dark_background)));
+}
+
+.gridline {
+	stroke-width: 0.5;
+	stroke-dasharray: none;
+	stroke: var(--grey_light);
+}
+
+.dot {
+	transition: r 0.1s ease;
+	cursor: pointer;
+}
+
+.tick-label {
+	fill: currentColor;
+	font-size: 0.6em;
+}
+
+.tick-label--hover {
+	fill: var(--black);
+	font-weight: 600;
+}
+
+.tooltip-bg {
+	opacity: 0.85;
+	fill: var(--black);
+}
+
+.tooltip-text {
+	fill: var(--white);
+	font-size: 0.6em;
+	font-weight: 600;
+}

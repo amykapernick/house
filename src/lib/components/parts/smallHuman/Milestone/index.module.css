@@ -1,0 +1,47 @@
+@import '@mixins';
+
+.content {
+	display: grid;
+	grid-template-areas: 'range range range' 'detail detail detail' 'note note note' 'tags . status';
+	grid-template-columns: auto 1fr auto;
+	grid-template-rows: auto auto 1fr auto;
+	height: 100%;
+	column-gap: 1em;
+
+	/* TODO: kept :global() rather than hashed - this component passes the
+	   literal "status" class to StatusSelect/Pill, then reaches back out to
+	   it via :global() to position it in the grid (see #641). A fragile
+	   string contract; should become an explicit prop instead. */
+
+	& :global(.status) {
+		grid-area: status;
+		align-self: center;
+		margin: 0;
+	}
+}
+
+.range {
+	grid-area: range;
+	margin: 0;
+	color: var(--purple_bright);
+	font-size: 0.8em;
+	font-weight: 600;
+}
+
+.detail {
+	grid-area: detail;
+	margin: 0 0 0.7em;
+	font-size: 0.9em;
+}
+
+.note {
+	grid-area: note;
+}
+
+.category {
+
+	@include subtitle;
+
+	grid-area: tags;
+	align-self: center;
+}
