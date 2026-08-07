@@ -1,21 +1,91 @@
-/* TODO: Style the year view - currently bare structural markup only
-   (month/weekday/day-cell/event grid). */
+@import '@mixins';
 
-.year-grid {
-	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(16em, 1fr));
+.year_view {
+	max-width: 100%;
+	overflow-x: hidden;
 }
 
-.weekday-row,
-.day-grid {
+.year {
 	display: grid;
-	grid-template-columns: repeat(7, 1fr);
+	grid-auto-flow: row;
+	grid-template-columns: repeat(var(--cols), 6ch);
+	max-width: 100%;
+	overflow-x: auto;
+	font-size: 0.8em;
+}
+
+
+.days, .day {
+
+	@include subtitle;
+}
+
+.days {
+	grid-row: 1;
+	font-size: 1.1em;
+	text-align: center;
+}
+
+.day, .label, .month {
+	grid-row: calc(var(--row) + 2);
+}
+
+.days, .day, .event, .month {
+	grid-column-start: var(--col-start);
+}
+
+.event, .month {
+	grid-column-end: var(--col-end, 'span 1');
+}
+
+.label {
+	display: flex;
+	z-index: -1;
+	grid-column: 1 / -1;
+	align-content: center;
+	align-items: center;
+	margin: 0;
+	padding-left: 0.2em;
+	opacity: 0.5;
+	font-size: 2em;
+	
+	&:nth-of-type(2n-1) {
+		background: var(--sidebar_bg);
+	}
+}
+
+.month {
+	display: grid;
+	grid-auto-flow: column dense;
+	grid-template-columns: subgrid;
+	row-gap: 0.1em;
+}
+
+.day {
+	grid-row: 1;
+	text-align: right;
 }
 
 .event {
 	display: block;
+	display: -webkit-box;
+	align-self: start;
 	width: 100%;
+	overflow: hidden;
 	background: var(--event_background);
 	color: var(--event_colour);
 	text-align: left;
+	line-clamp: 2;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 2;
+
+	&.continues {
+		border-top-right-radius: 0;
+		border-bottom-right-radius: 0;
+	}
+
+	&.continuing {
+		border-top-left-radius: 0;
+		border-bottom-left-radius: 0;
+	}
 }
