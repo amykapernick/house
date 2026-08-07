@@ -22,7 +22,7 @@ const parseTasks = (tasks: Task[]): TaskEvent[] => {
 			allDay: task.allDay ?? false,
 			// parseISO, not `new Date` - see parseEvents.ts for why a bare
 			// date-only string needs local-midnight (not UTC-midnight) parsing
-			// to avoid @event-calendar/core spilling allDay tasks into an extra day.
+			// to avoid allDay tasks reading as spilling into an extra day.
 			start: parseISO(task.due as unknown as string),
 			end: parseISO((task.end ?? task.due) as unknown as string),
 			colour: task.assigned.length === 1 ? task.assigned[0].colour : EVERYONE_COLOUR,

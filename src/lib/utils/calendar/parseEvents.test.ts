@@ -49,12 +49,12 @@ describe(`parseEvents`, () => {
 		// how this bug hid from every other test in this file. Overriding TZ
 		// for just this test reproduces a positive-offset timezone (e.g.
 		// Australia) where they aren't: `new Date('2026-07-28')` parses as UTC
-		// midnight, which reads back as ~10-11am *local* time, tricking
-		// @event-calendar/core's exclusive-end-date heuristic into bumping the
-		// event's end forward by an extra day (the "spills into 2 days"
-		// symptom). parseISO parses a bare date at local midnight instead, so
-		// getHours()/getDate() below must land exactly on midnight of the
-		// intended local calendar day.
+		// midnight, which reads back as ~10-11am *local* time - a calendar grid
+		// reading getHours()/getDate() in local time (as a browser naturally
+		// does) would misread the intended exclusive-end date (the "spills
+		// into 2 days" symptom). parseISO parses a bare date at local midnight
+		// instead, so getHours()/getDate() below must land exactly on midnight
+		// of the intended local calendar day.
 		const originalTZ = process.env.TZ;
 		process.env.TZ = `Australia/Sydney`;
 

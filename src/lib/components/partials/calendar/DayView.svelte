@@ -1,10 +1,11 @@
 <script lang="ts">
-	import { TimeGrid, Interaction } from '@event-calendar/core';
 	import CalendarBase from './CalendarBase/index.svelte';
+	import EventContent from './DayViewEventContent.svelte';
 	import parseTasks from '$utils/calendar/parseTasks';
 	import parseEvents from '$utils/calendar/parseEvents';
 	import type { Task } from '$types/tasks';
 	import type { ScheduleBlock, PaletteColour } from '$types/schedule';
+	import type { CalendarInstanceApi } from '@svar-ui/svelte-calendar';
 
 	let {
 		tasks = [],
@@ -73,32 +74,25 @@
 	});
 
 	const optionsOverride = {
-		view: 'timeGridDay',
-		editable: false,
-		selectable: false,
-		slotMinTime: '06:00:00',
-		slotMaxTime: '22:00:00',
-		headerToolbar: { start: 'title', center: 'today,prev,next', end: '' },
+		view: 'day',
+		readonly: true,
+		eventContent: EventContent,
 		// Fires on every navigation (prev/next/today), not just the initial
 		// mount - lets the dashboard refetch events/schedule for whichever day
-		// is now visible instead of always showing "today"'s data.
-		datesSet: (info: any) => {
-			onDateChange?.(info.start);
-		},
-		eventContent: (info: any) => {
-			const { type } = info.event.extendedProps;
-			let icon = '●';
-			if (type === 'task') icon = '☐';
-			else if (type === 'event') icon = '📅';
-			else if (type === 'block') icon = '';
-			return { html: `<span>${icon ? `${icon} ` : ''}${info.event.title}</span>` };
+		// is now visible instead of always showing "today"'s data. visibleDateRange
+		// is a Svelte store, so subscribing also fires once immediately with the
+		// initial value - same as datesSet firing on mount under @event-calendar.
+		init: (api: CalendarInstanceApi) => {
+			api.getReactiveState().visibleDateRange.subscribe((range) => {
+				onDateChange?.(range.start);
+			});
 		},
 	};
 </script>
 
 <CalendarBase
 	class="day_view {className}"
-	plugins={[TimeGrid, Interaction]}
 	events={calendarEvents}
+	views={['day']}
 	{optionsOverride}
 />

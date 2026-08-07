@@ -15,13 +15,14 @@ const parseEvents = (events: any[]): ParsedEvent[] => {
 			// parseISO (not `new Date`) - a bare date like "2026-07-27" (no time,
 			// no offset) is parsed as UTC midnight by the native Date
 			// constructor, but as local midnight by parseISO. For allDay events
-			// this matters: @event-calendar/core reads the parsed Date back out
-			// via its LOCAL getters to decide whether an end date already sits
-			// at midnight (exclusive, as HA/ICS provide it) or needs bumping by
-			// a day. In any timezone with a non-zero UTC offset (e.g.
-			// Australia), a UTC-midnight end date reads back as a non-midnight
-			// local time, so the library thinks it has a "time part" and bumps
-			// it forward an extra day - the event visibly spills into the next
+			// this matters regardless of which calendar library reads the
+			// result: a UTC-midnight Date is a non-midnight local time in any
+			// timezone with a non-zero offset (e.g. Australia), so grid/layout
+			// code working in local time (day-of-month, weekday, "is this
+			// midnight" checks - @svar-ui/calendar-store's normalizeAllDayEnd
+			// does exactly this for events it creates via its own add/update
+			// actions, though not for the bulk events array fed in below) would
+			// otherwise read the event as spanning into part of the next local
 			// day. Unit tests run pinned to TZ=UTC (see vitest.config.ts) so
 			// this doesn't reproduce there; parseISO avoids it in every timezone.
 			start: parseISO(event.dates.start),
