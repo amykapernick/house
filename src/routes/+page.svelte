@@ -502,13 +502,6 @@
 		}
 	}
 
-	.schedule-toggle {
-		display: flex;
-		align-items: center;
-		gap: 0.4em;
-		font-size: 0.85em;
-	}
-
 	.agenda,
 	.habits {
 		margin: 0;
