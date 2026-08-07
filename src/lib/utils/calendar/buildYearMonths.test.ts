@@ -72,6 +72,17 @@ describe(`buildYearMonths`, () => {
 		expect(july.events).toEqual([]);
 	});
 
+	it(`does not leak a next-month event (starting exactly at next month's midnight) into this month`, () => {
+		// endOfMonth() lands at 23:59:59.999 on the last day, not midnight - a
+		// naive addDays(monthEnd, 1) exclusive boundary would land at
+		// 23:59:59.999 the next day too, letting a New Year's Day event
+		// (starting exactly at next-month's midnight) count as "before" it.
+		const events: YearViewEventInput[] = [{ id: `nye`, title: `New Year's Day`, start: new Date(2027, 0, 1), end: new Date(2027, 0, 2), allDay: true }];
+		const [, , , , , , , , , , , december] = buildYearMonths(2026, events);
+
+		expect(december.events).toEqual([]);
+	});
+
 	it(`repeats an event that spans a month boundary, once per month, clipped to that month's days`, () => {
 		// 28 June - 3 July (exclusive end): covers the 28th-30th in June, 1st-2nd in July.
 		const events: YearViewEventInput[] = [{ id: `1`, title: `Trip`, start: new Date(2026, 5, 28), end: new Date(2026, 6, 3), allDay: true }];

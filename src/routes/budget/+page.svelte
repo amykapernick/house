@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { format, startOfWeek } from 'date-fns';
+	import { format, startOfWeek, subWeeks, endOfWeek } from 'date-fns';
 	import { DATE_FORMATS } from '$utils/dateFormats';
 	import { beforeNavigate } from '$app/navigation';
 	import Budget from '$partials/finance/Budget/index.svelte';
@@ -18,7 +18,11 @@
 	import Title from '$parts/Title/index.svelte';
 
 	let checkInOpen = $state(false);
-	const currentWeekStart = format(startOfWeek(new Date(), { weekStartsOn: 1 }), DATE_FORMATS.iso);
+	// Check-in logs the previous, already-completed Monday-Sunday week rather than the
+	// still-in-progress current one, since actual spend for this week isn't final yet.
+	const previousWeekStart = subWeeks(startOfWeek(new Date(), { weekStartsOn: 1 }), 1);
+	const previousWeekStartIso = format(previousWeekStart, DATE_FORMATS.iso);
+	const previousWeekEnd = endOfWeek(previousWeekStart, { weekStartsOn: 1 });
 
 	let budget = $state<BudgetItem[]>([]);
 	let buckets = $state<BudgetBucket[]>([]);
@@ -234,7 +238,7 @@
 		{:else}
 			<button type="button" onclick={startEditing}>Edit</button>
 		{/if}
-		<button type="button" onclick={() => (checkInOpen = true)}>Log this week's spend</button>
+		<button type="button" onclick={() => (checkInOpen = true)}>Log last week's spend</button>
 	</div>
 
 	<h2>Overview</h2>
@@ -249,8 +253,10 @@
 	<Budget bind:budget={editableBudget} buckets={editableBuckets} entries={budgetSpend} income={true} {editing} onChange={() => (dirty = true)} />
 
 	<Modal bind:open={checkInOpen} title="Budget Check-in">
-		<p class="week-label">Week starting {currentWeekStart}</p>
-		<BudgetCheckIn budget={budget} entries={budgetSpend} weekStart={currentWeekStart} onSaved={() => loadBudget(true)} />
+		<p class="week-label">
+			Week of {format(previousWeekStart, DATE_FORMATS.short)} - {format(previousWeekEnd, DATE_FORMATS.short)}
+		</p>
+		<BudgetCheckIn budget={budget} entries={budgetSpend} weekStart={previousWeekStartIso} onSaved={() => loadBudget(true)} />
 	</Modal>
 {/if}
 

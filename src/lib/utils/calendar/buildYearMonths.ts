@@ -48,7 +48,13 @@ export function buildYearMonths(year: number, events: YearViewEventInput[], toda
 	return Array.from({ length: 12 }, (_, monthIndex) => {
 		const monthStart = new Date(year, monthIndex, 1);
 		const monthEnd = endOfMonth(monthStart);
-		const monthEndExclusive = addDays(monthEnd, 1);
+		// Deliberately not `addDays(monthEnd, 1)` - endOfMonth lands at
+		// 23:59:59.999 on the last day, so adding a day would land at
+		// 23:59:59.999 the next day instead of exact midnight. That fuzzy
+		// boundary let an event starting at next-month's midnight (e.g. New
+		// Year's Day) count as "before" it and leak into this month with a
+		// zero-length segment.
+		const monthEndExclusive = new Date(year, monthIndex + 1, 1);
 		// getDay is Sunday-first (0-6); shift to Monday-first to match WEEK_OPTIONS elsewhere.
 		const offset = (getDay(monthStart) + 6) % 7;
 
@@ -60,7 +66,6 @@ export function buildYearMonths(year: number, events: YearViewEventInput[], toda
 		// Events only render at month level (one bar per month, spanning the days
 		// it covers) rather than per-day - an event crossing a month boundary
 		// shows up once per month it touches, each clipped to that month's days.
-		// TODO: Events are showing up after the last day that start in the next month, (eg. New years day in december, after the 31st), check timezones
 		const monthEvents: YearViewEvent[] = allDayEvents.flatMap((event) => {
 			const segmentStart = max([event.start, monthStart]);
 			const segmentEnd = min([effectiveEnd(event), monthEndExclusive]);
