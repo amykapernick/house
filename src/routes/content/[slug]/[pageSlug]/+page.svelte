@@ -28,7 +28,7 @@
 	// whenever the slug/pageSlug changes.
 	let readAnchors = new SvelteSet<string>();
 	let hasResumedScroll = $state(false);
-	let showToc = $state(true);
+	let showToc = $state(false);
 
 	function loadReadAnchors(slug: string, pageSlug: string) {
 		readAnchors.clear();
