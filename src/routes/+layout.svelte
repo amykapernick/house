@@ -12,13 +12,9 @@
 	import Header from '$partials/Header/index.svelte';
 	import Footer from '$partials/Footer/index.svelte';
 	import Layout from '$layouts/Default/index.svelte';
-	import CommandPalette from '$parts/CommandPalette/index.svelte';
 	import TaskReminderBanner from '$parts/TaskReminderBanner/index.svelte';
-	import FocusTimer from '$parts/FocusTimer/index.svelte';
+	import FloatingActions from '$parts/FloatingActions/index.svelte';
 	import OnlineStatus from '$parts/OnlineStatus/index.svelte';
-	import { focusTimerState } from '$utils/focusTimer';
-	import Timer from '$img/icons/stopwatch-fill.svg?component';
-	import Search from '$img/icons/search-1.svg?component';
 
 	let { children } = $props();
 
@@ -121,10 +117,6 @@
 		swipeIsVertical = null;
 	}
 
-	function openCommandPalette() {
-		commandPaletteOpen = true;
-	}
-
 	afterNavigate(({ to }) => {
 		if (to) recordPageVisit(to.url.pathname);
 	});
@@ -155,44 +147,20 @@
 
 <OnlineStatus />
 
-<button
-	type="button"
-	class="palette_trigger"
-	onclick={openCommandPalette}
->
-	<Search />
-	<span class="sr-only">Open Command Palette</span>
-</button>
-
-<!-- TODO: Add a controls section -->
-{#if !$focusTimerState}
-	<button
-		type="button"
-		class="focus_timer_trigger"
-		onclick={() => (focusTimerOpen = !focusTimerOpen)}
-		aria-expanded={focusTimerOpen}
-	>
-		<Timer />
-		<span class="sr-only">Toggle focus timer panel</span>
-	</button>
-{/if}
+<FloatingActions
+	bind:commandPaletteOpen
+	bind:focusTimerOpen
+	{menuItems}
+	isAuthenticated={$isAuthenticated}
+/>
 
 <Header />
 <main class="main">
-	<Layout
-		wide={page.data.layoutWidth === 'wide'}
-		full={page.data.layoutWidth === 'full'}
-	>
+	<Layout width={page.data.layoutWidth} class={page.data.layoutClass}>
 		{@render children()}
 	</Layout>
 </main>
 <Footer />
-<CommandPalette
-	bind:open={commandPaletteOpen}
-	{menuItems}
-	isAuthenticated={$isAuthenticated}
-/>
-<FocusTimer bind:open={focusTimerOpen} />
 <TaskReminderBanner />
 
 <!-- TODO: migrate to CSS Modules (see #641) -->
@@ -211,34 +179,7 @@
 
 	.main {
 		grid-area: main;
-
-		/* margin-bottom: 5em; */
-	}
-
-	.palette_trigger {
-
-		@include button_icon;
-
-		position: fixed;
-		z-index: 1000;
-		right: 0.5em;
-		bottom: 4.5rem;
-		margin: 0;
-		box-shadow: var(--shadow_soft);
-		font-size: 1.3em;
-	}
-
-	.focus_timer_trigger {
-
-		@include button_icon;
-
-		position: fixed;
-		z-index: 1000;
-		right: 3.5em;
-		bottom: 4.5rem;
-		margin: 0;
-		box-shadow: var(--shadow_soft);
-		font-size: 1.3em;
+		margin-bottom: 5em;
 	}
 
 	@media (width >= 50em) {
@@ -252,6 +193,7 @@
 
 		.main {
 			max-height: 100vh;
+			margin-bottom: 0;
 			overflow-y: auto;
 		}
 	}

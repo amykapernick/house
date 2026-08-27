@@ -33,6 +33,7 @@
 	import EmptyState from '$parts/EmptyState/index.svelte';
 	import { getPageTitle } from '$utils/pageTitle';
 	import { SvelteSet } from 'svelte/reactivity';
+	import Title from '$parts/Title/index.svelte';
 
 	let data = $state<any>(null);
 	let allergens = $state<any[]>([]);
@@ -373,7 +374,7 @@
 	<title>{getPageTitle(`Small Human`)}</title>
 </svelte:head>
 
-<h1>Small Human</h1>
+<Title>Small Human</Title>
 
 <Allergens
 	{allergens}

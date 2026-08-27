@@ -8,6 +8,7 @@
 	import Skeleton from '$parts/Skeleton/index.svelte';
 	import type { Chore } from '$types/chores';
 	import { getPageTitle } from '$utils/pageTitle';
+	import Title from '$parts/Title/index.svelte';
 
 	let chores = $state<Chore[]>([]);
 	let loading = $state(true);
@@ -35,7 +36,7 @@
 	<meta name="description" content="Track recurring household chores" />
 </svelte:head>
 
-<h1>Chores</h1>
+<Title>Chores</Title>
 {#if loading}
 	<Skeleton rows={3} />
 {:else}

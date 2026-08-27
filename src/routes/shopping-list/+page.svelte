@@ -9,6 +9,7 @@
 	import EmptyState from '$parts/EmptyState/index.svelte';
 	import FreezerRecipesModal from '$partials/shoppingList/FreezerRecipesModal/index.svelte';
 	import { getPageTitle } from '$utils/pageTitle';
+	import Title from '$parts/Title/index.svelte';
 
 	type SubGroup = { name: string; items: any[] };
 	type StoreGroup = { name: string; items: any[]; subGroups: SubGroup[] };
@@ -293,7 +294,7 @@
 	<title>{getPageTitle(`Shopping List`)}</title>
 </svelte:head>
 
-<h1>Shopping List</h1>
+<Title>Shopping List</Title>
 
 <a
 	href={resolve('/shopping-list/cart')}

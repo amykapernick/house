@@ -7,6 +7,7 @@
 	import { saveArticleMutation } from '$utils/content';
 	import { importRecipeMutation } from '$utils/recipes';
 	import { getPageTitle } from '$utils/pageTitle';
+	import Title from '$parts/Title/index.svelte';
 
 	// Landing page for the PWA's Web Share Target (see static/manifest.json) -
 	// sharing a url from any app's Share menu on Android/desktop, once House is
@@ -64,7 +65,7 @@
 	<title>{getPageTitle(`Save Shared Link`)}</title>
 </svelte:head>
 
-<h1>Save Shared Link</h1>
+<Title>Save Shared Link</Title>
 
 {#if !url}
 	<p>Share a link to House from your phone or browser's Share menu to save it here.</p>

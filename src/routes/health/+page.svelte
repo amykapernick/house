@@ -9,6 +9,7 @@
 	import EmptyState from '$parts/EmptyState/index.svelte';
 	import type { Colour } from '$types/global';
 	import { getPageTitle } from '$utils/pageTitle';
+	import Title from '$parts/Title/index.svelte';
 
 	type HealthMetricPoint = { date: string; value: number };
 	type HealthMetricHistory = { key: string; label: string | null; unit: string | null; points: HealthMetricPoint[] };
@@ -88,7 +89,7 @@
 	/>
 </svelte:head>
 
-<h1>Health</h1>
+<Title>Health</Title>
 
 <fieldset class="range_filter">
 	<legend>Show</legend>

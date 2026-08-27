@@ -8,6 +8,7 @@
 	import EmptyState from '$components/parts/EmptyState/index.svelte';
 	import { getPageTitle } from '$utils/pageTitle';
 	import type { Author } from '$types/generated';
+	import Title from '$parts/Title/index.svelte';
 
 	let authors = $state<Author[]>([]);
 	let loading = $state(true);
@@ -59,7 +60,7 @@
 {:else if !author}
 	<EmptyState title="Author not found" />
 {:else}
-	<h1>{author.name}</h1>
+	<Title>{author.name}</Title>
 
 	{#if series.length}
 		<ul class="series-links">

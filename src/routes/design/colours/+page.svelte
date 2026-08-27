@@ -9,6 +9,7 @@
 	import buildColoursCss from '$styles/config/buildColoursCss.js';
 	import type { EditableColour } from '$types/colour';
 	import { getPageTitle } from '$utils/pageTitle';
+	import Title from '$parts/Title/index.svelte';
 
 	let colours = $state<EditableColour[]>([]);
 	let loading = $state(true);
@@ -304,7 +305,7 @@
 	<title>{getPageTitle(`Colours`)}</title>
 </svelte:head>
 
-<h1>Colours</h1>
+<Title>Colours</Title>
 {#if loading}
 	<Skeleton rows={3} />
 {:else}

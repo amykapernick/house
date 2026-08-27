@@ -15,6 +15,8 @@ declare global {
 		interface PageData {
 			/** Read by the root +layout.svelte to size $layouts/Default/index.svelte - see its `wide`/`full` props. */
 			layoutWidth?: `wide` | `full`
+			/** Read by the root +layout.svelte and passed to $layouts/Default/index.svelte's `class` prop. */
+			layoutClass?: string
 		}
 	}
 }

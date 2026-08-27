@@ -1,10 +1,11 @@
 <script lang="ts">
 	import { Calendar, Willow } from '@svar-ui/svelte-calendar';
+	import type { CalendarInstanceApi } from '@svar-ui/svelte-calendar';
 	import { getToolbarItems } from '@svar-ui/calendar-store';
 	import { registerToolbarItem } from '@svar-ui/svelte-toolbar';
-	import { Button } from '@svar-ui/svelte-core';
 	import toSvarEvent, { type AppCalendarEvent } from '$utils/calendar/toSvarEvent';
 	import eventColourClass from './eventColourClass';
+	import ViewSwitcher from './ViewSwitcher.svelte';
 	import './agendaView';
 	import './resourcesView';
 	import styles from './index.module.css';
@@ -14,7 +15,7 @@
 	// app load, not per CalendarBase instance - side effects at the top of a
 	// .svelte <script> still only execute once since the module itself is
 	// only evaluated once.
-	registerToolbarItem('viewToggle', Button);
+	registerToolbarItem('calendarViews', ViewSwitcher);
 
 	// month/week/day are native @svar-ui/svelte-calendar views. agenda/resources
 	// are also genuine SVAR views, registered via agendaView.ts/resourcesView.ts's
@@ -44,6 +45,18 @@
 		class?: string;
 	} = $props();
 
+	// Captures the calendar's api so ViewSwitcher's onSelectView can drive
+	// view switches directly via api.exec - needed because ViewSwitcher
+	// bypasses the toolbar's normal onchange path (see toolbarItems below),
+	// which is what @svar-ui/svelte-calendar's own Navigation.svelte would
+	// otherwise use to do this itself for its 'modes' item.
+	let calendarApi: CalendarInstanceApi | undefined;
+
+	function handleInit(api: CalendarInstanceApi) {
+		calendarApi = api;
+		optionsOverride.init?.(api);
+	}
+
 	// The resource column list is injected via ViewConfig.sections (a documented
 	// deep-merge over the registered ViewModel's own getSections() output, see
 	// resourcesView.ts) rather than stored on the ViewModel instance - keeps it
@@ -71,16 +84,32 @@
 	// appears under the first.
 	let svarEvents = $derived(events.map((event) => ({ ...toSvarEvent(event), resourceId: event.resourceIds?.[0] })));
 
-	// Mirrors @event-calendar/core's customButtons mechanism: each customViews
-	// entry becomes a toolbar button (via the 'viewToggle' comp registered
-	// above) whose click swaps the whole calendar out for a caller-rendered
-	// component, same as today's Year button. SVAR's own add-event button is
-	// dropped since nothing renders its target (editorData) - this app uses
-	// its own create/edit modals instead of @svar-ui/svelte-editor's form.
-	let toolbarItems = $derived([
-		...getToolbarItems().filter((item) => item.comp !== 'addEventButton'),
-		...(customViews ?? []).map((view) => ({ id: view.name, comp: 'viewToggle', text: view.text, handler: view.onClick })),
-	]);
+	let viewOptions = $derived((views ?? ['month', 'week', 'day']).map((id) => ({ id, label: id.charAt(0).toUpperCase() + id.slice(1) })));
+
+	// Replaces the default toolbar's 'modes' item (a <select>, comp:
+	// 'richselect') with ViewSwitcher (comp: 'calendarViews', registered
+	// above) - a single row of buttons covering both the built-in SVAR views
+	// and the caller's customViews (Year/Timeline), which mirrors
+	// @event-calendar/core's old customButtons mechanism by swapping the
+	// whole calendar out for a caller-rendered component on click (same as
+	// today's Year button). Kept as the *same* 'modes' item (just with a
+	// different comp/extra fields) rather than a second item alongside it -
+	// @svar-ui/svelte-calendar's own Navigation.svelte always recomputes
+	// 'modes'' `value` from its internal current-view store afterwards
+	// (harmless - ViewSwitcher reads that same `value` field), so a second,
+	// separate item wouldn't get that live highlight for free. SVAR's own
+	// add-event button is dropped since nothing renders its target
+	// (editorData) - this app uses its own create/edit modals instead of
+	// @svar-ui/svelte-editor's form.
+	let toolbarItems = $derived(
+		getToolbarItems()
+			.filter((item) => item.comp !== 'addEventButton')
+			.map((item) =>
+				item.id === 'modes'
+					? { ...item, comp: 'calendarViews', views: viewOptions, customViews: customViews ?? [], onSelectView: (id: string) => calendarApi?.exec('navigate-to', { view: id }) }
+					: item,
+			),
+	);
 
 	// SVAR's eventCss returns a class name (not a style object, unlike
 	// @event-calendar/core's eventDidMount) - see eventColourClass.ts. Merged
@@ -110,7 +139,7 @@
 			eventContent={optionsOverride.eventContent}
 			cellCss={optionsOverride.cellCss}
 			{eventCss}
-			init={optionsOverride.init}
+			init={handleInit}
 		/>
 	</Willow>
 </div>

@@ -11,6 +11,7 @@
 	import EmptyState from '$components/parts/EmptyState/index.svelte';
 	import ImportRecipeModal from '$components/parts/recipes/ImportRecipeModal/index.svelte';
 	import { getPageTitle } from '$utils/pageTitle';
+	import Title from '$parts/Title/index.svelte';
 
 	let recipes = $state<any[]>([]);
 	let allTags = $state<any[]>([]);
@@ -174,7 +175,7 @@
 	<title>{getPageTitle(`Recipes`)}</title>
 </svelte:head>
 
-<h1>Recipes</h1>
+<Title>Recipes</Title>
 
 <button type="button" class="import" onclick={openImportModal}>Import from URL</button>
 

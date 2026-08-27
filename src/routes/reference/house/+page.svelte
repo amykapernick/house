@@ -10,6 +10,7 @@
 	import { buildHouseSaveOps, type HouseBoard, type DraftHouseArea, type DraftHouseItem } from '$utils/houseEditDnd';
 	import type { Area, Item } from '$types/house';
 	import { getPageTitle } from '$utils/pageTitle';
+	import Title from '$parts/Title/index.svelte';
 
 	const MAP_SIZE = [1189, 1593];
 
@@ -538,7 +539,7 @@
 	<title>{getPageTitle(`House`)}</title>
 </svelte:head>
 
-<h1>House</h1>
+<Title>House</Title>
 
 {#if $isAuthenticated}
 	<div class="toolbar">

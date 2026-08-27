@@ -12,6 +12,7 @@
 	import Skeleton from '$parts/Skeleton/index.svelte';
 	import type { Task, TaskStatus } from '$types/tasks';
 	import { getPageTitle } from '$utils/pageTitle';
+	import Title from '$parts/Title/index.svelte';
 
 	let tasks = $state<Task[]>([]);
 	let loading = $state(true);
@@ -50,7 +51,7 @@
 	<meta name="description" content="View all upcoming and overdue tasks in various views" />
 </svelte:head>
 
-<h1>Tasks</h1>
+<Title>Tasks</Title>
 {#if permission !== `granted` && permission !== `unsupported`}
 	<button class="enable_reminders" onclick={enableReminders}>Enable task reminders</button>
 {/if}

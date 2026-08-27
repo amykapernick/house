@@ -6,6 +6,7 @@
 	import Skeleton from '$components/parts/Skeleton/index.svelte';
 	import EmptyState from '$components/parts/EmptyState/index.svelte';
 	import type { Author } from '$types/generated';
+	import Title from '$parts/Title/index.svelte';
 
 	let authors = $state<Author[]>([]);
 	let loading = $state(true);
@@ -51,7 +52,7 @@
 
 <a href={resolve('/reference/books')} class="back">← Books</a>
 
-<h1>Authors</h1>
+<Title>Authors</Title>
 
 {#if loading}
 	<Skeleton rows={3} />

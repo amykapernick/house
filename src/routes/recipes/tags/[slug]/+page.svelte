@@ -8,6 +8,7 @@
 	import Skeleton from '$components/parts/Skeleton/index.svelte';
 	import EmptyState from '$components/parts/EmptyState/index.svelte';
 	import { getPageTitle } from '$utils/pageTitle';
+	import Title from '$parts/Title/index.svelte';
 
 	let recipes = $state<any[]>([]);
 	let loading = $state(true);
@@ -72,7 +73,7 @@
 	<span>{tagName}</span>
 </nav>
 
-<h1>{tagName}</h1>
+<Title>{tagName}</Title>
 
 {#if loading}
 	<Skeleton rows={3} />

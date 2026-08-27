@@ -13,6 +13,7 @@
 	import type { ScheduleBlock, ScheduleSavePayload, RoutineDays, PaletteColour } from '$types/schedule';
 	import type { Task, TaskStatus } from '$types/tasks';
 	import { getPageTitle } from '$utils/pageTitle';
+	import Title from '$parts/Title/index.svelte';
 
 	let blocks = $state<ScheduleBlock[]>([]);
 	let colours = $state<PaletteColour[]>([]);
@@ -256,7 +257,7 @@
 	<meta name="description" content="Weekly routine schedule" />
 </svelte:head>
 
-<h1>Schedule</h1>
+<Title>Schedule</Title>
 {#if loading}
 	<Skeleton rows={3} />
 {:else}

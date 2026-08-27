@@ -4,6 +4,7 @@
 	import { resolve } from '$app/paths';
 	import { getPageTitle } from '$utils/pageTitle';
 	import Skeleton from '$parts/Skeleton/index.svelte';
+	import Title from '$parts/Title/index.svelte';
 
 	let tags = $state<any[]>([]);
 	let loading = $state(true);
@@ -42,7 +43,7 @@
 
 <a href={resolve('/recipes')} class="back">← Recipes</a>
 
-<h1>Tags</h1>
+<Title>Tags</Title>
 
 {#if loading}
 	<Skeleton rows={3} />

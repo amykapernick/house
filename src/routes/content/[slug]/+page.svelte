@@ -16,12 +16,12 @@
 	import EmptyState from '$components/parts/EmptyState/index.svelte';
 	import type { ContentEntry, ContentGroup, ContentPage } from '$types/generated';
 	import { getPageTitle } from '$utils/pageTitle';
+	import Title from '$parts/Title/index.svelte';
 
 	let entry = $state<ContentEntry | null>(null);
 	let groups = $state<ContentGroup[]>([]);
 	let digest = $state<ContentPage | null>(null);
 	let loading = $state(true);
-	let showToc = $state(false);
 
 	// Course-style entries (no Brief) normally list linked subpages via
 	// contentIndex - but a flat saved article has no subpages, so an empty
@@ -155,7 +155,7 @@
 	<title>{getPageTitle(entry?.title ?? `Content`)}</title>
 </svelte:head>
 
-<h1><ContentIcon icon={entry?.icon} iconType={entry?.iconType} />{entry?.title ?? $page.params.slug}{#if allRead}<span class="read-mark" title="Fully read">✓</span>{/if}</h1>
+<Title><ContentIcon icon={entry?.icon} iconType={entry?.iconType} />{entry?.title ?? $page.params.slug}{#if allRead}<span class="read-mark" title="Fully read">✓</span>{/if}</Title>
 {#if loading}
 	<Skeleton rows={3} />
 {:else if entry?.brief}
@@ -165,14 +165,14 @@
 	{#if !digest?.content}
 		<EmptyState title="No versions yet" />
 	{:else}
-		<TableOfContents {toc} {readAnchors} bind:showToc />
+		<TableOfContents {toc} {readAnchors} />
 		<TrackableContent {chunks} {readAnchors} onToggleRead={handleToggleRead} />
 	{/if}
 {:else if flatArticle}
 	{#if !digest?.content}
 		<p>Not found.</p>
 	{:else}
-		<TableOfContents {toc} {readAnchors} bind:showToc />
+		<TableOfContents {toc} {readAnchors} />
 		<TrackableContent {chunks} {readAnchors} onToggleRead={handleToggleRead} />
 	{/if}
 {:else}
@@ -181,12 +181,6 @@
 
 <!-- TODO: migrate to CSS Modules (see #641) -->
 <style>
-	h1 {
-		display: flex;
-		align-items: center;
-		gap: 0.4em;
-	}
-
 	.read-mark {
 		margin-left: 0.4em;
 		color: var(--green);

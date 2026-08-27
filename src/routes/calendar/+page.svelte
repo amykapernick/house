@@ -19,6 +19,8 @@
 	import type { CalendarInstanceApi } from '@svar-ui/svelte-calendar';
 	import type { Task } from '$types/tasks';
 	import { getPageTitle } from '$utils/pageTitle';
+	import Title from '$parts/Title/index.svelte';
+	import styles from './+page.module.css';
 
 	let tasks = $state<Task[]>([]);
 	let events = $state<any[]>([]);
@@ -44,7 +46,9 @@
 		const padded = computePaddedRange(visible);
 		lastFetchedRange = padded;
 
-		function handleEvents(res: any) { events = res.events ?? []; }
+		function handleEvents(res: any) {
+			events = res.events ?? [];
+		}
 		fetchClientData({
 			skipCache: true,
 			onStale: handleEvents,
@@ -114,12 +118,11 @@
 			// first fetch is seeded here from the same initial week CalendarBase itself
 			// defaults to (firstDay: 1), same pattern as schedule/+page.svelte.
 			const today = new Date();
-			handleRangeChange(
-				startOfWeek(today, { weekStartsOn: 1 }),
-				endOfWeek(today, { weekStartsOn: 1 })
-			);
+			handleRangeChange(startOfWeek(today, { weekStartsOn: 1 }), endOfWeek(today, { weekStartsOn: 1 }));
 
-			function handleCalMeals(res: any) { mealPlans = res.mealPlans?.items ?? []; }
+			function handleCalMeals(res: any) {
+				mealPlans = res.mealPlans?.items ?? [];
+			}
 			fetchClientData({
 				cacheKey: 'calendar-mealplans',
 				onStale: handleCalMeals,
@@ -244,9 +247,7 @@
 		// the events/icsEvents merge - only calendar-platform events get narrowed.
 		const isResourceView = currentView === 'resources' || activeCustomView === 'timeline';
 		const visibleTasks = isResourceView ? tasks : tasks.filter((task) => isVisibleToUser(task.assigned, selectedUserSlug));
-		const visibleEvents = isResourceView
-			? events
-			: events.filter((event) => event.platform === 'notion' || isVisibleToUser(event.family, selectedUserSlug));
+		const visibleEvents = isResourceView ? events : events.filter((event) => event.platform === 'notion' || isVisibleToUser(event.family, selectedUserSlug));
 
 		const taskEvents = parseTasks(visibleTasks);
 		const calEvents = parseEvents(visibleEvents);
@@ -343,19 +344,47 @@
 
 <svelte:head>
 	<title>{getPageTitle(`Calendar`)}</title>
-	<meta name="description" content="View combined calendars and tasks for the family" />
+	<meta
+		name="description"
+		content="View combined calendars and tasks for the family"
+	/>
 </svelte:head>
 
-<h1>{calendarTitle || `Calendar`}</h1>
+<Title>{calendarTitle || `Calendar`}</Title>
 {#if loading}
-	<Skeleton rows={3} />
+	<Skeleton
+		rows={3}
+		class={styles.loading}
+	/>
 {:else}
-	<FamilyFilter bind:selectedUserSlug pageKey="calendar" />
+	<FamilyFilter
+		bind:selectedUserSlug
+		pageKey="calendar"
+		class={styles.filter}
+	/>
 
 	{#if activeCustomView === 'year'}
-		<YearView {tasks} {events} bind:year={yearViewYear} bind:title={calendarTitle} onRangeChange={handleRangeChange} onEventClick={handleCustomViewEventClick} onBack={() => (activeCustomView = null)} />
+		<YearView
+			{tasks}
+			{events}
+			bind:year={yearViewYear}
+			bind:title={calendarTitle}
+			onRangeChange={handleRangeChange}
+			onEventClick={handleCustomViewEventClick}
+			onBack={() => (activeCustomView = null)}
+			class={styles.calendar}
+		/>
 	{:else if activeCustomView === 'timeline'}
-		<TimelineView {tasks} {events} {resources} bind:title={calendarTitle} onRangeChange={handleRangeChange} onEventClick={handleCustomViewEventClick} onBack={() => (activeCustomView = null)} />
+		<TimelineView
+			{tasks}
+			{events}
+			{resources}
+			bind:title={calendarTitle}
+			onRangeChange={handleRangeChange}
+			onEventClick={handleCustomViewEventClick}
+			onBack={() => (activeCustomView = null)}
+			class={styles.calendar}
+		/>
 	{:else}
 		<CalendarBase
 			events={calendarEvents}
@@ -366,6 +395,7 @@
 				{ name: 'timeline', text: 'Timeline', onClick: () => (activeCustomView = 'timeline') },
 			]}
 			{optionsOverride}
+			class={styles.calendar}
 		/>
 	{/if}
 
@@ -384,6 +414,12 @@
 	{/if}
 
 	{#if selectedEvent}
-		<EventDetailModal bind:open={eventModalOpen} title={selectedEvent.title} start={selectedEvent.start} end={selectedEvent.end} link={selectedEvent.link} />
+		<EventDetailModal
+			bind:open={eventModalOpen}
+			title={selectedEvent.title}
+			start={selectedEvent.start}
+			end={selectedEvent.end}
+			link={selectedEvent.link}
+		/>
 	{/if}
 {/if}

@@ -45,7 +45,7 @@
 	for={id}>{label}</label
 >
 <select
-	class="select {className}"
+	class="{styles.select} {className}"
 	{id}
 	bind:value
 	{onchange}
@@ -56,7 +56,7 @@
 		type="button"
 		aria-label={label}
 	>
-		<selectedcontent>
+		<selectedcontent class={styles.selectedcontent}>
 			{#if selectedOption}
 				{#if children}
 					{@render children(selectedOption)}

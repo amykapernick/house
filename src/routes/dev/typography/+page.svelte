@@ -2,6 +2,7 @@
 	import Select from '$components/parts/Select/index.svelte';
 	import Slider from '$components/parts/Slider/index.svelte';
 	import { getPageTitle } from '$utils/pageTitle';
+	import Title from '$parts/Title/index.svelte';
 
 	let sliderValue = $state(50);
 </script>
@@ -13,7 +14,7 @@
 {#if !import.meta.env.DEV}
 	<p>The typography reference is only available when running the app locally.</p>
 {:else}
-	<h1>Typography</h1>
+	<Title>Typography</Title>
 
 	<section>
 		<h2>Headings</h2>
