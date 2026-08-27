@@ -12,6 +12,13 @@ export function formatViolations(violations: Result[]): string {
 export async function runAxeScan(page: Page, name: string, disableRules: string[] = []): Promise<void> {
 	await expect(page.locator(`body`)).toBeVisible();
 
+	// Every route sets its own <svelte:head><title> on mount, but on a fresh
+	// (non-SPA) navigation the JS bundle still has to download and hydrate
+	// first - until then there's no "Loading..." text in the DOM at all, so
+	// the wait below for it to hide resolves immediately and axe can run
+	// against the pre-hydration shell, always flagging a missing title.
+	await page.waitForFunction(() => document.title.length > 0);
+
 	// Pages fetch their data client-side after mount (see the Page Data
 	// Pattern in CLAUDE.md) and show "Loading..." until it resolves - without
 	// this, axe can race ahead and scan the placeholder instead of the real

@@ -101,7 +101,11 @@ test.describe(`meal plan entry create + delete`, () => {
 
 		await expect(page.getByText(marker)).toBeVisible();
 
-		const mealCard = page.locator(`.meal`, { hasText: marker });
+		// `.meal` isn't a real selector - MealPlanningDay's card styling comes
+		// from a CSS module, so its rendered class is hashed (e.g.
+		// `_meal_dz28r_38`), never the literal token "meal". Its role and the
+		// dndzone's own aria-label (see MEAL_PLANNING zones) are stable instead.
+		const mealCard = page.locator(`[aria-label$="meals"]`).getByRole(`listitem`).filter({ hasText: marker });
 		await mealCard.getByRole(`button`, { name: `Edit meal` }).click();
 
 		const editDialog = page.getByRole(`dialog`);
@@ -179,7 +183,10 @@ test.describe(`meal planning mode`, () => {
 		await tabUntilOnMealsZone(page);
 		await page.keyboard.press(`Space`); // drop
 
-		const droppedMeal = page.locator(`.meal`, { hasText: recipeName! });
+		// See the create+delete test above for why `.meal` can't be used -
+		// scoped to the meals dndzone (not `main`/`getByRole('listitem')`
+		// alone) since the still-visible palette card shares the same text.
+		const droppedMeal = page.locator(`[aria-label$="meals"]`).getByRole(`listitem`).filter({ hasText: recipeName! });
 		await expect(droppedMeal).toBeVisible();
 		await expect(droppedMeal.getByText(`New`)).toBeVisible();
 
@@ -202,7 +209,7 @@ test.describe(`meal planning mode`, () => {
 		await expect(page.locator(`.week`).getByText(recipeName!)).toBeVisible();
 
 		await page.getByRole(`button`, { name: `Start meal planning` }).click();
-		const mealCard = page.locator(`.meal`, { hasText: recipeName! });
+		const mealCard = page.locator(`[aria-label$="meals"]`).getByRole(`listitem`).filter({ hasText: recipeName! });
 		await mealCard.getByRole(`button`, { name: `Edit meal` }).click();
 
 		const editDialog = page.getByRole(`dialog`);
