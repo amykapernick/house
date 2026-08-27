@@ -2,6 +2,11 @@ import type { CodegenConfig } from '@graphql-codegen/cli';
 
 const config: CodegenConfig = {
 	schema: `../household_api/src/graphql/**/*.graphql`,
+	hooks: {
+		// codegen's typescript plugin always emits 2-space/quoted output, which doesn't
+		// match this repo's tabs/backticks eslint style - reformat right after writing.
+		afterOneFileWrite: [`eslint --fix -c ./config/eslint.config.mjs`],
+	},
 	generates: {
 		'./src/lib/types/generated.ts': {
 			plugins: [`typescript`],
