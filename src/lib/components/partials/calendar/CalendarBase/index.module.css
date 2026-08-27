@@ -1,8 +1,140 @@
 @import '@mixins';
 
 .container {
+	display: grid;
+	grid-column: 1 / -1;
+	grid-row: 1 / 4;
+	grid-template-columns: subgrid;
+	grid-template-rows: subgrid;
 
-	
+	& :global(.wx-theme) {
+		--wx-background: var(--transparent);
+
+		/* base colours */
+		--wx-color-primary: var(--purple_bright);
+		--wx-color-primary-selected: color-mix(in oklch, var(--purple_bright) 16%, var(--card_top));
+		--wx-color-primary-font: var(--purple_bright_text);
+		--wx-color-secondary: var(--transparent);
+		--wx-color-secondary-hover: color-mix(in oklch, var(--purple_bright) 12%, var(--transparent));
+		--wx-color-secondary-font: var(--purple_bright);
+		--wx-color-secondary-font-hover: var(--purple_bright);
+		--wx-color-secondary-border: var(--purple_bright);
+		--wx-color-secondary-border-disabled: var(--border);
+		--wx-color-success: var(--success);
+		--wx-color-warning: var(--warning);
+		--wx-color-info: var(--accent_blue);
+		--wx-color-danger: var(--error);
+		--wx-color-disabled: var(--row_hover);
+		--wx-color-disabled-alt: var(--border);
+		--wx-color-font: var(--text_primary);
+		--wx-color-font-alt: var(--text_secondary);
+		--wx-color-font-disabled: var(--text_muted);
+		--wx-color-link: var(--purple_bright);
+		--wx-background-alt: var(--card_bottom);
+		--wx-background-hover: var(--row_hover);
+
+		/* font */
+		--wx-font-family: $font_main;
+
+		/* icons */
+		--wx-icon-color: var(--text_secondary);
+
+		/* other */
+		--wx-border: 1px solid var(--border);
+		--wx-border-radius: 0.5em;
+		--wx-radius-major: 0.7em;
+		--wx-border-medium: 1px solid var(--border);
+		--wx-shadow-light: var(--shadow_card);
+		--wx-shadow-medium: var(--shadow_popover);
+		--wx-box-shadow: var(--shadow_card);
+		--wx-box-shadow-strong: var(--shadow_popover);
+
+		/* input */
+		--wx-input-font-color: var(--text_primary);
+		--wx-input-background: var(--input_bg);
+		--wx-input-background-disabled: var(--row_hover);
+		--wx-input-placeholder-color: var(--text_muted);
+		--wx-input-border: 1px solid var(--input_border);
+		--wx-input-border-focus: 1px solid var(--purple_bright);
+		--wx-input-border-disabled: 1px solid var(--border);
+		--wx-input-border-radius: 0.5em;
+		--wx-input-icon-color: var(--text_secondary);
+
+		/* checkbox and radio */
+		--wx-checkbox-border-color: var(--text_secondary);
+		--wx-checkbox-border-color-disabled: var(--border);
+		--wx-checkbox-border-radius: 0.3em;
+		--wx-checkbox-font-color: var(--text_primary);
+
+		/* label */
+		--wx-label-font-color: var(--text_primary);
+
+		/* button */
+		--wx-button-font-family: $font_heading;
+		--wx-button-font-color: var(--text_primary);
+		--wx-button-danger-font-color: var(--error_text);
+		--wx-button-background: var(--card_bottom);
+		--wx-button-border: 1px solid var(--transparent);
+		--wx-button-border-radius: 0.7em;
+		--wx-button-pressed: var(--row_hover);
+		--wx-button-danger-pressed: var(--error);
+		--wx-button-primary-pressed: color-mix(in oklch, var(--purple_bright) 80%, var(--black));
+
+		/* segmented */
+		--wx-segmented-background: var(--card_bottom);
+		--wx-segmented-background-hover: var(--row_hover);
+		--wx-segmented-border-radius: 0.7em;
+
+		/* tabs */
+		--wx-tabs-hover-border: var(--text_secondary);
+		--wx-tabs-active-color: var(--purple_bright);
+		--wx-tabs-active-border: var(--purple_bright);
+
+		/* slider */
+		--wx-slider-primary: var(--purple_bright);
+		--wx-slider-background: var(--card_bottom);
+		--wx-slider-label-font-color: var(--text_primary);
+
+		/* switch */
+		--wx-switch-primary: var(--purple_bright);
+		--wx-switch-background: var(--text_muted);
+		--wx-switch-thumb-background: var(--card_top);
+		--wx-switch-thumb-border-disabled: 1px solid var(--border);
+
+		/* popup and dropdown */
+		--wx-popup-background: var(--card_top);
+		--wx-popup-shadow: var(--shadow_popover);
+		--wx-popup-border: 1px solid var(--border);
+		--wx-popup-border-radius: 0.5em;
+
+		/* modal */
+		--wx-modal-background: var(--card_top);
+		--wx-modal-shadow: var(--shadow_popover);
+		--wx-modal-border-radius: 0.7em;
+		--wx-modal-backdrop: rgb(0 0 0 / 40%);
+		--wx-modal-header-font-family: $font_heading;
+		--wx-modal-header-font-color: var(--text_primary);
+
+		/* notice */
+		--wx-notice-background: var(--card_top);
+		--wx-notice-shadow: var(--shadow_popover);
+		--wx-notice-font-color: var(--text_primary);
+		--wx-notice-icon-color: var(--text_secondary);
+		--wx-notice-type-border-color: var(--purple_bright);
+		--wx-notice-type-font-color: var(--text_primary);
+		--wx-notice-type-icon-color: var(--purple_bright);
+
+		/* calendar */
+		--wx-calendar-border-radius: 0.7em;
+		--wx-calendar-font-family: $font_main;
+		--wx-calendar-font-color: var(--text_primary);
+		--wx-calendar-icon-color: var(--text_secondary);
+		--wx-calendar-header-font-weight: 700;
+		--wx-calendar-controls-font-family: $font_heading;
+		--wx-calendar-controls-font-color: var(--text_primary);
+		--wx-calendar-grid-color: var(--border);
+		--wx-calendar-weekend-background: var(--card_bottom);
+
+		
+	}
 }
-
-

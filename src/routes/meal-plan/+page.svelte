@@ -4,7 +4,7 @@
 	import { prefetchRecipes } from '$utils/prefetchRecipes';
 	import { getWeekRange, getPlanningRange, getNextSaturday } from '$utils/dateRanges';
 	import { getCurrentNoongarSeason } from '$utils/noongarSeason';
-	import { buildMealPlanSaveOps, type PlanningDay, type PlanningDndItem, type PlanningRecipe } from '$utils/mealPlanningDnd';
+	import { buildMealPlanSaveOps, type ExistingDndItem, type PlanningDay, type PlanningDndItem, type PlanningRecipe } from '$utils/mealPlanningDnd';
 	import { beforeNavigate } from '$app/navigation';
 	import { format, parseISO, isToday, isYesterday } from 'date-fns';
 	import { DATE_FORMATS } from '$utils/dateFormats';
@@ -16,6 +16,7 @@
 	import DayColumn from '$lib/components/partials/mealPlan/DayColumn/index.svelte';
 	import { getPageTitle } from '$utils/pageTitle';
 	import Skeleton from '$parts/Skeleton/index.svelte';
+	import Title from '$parts/Title/index.svelte';
 
 	let days = $state<any[]>([]);
 	let loading = $state(true);
@@ -116,6 +117,7 @@
 			days = newDays;
 			loading = false;
 			prefetchRecipes(newDays.flatMap((day) => day.entries.map((entry: any) => entry.recipe?.slug)));
+			if (planningMode) syncPlanningBoardFromDays();
 		}
 
 		fetchClientData({
@@ -199,11 +201,14 @@
 		fetchMealPlan(true);
 	}
 
-	// Rebuilds the working copy from server truth whenever `days` refreshes
-	// while in planning mode - this is what clears all drafts/moves after a
-	// successful save (fetchMealPlan(true) -> days updates -> board rebuilt).
-	$effect(() => {
-		if (!planningMode) return;
+	// Rebuilds the working copy from server truth. Called explicitly after a
+	// fetchMealPlan() resolves in planning mode (entering planning, changing
+	// week count, exiting, or a full plan save) - this is what clears all
+	// drafts/moves once they're actually persisted. Deliberately NOT a $effect
+	// keyed on `days`, since a quick single-entry add/edit/delete via the modal
+	// also updates `days` and must NOT wipe unrelated unsaved drafts/moves
+	// elsewhere on the board - see upsertPlanningEntry/removePlanningEntry.
+	function syncPlanningBoardFromDays() {
 		planningBoard = displayDays.map((day) => ({
 			date: day.date,
 			items: day.entries.map((entry: any): PlanningDndItem => ({
@@ -217,7 +222,49 @@
 				recipe: entry.recipe ?? null,
 			})),
 		}));
-	});
+	}
+
+	// Patches a single created/updated entry into local state without a full
+	// refetch, so unrelated unsaved drag/drop changes on the planning board
+	// survive a quick add/edit via the modal.
+	function upsertPlanningEntry(entry: any) {
+		days = days.map((day) => {
+			if (day.date !== entry.date) return day;
+			const exists = day.entries.some((e: any) => e.id === entry.id);
+			const entries = exists
+				? day.entries.map((e: any) => (e.id === entry.id ? entry : e))
+				: [...day.entries, entry];
+			return { ...day, entries };
+		});
+
+		if (planningMode) {
+			const day = planningBoard.find((d) => d.date === entry.date);
+			if (day) {
+				const item: ExistingDndItem = {
+					id: entry.id,
+					kind: `existing`,
+					date: entry.date,
+					originalDate: entry.date,
+					entryType: entry.entryType,
+					title: entry.title ?? null,
+					text: entry.text ?? null,
+					recipe: entry.recipe ?? null,
+				};
+				const idx = day.items.findIndex((i) => i.id === entry.id);
+				day.items = idx === -1 ? [...day.items, item] : day.items.map((i, n) => (n === idx ? item : i));
+			}
+		}
+	}
+
+	// Counterpart to upsertPlanningEntry for a modal delete.
+	function removePlanningEntry(id: string, date: string) {
+		days = days.map((day) => (day.date === date ? { ...day, entries: day.entries.filter((e: any) => e.id !== id) } : day));
+
+		if (planningMode) {
+			const day = planningBoard.find((d) => d.date === date);
+			if (day) day.items = day.items.filter((i) => i.id !== id);
+		}
+	}
 
 	async function handleSaveMealPlan() {
 		const ops = buildMealPlanSaveOps(planningBoard);
@@ -394,10 +441,19 @@
 		}
 		const args = parts.join(`, `);
 
+		// Only recipe display fields (image/totalTime/servings) are requested
+		// back - everything else needed to patch local state (see
+		// upsertPlanningEntry) is already known from the draft/modal fields
+		// below, rather than trusting the mutation's own echoed-back `date`.
+		// household_api's date-only fields round-trip through Mealie via a
+		// JS Date that a *local* API server can construct in its own
+		// timezone, so re-deriving the entry from what we already sent avoids
+		// depending on that round-trip being timezone-safe.
+		const entryFields = `id recipe { id name slug image totalTime servings }`;
 		const mutation =
 			modalMode === `create`
-				? `mutation { createMealPlanEntry(${args}) { id } }`
-				: `mutation { updateMealPlanEntry(id: ${gqlStr(draftId)}, ${args}) { id } }`;
+				? `mutation { createMealPlanEntry(${args}) { ${entryFields} } }`
+				: `mutation { updateMealPlanEntry(id: ${gqlStr(draftId)}, ${args}) { ${entryFields} } }`;
 
 		const res = await postMutation(mutation);
 		saving = false;
@@ -407,8 +463,16 @@
 			return;
 		}
 
+		const saved = res.data[modalMode === `create` ? `createMealPlanEntry` : `updateMealPlanEntry`];
 		modalOpen = false;
-		fetchMealPlan(true);
+		upsertPlanningEntry({
+			id: modalMode === `create` ? saved.id : draftId,
+			date: draftDate,
+			entryType: draftEntryType,
+			title: draftLinkMode === `custom` ? draftTitle.trim() : null,
+			text: draftLinkMode === `custom` ? draftText.trim() || null : null,
+			recipe: draftLinkMode === `recipe` ? saved.recipe : null,
+		});
 	}
 
 	async function handleDelete() {
@@ -424,7 +488,7 @@
 		}
 
 		modalOpen = false;
-		fetchMealPlan(true);
+		removePlanningEntry(draftId, draftDate);
 	}
 
 	// isToday/isYesterday are relative to the viewer's own clock, so they stay
@@ -447,7 +511,7 @@
 	<title>{getPageTitle(`Meal Plan`)}</title>
 </svelte:head>
 
-<h1>Meal Plan</h1>
+<Title>Meal Plan</Title>
 
 {#if planningMode}
 	<div class="planning-toolbar">

@@ -6,6 +6,7 @@
 	import Skeleton from '$parts/Skeleton/index.svelte';
 	import type { PaletteColour } from '$types/schedule';
 	import { getPageTitle } from '$utils/pageTitle';
+	import Title from '$parts/Title/index.svelte';
 
 	let clerkContainer: HTMLDivElement | undefined = $state();
 
@@ -157,7 +158,7 @@
 	<title>{getPageTitle(`Profile`)}</title>
 </svelte:head>
 
-<h1>Profile</h1>
+<Title>Profile</Title>
 
 <div class="account" bind:this={clerkContainer}></div>
 

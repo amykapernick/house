@@ -2,8 +2,8 @@
 	import { format } from 'date-fns';
 	import { DATE_FORMATS } from '$utils/dateFormats';
 	import { SvelteDate } from 'svelte/reactivity';
-	import { TimeGrid, Interaction } from '@event-calendar/core';
 	import CalendarBase from '../CalendarBase/index.svelte';
+	import EventContent from './EventContent.svelte';
 	import ScheduleBlockModal from '../ScheduleBlockModal/index.svelte';
 	import ScheduleSaveModal from '../ScheduleSaveModal/index.svelte';
 	import TaskEventModal from '../TaskEventModal/index.svelte';
@@ -12,6 +12,7 @@
 	import { completeTask } from '$utils/completeTask';
 	import type { ScheduleBlock, ScheduleSavePayload, RoutineDays, PaletteColour } from '$types/schedule';
 	import type { Task } from '$types/tasks';
+	import type { CalendarInstanceApi } from '@svar-ui/svelte-calendar';
 	import styles from './index.module.css';
 
 	let {
@@ -212,34 +213,30 @@
 		blockModalOpen = false;
 	}
 
-	function handleEventChange(info: any) {
-		if (readOnly) {
-			info.revert?.();
-			return;
-		}
-
-		const { id, start, end } = info.event;
-		editableBlocks = editableBlocks.map((block) => (block.id === id ? { ...block, start: format(start, LOCAL_DATETIME), end: format(end, LOCAL_DATETIME) } : block));
+	// A move sends both start and end; a resize (dragging just an edge) sends
+	// only whichever end changed - see @svar-ui/svelte-calendar's dragresize.js.
+	function handleEventChange(id: string | number, start: Date | undefined, end: Date | undefined) {
+		editableBlocks = editableBlocks.map((block) => (block.id === id ? { ...block, start: start ? format(start, LOCAL_DATETIME) : block.start, end: end ? format(end, LOCAL_DATETIME) : block.end } : block));
 		hasChanges = true;
 	}
 
-	function handleSelect(info: any) {
+	function handleSelect(start: Date, end: Date) {
 		if (readOnly) return;
-		openCreateModal(info.start, info.end);
+		openCreateModal(start, end);
 	}
 
-	function handleEventClick(info: any) {
-		const { type, link, status, platform } = info.event.extendedProps ?? {};
+	function handleEventClick(event: { id: string | number; text?: string; start: Date; extendedProps?: Record<string, unknown> }) {
+		const { type, link, status, platform } = (event.extendedProps ?? {}) as { type?: string; link?: string; status?: unknown; platform?: `notion` | `todoist` };
 
 		if (type === `task`) {
 			completeError = ``;
 			selectedTask = {
-				id: info.event.id,
-				title: info.event.title,
-				due: info.event.start,
-				status,
-				platform,
-				link,
+				id: String(event.id),
+				title: event.text ?? '',
+				due: event.start,
+				status: status as string,
+				platform: platform as `notion` | `todoist`,
+				link: link as string,
 			};
 			taskModalOpen = true;
 			return;
@@ -252,7 +249,7 @@
 
 		if (readOnly) return;
 
-		const block = editableBlocks.find((b) => b.id === info.event.id);
+		const block = editableBlocks.find((b) => b.id === event.id);
 		if (block) openEditModal(block);
 	}
 
@@ -279,42 +276,45 @@
 	}
 
 	// CalendarBase reads this once at mount; per-instance readOnly flips are
-	// enforced by the handler guards above instead.
+	// enforced by the handler guards/init closures below instead, which read
+	// the live prop rather than this frozen snapshot.
 	// svelte-ignore state_referenced_locally
 	const optionsOverride = {
-		view: 'timeGridWeek',
-		editable: !readOnly,
-		selectable: !readOnly,
-		allDaySlot: true,
-		slotMinTime: '05:00:00',
-		slotMaxTime: '23:00:00',
-		headerToolbar: {
-			start: 'title',
-			center: '',
-			end: 'today prev,next timeGridWeek,timeGridDay',
+		view: 'week',
+		readonly: readOnly,
+		eventContent: EventContent,
+		init: (api: CalendarInstanceApi) => {
+			// Drag-to-create/move/resize all route through add-event/update-event
+			// (see @svar-ui/svelte-calendar's drag directive) - intercepting lets
+			// this app's own editableBlocks stay the single source of truth
+			// instead of @svar-ui/calendar-store's internal event store, and
+			// vetoing add-event always (rather than only when readOnly) keeps a
+			// stray unlabeled block from appearing before the create modal is
+			// even filled in.
+			api.intercept('add-event', (rawAction) => {
+				const { event } = rawAction as { event: { start?: Date; end?: Date } };
+				if (event.start && event.end) handleSelect(event.start, event.end);
+				return false;
+			});
+			api.intercept('update-event', (rawAction) => {
+				if (readOnly) return false;
+				const { id, event } = rawAction as { id: string | number; event: { start?: Date; end?: Date } };
+				if (event.start || event.end) handleEventChange(id, event.start, event.end);
+			});
+			api.intercept('select-event', (rawAction) => {
+				const { id } = rawAction as { id: string | number | null };
+				if (id == null) return false;
+				const event = api.getEvent(id);
+				if (event) handleEventClick(event as { id: string | number; text?: string; start: Date; extendedProps?: Record<string, unknown> });
+				return false;
+			});
+			api.getReactiveState().visibleDateRange.subscribe((range) => {
+				const end = new SvelteDate(range.end);
+				end.setDate(end.getDate() - 1);
+				visibleRange = { start: range.start, end };
+				onRangeChange?.(range.start, end);
+			});
 		},
-		buttonText: {
-			today: 'This Week',
-			timeGridWeek: 'Week',
-			timeGridDay: 'Day',
-		},
-		datesSet: (info: any) => {
-			const end = new SvelteDate(info.end);
-			end.setDate(end.getDate() - 1);
-			visibleRange = { start: info.start, end };
-			onRangeChange?.(info.start, end);
-		},
-		eventContent: (info: any) => {
-			const { type } = info.event.extendedProps ?? {};
-			let icon = '';
-			if (type === 'task') icon = '☐ ';
-			else if (type === 'event') icon = '📅 ';
-			return { html: `<span>${icon}${info.event.title}</span>` };
-		},
-		select: handleSelect,
-		eventClick: handleEventClick,
-		eventDrop: handleEventChange,
-		eventResize: handleEventChange,
 	};
 </script>
 
@@ -334,8 +334,8 @@
 	</div>
 
 	<CalendarBase
-		plugins={[TimeGrid, Interaction]}
 		events={calendarEvents}
+		views={['week', 'day']}
 		{optionsOverride}
 	/>
 

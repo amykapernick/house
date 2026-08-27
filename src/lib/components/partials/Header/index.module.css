@@ -8,7 +8,7 @@
 	--header_border: light-dark(color-mix(in oklch, var(--background) 78%, var(--black)), color-mix(in oklch, var(--dark_background) 78%, var(--white)));
 
 	display: grid;
-	position: fixed;
+	position: sticky;
 	z-index: 50;
 	top: 0;
 	right: 0;

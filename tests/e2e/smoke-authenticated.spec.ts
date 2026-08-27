@@ -48,7 +48,9 @@ test(`search shows results for a query passed in the URL`, async ({ page }) => {
 	// deterministic without relying on live data.
 	await page.goto(`/search?q=budget`);
 	await expect(page.getByRole(`heading`, { level: 2, name: `Pages` })).toBeVisible();
-	await expect(page.getByRole(`link`, { name: `Budget` })).toBeVisible();
+	// Scoped to main - the header nav also has a permanent "Budget" link, so
+	// an unscoped locator matches both it and the search result.
+	await expect(page.getByRole(`main`).getByRole(`link`, { name: `Budget` })).toBeVisible();
 });
 
 test(`colours renders swatches and Edit/Discard never triggers a save`, async ({ page }) => {

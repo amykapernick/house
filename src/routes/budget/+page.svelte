@@ -15,6 +15,7 @@
 	import type { BudgetBucket } from '$types/budgetBucket';
 	import type { BudgetSpendEntry } from '$types/budgetSpend';
 	import { getPageTitle } from '$utils/pageTitle';
+	import Title from '$parts/Title/index.svelte';
 
 	let checkInOpen = $state(false);
 	const currentWeekStart = format(startOfWeek(new Date(), { weekStartsOn: 1 }), DATE_FORMATS.iso);
@@ -220,7 +221,7 @@
 	<title>{getPageTitle(`Budget`)}</title>
 </svelte:head>
 
-<h1>Budget</h1>
+<Title>Budget</Title>
 {#if loading}
 	<Skeleton rows={3} />
 {:else}

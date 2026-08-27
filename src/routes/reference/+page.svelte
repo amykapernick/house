@@ -10,6 +10,7 @@
 	import type { Supplier } from '$types/suppliers';
 	import { getPageTitle } from '$utils/pageTitle';
 	import Card from '$components/parts/resources/Card/index.svelte';
+	import Title from '$parts/Title/index.svelte';
 
 	let resources = $state<Resource[]>([]);
 	let assets = $state<Asset[]>([]);
@@ -124,7 +125,7 @@
 	<title>{getPageTitle(`Reference`)}</title>
 </svelte:head>
 
-<h1>Reference</h1>
+<Title>Reference</Title>
 {#if resourcesLoading || assetsLoading || suppliersLoading}
 	<Skeleton rows={3} />
 {/if}

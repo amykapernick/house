@@ -15,9 +15,8 @@ declare module '*.svg?component' {
 	export default content;
 }
 
-// Raw SVG markup as a string — use when embedding an icon inside HTML built as
-// a plain string (e.g. @event-calendar/core's eventContent, which returns
-// {html} rather than mounting real Svelte components).
+// Raw SVG markup as a string — use when embedding an icon inside HTML built
+// as a plain string rather than mounting a real Svelte component.
 declare module '*.svg?src' {
 	const content: string;
 	export default content;

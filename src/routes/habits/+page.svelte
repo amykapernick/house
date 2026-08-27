@@ -12,6 +12,7 @@
 	import Skeleton from '$parts/Skeleton/index.svelte';
 	import type { Habit } from '$types/habits';
 	import { getPageTitle } from '$utils/pageTitle';
+	import Title from '$parts/Title/index.svelte';
 
 	let habits = $state<Habit[]>([]);
 	let loading = $state(true);
@@ -97,7 +98,7 @@
 	/>
 </svelte:head>
 
-<h1>Habits</h1>
+<Title>Habits</Title>
 {#if loading}
 	<Skeleton rows={3} />
 {:else}

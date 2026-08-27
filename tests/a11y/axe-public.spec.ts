@@ -16,7 +16,11 @@ for (const route of routes.filter((r) => !r.auth)) {
 // from their index page instead of a hardcoded URL.
 test(`recipe detail (via /recipes) has no automatically detectable accessibility violations`, async ({ page }) => {
 	await page.goto(`/recipes`);
-	const firstRecipe = page.locator(`a[href^="/recipes/"]`).first();
+	// Scoped to main - an unscoped `a[href^="/recipes/"]` locator also matches
+	// the (hidden) global command palette's recently-visited-pages results,
+	// which can include a /recipes/tags entry from earlier in the test run
+	// and resolves first in DOM order, never becoming visible.
+	const firstRecipe = page.getByRole(`main`).locator(`a[href^="/recipes/"]`).first();
 	await firstRecipe.waitFor();
 	await firstRecipe.click();
 	await runAxeScan(page, `recipe-detail`);

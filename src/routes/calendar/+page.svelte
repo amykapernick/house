@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { TimeGrid, DayGrid, List, Interaction } from '@event-calendar/core';
-	import { SvelteDate } from 'svelte/reactivity';
-	import { startOfWeek, endOfWeek, parseISO, setHours } from 'date-fns';
+	import { startOfWeek, endOfWeek, parseISO, setHours, subDays } from 'date-fns';
 	import CalendarBase from '$partials/calendar/CalendarBase/index.svelte';
+	import EventContent from '$partials/calendar/CalendarBase/EventContent.svelte';
 	import YearView from '$partials/calendar/YearView/index.svelte';
+	import TimelineView from '$partials/calendar/TimelineView/index.svelte';
 	import TaskEventModal from '$partials/calendar/TaskEventModal/index.svelte';
 	import EventDetailModal from '$partials/calendar/EventDetailModal/index.svelte';
 	import FamilyFilter from '$parts/FamilyFilter/index.svelte';
@@ -15,17 +15,12 @@
 	import fetchClientData from '$utils/fetchClientData';
 	import fetchFamilyMembers, { EVERYONE, isVisibleToUser, type FamilyMember } from '$utils/fetchFamilyMembers';
 	import formatCalendarTitle from '$utils/calendar/formatCalendarTitle';
-	import formatEventTimeRange from '$utils/calendar/formatEventTimeRange';
 	import { computePaddedRange, needsRefetch, type DateRange } from '$utils/calendar/paddedRange';
-	import notionIcon from '$img/icons/notion.svg?src';
-	import todoistIcon from '$img/icons/todoist.svg?src';
+	import type { CalendarInstanceApi } from '@svar-ui/svelte-calendar';
 	import type { Task } from '$types/tasks';
 	import { getPageTitle } from '$utils/pageTitle';
-
-	// Matches Task.svelte's own external "open in platform" link - github tasks
-	// have no icon there either (see that component's own TODO), so they're
-	// skipped here the same way.
-	const platformIcons: Partial<Record<Task['platform'], string>> = { notion: notionIcon, todoist: todoistIcon };
+	import Title from '$parts/Title/index.svelte';
+	import styles from './+page.module.css';
 
 	let tasks = $state<Task[]>([]);
 	let events = $state<any[]>([]);
@@ -51,7 +46,9 @@
 		const padded = computePaddedRange(visible);
 		lastFetchedRange = padded;
 
-		function handleEvents(res: any) { events = res.events ?? []; }
+		function handleEvents(res: any) {
+			events = res.events ?? [];
+		}
 		fetchClientData({
 			skipCache: true,
 			onStale: handleEvents,
@@ -121,12 +118,11 @@
 			// first fetch is seeded here from the same initial week CalendarBase itself
 			// defaults to (firstDay: 1), same pattern as schedule/+page.svelte.
 			const today = new Date();
-			handleRangeChange(
-				startOfWeek(today, { weekStartsOn: 1 }),
-				endOfWeek(today, { weekStartsOn: 1 })
-			);
+			handleRangeChange(startOfWeek(today, { weekStartsOn: 1 }), endOfWeek(today, { weekStartsOn: 1 }));
 
-			function handleCalMeals(res: any) { mealPlans = res.mealPlans?.items ?? []; }
+			function handleCalMeals(res: any) {
+				mealPlans = res.mealPlans?.items ?? [];
+			}
 			fetchClientData({
 				cacheKey: 'calendar-mealplans',
 				onStale: handleCalMeals,
@@ -172,14 +168,15 @@
 		taskModalOpen = false;
 	}
 
-	let currentView = $state('timeGridWeek');
-	let showYearView = $state(false);
+	let currentView = $state('week');
+	let activeCustomView = $state<'year' | 'timeline' | null>(null);
 	let yearViewYear = $state(new Date().getFullYear());
 	let familyMembers = $state<FamilyMember[]>([]);
 
-	// Shared by optionsOverride.eventClick (info.event, the @event-calendar/core
-	// shape) and YearView's onEventClick (a YearViewEvent, same extendedProps
-	// shape) - both funnel task clicks into the same TaskEventModal.
+	// Shared by the SVAR select-event intercept below (which adapts SVAR's
+	// {id, text, start, extendedProps} shape into this one) and YearView's
+	// onEventClick (a YearViewEvent, same extendedProps shape) - both funnel
+	// task clicks into the same TaskEventModal.
 	function handleEventClick(event: { id: string; title: string; start?: Date; extendedProps?: Record<string, unknown> }) {
 		const { link, type, status, platform } = event.extendedProps as { type: string; link?: string; status?: unknown; platform?: unknown };
 		if (type === 'task') {
@@ -206,11 +203,12 @@
 	let selectedEvent = $state<{ title: string; start: Date; end: Date; link?: string } | null>(null);
 	let eventModalOpen = $state(false);
 
-	// YearView-only: a plain event bar there has no inline "open in platform"
-	// link like the main view's eventContent affordance, so clicking it shows
-	// its details in a modal instead of jumping straight to an external tab -
-	// tasks still fall through to the same TaskEventModal as everywhere else.
-	function handleYearEventClick(event: { id: string; title: string; start: Date; end: Date; extendedProps?: Record<string, unknown> }) {
+	// Shared by YearView and TimelineView: a plain event bar there has no
+	// inline "open in platform" link like the main view's EventContent
+	// affordance, so clicking it shows its details in a modal instead of
+	// jumping straight to an external tab - tasks still fall through to the
+	// same TaskEventModal as everywhere else.
+	function handleCustomViewEventClick(event: { id: string; title: string; start: Date; end: Date; extendedProps?: Record<string, unknown> }) {
 		if ((event.extendedProps as { type?: string })?.type === 'task') {
 			handleEventClick(event);
 			return;
@@ -226,16 +224,16 @@
 		}
 	});
 
-	// Backs the resourceTimeGridDay/resourceTimelineWeek views' per-person
-	// columns/rows - only tasks and ical events carry an assignee/family (see
-	// parseTasks/parseEvents), so Notion events and meal plans have no
-	// resourceIds and simply won't appear in either resource view.
+	// Backs the Resources view's per-person columns and the custom Timeline
+	// view's per-person rows - only tasks and ical events carry an
+	// assignee/family (see parseTasks/parseEvents), so Notion events and meal
+	// plans have no resourceIds and simply won't appear in either.
 	let resources = $derived(
 		familyMembers.map((member) => ({
 			id: member.slug,
 			title: member.name,
-			eventBackgroundColor: member.colour ? `var(--${member.colour})` : undefined,
-			eventTextColor: member.colour ? `var(--${member.colour}_text)` : undefined,
+			colour: member.colour ? `var(--${member.colour})` : undefined,
+			textColour: member.colour ? `var(--${member.colour}_text)` : undefined,
 		})),
 	);
 
@@ -243,15 +241,13 @@
 		// Resource views exist to show every family member side by side, so the
 		// single-person "Filter by family member" selector (see FamilyFilter,
 		// which defaults to "just me") is skipped there - otherwise switching to
-		// By Person/Timeline would only ever populate one row/column. The
-		// non-resource views (month/week/day/list) keep respecting it. Notion
+		// Resources/Timeline would only ever populate one row/column. The
+		// non-resource views (month/week/day/agenda) keep respecting it. Notion
 		// events carry no family data and always bypass the filter, same as before
 		// the events/icsEvents merge - only calendar-platform events get narrowed.
-		const isResourceView = currentView?.startsWith('resource') ?? false;
+		const isResourceView = currentView === 'resources' || activeCustomView === 'timeline';
 		const visibleTasks = isResourceView ? tasks : tasks.filter((task) => isVisibleToUser(task.assigned, selectedUserSlug));
-		const visibleEvents = isResourceView
-			? events
-			: events.filter((event) => event.platform === 'notion' || isVisibleToUser(event.family, selectedUserSlug));
+		const visibleEvents = isResourceView ? events : events.filter((event) => event.platform === 'notion' || isVisibleToUser(event.family, selectedUserSlug));
 
 		const taskEvents = parseTasks(visibleTasks);
 		const calEvents = parseEvents(visibleEvents);
@@ -288,7 +284,7 @@
 			},
 		}));
 
-		const showMeals = currentView?.startsWith('timeGrid') ?? false;
+		const showMeals = currentView === 'week' || currentView === 'day';
 		if (showMeals && mealPlans.length) {
 			for (const meal of mealPlans) {
 				const day = parseISO(meal.date);
@@ -316,65 +312,90 @@
 	});
 
 	const optionsOverride = {
-		view: 'timeGridWeek',
-		editable: false,
-		selectable: true,
-		dayMaxEvents: true,
-		viewDidMount: (info: any) => {
-			currentView = info?.type ?? info?.view?.type ?? 'timeGridWeek';
+		view: 'week',
+		readonly: true,
+		eventContent: EventContent,
+		init: (api: CalendarInstanceApi) => {
+			const { currentView: currentViewStore, visibleDateRange } = api.getReactiveState();
+			currentViewStore.subscribe((view) => {
+				currentView = view;
+			});
+			// Fires on every navigation (prev/next/today) as well as view
+			// switches - drives both the page's h1 and event refetching, same
+			// dual role @event-calendar/core's datesSet played.
+			visibleDateRange.subscribe((range) => {
+				const end = subDays(range.end, 1);
+				calendarTitle = formatCalendarTitle(range.start, end);
+				handleRangeChange(range.start, end);
+			});
+			// SVAR's click routes through select-event (see clickevent.js) - veto
+			// its own editorData bookkeeping (unused, this app has its own modals)
+			// and adapt {id, text, extendedProps} into handleEventClick's shape.
+			api.intercept('select-event', (action) => {
+				const { id } = action as { id: string | number | null };
+				if (id == null) return false;
+				const event = api.getEvent(id);
+				if (event) handleEventClick({ id: String(event.id), title: (event as { text?: string }).text ?? '', start: event.start, extendedProps: (event as { extendedProps?: Record<string, unknown> }).extendedProps });
+				return false;
+			});
 		},
-		// Drives the page's h1 - datesSet fires on every navigation
-		// (prev/next/today) as well as view switches, unlike viewDidMount which
-		// only fires on the latter, so this is what keeps the heading in sync as
-		// the visible range changes.
-		datesSet: (info: any) => {
-			calendarTitle = info?.view?.title ?? '';
-			const end = new SvelteDate(info.end);
-			end.setDate(end.getDate() - 1);
-			handleRangeChange(info.start, end);
-		},
-		titleFormat: (start: Date, end: Date) => formatCalendarTitle(start, end),
-		eventContent: (info: any) => {
-			const { type, link, platform } = info.event.extendedProps;
-			// allDay events/tasks have no meaningful time-of-day to show.
-			const timeLabel = info.event.allDay ? '' : formatEventTimeRange(info.event.start, info.event.end);
-			const timeHtml = timeLabel ? `<span class="event-time">${timeLabel}</span> ` : '';
-			if (type === 'task') {
-				// Same external "open in platform" link as Task.svelte - stopPropagation
-				// keeps its click from also bubbling up to eventClick's modal-open handler.
-				const platformLink = link ? `<a class="platform" href="${link}" target="_blank" rel="noreferrer" onclick="event.stopPropagation()"><span class="sr-only">Open in ${platform}</span>${platformIcons[platform as Task['platform']] ?? ''}</a>` : '';
-				return { html: `<span class="task">${timeHtml}${info.event.title}${platformLink}</span>` };
-			}
-			if (type === 'meal') {
-				return { html: `<span class="meal">🍽 ${timeHtml}${info.event.title}</span>` };
-			}
-			return { html: `<span class="event">${timeHtml}${info.event.title}</span>` };
-		},
-		eventClick: (info: any) => handleEventClick(info.event),
 	};
 </script>
 
 <svelte:head>
 	<title>{getPageTitle(`Calendar`)}</title>
-	<meta name="description" content="View combined calendars and tasks for the family" />
+	<meta
+		name="description"
+		content="View combined calendars and tasks for the family"
+	/>
 </svelte:head>
 
-<h1>{calendarTitle || `Calendar`}</h1>
+<Title>{calendarTitle || `Calendar`}</Title>
 {#if loading}
-	<Skeleton rows={3} />
+	<Skeleton
+		rows={3}
+		class={styles.loading}
+	/>
 {:else}
-	<FamilyFilter bind:selectedUserSlug pageKey="calendar" />
+	<FamilyFilter
+		bind:selectedUserSlug
+		pageKey="calendar"
+		class={styles.filter}
+	/>
 
-	{#if showYearView}
-		<YearView {tasks} {events} bind:year={yearViewYear} bind:title={calendarTitle} onRangeChange={handleRangeChange} onEventClick={handleYearEventClick} onBack={() => (showYearView = false)} />
+	{#if activeCustomView === 'year'}
+		<YearView
+			{tasks}
+			{events}
+			bind:year={yearViewYear}
+			bind:title={calendarTitle}
+			onRangeChange={handleRangeChange}
+			onEventClick={handleCustomViewEventClick}
+			onBack={() => (activeCustomView = null)}
+			class={styles.calendar}
+		/>
+	{:else if activeCustomView === 'timeline'}
+		<TimelineView
+			{tasks}
+			{events}
+			{resources}
+			bind:title={calendarTitle}
+			onRangeChange={handleRangeChange}
+			onEventClick={handleCustomViewEventClick}
+			onBack={() => (activeCustomView = null)}
+			class={styles.calendar}
+		/>
 	{:else}
 		<CalendarBase
-			plugins={[TimeGrid, DayGrid, List, Interaction]}
 			events={calendarEvents}
 			{resources}
-			views={['month', 'week', 'day', 'byPerson', 'timeline', 'list']}
-			customViews={[{ name: 'year', text: 'Year', onClick: () => (showYearView = true) }]}
+			views={['month', 'week', 'day', 'agenda', 'resources']}
+			customViews={[
+				{ name: 'year', text: 'Year', onClick: () => (activeCustomView = 'year') },
+				{ name: 'timeline', text: 'Timeline', onClick: () => (activeCustomView = 'timeline') },
+			]}
 			{optionsOverride}
+			class={styles.calendar}
 		/>
 	{/if}
 
@@ -393,6 +414,12 @@
 	{/if}
 
 	{#if selectedEvent}
-		<EventDetailModal bind:open={eventModalOpen} title={selectedEvent.title} start={selectedEvent.start} end={selectedEvent.end} link={selectedEvent.link} />
+		<EventDetailModal
+			bind:open={eventModalOpen}
+			title={selectedEvent.title}
+			start={selectedEvent.start}
+			end={selectedEvent.end}
+			link={selectedEvent.link}
+		/>
 	{/if}
 {/if}

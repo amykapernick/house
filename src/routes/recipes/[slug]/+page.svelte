@@ -12,6 +12,7 @@
 	import { compatibleUnits, convertQuantity, unitFamilyLabel, unitLabel, unitOptionLabel, unitRoot, unitsInFamily } from '$lib/utils/units';
 	import type { RecipeIngredientUnit } from '$lib/types/generated';
 	import Pill from '$components/parts/Pill/index.svelte';
+	import Title from '$parts/Title/index.svelte';
 
 	let recipe = $state<any>(null);
 	let loading = $state(true);
@@ -174,7 +175,7 @@
 				/>
 			{/if}
 
-			<h1>{recipe.name}</h1>
+			<Title>{recipe.name}</Title>
 
 			{#if recipe.description}
 				<p class="description">{recipe.description}</p>
@@ -403,7 +404,6 @@
 			row-gap: 20px;
 			grid-template-areas:
 				'image'
-				'title'
 				'desc'
 				'meta'
 				'scale'
@@ -412,11 +412,6 @@
 			grid-template-columns: 1fr;
 			width: 100%;
 		}
-	}
-
-	h1 {
-		grid-area: title;
-		margin: 0;
 	}
 
 	.description {
@@ -665,7 +660,6 @@
 				row-gap: 10px;
 				grid-template-areas:
 					'image image'
-					'title title'
 					'desc desc'
 					'meta meta'
 					'scale units'

@@ -18,6 +18,7 @@
 	import Card from '$parts/Card/index.svelte';
 	import Cards from '$parts/Cards/index.svelte';
 	import Switch from '$parts/Switch/index.svelte';
+	import LayoutWidth from '$parts/LayoutWidth/index.svelte';
 	import Modal from '$parts/Modal/index.svelte';
 	import type { ModalAction } from '$parts/Modal/index.svelte';
 	import TableOfContents from '$parts/content/TableOfContents/index.svelte';
@@ -42,11 +43,19 @@
 	import LineChart from '$components/parts/graph/LineChart/index.svelte';
 	import Milestone from '$parts/smallHuman/Milestone/index.svelte';
 	import StatusSelect from '$parts/smallHuman/StatusSelect/index.svelte';
+	import Title from '$parts/Title/index.svelte';
 
 	const themeOptions: ['light', 'dark'] = ['light', 'dark'];
 	function handleThemeToggle(index: number) {
 		setTheme(themeOptions[index]);
 	}
+
+	const layoutWidthOptions: { value: `normal` | `wide` | `full`; label: string }[] = [
+		{ value: `normal`, label: `Normal` },
+		{ value: `wide`, label: `Wide` },
+		{ value: `full`, label: `Full` },
+	];
+	let devLayoutWidth = $state<`normal` | `wide` | `full`>(`normal`);
 
 	let activeTab = $state('overview');
 	const devTabs = [
@@ -62,7 +71,6 @@
 		{ label: `Delete`, onclick: () => (confirmOpen = false), variant: `danger` },
 	];
 
-	let showToc = $state(false);
 	const devToc: TocEntry[] = [
 		{ level: 2, text: 'Section one', anchor: 'dev-toc-one' },
 		{ level: 2, text: 'Section two', anchor: 'dev-toc-two' },
@@ -143,8 +151,19 @@
 {#if !import.meta.env.DEV}
 	<p>The component reference is only available when running the app locally.</p>
 {:else}
-	<h1>Components</h1>
+	<Title>Components</Title>
 	<p>One section per component backlog item. New components get their content filled in here as they're built.</p>
+
+	<section>
+		<h2>Layout width</h2>
+		<SegmentedToggle
+			legend="Layout width"
+			name="layout-width"
+			options={layoutWidthOptions}
+			bind:value={devLayoutWidth}
+		/>
+		<LayoutWidth value={devLayoutWidth} />
+	</section>
 
 	<section>
 		<h2>Status pill</h2>
@@ -230,7 +249,6 @@
 		<TableOfContents
 			toc={devToc}
 			readAnchors={devReadAnchors}
-			bind:showToc
 		/>
 	</section>
 

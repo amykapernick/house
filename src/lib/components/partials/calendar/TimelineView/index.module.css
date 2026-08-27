@@ -1,0 +1,59 @@
+@import '@mixins';
+
+.timeline_view {
+	max-width: 100%;
+	overflow-x: hidden;
+}
+
+.timeline {
+	display: grid;
+	grid-auto-rows: minmax(2.4em, auto);
+	grid-template-columns: 10ch repeat(var(--cols), 1fr);
+	max-width: 100%;
+	overflow-x: auto;
+}
+
+.corner {
+	grid-column: 1;
+	grid-row: 1;
+}
+
+.day_header {
+	grid-column-start: var(--col-start);
+	grid-row: 1;
+	font-size: 0.9em;
+	text-align: center;
+}
+
+.row_label {
+	grid-column: 1;
+	grid-row: var(--row);
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.row {
+	display: grid;
+	grid-column: 2 / -1;
+	grid-row: var(--row);
+	grid-template-columns: subgrid;
+	align-items: center;
+	gap: 0.1em 0;
+	border-top: 1px solid #e6e6e6;
+}
+
+.event {
+	grid-column-end: var(--col-end, span 1);
+	grid-column-start: var(--col-start);
+	overflow: hidden;
+	background: var(--event_background);
+	color: var(--event_colour);
+	text-align: left;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.empty {
+	grid-column: 1 / -1;
+}

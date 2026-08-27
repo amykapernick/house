@@ -13,6 +13,7 @@
 	import Skeleton from '$components/parts/Skeleton/index.svelte';
 	import type { ContentEntry, ContentPage } from '$types/generated';
 	import { getPageTitle } from '$utils/pageTitle';
+	import Title from '$parts/Title/index.svelte';
 
 	let entry = $state<ContentEntry | null>(null);
 
@@ -28,7 +29,6 @@
 	// whenever the slug/pageSlug changes.
 	let readAnchors = new SvelteSet<string>();
 	let hasResumedScroll = $state(false);
-	let showToc = $state(true);
 
 	function loadReadAnchors(slug: string, pageSlug: string) {
 		readAnchors.clear();
@@ -110,9 +110,9 @@
 {:else if !contentPage}
 	<p>Page not found.</p>
 {:else}
-	<h1>{contentPage.title}</h1>
+	<Title>{contentPage.title}</Title>
 
-	<TableOfContents {toc} {readAnchors} bind:showToc />
+	<TableOfContents {toc} {readAnchors} />
 	<TrackableContent {chunks} {readAnchors} onToggleRead={handleToggleRead} />
 {/if}
 

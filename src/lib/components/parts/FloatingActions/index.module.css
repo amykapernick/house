@@ -1,0 +1,42 @@
+@import '@mixins';
+
+.actions {
+	display: flex;
+	position: fixed;
+	z-index: 1000;
+	right: 0.5em;
+	bottom: 5.5em;
+	flex-direction: row-reverse;
+	align-items: center;
+	gap: 0.5em;
+}
+
+
+
+.trigger,
+.action {
+
+	@include button_icon;
+
+	margin: 0;
+	box-shadow: var(--shadow_soft);
+	font-size: 1.3em;
+}
+
+
+.trigger {
+	order: -1;
+}
+
+@media(aspect-ratio <= 1) {
+	.actions {
+		flex-direction: column-reverse;
+	}
+}
+
+@media(width >= 50em) {
+	.actions {
+		right: 1.5em;
+		bottom: 1em;
+	}
+}

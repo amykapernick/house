@@ -7,6 +7,7 @@
 	import { getToken, isAuthenticated } from '$lib/auth';
 	import { getGraphqlUrl } from '$utils/fetchClientData';
 	import { getPageTitle } from '$utils/pageTitle';
+	import Title from '$parts/Title/index.svelte';
 
 	const DEFAULT_QUERY = `query {\n  \n}\n`;
 
@@ -94,7 +95,7 @@
 {:else}
 	<div class="console">
 		<header class="toolbar">
-			<h1>GraphQL Console</h1>
+			<Title>GraphQL Console</Title>
 			<span
 				class="status"
 				data-ok={$isAuthenticated}
@@ -155,11 +156,6 @@
 		align-items: center;
 		gap: 1em;
 		margin-bottom: 0.75em;
-
-		& h1 {
-			margin: 0;
-			font-size: 1.3em;
-		}
 	}
 
 	.status {

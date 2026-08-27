@@ -10,6 +10,7 @@
 	import EmptyState from '$components/parts/EmptyState/index.svelte';
 	import { getPageTitle } from '$utils/pageTitle';
 	import type { Book } from '$types/generated';
+	import Title from '$parts/Title/index.svelte';
 
 	let books = $state<Book[]>([]);
 	let loading = $state(true);
@@ -117,7 +118,7 @@
 	<title>{getPageTitle(`Books`)}</title>
 </svelte:head>
 
-<h1>Books</h1>
+<Title>Books</Title>
 
 <button
 	type="button"

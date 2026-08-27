@@ -21,21 +21,21 @@ export interface A11yRoute {
 	axeDisableRules?: string[];
 }
 
-// @event-calendar/core (5.7.1, and still true in the latest 5.9.0 per its
-// published source) always renders its toolbar <nav> as a direct child of
-// the calendar's own role="table"/"list" container - ARIA disallows that
-// nesting, but it's the library's own structure, not something we can fix
-// from consumer code without patching its DOM after every render.
-const CALENDAR_LIBRARY_RULES = [`aria-required-children`];
-
 export const routes: A11yRoute[] = [
 	{ name: `sign-in`, path: `/sign-in`, auth: false },
 	{ name: `home`, path: `/`, auth: true },
 	{ name: `tasks`, path: `/tasks`, auth: true },
 	{ name: `habits`, path: `/habits`, auth: true },
 	{ name: `chores`, path: `/chores`, auth: true },
-	{ name: `calendar`, path: `/calendar`, auth: true, axeDisableRules: CALENDAR_LIBRARY_RULES },
-	{ name: `schedule`, path: `/schedule`, auth: true, axeDisableRules: CALENDAR_LIBRARY_RULES },
+	// The @event-calendar/core-specific aria-required-children suppression
+	// this used to carry is gone along with that library (see CLAUDE.md's
+	// Calendar section) - @svar-ui/svelte-calendar's toolbar/layout markup
+	// doesn't nest a <nav> inside a role="table"/"list" container the way
+	// @event-calendar/core did. Re-add a suppression here (with a comment
+	// explaining the new violation) if CI turns up a different SVAR-specific
+	// a11y issue once this actually runs against a live preview.
+	{ name: `calendar`, path: `/calendar`, auth: true },
+	{ name: `schedule`, path: `/schedule`, auth: true },
 	{ name: `budget`, path: `/budget`, auth: true },
 	{ name: `recipes`, path: `/recipes`, auth: false },
 	{ name: `recipe-tags`, path: `/recipes/tags`, auth: false },

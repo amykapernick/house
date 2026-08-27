@@ -40,7 +40,9 @@ $effect(() => {
 
 ## Calendar
 
-Uses `@event-calendar/core` with DayGrid, TimeGrid, List, Interaction plugins. Three event sources parsed to a common format: tasks (`parseTasks`), Notion events (`parseEvents`), ICS feeds (`parseEvents`). ICS events fetched separately to avoid blocking.
+Uses `@svar-ui/svelte-calendar` (free/MIT tier — Month/Week/Day views only) via `CalendarBase`, which also registers two custom SVAR views through the library's `registerCalendarView`/`ViewModel` extension mechanism: Agenda (`agendaView.ts`, `mode: "list"`) and Resources (`resourcesView.ts`, a per-family-member column via a `unit`-type scale). Year (`YearView`) and Timeline (`TimelineView`) aren't SVAR views at all — the free tier's `combined` scale type (needed for a real hour-level Gantt axis) isn't implemented, and Year/Agenda/Resources/Timeline are PRO-only as *built-in* views regardless — so both are fully bespoke Svelte components that a caller swaps in for `CalendarBase` entirely (conditional rendering, own nav/title state), the same pattern for both. `CalendarBase`'s `customViews` prop renders their toolbar buttons via `registerToolbarItem`. Three event sources parsed to a common format: tasks (`parseTasks`), Notion events (`parseEvents`), ICS feeds (`parseEvents`). ICS events fetched separately to avoid blocking. `src/lib/utils/calendar/toSvarEvent.ts` adapts the app's own event shape to SVAR's `CalendarEvent` (`text` not `title`, colour/resource fields carried in its open `[key: string]: any` bag) — only used inside `CalendarBase`, so `parseTasks`/`parseEvents`/the app's own `Event` type stay library-agnostic.
+
+Styling is intentionally minimal/functional (SVAR's own Willow theme, no dark mode, no responsive polish) pending a follow-up pass — see git history around the `@svar-ui/svelte-calendar` migration for what shipped functional-only vs. what's still open.
 
 ## CI/CD
 

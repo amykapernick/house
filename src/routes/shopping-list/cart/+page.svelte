@@ -11,6 +11,7 @@
 	import { getPageTitle } from '$utils/pageTitle';
 	import { formatCurrency } from '$utils/currency';
 	import { getCartItems, addCartItem, removeCartItem, clearCartItems, type CartItem } from '$utils/shoppingCart';
+	import Title from '$parts/Title/index.svelte';
 
 	let items = $state<any[]>([]);
 	let storeGroups = $state<any[]>([]);
@@ -135,7 +136,7 @@
 	class="back-link">← Shopping list</a
 >
 
-<h1>Shopping Cart</h1>
+<Title>Shopping Cart</Title>
 
 <form
 	class="add-form"

@@ -30,6 +30,7 @@
 	import EmptyState from '$parts/EmptyState/index.svelte';
 	import ContentIcon from '$parts/ContentIcon/index.svelte';
 	import RecipeIcon from '$img/icons/recipe-book-47.svg?component';
+	import Title from '$parts/Title/index.svelte';
 
 	const RECIPE_MIN_CHARS = 2;
 	const RECIPE_DEBOUNCE_MS = 250;
@@ -340,7 +341,7 @@
 </svelte:head>
 
 <section class="search">
-	<h1>Search</h1>
+	<Title>Search</Title>
 	<form
 		class="query-form"
 		onsubmit={handleSubmit}

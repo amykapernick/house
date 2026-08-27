@@ -15,11 +15,11 @@
 	import EmptyState from '$components/parts/EmptyState/index.svelte';
 	import type { ContentEntry, ContentPage } from '$types/generated';
 	import { getPageTitle } from '$utils/pageTitle';
+	import Title from '$parts/Title/index.svelte';
 
 	let entry = $state<ContentEntry | null>(null);
 	let archive = $state<ContentPage | null>(null);
 	let loading = $state(true);
-	let showToc = $state(false);
 
 	// Which Chapter (h3), or bare Section (h2 with no chapters), anchors this
 	// device has already read - per-device (localStorage), scoped under
@@ -102,13 +102,13 @@
 
 <a href={resolve(`/content/archive`)} class="back">← Archive</a>
 
-<h1><ContentIcon icon={entry?.icon} iconType={entry?.iconType} />{entry?.title ?? $page.params.slug} Archive{#if allRead}<span class="read-mark" title="Fully read">✓</span>{/if}</h1>
+<Title><ContentIcon icon={entry?.icon} iconType={entry?.iconType} />{entry?.title ?? $page.params.slug} Archive{#if allRead}<span class="read-mark" title="Fully read">✓</span>{/if}</Title>
 {#if loading}
 	<Skeleton rows={3} />
 {:else if !archive?.content}
 	<EmptyState title="No archived versions yet" />
 {:else}
-	<TableOfContents {toc} {readAnchors} bind:showToc />
+	<TableOfContents {toc} {readAnchors} />
 	<TrackableContent {chunks} {readAnchors} onToggleRead={handleToggleRead} />
 {/if}
 
@@ -123,12 +123,6 @@
 		&:hover {
 			text-decoration: underline;
 		}
-	}
-
-	h1 {
-		display: flex;
-		align-items: center;
-		gap: 0.4em;
 	}
 
 	.read-mark {
