@@ -7,7 +7,7 @@
 	import Modal from '$parts/Modal/index.svelte';
 	import type { ModalAction } from '$parts/Modal/index.svelte';
 	import Select from '$parts/Select/index.svelte';
-	import './index.module.css';
+	import styles from './index.module.css';
 
 	const {
 		id,
@@ -62,7 +62,8 @@
 	bind:value={selectedValue}
 	{options}
 	onchange={handleChange}
-	class={`${className} ${selectedValue}`}
+	class="{styles.status} {className}"
+	data-status={selectedValue}
 >
 	{#snippet children(option)}
 		<Icon name={option.value} />

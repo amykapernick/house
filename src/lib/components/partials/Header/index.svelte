@@ -93,7 +93,6 @@
 		]}
 	/>
 	<MainMenu
-		class="nav"
 		{menuItems}
 		isAuthenticated={$isAuthenticated}
 		collapsed={$sidebarCollapsed}

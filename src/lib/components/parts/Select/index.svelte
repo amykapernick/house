@@ -14,6 +14,7 @@
 		children,
 		class: className = '',
 		hiddenLabel = false,
+		...rest
 	}: {
 		id: string;
 		label: string;
@@ -23,6 +24,7 @@
 		children?: Snippet<[{ value: Value; label: string }]>;
 		class?: string;
 		hiddenLabel?: boolean;
+		[key: string]: unknown;
 	} = $props();
 
 	let selectedOption = $derived(options.find((option) => option.value === value));
@@ -50,6 +52,7 @@
 	bind:value
 	{onchange}
 	onclick={handlePickerClick}
+	{...rest}
 >
 	<button
 		class={styles.selected}

@@ -35,14 +35,14 @@
 		{/if}
 		{#if onStatusChange}
 			<StatusSelect
-				class="status"
+				class={styles.status}
 				{id}
 				{status}
 				labels={statusLabel}
 				onChange={onStatusChange}
 			/>
 		{:else}
-			<span class="status">{statusLabel[status]}</span>
+			<span class={styles.status}>{statusLabel[status]}</span>
 		{/if}
 		{#if reference?.video}
 			<button

@@ -62,11 +62,11 @@
 				{status}
 				labels={statusLabel}
 				onChange={onStatusChange}
-				class="status"
+				class={styles.status}
 			/>
 		{:else}
 			<Pill
-				class="status"
+				class={styles.status}
 				{status}>{statusLabel[status]}</Pill
 			>
 		{/if}

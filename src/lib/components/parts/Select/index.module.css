@@ -1,9 +1,3 @@
-/* TODO: kept :global() rather than hashed - StatusSelect.svelte reaches in
-   from outside via :global(.status.select) (combined with a forwarded
-   "status" class and a dynamic state class) to colour this component's own
-   root by state (see #641). A fragile string contract; should become an
-   explicit prop instead. */
-
 .select {
 	padding: 0;
 	border: 1px solid var(--input_border);

@@ -97,7 +97,7 @@
 		teeth.teeth
 			.map(
 				(t) => `
-		.teeth:has(svg .t_${t.fdi}:is(:hover, :focus, :focus-within)) ~ .teeth_details .t_${t.fdi} {
+		.${styles.teeth}:has(svg .t_${t.fdi}:is(:hover, :focus, :focus-within)) ~ .${styles.teeth_details} .t_${t.fdi} {
 			visibility: visible;
 		}`,
 			)
@@ -116,7 +116,7 @@
 	<!-- Event delegation wrapper - the actual interactive targets (tooth groups) have role="button"/tabindex/keydown handling set individually -->
 	<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 	<figure
-		class="teeth"
+		class={styles.teeth}
 		bind:this={wrapper}
 		onclick={handleTeethClick}
 		onkeydown={handleTeethKeydown}
@@ -138,7 +138,7 @@
 		]}
 	/>
 	<p>{teeth.teething_note}</p>
-	<div class="teeth_details">
+	<div class={styles.teeth_details}>
 		{#each teeth.teeth as tooth (tooth.fdi)}
 			<p class={`t_${tooth.fdi}`}>
 				<span class={styles.name}>{tooth.fdi}: {tooth.name} - </span>

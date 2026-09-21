@@ -61,14 +61,7 @@
 }
 
 @media (width >= 60em) {
-
-	/* TODO: `.nav` only matches because Header/index.svelte happens to pass
-	   class="nav" into this component - a coincidental string contract, not
-	   an owned relationship. Kept as an explicit :global() escape to
-	   preserve current behaviour under CSS Modules (see #641); should
-	   become an explicit prop on this component instead. */
-
-	:global(.nav):not(.collapsed) {
+	.root:not(.collapsed) {
 		& .menu a {
 			display: flex;
 			align-items: center;

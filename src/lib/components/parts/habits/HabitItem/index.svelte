@@ -223,13 +223,6 @@
 			data-missed={missed}
 			class={styles.status}
 		></span>
-		<!-- TODO: simplify this to just be one line with swithc out statement -->
-		{#if done}
-			<span class="sr-only">{name} completed on {format(day, 'EEEE d MMM')}</span>
-		{:else if missed}
-			<span class="sr-only">{name} wasn't completed on {format(day, 'EEEE d MMM')}</span>
-		{:else}
-			<span class="sr-only">{name} is upcoming on {format(day, 'EEEE d MMM')}</span>
-		{/if}
+		<span class="sr-only">{name} {done ? 'completed' : missed ? "wasn't completed" : 'is upcoming'} on {format(day, 'EEEE d MMM')}</span>
 	{/if}
 {/snippet}

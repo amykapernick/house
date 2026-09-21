@@ -1,10 +1,4 @@
-/* TODO: kept :global() rather than hashed - this component builds a raw CSS
-   string (toothDetailsStyle) that hardcodes the literal ".teeth"/
-   ".teeth_details" selectors and injects it into <svelte:head> via {@html},
-   entirely outside CSS Modules' hashing (see #641). A fragile string
-   contract; should become an explicit prop/data-attribute instead. */
-
-:global(.teeth) {
+.teeth {
 	--tooth: var(--background);
 
 	max-width: 400px;
@@ -22,7 +16,7 @@
 	}
 }
 
-:global(.teeth_details) {
+.teeth_details {
 	display: grid;
 	grid-template-areas: 'details';
 	place-items: start start;

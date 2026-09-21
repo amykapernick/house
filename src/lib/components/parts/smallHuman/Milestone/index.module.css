@@ -8,12 +8,7 @@
 	height: 100%;
 	column-gap: 1em;
 
-	/* TODO: kept :global() rather than hashed - this component passes the
-	   literal "status" class to StatusSelect/Pill, then reaches back out to
-	   it via :global() to position it in the grid (see #641). A fragile
-	   string contract; should become an explicit prop instead. */
-
-	& :global(.status) {
+	& .status {
 		grid-area: status;
 		align-self: center;
 		margin: 0;
