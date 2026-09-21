@@ -21,7 +21,7 @@
 		cursor: pointer;
 
 		&:hover {
-			background: color-mix(in oklch, var(--purple_bright) 8%, var(--transparent));
+			background: var(--purple_bright_tint_bg_strong);
 		}
 	}
 }
