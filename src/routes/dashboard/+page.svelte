@@ -3,11 +3,12 @@
 	import fetchClientData from '$utils/fetchClientData';
 	import { getPageTitle } from '$utils/pageTitle';
 	import Skeleton from '$parts/Skeleton/index.svelte';
-	import WeatherCard from '$partials/dashboard/WeatherCard/index.svelte';
-	import AstroCard from '$partials/dashboard/AstroCard/index.svelte';
-	import UvGauge from '$partials/dashboard/UvGauge/index.svelte';
-	import BinDaysCard from '$partials/dashboard/BinDaysCard/index.svelte';
-	import SeasonCard from '$partials/dashboard/SeasonCard/index.svelte';
+	import Panel from '$parts/Dashboard/Panel/index.svelte';
+	import WeatherCard from '$parts/Dashboard/WeatherCard/index.svelte';
+	import AstroCard from '$parts/Dashboard/AstroCard/index.svelte';
+	import UvGauge from '$parts/Dashboard/UvGauge/index.svelte';
+	import BinDaysCard from '$parts/Dashboard/BinDaysCard/index.svelte';
+	import SeasonCard from '$parts/Dashboard/SeasonCard/index.svelte';
 	import type { House } from '$types/generated';
 
 	let dashboard = $state<House | null>(null);
@@ -61,25 +62,41 @@
 	<Skeleton rows={4} />
 {:else}
 	<div class="grid">
-		<section class="card">
-			<h2 class="sr-only">Astro</h2>
+		<Panel
+			title="Astro"
+			headingVisible={false}
+			class="card"
+		>
 			<AstroCard sun={dashboard?.sun ?? null} />
-		</section>
-		<section class="card">
-			<h2 class="sr-only">Weather</h2>
+		</Panel>
+		<Panel
+			title="Weather"
+			headingVisible={false}
+			class="card"
+		>
 			<WeatherCard weather={dashboard?.weather ?? null} />
-		</section>
-		<section class="card">
+		</Panel>
+		<Panel
+			title="UV Index"
+			headingVisible={false}
+			class="card"
+		>
 			<UvGauge uv={dashboard?.uv ?? null} />
-		</section>
-		<section class="card wide">
-			<h2 class="sr-only">Bin Days</h2>
+		</Panel>
+		<Panel
+			title="Bin Days"
+			headingVisible={false}
+			class="card wide"
+		>
 			<BinDaysCard bins={dashboard?.binCollections ?? []} />
-		</section>
-		<section class="card">
-			<h2 class="sr-only">Season</h2>
+		</Panel>
+		<Panel
+			title="Season"
+			headingVisible={false}
+			class="card"
+		>
 			<SeasonCard season={dashboard?.currentSeason ?? null} />
-		</section>
+		</Panel>
 	</div>
 {/if}
 
@@ -91,7 +108,11 @@
 		gap: 1.5em;
 	}
 
-	.card {
+	/* :global, not scoped like .grid above - Panel (a child component) renders
+	   the section this class lands on, so this page's own template never
+	   contains the element directly and Svelte's default scoping can't reach it. */
+
+	:global(.card) {
 		padding: 1.5em;
 		border: 1px solid light-dark(var(--border), color-mix(in oklch, var(--dark_background) 78%, var(--white)));
 		border-radius: 1em;
@@ -104,10 +125,8 @@
 			gap: 2em;
 		}
 
-		.card {
-			&.wide {
-				grid-column: span 3;
-			}
+		:global(.card.wide) {
+			grid-column: span 3;
 		}
 	}
 </style>

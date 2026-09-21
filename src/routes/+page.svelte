@@ -1,27 +1,33 @@
 <script lang="ts">
 	import { isAuthenticated } from '$lib/auth';
-	import { format, parseISO, startOfDay, startOfToday, endOfDay, subDays, addDays, isPast, isToday } from 'date-fns';
+	import { format, parseISO, startOfDay, endOfDay, subDays, addDays } from 'date-fns';
 	import { DATE_FORMATS } from '$utils/dateFormats';
 	import { SvelteMap } from 'svelte/reactivity';
 	import fetchClientData, { setCache } from '$utils/fetchClientData';
 	import fetchHabitsData from '$utils/habitsData';
-	import { isDayDone, isExplicitlyDone } from '$utils/habitCompletion';
 	import { prefetchRecipes } from '$utils/prefetchRecipes';
 	import { getDashboardMealPlanRange } from '$utils/dateRanges';
-	import { resolve } from '$app/paths';
-	import RecipeCard from '$components/parts/recipes/RecipeCard/index.svelte';
-	import Skeleton from '$components/parts/Skeleton/index.svelte';
-	import EmptyState from '$components/parts/EmptyState/index.svelte';
-	import Switch from '$parts/Switch/index.svelte';
-	import HabitCheckItem from '$parts/habits/HabitCheckItem/index.svelte';
-	import AllergenCheckItem from '$parts/smallHuman/AllergenCheckItem/index.svelte';
-	import DayView from '$partials/calendar/DayView.svelte';
+	import EmptyState from '$parts/EmptyState/index.svelte';
+	import Today from '$parts/Dashboard/Today/index.svelte';
+	import Upcoming from '$parts/Dashboard/Upcoming/index.svelte';
+	import Habits from '$parts/Dashboard/Habits/index.svelte';
+	import Meals from '$parts/Dashboard/Meals/index.svelte';
+	import type { DueSoonItem } from '$parts/Dashboard/Habits/index.svelte';
 	import { getPageTitle } from '$utils/pageTitle';
-	import { EVERYONE, isVisibleToUser, fetchCurrentUserSlug } from '$utils/fetchFamilyMembers';
+	import { EVERYONE, isVisibleToUser, fetchCurrentUser } from '$utils/fetchFamilyMembers';
+	import type { CurrentUser } from '$utils/fetchFamilyMembers';
 	import type { Habit } from '$types/habits';
 	import type { Task } from '$types/tasks';
 	import type { ScheduleBlock, PaletteColour } from '$types/schedule';
-	import Pill from '$components/parts/Pill/index.svelte';
+	import styles from './+page.module.css';
+
+	function greetingForHour(hour: number): string {
+		if (hour < 12) return 'morning';
+		if (hour < 18) return 'afternoon';
+		return 'evening';
+	}
+	const greeting = greetingForHour(new Date().getHours());
+	const todayLabel = format(new Date(), 'EEEE d MMMM');
 
 	let meals = $state<any[]>([]);
 	let loading = $state(true);
@@ -30,6 +36,10 @@
 	// current-user lookup resolves - the dashboard always shows the signed-in
 	// user's own items, with no picker to switch to anyone else's.
 	let currentUserSlug = $state(EVERYONE);
+	// The signed-in user's family-record display name (PocketBase, via the `me`
+	// query) - not Clerk's own user object, which the header/profile page also
+	// bypass in favour of this same `me.name` for the same reason.
+	let currentUserName = $state<string | null>(null);
 
 	let upcomingTasks = $state<Task[]>([]);
 	let upcomingLoading = $state(true);
@@ -39,7 +49,6 @@
 	let scheduleBlocks = $state<ScheduleBlock[]>([]);
 	let scheduleLoading = $state(true);
 	let colours = $state<PaletteColour[]>([]);
-	let showSchedule = $state(true);
 	// The day currently shown in the dashboard's Today/calendar widget -
 	// navigating via DayView's own prev/next/today buttons reports back here
 	// via onDateChange, which drives the events/schedule refetch below.
@@ -62,8 +71,6 @@
 	// Habits and allergens (also Todoist tasks under the hood, completed via
 	// the same completeHabit mutation) share one "due soon" list on the
 	// dashboard, so they're merged and sorted together by due date.
-	type DueSoonItem = { due: string } & ({ type: 'habit'; habit: Habit & { due: string } } | { type: 'allergen'; allergen: any });
-
 	let dueSoonItems = $derived.by(() => {
 		const rangeEnd = endOfDay(addDays(new Date(), 3));
 
@@ -74,26 +81,6 @@
 
 		return [...habitItems, ...allergenItems].sort((a, b) => new Date(a.due).getTime() - new Date(b.due).getTime());
 	});
-
-	// Warning takes priority over the due-date categories below - a habit
-	// already covered by a prior completion's recurrence window shouldn't
-	// also read as overdue/due/upcoming.
-	function habitPillStatus(habit: Habit & { due: string }): 'warning' | 'error' | 'info' | 'success' {
-		const today = startOfToday();
-		if (isDayDone(today, habit.completions, habit.recurrenceInterval) && !isExplicitlyDone(today, habit.completions)) return 'warning';
-
-		const due = new Date(habit.due);
-		if (isPast(due) && !isToday(due)) return 'error';
-		if (isToday(due)) return 'info';
-		return 'success';
-	}
-
-	function allergenPillStatus(allergen: { due: string }): 'error' | 'info' | 'success' {
-		const due = new Date(allergen.due);
-		if (isPast(due) && !isToday(due)) return 'error';
-		if (isToday(due)) return 'info';
-		return 'success';
-	}
 
 	// Keep the shared cache in sync so a revisit within the TTL doesn't show the pre-update streak.
 	function handleHabitComplete(id: string) {
@@ -295,10 +282,11 @@
 
 	$effect(() => {
 		if ($isAuthenticated) {
-			function handleCurrentUser(slug: string | undefined) {
-				if (slug) currentUserSlug = slug;
+			function handleCurrentUser(user: CurrentUser | undefined) {
+				if (user?.slug) currentUserSlug = user.slug;
+				currentUserName = user?.name ?? null;
 			}
-			fetchCurrentUserSlug(handleCurrentUser).then(handleCurrentUser);
+			fetchCurrentUser(handleCurrentUser).then(handleCurrentUser);
 		}
 	});
 
@@ -337,131 +325,43 @@
 <h1 class="sr-only">Dashboard</h1>
 
 {#if $isAuthenticated}
-	<div class="dashboard">
-		<section
-			class="widget"
-			data-widget="tasks"
-		>
-			<h2 class="sr-only">Upcoming</h2>
-			<a href={resolve('/tasks')}>View Tasks</a>
-
-			{#if upcomingLoading}
-				<Skeleton rows={3} />
-			{:else if upcomingItems.length === 0}
-				<EmptyState title="Nothing due in the next week" />
-			{:else}
-				<ul class="agenda">
-					{#each upcomingItems as item (item.id)}
-						<li class="agenda-item">
-							<span class="agenda-label">{item.label}</span>
-							<span
-								class="agenda-meta"
-								class:overdue={item.meta === 'Overdue'}>{item.meta}</span
-							>
-						</li>
-					{/each}
-				</ul>
+	<div class={styles.dashboard}>
+		<header class={styles.header}>
+			{#if currentUserName}
+				<p class={styles.greeting}>Good {greeting}, {currentUserName}</p>
+				<p class={styles.date}>{todayLabel}</p>
 			{/if}
-		</section>
+		</header>
 
-		<section
-			class="widget"
-			data-widget="habits"
-		>
-			<h2 class="sr-only">Habits</h2>
-			<a href={resolve('/habits')}>View all</a>
+		<Today
+			class={styles.today}
+			tasks={visibleTasks}
+			events={visibleDayEvents}
+			scheduleBlocks={visibleScheduleBlocks}
+			{colours}
+			loading={dayLoading}
+			onDateChange={(date) => (selectedDay = startOfDay(date))}
+		/>
 
-			{#if habitsLoading || allergensLoading}
-				<Skeleton rows={3} />
-			{:else if dueSoonItems.length === 0}
-				<EmptyState title="Nothing due today" />
-			{:else}
-				<ul class="habits">
-					{#each dueSoonItems as item (item.type === 'habit' ? item.habit.id : item.allergen.id)}
-						<li>
-							{#if item.type === 'habit'}
-								<Pill
-									class="habit"
-									status={habitPillStatus(item.habit)}
-									><HabitCheckItem
-										{...item.habit}
-										onComplete={handleHabitComplete}
-									/></Pill
-								>
-							{:else}
-								<Pill
-									class="habit"
-									status={allergenPillStatus(item.allergen)}
-									><AllergenCheckItem
-										{...item.allergen}
-										onComplete={handleAllergenComplete}
-									/></Pill
-								>
-							{/if}
-						</li>
-					{/each}
-				</ul>
-			{/if}
-		</section>
+		<Upcoming
+			class={styles.upcoming}
+			items={upcomingItems}
+			loading={upcomingLoading}
+		/>
 
-		<section
-			class="widget"
-			data-widget="calendar"
-		>
-			<h2 class="sr-only">Today</h2>
-			<Switch
-				name="Schedule visibility"
-				value={showSchedule ? 1 : 0}
-				toggleFunction={(index) => (showSchedule = index === 1)}
-				options={[{ label: 'Schedule' }, { label: 'Calendar' }]}
-			/>
-			<a href={resolve('/calendar')}>View calendar</a>
+		<Habits
+			class={styles.habits}
+			items={dueSoonItems}
+			loading={habitsLoading || allergensLoading}
+			onHabitComplete={handleHabitComplete}
+			onAllergenComplete={handleAllergenComplete}
+		/>
 
-			{#if dayLoading}
-				<Skeleton rows={3} />
-			{:else}
-				<DayView
-					tasks={visibleTasks}
-					events={visibleDayEvents}
-					scheduleBlocks={visibleScheduleBlocks}
-					{colours}
-					{showSchedule}
-					onDateChange={(date) => (selectedDay = startOfDay(date))}
-				/>
-			{/if}
-		</section>
-
-		<section
-			class="widget"
-			data-widget="meals"
-		>
-			<h2 class="sr-only">This week's meals</h2>
-			<a href={resolve('/meal-plan')}>View all</a>
-
-			{#if loading}
-				<Skeleton rows={3} />
-			{:else if weekRecipes.length === 0}
-				<EmptyState title="No meals planned this week" />
-			{:else}
-				<div class="grid">
-					{#each weekRecipes as { recipe, days } (recipe.slug)}
-						<RecipeCard
-							{recipe}
-							size="compact"
-							dayLabel={days.length ? days.join(', ') : undefined}
-						>
-							{#snippet tags(recipeTags)}
-								<ul class="tags">
-									{#each recipeTags as tag (tag.slug)}
-										<li>{tag.name}</li>
-									{/each}
-								</ul>
-							{/snippet}
-						</RecipeCard>
-					{/each}
-				</div>
-			{/if}
-		</section>
+		<Meals
+			class={styles.meals}
+			recipes={weekRecipes}
+			{loading}
+		/>
 	</div>
 {:else}
 	<EmptyState
@@ -469,157 +369,3 @@
 		message="See your upcoming tasks and this week's meals once you're signed in."
 	/>
 {/if}
-
-<!-- TODO: migrate to CSS Modules (see #641) -->
-<style>
-	@import '@mixins';
-
-	.dashboard {
-		display: grid;
-		grid-gap: 1em;
-		grid-template-areas: 'upcoming' 'habits' 'calendar' 'meals';
-	}
-
-	.widget {
-		&[data-widget='tasks'] {
-			grid-area: upcoming;
-		}
-
-		&[data-widget='calendar'] {
-			grid-area: calendar;
-
-			& :global(.calendar-container.day_view) {
-				max-height: 80vh;
-			}
-		}
-
-		&[data-widget='habits'] {
-			grid-area: habits;
-		}
-
-		&[data-widget='meals'] {
-			grid-area: meals;
-		}
-	}
-
-	.agenda,
-	.habits {
-		margin: 0;
-		padding: 0;
-		list-style: none;
-	}
-
-	.habits {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.5em;
-
-		& :global(.habit) {
-			position: relative;
-		}
-
-		& :global(.habit-check) {
-			grid-template-areas:
-				'label streak'
-				'due streak';
-			grid-template-columns: 1fr auto;
-		}
-
-		& :global(:is(.habit-check, .allergen-check) .checkbox) {
-			position: static;
-			grid-area: streak;
-			width: 0.1px;
-			height: 0.1px;
-		}
-
-		& :global(:is(.habit-check, .allergen-check) .checkbox svg) {
-			display: none;
-		}
-
-		& :global(:is(.habit-check, .allergen-check) .checkbox::before) {
-			content: '';
-			position: absolute;
-			inset: 0;
-		}
-	}
-
-	.agenda-item {
-		display: flex;
-		align-items: baseline;
-		justify-content: space-between;
-		padding: 0.5em 0;
-		border-bottom: 1px solid var(--grey_light);
-		gap: 1em;
-
-		&:last-child {
-			border-bottom: none;
-		}
-	}
-
-	.agenda-label {
-		font-size: 0.9em;
-	}
-
-	.agenda-meta {
-		flex-shrink: 0;
-		color: var(--grey);
-		font-size: 0.8em;
-
-		&.overdue {
-			color: var(--red);
-			font-weight: 600;
-		}
-	}
-
-	.grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-		gap: 1em;
-	}
-
-	.tags {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 3px;
-		margin: 0;
-		padding: 0;
-		list-style: none;
-
-		& li {
-			padding: 0.1em 0.3em;
-			border: 1px solid currentColor;
-			border-radius: 0.2em;
-			color: var(--blue);
-			font-size: 0.65em;
-		}
-	}
-
-	@media (width >= 40em) {
-		.dashboard {
-			grid-template-areas: 'upcoming calendar' 'habits calendar' 'meals calendar';
-			grid-template-columns: 1fr auto;
-			grid-template-rows: auto auto 1fr;
-			gap: 2em;
-		}
-
-		.widget {
-			&[data-widget='calendar'] {
-				min-width: 20em;
-			}
-		}
-	}
-
-	@media (width >= 65em) {
-		.dashboard {
-			grid-template-areas: 'upcoming habits calendar' 'meals meals calendar';
-			grid-template-columns: 1fr 1fr auto;
-			grid-template-rows: auto 1fr;
-		}
-
-		.widget {
-			&[data-widget='calendar'] {
-				min-width: 30em;
-			}
-		}
-	}
-</style>

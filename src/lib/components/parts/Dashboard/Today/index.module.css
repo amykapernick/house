@@ -1,0 +1,53 @@
+@import '@mixins';
+
+.link {
+
+	@include button_link;
+
+	&::after {
+		content: '→';
+		margin-left: 0.3em;
+	}
+}
+
+.calendar-card {
+	display: grid;
+	grid-template-rows: auto auto 1fr;
+
+	/* CalendarBase's own container has no defined height, and SVAR's calendar
+	   fills it via a `height: 100%` chain all the way down to the internal
+	   `.wx-calendar-main` grid - without an explicit height set somewhere in
+	   this chain, every level in it resolves to 0. `day_view` (set by
+	   DayView.svelte) is the one literal, non-hashed class on that div. */
+
+	& :global(.day_view) {
+		height: 70vh;
+	}
+
+	/* SVAR renders the all-day/multi-day events row and the scrollable hour
+	   grid as sibling ".wx-section" elements sharing one border/background
+	   (".wx-section { border-bottom }"). ".wx-section-sticky" is only ever the
+	   all-day row (its own section is the sole one sized "content-optional";
+	   the hour grid is always a plain 1fr section, never sticky) and
+	   ".wx-section-last" is always the hour grid (it's always the last
+	   section, all-day row or not) - splitting the border there separates them
+	   into a plain all-day strip above a boxed, rounded-top time grid. */
+
+	& :global(.wx-section-sticky) {
+		margin-bottom: 0.5em;
+		border-bottom: none;
+	}
+
+	& :global(.wx-section-last) {
+		border: 1px solid var(--border);
+		border-radius: 0.7em 0.7em 0 0;
+
+		/* Same fixed literal as Upcoming's box (see its index.module.css) -
+		   deliberately not one of the app's theme-aware tokens, since
+		   --background always equals whatever the page itself is painted
+		   with (see that file's comment for the full reasoning). */
+
+		/* stylelint-disable-next-line house/no-duplicate-colour-value -- intentional, see comment above */
+		background: #f7f0eb;
+	}
+}

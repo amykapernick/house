@@ -1,13 +1,13 @@
 @import '@mixins';
 
-:global(.chip) {
+.chip {
 	position: relative;
 	border: var(--border);
 	background: var(--white);
 	color: var(--black);
 	font-weight: 700;
 
-	& :global(.tooltip-trigger) {
+	& .tooltip-trigger {
 		position: absolute;
 		right: 0.5em;
 		bottom: 0.2em;

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
+	import { afterNavigate } from '$app/navigation';
 	import { format, parseISO } from 'date-fns';
 	import fetchClientData from '$utils/fetchClientData';
 	import { DATE_FORMATS } from '$utils/dateFormats';
@@ -22,6 +23,23 @@
 	let defaultUnitId = $state<Record<string, string>>({});
 	let checkedIngredients = $state<Record<number, boolean>>({});
 	let checkedSteps = $state<Record<number, boolean>>({});
+
+	// Where "back" should go: wherever the user actually came from (the
+	// filtered/sorted recipe list, a tag page, meal plan, ...), navigated via
+	// real browser back so that page's own snapshot/state is restored rather
+	// than a fresh reload of it. Falls back to a plain link to /recipes for a
+	// direct visit (bookmark, shared link, page refresh) with no in-app "from".
+	let backLabel = $state<string | null>(null);
+
+	function labelForBack(pathname: string): string {
+		if (pathname.startsWith('/meal-plan')) return 'Meal plan';
+		if (pathname.startsWith('/recipes/tags')) return 'Tags';
+		return 'Recipes';
+	}
+
+	afterNavigate(({ from }) => {
+		backLabel = from?.url ? labelForBack(from.url.pathname) : null;
+	});
 
 	const NUTRITION_LABELS: [key: string, name: string][] = [
 		['calories', 'Calories'],
@@ -155,10 +173,14 @@
 	<title>{getPageTitle(recipe?.name ?? `Recipe`)}</title>
 </svelte:head>
 
-<a
-	href={resolve('/recipes')}
-	class="back">← Recipes</a
->
+{#if backLabel}
+	<button type="button" class="back" onclick={() => history.back()}>← {backLabel}</button>
+{:else}
+	<a
+		href={resolve('/recipes')}
+		class="back">← Recipes</a
+	>
+{/if}
 
 {#if loading}
 	<Skeleton rows={3} />
@@ -383,6 +405,21 @@
 <!-- TODO: migrate to CSS Modules (see #641) -->
 <style>
 	@import '@mixins';
+
+	.back {
+		display: inline-block;
+		margin-bottom: 1em;
+		padding: 0;
+		border: none;
+		background: none;
+		color: var(--purple_bright);
+		font: inherit;
+		cursor: pointer;
+
+		&:hover {
+			text-decoration: underline;
+		}
+	}
 
 	.hero {
 		grid-area: image;
@@ -644,7 +681,7 @@
 		justify-content: end;
 		margin-top: 3em;
 		padding-top: 2em;
-		border-top: 1px solid color-mix(in oklch, var(--background) 92%, var(--black));
+		border-top: 1px solid var(--row_border);
 		color: var(--text_secondary);
 		font-size: 0.8em;
 		gap: 20px;

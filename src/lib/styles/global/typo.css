@@ -107,9 +107,9 @@ figure {
 	margin-top: 2em;
 	margin-bottom: 2em;
 	padding: 1em;
-	border: 1px solid color-mix(in oklch, var(--background) 78%, var(--black));
+	border: 1px solid var(--border);
 	border-radius: 1em;
-	background: light-dark(var(--white_true), color-mix(in oklch, var(--dark_background) 85%, var(--white)));
+	background: var(--surface_bg);
 	box-shadow: var(--shadow_card);
 }
 

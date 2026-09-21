@@ -1,6 +1,11 @@
 <script lang="ts">
 	import styles from './index.module.css';
 
+	// Roughly 2 rows' worth of pills at typical tag-name lengths - CSS-only
+	// row clamping isn't reliable here since pill width varies a lot with
+	// name length, so this collapses by a plain count instead.
+	const COLLAPSED_TAG_COUNT = 20;
+
 	let {
 		tags,
 		selectedTags,
@@ -13,15 +18,9 @@
 		onClear: () => void;
 	} = $props();
 
-	let tagSearch = $state(``);
 	let showAllTags = $state(false);
 
-	let filteredTags = $derived.by(() => {
-		let list = tags;
-		if (tagSearch) list = list.filter((tag) => tag.name.toLowerCase().includes(tagSearch.toLowerCase()));
-		if (!showAllTags && !tagSearch) return list.slice(0, 40);
-		return list;
-	});
+	let visibleTags = $derived(showAllTags ? tags : tags.slice(0, COLLAPSED_TAG_COUNT));
 </script>
 
 <section class={styles["tag-cloud"]}>
@@ -30,17 +29,10 @@
 		{#if selectedTags.length}
 			<button class={styles["clear-tags"]} onclick={onClear}>Clear filters</button>
 		{/if}
-		<input
-			type="text"
-			class={styles["tag-filter"]}
-			placeholder="Find a tag..."
-			aria-label="Find a tag"
-			bind:value={tagSearch}
-		/>
 	</div>
 
 	<div class={styles["tag-list"]}>
-		{#each filteredTags as tag (tag.slug)}
+		{#each visibleTags as tag (tag.slug)}
 			<input
 				type="checkbox"
 				id="tag-{tag.slug}"
@@ -51,13 +43,15 @@
 		{/each}
 	</div>
 
-	{#if !tagSearch && !showAllTags && tags.length > 40}
-		<button class={styles.show} onclick={() => showAllTags = true}>
-			Show all {tags.length} tags
-		</button>
-	{:else if showAllTags && !tagSearch}
-		<button class={styles.show} onclick={() => showAllTags = false}>
-			Show fewer
-		</button>
+	{#if tags.length > COLLAPSED_TAG_COUNT}
+		{#if !showAllTags}
+			<button class={styles.show} onclick={() => showAllTags = true}>
+				Show all {tags.length} tags
+			</button>
+		{:else}
+			<button class={styles.show} onclick={() => showAllTags = false}>
+				Show fewer
+			</button>
+		{/if}
 	{/if}
 </section>

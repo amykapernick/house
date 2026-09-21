@@ -53,7 +53,7 @@
 	/>
 	<Card
 		theme="white"
-		class="season"
+		class={styles.season}
 	>
 		<h3 class="subtitle">Current Season</h3>
 		<span class={styles.period}><strong>{seasonal.noongar_season.current}</strong> • {seasonal.noongar_season.current_period}</span>
@@ -61,7 +61,7 @@
 	</Card>
 	<Card
 		theme="white"
-		class="season"
+		class={styles.season}
 	>
 		<h3 class="subtitle">Next Season • {formatWeeksCountdown(seasonal.noongar_season.weeks_until_next)}</h3>
 		<span class={styles.period}><strong>{seasonal.noongar_season.next}</strong> • {seasonal.noongar_season.next_period}</span>
@@ -73,7 +73,7 @@
 <h3 class="subtitle">Today - Indoors</h3>
 <p>{daytime.current_recommendation.indoor.summary}</p>
 <div class={styles.chips}>
-	{#each daytime.current_recommendation.indoor.layers as layer (layer.position)}
+	{#each daytime.current_recommendation.indoor.layers as layer, i (i)}
 		<Outfit {layer} />
 	{/each}
 	{#if feetOutfit(daytime.current_recommendation.indoor)}
@@ -84,7 +84,7 @@
 <h3 class="subtitle">Today - Outdoors <em>(add to indoor layers)</em></h3>
 <p>{daytime.current_recommendation.outdoor.summary}</p>
 <div class={styles.chips}>
-	{#each daytime.current_recommendation.outdoor.layers as layer (layer.position)}
+	{#each daytime.current_recommendation.outdoor.layers as layer, i (i)}
 		<Outfit {layer} />
 	{/each}
 	{#if feetOutfit(daytime.current_recommendation.outdoor)}

@@ -1,9 +1,4 @@
-/* TODO: kept :global() rather than hashed - this component passes the
-   literal "season" class to $parts/Card, then reaches back out to it via
-   :global() to layer its own colouring on top (see #641). A fragile
-   string contract; should become an explicit prop instead. */
-
-:global(.card.season) {
+.season {
 	color: var(--text_secondary);
 	font-size: 0.9em;
 

@@ -34,6 +34,7 @@
 		resources = [],
 		views,
 		customViews,
+		sectionOverrides,
 		optionsOverride = {},
 		class: className = '',
 	}: {
@@ -41,6 +42,10 @@
 		resources?: Resource[];
 		views?: BuiltInView[];
 		customViews?: CustomView[];
+		/** Per-view section overrides (eg. `{ day: { timeGrid: { yScale: { startHour: 0, endHour: 24 } } } }`),
+		 * deep-merged into that view's own ViewModel.getSections() output - the same documented
+		 * mechanism the `resources` view below uses for its column list, just generalised to any view. */
+		sectionOverrides?: Record<string, Record<string, any>>;
 		optionsOverride?: Record<string, any>;
 		class?: string;
 	} = $props();
@@ -65,17 +70,21 @@
 	// changes.
 	let svarViews = $derived(
 		(views ?? ['month', 'week', 'day']).map((name) => {
-			if (name !== 'resources') return name;
-			return {
-				id: 'resources',
-				sections: {
-					resources: {
-						xScale: {
-							items: resources.length ? resources.map((r) => ({ id: r.id, label: r.title })) : [{ id: '_none', label: '' }],
+			if (name === 'resources') {
+				return {
+					id: 'resources',
+					sections: {
+						resources: {
+							xScale: {
+								items: resources.length ? resources.map((r) => ({ id: r.id, label: r.title })) : [{ id: '_none', label: '' }],
+							},
 						},
 					},
-				},
-			};
+				};
+			}
+
+			const override = sectionOverrides?.[name];
+			return override ? { id: name, sections: override } : name;
 		}),
 	);
 
@@ -135,7 +144,7 @@
 			view={optionsOverride.view}
 			date={optionsOverride.date}
 			readonly={optionsOverride.readonly ?? false}
-			toolbar={optionsOverride.toolbar ?? { items: toolbarItems }}
+			toolbar={optionsOverride.toolbar === undefined ? { items: toolbarItems } : optionsOverride.toolbar}
 			eventContent={optionsOverride.eventContent}
 			cellCss={optionsOverride.cellCss}
 			{eventCss}

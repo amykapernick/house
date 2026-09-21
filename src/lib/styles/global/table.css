@@ -48,6 +48,6 @@ td, th {
 
 tfoot {
 	border-top: 2px solid var(--grey);
-	background: light-dark(var(--white_true), color-mix(in oklch, var(--dark_background) 85%, var(--white)));
+	background: var(--surface_bg);
 	font-weight: 700;
 }

@@ -12,8 +12,8 @@
 	import Singlet from '$img/smallHuman/singlet.svg?component';
 	import Socks from '$img/smallHuman/socks.svg?component';
 	import Mittens from '$img/smallHuman/glove-colored.svg?component';
-	import Sunscreen from '$img/smallHuman/sun-cream-svgrepo-com.svg?component';
-	import Sweater from '$img/smallHuman/sweater-svgrepo-com.svg?component';
+	import Sunscreen from '$img/smallHuman/sun-cream.svg?component';
+	import Sweater from '$img/smallHuman/sweater.svg?component';
 	import type { ClothingLayer, ClothingType, SleeveLength } from '$types/generated';
 	import styles from './index.module.css';
 

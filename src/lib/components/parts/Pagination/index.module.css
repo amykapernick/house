@@ -1,27 +1,49 @@
+@import '@mixins';
+
 .pagination {
 	display: flex;
+	flex-wrap: wrap;
 	align-items: center;
 	justify-content: center;
 	margin-top: 2em;
 	padding: 1em 0;
-	gap: 1em;
+	gap: 0.4em;
+}
 
-	& button {
-		padding: 0.5em 1em;
-		border: 1px solid var(--grey_light);
-		border-radius: 0.3em;
-		background: var(--transparent);
-		color: var(--black);
-		cursor: pointer;
+.nav {
 
-		&:disabled {
-			opacity: 0.4;
-			cursor: default;
-		}
+	@include button_secondary;
+
+	padding: 0.5em 1em;
+	border-radius: 0.5em;
+	font-size: 0.85em;
+
+	&:disabled {
+		opacity: 0.4;
+		cursor: default;
 	}
+}
 
-	& span {
-		color: var(--grey);
-		font-size: 0.9em;
+.page {
+
+	@include button_secondary(purple_bright);
+
+	min-width: 2.4em;
+	padding: 0.5em;
+	border-radius: 0.5em;
+	font-weight: 600;
+
+	&.active {
+
+		@include button;
+
+		padding: 0.5em;
+		border-radius: 0.5em;
+		font-weight: 600;
 	}
+}
+
+.ellipsis {
+	padding: 0 0.3em;
+	color: var(--text_secondary);
 }

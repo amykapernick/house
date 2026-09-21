@@ -22,6 +22,7 @@
 	--shadow_popover: rgb(13 13 13 / 4%) 0 1px 2px, rgb(95 65 50 / 9%) 0 8px 20px;
 	--blue_tint_bg: color-mix(in oklch, var(--blue) 8%, var(--transparent));
 	--purple_bright_tint_bg: color-mix(in oklch, var(--purple_bright) 4%, var(--transparent));
+	--surface_bg: light-dark(var(--white_true), color-mix(in oklch, var(--dark_background) 85%, var(--white)));
 
 
 	color-scheme: light dark;

@@ -1,39 +1,64 @@
+@import '@mixins';
+
 .card {
-	display: block;
+	display: grid;
+	position: relative;
+	grid-template-rows: auto 1fr;
 	overflow: hidden;
-	transition: box-shadow 0.2s;
-	border: 1px solid var(--grey_light);
-	border-radius: 0.5em;
-	color: inherit;
-	text-decoration: none;
+	transition: transform 0.15s ease, box-shadow 0.15s ease;
+	border: 1px solid var(--border);
+	border-radius: 0.7em;
+	background: linear-gradient(180deg, var(--card_top), var(--card_bottom));
+	box-shadow: var(--shadow_card);
 
 	&:hover {
-		box-shadow: 0 2px 8px rgb(0 0 0 / 10%);
+		transform: translateY(-2px);
+		box-shadow: var(--shadow_popover);
+
+		& img {
+			transform: scale(1.05);
+		}
+	}
+}
+
+.media {
+	position: relative;
+	overflow: hidden;
+	aspect-ratio: 4 / 3;
+
+	&.compact {
+		aspect-ratio: 16 / 9;
 	}
 
 	& img {
 		display: block;
 		width: 100%;
-		height: 180px;
+		height: 100%;
+		transition: transform 0.3s ease;
 		object-fit: cover;
-	}
-
-	& .no-image {
-		width: 100%;
-		height: 180px;
-		background: color-mix(in oklch, var(--purple_bright) 8%, var(--transparent));
-	}
-
-	&.compact {
-		& img,
-		& .no-image {
-			height: 140px;
-		}
 	}
 }
 
+.no-image {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	height: 100%;
+	background-image: repeating-linear-gradient(
+		135deg,
+		var(--stripe_a),
+		var(--stripe_a) 10px,
+		var(--stripe_b) 10px,
+		var(--stripe_b) 20px
+	);
+}
+
 .info {
-	padding: 0.8em;
+	display: grid;
+	grid-template-areas: 'title' 'description' 'meta' 'tags';
+	grid-template-rows: auto auto 1fr auto;
+	padding: 0.9em;
 
 	& h2 {
 		margin: 0 0 0.3em;
@@ -52,6 +77,18 @@
 	}
 }
 
+.title-link {
+	color: inherit;
+	text-decoration: none;
+
+	@include block_link;
+
+	&:hover,
+	&:focus-visible {
+		text-decoration: underline;
+	}
+}
+
 .day {
 	display: block;
 	margin-bottom: 0.2em;
@@ -66,7 +103,7 @@
 	display: -webkit-box;
 	margin: 0 0 0.5em;
 	overflow: hidden;
-	color: var(--grey);
+	color: var(--text_secondary);
 	font-size: 0.85em;
 	-webkit-line-clamp: 2;
 	-webkit-box-orient: vertical;
@@ -79,8 +116,11 @@
 
 .meta {
 	display: flex;
+	grid-area: meta;
+	flex-wrap: wrap;
+	align-items: baseline;
 	margin-bottom: 0.5em;
-	color: var(--grey);
+	color: var(--text_secondary);
 	font-size: 0.8em;
 	gap: 1em;
 
@@ -89,4 +129,31 @@
 		font-size: 0.75em;
 		gap: 0.8em;
 	}
+}
+
+.rating {
+	color: var(--purple_bright);
+	letter-spacing: 0.1em;
+}
+
+.actions {
+	display: flex;
+	position: absolute;
+	z-index: 1;
+	top: 0.5em;
+	right: 0.5em;
+	gap: 0.4em;
+
+	& button {
+
+		@include button_icon;
+
+		box-shadow: var(--shadow_soft);
+	}
+}
+
+.tags {
+	position: relative;
+	z-index: 1;
+	grid-area: tags;
 }

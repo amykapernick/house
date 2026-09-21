@@ -1,0 +1,72 @@
+@import '@mixins';
+
+.link {
+
+	@include button_link;
+
+	&::after {
+		content: '→';
+		margin-left: 0.3em;
+	}
+}
+
+.agenda-container {
+	padding: 1.2em;
+	border: 1px solid var(--border);
+	border-radius: 0.7em;
+
+	/* Deliberately a fixed literal, not one of the app's theme-aware tokens:
+	   --background (the only token that already equals this value) is also
+	   what the page itself is painted with, so reusing it here would always
+	   make this panel exactly match whatever's behind it - the opposite of a
+	   visible panel, in both light and dark mode. */
+
+	/* stylelint-disable-next-line house/no-duplicate-colour-value -- intentional: see comment above */
+	background: #f7f0eb;
+}
+
+.agenda {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.agenda-item {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	padding: 0.6em 0;
+	border-bottom: 1px solid var(--border);
+	gap: 1em;
+
+	&:last-child {
+		border-bottom: none;
+	}
+}
+
+.agenda-label {
+	position: relative;
+	padding-left: 1.1em;
+	font-size: 0.9em;
+
+	&::before {
+		content: '';
+		position: absolute;
+		top: 0.5em;
+		left: 0;
+		width: 0.4em;
+		height: 0.4em;
+		border-radius: 50%;
+		background: var(--text_secondary);
+	}
+}
+
+.agenda-meta {
+	flex-shrink: 0;
+	color: var(--text_muted);
+	font-size: 0.8em;
+}
+
+.overdue-pill {
+	text-transform: uppercase;
+}

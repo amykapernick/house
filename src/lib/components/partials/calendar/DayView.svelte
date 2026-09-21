@@ -73,18 +73,53 @@
 		return [...items, ...blockEvents];
 	});
 
+	// SVAR's day view defaults to an 8am-6pm window (DayViewModel's own
+	// `timeGrid` section) - the full 0-24 range is kept (via CalendarBase's
+	// sectionOverrides, a documented deep-merge over the ViewModel's
+	// getSections() output, same mechanism as the resources view's column
+	// list) so every hour is reachable by scrolling, but the initial scroll
+	// position below opens on 5am rather than midnight. `ui.minUnitHeight`
+	// defaults to 100px/hour - too tall for a dashboard widget, so it's
+	// shrunk to roughly 2em (HOUR_PX below - also used to compute the initial
+	// scroll offset, so the two must stay in sync).
+	const HOUR_PX = 32;
+	const INITIAL_SCROLL_HOUR = 5;
+	const sectionOverrides = { day: { timeGrid: { yScale: { startHour: 0, endHour: 24, ui: { minUnitHeight: HOUR_PX } } } } };
+
 	const optionsOverride = {
 		view: 'day',
 		readonly: true,
 		eventContent: EventContent,
-		// Fires on every navigation (prev/next/today), not just the initial
-		// mount - lets the dashboard refetch events/schedule for whichever day
-		// is now visible instead of always showing "today"'s data. visibleDateRange
-		// is a Svelte store, so subscribing also fires once immediately with the
-		// initial value - same as datesSet firing on mount under @event-calendar.
+		// Dashboard widget has no prev/next/today controls of its own left to
+		// drive this (see the Switch above it for the one control it does keep),
+		// so the built-in toolbar (Navigation.svelte) is switched off entirely
+		// rather than just hidden with CSS.
+		toolbar: null,
+		// Fires once on mount (there's no way to navigate away from today with
+		// the toolbar gone) - kept for parity with other CalendarBase callers
+		// and in case a future control re-enables day navigation here.
 		init: (api: CalendarInstanceApi) => {
 			api.getReactiveState().visibleDateRange.subscribe((range) => {
 				onDateChange?.(range.start);
+			});
+
+			// SVAR has no scroll-to-time API - the hour grid's scroll container
+			// (".wx-sections") is found and nudged directly instead. `day_view`
+			// (set below) is a stable, literal class - not scoped via a wrapper
+			// element, since CalendarBase's own container needs to stay the
+			// direct child of DayView's caller (the dashboard's own
+			// `.calendar_card` wrapper depends on that direct parent/child
+			// relationship for its subgrid). Only one DayView exists on the
+			// page, so a plain global lookup is safe here. Its min-height
+			// (driven by the same minUnitHeight above) is set synchronously
+			// from static scale data, not gated behind the ResizeObserver-driven
+			// "measured" state the grid content itself waits on, so the
+			// scrollable height is already correct on the first frame - but a
+			// rAF is still used to be safe against any layout not having
+			// settled yet.
+			requestAnimationFrame(() => {
+				const scrollEl = document.querySelector<HTMLElement>('.day_view .wx-sections');
+				if (scrollEl) scrollEl.scrollTop = INITIAL_SCROLL_HOUR * HOUR_PX;
 			});
 		},
 	};
@@ -94,5 +129,6 @@
 	class="day_view {className}"
 	events={calendarEvents}
 	views={['day']}
+	{sectionOverrides}
 	{optionsOverride}
 />

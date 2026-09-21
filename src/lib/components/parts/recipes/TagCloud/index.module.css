@@ -22,19 +22,11 @@
 	}
 }
 
-.tag-filter {
-	width: 180px;
-	margin-left: auto;
-	padding: 0.3em 0.5em;
-	border: 1px solid var(--grey_light);
-	border-radius: 0.3em;
-	font-size: 0.85em;
-}
-
 .clear-tags {
 
 	@include button_secondary;
 
+	margin-left: auto;
 	padding: 0.2em 0.5em;
 	font-size: 0.8em;
 }
@@ -42,8 +34,8 @@
 .tag-list {
 	display: flex;
 	flex-wrap: wrap;
-	gap: 0.3em;
 	margin-bottom: 0.5em;
+	gap: 0.3em;
 
 	& input[type="checkbox"] {
 

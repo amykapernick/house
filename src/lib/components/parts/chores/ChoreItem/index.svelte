@@ -46,7 +46,7 @@
 
 <div class="{styles['chore-item']} {className}">
 	<CheckboxButton
-		class="checkbox"
+		class={styles.checkbox}
 		state={completed ? 'complete' : 'incomplete'}
 		disabled={completed || saving}
 		onclick={completeChore}

@@ -19,7 +19,12 @@
 
 <div class={[styles.layout, className, effectiveWidth === `wide` && styles.wide, effectiveWidth === `full` && styles.full]}>
 	{#if $title}
-		<h1 class={styles.title}>{@render $title()}</h1>
+		<div class={styles.titleRow}>
+			<h1 class={styles.title}>{@render $title.content()}</h1>
+			{#if $title.actions}
+				{@render $title.actions()}
+			{/if}
+		</div>
 	{/if}
 	{@render children()}
 </div>

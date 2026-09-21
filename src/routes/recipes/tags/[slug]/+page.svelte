@@ -18,11 +18,35 @@
 	let tagName = $state('');
 	const perPage = 24;
 
+	// Persists pagination across browser back navigation (eg. landing back
+	// here after opening a recipe) - see the equivalent on /recipes.
+	export const snapshot = {
+		capture: () => ({ currentPage }),
+		restore: (value: { currentPage: number }) => {
+			currentPage = value.currentPage;
+		},
+	};
+
 	function fetchRecipes() {
 		loading = true;
 		const slug = $page.params.slug ?? '';
 
+		function applyRecipes(res: any) {
+			const data = res.recipes;
+			recipes = data?.items ?? [];
+			totalPages = data?.totalPages ?? 1;
+			total = data?.total ?? 0;
+			if (recipes.length && !tagName) {
+				const match = recipes[0].tags?.find((t: any) => t.slug === slug);
+				if (match) tagName = match.name;
+			}
+			if (!tagName) tagName = slug.replaceAll('-', ' ');
+			loading = false;
+		}
+
 		fetchClientData({
+			cacheKey: `recipes-tag-${slug}-${currentPage}`,
+			onStale: applyRecipes,
 			gqlQuery: `
 				query {
 					recipes(page: ${currentPage}, perPage: ${perPage}, tags: ["${slug}"]) {
@@ -37,18 +61,7 @@
 					}
 				}
 			`,
-		}).then((res) => {
-			const data = res.recipes;
-			recipes = data?.items ?? [];
-			totalPages = data?.totalPages ?? 1;
-			total = data?.total ?? 0;
-			if (recipes.length && !tagName) {
-				const match = recipes[0].tags?.find((t: any) => t.slug === slug);
-				if (match) tagName = match.name;
-			}
-			if (!tagName) tagName = slug.replaceAll('-', ' ');
-			loading = false;
-		});
+		}).then(applyRecipes);
 	}
 
 	onMount(() => {

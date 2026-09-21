@@ -39,7 +39,10 @@
 			<dd>{value}</dd>
 			{#if Icon}<span class={styles.icon}><Icon /></span>{/if}
 			{#if note}
-				<Tooltip label={note}>
+				<Tooltip
+					label={note}
+					class={styles['tooltip-trigger']}
+				>
 					<Info />
 				</Tooltip>
 			{/if}

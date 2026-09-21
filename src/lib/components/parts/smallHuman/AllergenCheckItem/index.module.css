@@ -1,9 +1,4 @@
-/* TODO: .allergen-check kept :global() rather than hashed - src/routes/+page.svelte
-   (the dashboard) reaches in from outside via :global(.allergen-check) to
-   restyle this component's grid layout inside its due-soon widget (see
-   #641). A fragile string contract; should become an explicit prop instead. */
-
-:global(.allergen-check) {
+.allergen-check {
 	display: grid;
 	position: relative;
 	grid-template-areas:
@@ -12,8 +7,27 @@
 	grid-template-columns: auto 1fr;
 	gap: 0.2ch 0.5ch;
 
-	& :global(.checkbox) {
+	& .checkbox {
 		grid-area: checkbox;
+	}
+
+	&[data-compact] {
+		& .checkbox {
+			position: static;
+			grid-area: streak;
+			width: 0.1px;
+			height: 0.1px;
+
+			& :global(svg) {
+				display: none;
+			}
+
+			&::before {
+				content: '';
+				position: absolute;
+				inset: 0;
+			}
+		}
 	}
 }
 
@@ -24,7 +38,7 @@
 	font-weight: 600;
 	gap: 0.4ch;
 
-	& :global(.icon) {
+	& .icon {
 		width: 1em;
 		height: 1em;
 	}

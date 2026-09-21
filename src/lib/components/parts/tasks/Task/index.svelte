@@ -92,7 +92,7 @@
 
 <div class="{styles.task} {className}">
 	<CheckboxButton
-		class="checkbox"
+		class={styles.checkbox}
 		state={completed}
 		disabled={completed === 'complete' || saving || platform === 'github'}
 		onclick={completeTask}
@@ -123,7 +123,7 @@
 	{/if}
 	{#if assigned}
 		<Assigned
-			class="assigned"
+			class={styles.assigned}
 			assignees={assigned}
 		/>
 	{/if}

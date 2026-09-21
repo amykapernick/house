@@ -2,7 +2,7 @@
 	import type { Feeding, ValueNote } from '$types/smallHuman';
 	import Stats from '$parts/Stats/index.svelte';
 	import DebugJson from '$parts/DebugJson/index.svelte';
-	import Breasts from '$img/smallHuman/breasts.svg?component';
+	import Breasts from '$img/smallHuman/bf.svg?component';
 	import Water from '$img/icons/glass-water.svg?component';
 	import Food from '$img/icons/soup.svg?component';
 	import Card from '$components/parts/smallHuman/Card/index.svelte';

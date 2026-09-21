@@ -482,6 +482,26 @@ export type Habit = {
 	streak: Maybe<Scalars[`Int`][`output`]>;
 };
 
+export type HealthHistory = {
+	activeCaloriesBurned: Maybe<HealthMetricHistory>;
+	basalBodyTemperature: Maybe<HealthMetricHistory>;
+	basalMetabolicRate: Maybe<HealthMetricHistory>;
+	bloodGlucose: Maybe<HealthMetricHistory>;
+	bodyFat: Maybe<HealthMetricHistory>;
+	bodyTemperature: Maybe<HealthMetricHistory>;
+	bodyWaterMass: Maybe<HealthMetricHistory>;
+	boneMass: Maybe<HealthMetricHistory>;
+	dailyDistance: Maybe<HealthMetricHistory>;
+	dailyElevationGained: Maybe<HealthMetricHistory>;
+	dailyFloors: Maybe<HealthMetricHistory>;
+	dailyHydration: Maybe<HealthMetricHistory>;
+	dailySteps: Maybe<HealthMetricHistory>;
+	diastolicBloodPressure: Maybe<HealthMetricHistory>;
+	heartRate: Maybe<HealthMetricHistory>;
+	heartRateVariability: Maybe<HealthMetricHistory>;
+	oxygenSaturation: Maybe<HealthMetricHistory>;
+};
+
 export type HealthMetric = {
 	key: Scalars[`String`][`output`];
 	label: Maybe<Scalars[`String`][`output`]>;
@@ -490,7 +510,6 @@ export type HealthMetric = {
 };
 
 export type HealthMetricHistory = {
-	key: Scalars[`String`][`output`];
 	label: Maybe<Scalars[`String`][`output`]>;
 	points: Array<HealthMetricPoint>;
 	unit: Maybe<Scalars[`String`][`output`]>;
@@ -1706,7 +1725,7 @@ export type UpdateUserInput = {
 export type User = {
 	colour: Maybe<Scalars[`String`][`output`]>;
 	health: Maybe<Array<HealthMetric>>;
-	healthHistory: Maybe<Array<HealthMetricHistory>>;
+	healthHistory: Maybe<HealthHistory>;
 	ids: Maybe<UserIds>;
 	name: Maybe<Scalars[`String`][`output`]>;
 	profile: Maybe<Scalars[`String`][`output`]>;

@@ -69,33 +69,36 @@
 		return { total, read };
 	}
 
+	function applyEntries(res: any) {
+		allEntries = res.contentEntries ?? [];
+		loading = false;
+
+		// Read-progress statuses are only shown on the live /content list -
+		// archived versions have no "read" concept, just a count.
+		if (archived) return;
+
+		for (const entry of allEntries) {
+			const slug = entry?.slug ?? ``;
+			if (!slug) continue;
+
+			if (entry.brief) {
+				statuses[slug] = statusFromDigestCache(slug, entry.sectionCount ?? null);
+			}
+			else {
+				loadCourseStatus(slug).then((status) => {
+					statuses[slug] = status;
+				});
+			}
+		}
+	}
+
 	$effect(() => {
 		if ($isAuthenticated) {
 			fetchClientData({
 				cacheKey: `content-entries`,
+				onStale: applyEntries,
 				gqlQuery: contentEntriesQuery,
-			}).then((res: any) => {
-				allEntries = res.contentEntries ?? [];
-				loading = false;
-
-				// Read-progress statuses are only shown on the live /content list -
-				// archived versions have no "read" concept, just a count.
-				if (archived) return;
-
-				for (const entry of allEntries) {
-					const slug = entry?.slug ?? ``;
-					if (!slug) continue;
-
-					if (entry.brief) {
-						statuses[slug] = statusFromDigestCache(slug, entry.sectionCount ?? null);
-					}
-					else {
-						loadCourseStatus(slug).then((status) => {
-							statuses[slug] = status;
-						});
-					}
-				}
-			});
+			}).then(applyEntries);
 		}
 	});
 </script>

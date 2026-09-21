@@ -20,7 +20,7 @@
 	width: 100%;
 	border-collapse: collapse;
 	border-radius: 1em;
-	background: light-dark(var(--white_true), color-mix(in oklch, var(--dark_background) 85%, var(--white)));
+	background: var(--surface_bg);
 
 	& th {
 		padding: 1em 0.2em;
@@ -32,7 +32,7 @@
 }
 
 .member {
-	border-top: 1px solid color-mix(in oklch, var(--background) 92%, var(--black));
+	border-top: 1px solid var(--row_border);
 	background: var(--feature_colour);
 	font-weight: 700;
 

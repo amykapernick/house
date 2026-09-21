@@ -5,7 +5,7 @@
 	import type { IconName } from '../Icon/index.svelte';
 	import Tooltip from '../Tooltip/index.svelte';
 	import Info from '$img/icons/c-info-fill.svg?component';
-	import './index.module.css';
+	import styles from './index.module.css';
 
 	let {
 		label,
@@ -21,11 +21,14 @@
 	} = $props();
 </script>
 
-<Card class="chip {className}">
+<Card class="{styles.chip} {className}">
 	<h3>{label}</h3>
 	<p>{value}</p>
 	{#if info}
-		<Tooltip label={info}>
+		<Tooltip
+			label={info}
+			class={styles['tooltip-trigger']}
+		>
 			<Info />
 		</Tooltip>
 	{/if}

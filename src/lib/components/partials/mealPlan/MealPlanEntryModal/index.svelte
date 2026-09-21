@@ -1,3 +1,15 @@
+<script
+	module
+	lang="ts"
+>
+	export const ENTRY_TYPE_OPTIONS = [
+		{ value: `breakfast`, label: `Breakfast` },
+		{ value: `lunch`, label: `Lunch` },
+		{ value: `dinner`, label: `Dinner` },
+		{ value: `side`, label: `Side` },
+	];
+</script>
+
 <script lang="ts">
 	import { format, parseISO } from 'date-fns';
 	import Modal from '$parts/Modal/index.svelte';
@@ -8,13 +20,6 @@
 	import styles from './index.module.css';
 
 	type Recipe = { id: string; name: string; slug: string; categories: { name: string }[]; tags: { name: string }[] };
-
-	const ENTRY_TYPE_OPTIONS = [
-		{ value: `breakfast`, label: `Breakfast` },
-		{ value: `lunch`, label: `Lunch` },
-		{ value: `dinner`, label: `Dinner` },
-		{ value: `side`, label: `Side` },
-	];
 
 	const RECIPE_MIN_CHARS = 2;
 	const RECIPE_FETCH_COUNT = 8;

@@ -10,7 +10,7 @@
 	font-weight: 600;
 	text-align: center;
 
-	& :global(.tooltip-trigger) {
+	& .tooltip-trigger {
 		position: absolute;
 		top: 0.5em;
 		right: 0.5em;

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Colour } from '$types/global';
 	import type { Snippet } from 'svelte';
-	import './index.module.css';
+	import styles from './index.module.css';
 
 	const {
 		children,
@@ -14,6 +14,9 @@
 	} = $props();
 </script>
 
-<div class="card {className} {theme}">
+<div
+	class="{styles.card} {className}"
+	data-theme={theme}
+>
 	{@render children()}
 </div>

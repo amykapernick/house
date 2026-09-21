@@ -24,6 +24,7 @@ module.exports = {
 		`**/*.json`,
 		`**/*.cjs`,
 		`**/*.mjs`,
+		`../src/lib/styles/global/colours.generated.css`,
 	],
 	rules: {
 		'at-rule-empty-line-before': `always`,

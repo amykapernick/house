@@ -12,12 +12,7 @@
 	gap: 0.2em 1ch;
 }
 
-/* TODO: kept :global() rather than hashed - this component forwards the
-   literal "checkbox" class to CheckboxButton, then reaches back out to it
-   via :global() to position it in the grid (see #641). A fragile string
-   contract; should become an explicit prop instead. */
-
-:global(.checkbox) {
+.checkbox {
 	grid-area: checkbox;
 	align-self: center;
 }
@@ -71,12 +66,7 @@
 	width: 100%;
 }
 
-/* TODO: kept :global() rather than hashed - this component forwards the
-   literal "assigned" class to Assigned, then reaches back out to it via
-   :global() to position it in the grid (see #641). A fragile string
-   contract; should become an explicit prop instead. */
-
-:global(.assigned) {
+.assigned {
 	grid-area: assigned;
 }
 

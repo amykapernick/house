@@ -1,0 +1,61 @@
+.dashboard {
+	display: grid;
+	gap: 1em;
+	grid-template-areas: 'header' 'upcoming' 'habits' 'today' 'meals';
+}
+
+.header {
+	grid-area: header;
+}
+
+.greeting {
+	margin: 0;
+	font-size: 1.6em;
+	font-weight: 700;
+}
+
+.date {
+	margin: 0.2em 0 0;
+	color: var(--text_secondary);
+}
+
+.today {
+	grid-area: today;
+}
+
+.upcoming {
+	grid-area: upcoming;
+}
+
+.habits {
+	grid-area: habits;
+}
+
+.meals {
+	grid-area: meals;
+}
+
+@media (width >= 40em) {
+	.dashboard {
+		grid-template-areas: 'header header' 'upcoming today' 'habits today' 'meals today';
+		grid-template-columns: 1fr auto;
+		grid-template-rows: auto auto auto 1fr;
+		gap: 2em;
+	}
+
+	.today {
+		min-width: 20em;
+	}
+}
+
+@media (width >= 65em) {
+	.dashboard {
+		grid-template-areas: 'header header header' 'upcoming habits today' 'meals meals today';
+		grid-template-columns: 1fr 1fr auto;
+		grid-template-rows: auto auto 1fr;
+	}
+
+	.today {
+		min-width: 30em;
+	}
+}

@@ -23,7 +23,7 @@
 </script>
 
 <Card
-	class="card {className} {onDismiss ? 'has-dismiss' : ''}"
+	class="{styles.card} {className} {onDismiss ? styles['has-dismiss'] : ''}"
 	style="
 
 --order: {order}"

@@ -46,3 +46,22 @@ export async function fetchCurrentUserSlug(onStale?: (slug: string | undefined) 
 
 	return res.me?.slug;
 }
+
+export type CurrentUser = { slug: string; name: string | null };
+
+// Separate cache key from fetchCurrentUserSlug's and the header/profile `me`
+// queries (different shapes) - sharing a key would let whichever query ran
+// last overwrite the cache with a partial `me` object for the other consumer.
+export async function fetchCurrentUser(onStale?: (user: CurrentUser | undefined) => void): Promise<CurrentUser | undefined> {
+	const res = await fetchClientData({
+		cacheKey: `dashboard-me`,
+		onStale: (data) => onStale?.(data.me ?? undefined),
+		gqlQuery: `
+			query {
+				me { slug name }
+			}
+		`,
+	});
+
+	return res.me ?? undefined;
+}

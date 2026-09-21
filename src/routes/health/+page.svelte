@@ -12,8 +12,9 @@
 	import Title from '$parts/Title/index.svelte';
 
 	type HealthMetricPoint = { date: string; value: number };
-	type HealthMetricHistory = { key: string; label: string | null; unit: string | null; points: HealthMetricPoint[] };
-	type HealthUser = { slug: string; name: string; colour: Colour | null; healthHistory: HealthMetricHistory[] | null };
+	type HealthMetricHistory = { label: string | null; unit: string | null; points: HealthMetricPoint[] };
+	type HealthHistory = Record<string, HealthMetricHistory | null>;
+	type HealthUser = { slug: string; name: string; colour: Colour | null; healthHistory: HealthHistory | null };
 
 	const DAY_OPTIONS = [7, 30, 90] as const;
 
@@ -37,15 +38,31 @@
 							slug
 							name
 							colour
-							healthHistory(days: ${days}) { key label unit points { date value } }
+							healthHistory(days: ${days}) {
+								dailySteps { label unit points { date value } }
+								activeCaloriesBurned { label unit points { date value } }
+								basalBodyTemperature { label unit points { date value } }
+								basalMetabolicRate { label unit points { date value } }
+								bloodGlucose { label unit points { date value } }
+								bodyFat { label unit points { date value } }
+								bodyTemperature { label unit points { date value } }
+								bodyWaterMass { label unit points { date value } }
+								boneMass { label unit points { date value } }
+								dailyDistance { label unit points { date value } }
+								dailyElevationGained { label unit points { date value } }
+								dailyFloors { label unit points { date value } }
+								dailyHydration { label unit points { date value } }
+								diastolicBloodPressure { label unit points { date value } }
+								heartRate { label unit points { date value } }
+								heartRateVariability { label unit points { date value } }
+								oxygenSaturation { label unit points { date value } }
+							}
 						}
 					}
 				`,
 			}).then(handle);
 		}
 	});
-
-	// TODO: Reorganise health history data so that different values can be fetched
 
 	type MetricCard = { key: string; label: string; unit: string | null; lines: LineChartLine[] };
 
@@ -58,13 +75,13 @@
 		const byKey = new Map<string, MetricCard>();
 
 		for (const user of users) {
-			for (const metric of user.healthHistory ?? []) {
-				if (!metric.points.length) continue;
+			for (const [key, metric] of Object.entries(user.healthHistory ?? {})) {
+				if (!metric?.points.length) continue;
 
-				if (!byKey.has(metric.key)) {
-					byKey.set(metric.key, { key: metric.key, label: metric.label ?? metric.key, unit: metric.unit, lines: [] });
+				if (!byKey.has(key)) {
+					byKey.set(key, { key, label: metric.label ?? key, unit: metric.unit, lines: [] });
 				}
-				byKey.get(metric.key)!.lines.push({
+				byKey.get(key)!.lines.push({
 					data: metric.points.map((p) => ({ x: parseISO(p.date), y: p.value })),
 					style: { colour: user.colour ?? 'blue' },
 					unit: metric.unit ?? '',
@@ -73,12 +90,12 @@
 			}
 		}
 
-		return [...byKey.values()].sort((a, b) => (a.key === 'daily_steps' ? -1 : b.key === 'daily_steps' ? 1 : a.label.localeCompare(b.label)));
+		return [...byKey.values()].sort((a, b) => (a.key === 'dailySteps' ? -1 : b.key === 'dailySteps' ? 1 : a.label.localeCompare(b.label)));
 	});
 
 	// Colours are stable per-person across every chart on the page, so one shared
 	// legend suffices - LineChart (unlike BarChart) has no built-in legend.
-	let legend = $derived(users.filter((u) => (u.healthHistory ?? []).some((m) => m.points.length)));
+	let legend = $derived(users.filter((u) => Object.values(u.healthHistory ?? {}).some((m) => m?.points.length)));
 </script>
 
 <svelte:head>
@@ -130,7 +147,6 @@
 	{/if}
 
 	<div class="grid">
-		<!-- TODO: Remove device name from caption -->
 		{#each metricCards as card (card.key)}
 			<Chart
 				type="line"

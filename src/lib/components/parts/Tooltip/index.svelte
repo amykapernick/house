@@ -32,7 +32,7 @@
 </script>
 
 <span
-	class="tooltip-trigger {className}"
+	class="{styles['tooltip-trigger']} {className}"
 	role="group"
 	aria-describedby={tooltipId}
 	ontouchstart={startPress}

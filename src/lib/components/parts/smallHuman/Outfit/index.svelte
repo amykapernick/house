@@ -66,7 +66,10 @@
 		/></span
 	>
 	<span class="label">{shortLabel}</span>
-	<Tooltip label={fullLabel}>
+	<Tooltip
+		label={fullLabel}
+		class={styles['tooltip-trigger']}
+	>
 		<Info />
 	</Tooltip>
 </div>

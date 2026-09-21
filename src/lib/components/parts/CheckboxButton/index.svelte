@@ -30,7 +30,7 @@
 
 <button
 	type="button"
-	class={['checkbox', styles[variant], styles[state], className].filter(Boolean).join(' ')}
+	class={[styles.checkbox, styles[variant], styles[state], className].filter(Boolean).join(' ')}
 	disabled={disabled || loading}
 	{onclick}
 	aria-label={label}

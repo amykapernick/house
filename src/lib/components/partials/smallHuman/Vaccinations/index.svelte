@@ -18,10 +18,11 @@
 	<p>{vaccinations.note}</p>
 	<div class={styles.vaccinations}>
 		{#each vaccinations.items as v (v.id)}
-			<Card>
+			<Card class={styles.card}>
 				<h3>{v.title}</h3>
 				<!-- TODO: Add due or given date -->
 				<Icon
+					class={styles.icon}
 					colour={true}
 					name={v.todoist_task ? 'calendar' : 'vaccine'}
 				/>

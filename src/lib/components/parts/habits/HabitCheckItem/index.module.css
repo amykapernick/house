@@ -1,9 +1,4 @@
-/* TODO: .habit-check kept :global() rather than hashed - src/routes/+page.svelte
-   (the dashboard) reaches in from outside via :global(.habit-check) to
-   restyle this component's grid layout inside its due-soon widget (see
-   #641). A fragile string contract; should become an explicit prop instead. */
-
-:global(.habit-check) {
+.habit-check {
 	display: grid;
 	grid-template-areas:
 		'checkbox label streak'
@@ -20,8 +15,32 @@
 		inset: 0 4em 0 2em;
 	}
 
-	& :global(.checkbox) {
+	& .checkbox {
 		grid-area: checkbox;
+	}
+
+	&[data-compact] {
+		grid-template-areas:
+			'label streak'
+			'due streak';
+		grid-template-columns: 1fr auto;
+
+		& .checkbox {
+			position: static;
+			grid-area: streak;
+			width: 0.1px;
+			height: 0.1px;
+
+			& :global(svg) {
+				display: none;
+			}
+
+			&::before {
+				content: '';
+				position: absolute;
+				inset: 0;
+			}
+		}
 	}
 }
 

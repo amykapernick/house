@@ -3,7 +3,7 @@ import { getToken } from '$lib/auth';
 
 // Single source of truth for the default cache lifetime - override for the whole
 // app via VITE_CACHE_TTL_MINUTES in .env, or per-call via the `ttl` prop.
-const DEFAULT_CACHE_TTL = Number(import.meta.env.VITE_CACHE_TTL_MINUTES ?? 30) * 60 * 1000;
+const DEFAULT_CACHE_TTL = Number(import.meta.env.VITE_CACHE_TTL_MINUTES ?? 60) * 60 * 1000;
 
 const LAST_DATA_UPDATE_KEY = `lastDataUpdate`;
 

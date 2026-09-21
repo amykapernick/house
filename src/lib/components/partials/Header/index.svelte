@@ -49,17 +49,20 @@
 	$effect(() => {
 		if (!$isAuthenticated) return;
 
+		function applyProfile(res: any) {
+			profileName = res?.me?.name ?? '';
+			profileImage = res?.me?.profile ?? '';
+		}
+
 		fetchClientData({
 			cacheKey: 'header-me',
+			onStale: applyProfile,
 			gqlQuery: `
 				query {
 					me { name profile }
 				}
 			`,
-		}).then((res) => {
-			profileName = res?.me?.name ?? '';
-			profileImage = res?.me?.profile ?? '';
-		});
+		}).then(applyProfile);
 	});
 </script>
 

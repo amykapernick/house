@@ -14,7 +14,7 @@
 	import SoySauce from '$img/smallHuman/soy-sauce.svg?component';
 	import styles from './index.module.css';
 
-	let { id, name, due, onComplete, class: className = '' }: { id: string; name: string; due?: string | null; onComplete?: (id: string) => void; class?: string } = $props();
+	let { id, name, due, onComplete, compact = false, class: className = '' }: { id: string; name: string; due?: string | null; onComplete?: (id: string) => void; compact?: boolean; class?: string } = $props();
 
 	// Same icon set as Allergens.svelte on the small-human page, keyed by allergen name.
 	const ICONS: Record<string, Component> = {
@@ -57,9 +57,12 @@
 	}
 </script>
 
-<div class="allergen-check {className}">
+<div
+	class="{styles['allergen-check']} {className}"
+	data-compact={compact || undefined}
+>
 	<CheckboxButton
-		class="checkbox"
+		class={styles.checkbox}
 		state={(done ? 'complete' : 'incomplete') as CheckState}
 		disabled={saving}
 		onclick={completeAllergen}
@@ -67,7 +70,7 @@
 	/>
 	<span class={styles.label}>
 		{#if Icon}<Icon
-				class="icon"
+				class={styles.icon}
 				aria-hidden="true"
 			/>{/if}
 		{name}

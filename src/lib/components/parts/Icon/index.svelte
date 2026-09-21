@@ -19,7 +19,7 @@
 	import SyringeColour from '$img/icons/syringe-2.svg?component';
 	import UpcomingColour from '$img/icons/time-machine.svg?component';
 	import NextColour from '$img/icons/double-arrow-right-colored.svg?component';
-	import './index.module.css';
+	import styles from './index.module.css';
 
 	export type IconName = MilestoneStatus | SignStatus | 'calendar' | 'vaccine';
 
@@ -95,7 +95,7 @@
 
 <span
 	bind:this={wrapper}
-	class="icon {className}"
+	class="{styles.icon} {className}"
 >
 	<IconComponent />
 </span>

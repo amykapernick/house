@@ -1,20 +1,14 @@
-/* TODO: kept :global() rather than hashed - this component wraps $parts/Card
-   and reaches into its rendered root via the literal "card"/"has-dismiss"
-   classes it forwards down, to give itself a heading/content grid layout
-   (see #641). A fragile string contract; should become an explicit prop
-   instead. */
-
-:global(.card) {
+.card {
 	display: grid;
 	grid-template-areas: 'heading' 'content';
 	grid-template-rows: auto 1fr;
 	order: var(--order);
 
-	&:global(.has-dismiss) .heading {
+	&.has-dismiss .heading {
 		padding-right: 1.6em;
 	}
 
-	& :global(*:is(p)) {
+	& p {
 		margin: 0;
 	}
 }

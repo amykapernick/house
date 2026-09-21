@@ -1,0 +1,15 @@
+.recipe {
+	margin: 0 0 1em;
+	font-weight: 600;
+}
+
+.field {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25em;
+	margin-bottom: 1em;
+}
+
+.error {
+	color: var(--red);
+}

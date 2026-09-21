@@ -1,9 +1,4 @@
-/* TODO: kept :global() rather than hashed - Task.svelte, HabitCheckItem.svelte,
-   ChoreItem.svelte, and AllergenCheckItem.svelte all reach in from outside via
-   :global(.checkbox) to grid-place this component's own root (see #641). A
-   fragile string contract; should become an explicit prop instead. */
-
-:global(.checkbox) {
+.checkbox {
 	padding: 0;
 	border: none;
 	background: none;

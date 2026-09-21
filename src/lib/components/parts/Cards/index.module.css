@@ -1,20 +1,9 @@
 .root {
-	display: flex;
-	flex-wrap: wrap;
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
 	gap: 0.5em;
-}
 
-@supports (grid-template-areas: '.') {
-	.root {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-		justify-content: stretch;
-		justify-items: stretch;
-	}
-}
-
-@media (width >= 50em) {
-	.root {
+	@media (width >= 50em) {
 		gap: 1em;
 	}
 }

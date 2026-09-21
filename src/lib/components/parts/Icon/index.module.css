@@ -1,8 +1,3 @@
-/* TODO: kept :global() rather than hashed - Vaccinations.svelte reaches in
-   from outside via :global(.icon) to grid-place this component's own root
-   (see #641). A fragile string contract; should become an explicit prop
-   instead. */
-
-:global(.icon) {
+.icon {
 	display: contents;
 }

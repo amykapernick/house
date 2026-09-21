@@ -9,7 +9,7 @@
 	import type { Habit } from '$types/habits';
 	import styles from './index.module.css';
 
-	let { id, name, due, recurrenceInterval, streak, completions, onComplete, class: className = '' }: Pick<Habit, 'id' | 'name' | 'due' | 'recurrenceInterval' | 'streak' | 'completions'> & { onComplete?: (id: string) => void; class?: string } = $props();
+	let { id, name, due, recurrenceInterval, streak, completions, onComplete, compact = false, class: className = '' }: Pick<Habit, 'id' | 'name' | 'due' | 'recurrenceInterval' | 'streak' | 'completions'> & { onComplete?: (id: string) => void; compact?: boolean; class?: string } = $props();
 
 	let saving = $state(false);
 	let actionError = $state('');
@@ -73,9 +73,12 @@
 	}
 </script>
 
-<div class="habit-check {className}">
+<div
+	class="{styles['habit-check']} {className}"
+	data-compact={compact || undefined}
+>
 	<CheckboxButton
-		class="checkbox"
+		class={styles.checkbox}
 		state={habitState()}
 		disabled={saving}
 		onclick={completeHabit}
