@@ -40,15 +40,12 @@
 	/>
 	<Chip
 		label="Nap Length"
-		// TODO: Format nap range better
-		value={`${sleep.current_pattern.nap_duration_range_min} - ${sleep.current_pattern.nap_duration_range_max}`}
+		value={`${sleep.current_pattern.nap_duration_range_min}–${sleep.current_pattern.nap_duration_range_max} min`}
 		info={sleep.current_pattern.naps_transition}
 	/>
 	<Chip
 		label="Total Daytime"
-		// TODO: get actual number from api
-		// value={sleep.current_pattern.naps}
-		info={sleep.current_pattern.total_daytime_sleep_approx}
+		value={sleep.current_pattern.total_daytime_sleep_approx}
 	/>
 	<Chip
 		label="Nap Cap"

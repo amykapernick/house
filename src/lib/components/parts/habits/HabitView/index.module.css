@@ -1,8 +1,6 @@
 @import '@mixins';
 
 .habit_view {
-
-	/* TODO: Fix overflow scrolling */
 	max-width: 100%;
 
 	& :global(.switcher) {
