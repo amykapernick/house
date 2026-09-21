@@ -1,0 +1,23 @@
+.event_content {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	width: 100%;
+	gap: 0.4ch;
+}
+
+.event_time {
+	font-weight: 700;
+}
+
+.platform {
+	display: inline-flex;
+	align-items: center;
+	margin-left: auto;
+	color: inherit;
+
+	& svg {
+		width: 1em;
+		height: 1em;
+	}
+}

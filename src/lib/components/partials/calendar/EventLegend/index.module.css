@@ -1,0 +1,32 @@
+.legend {
+	display: flex;
+	margin: 0;
+	padding: 0;
+	color: var(--text_secondary);
+	font-size: 0.9em;
+	list-style: none;
+	gap: 1.5em;
+
+	& li {
+		display: flex;
+		align-items: center;
+		gap: 0.5ch;
+
+		&::before {
+			content: '';
+			display: block;
+			width: 0.8em;
+			height: 0.8em;
+		}
+	}
+}
+
+.event::before {
+	border-radius: 100%;
+	background: var(--blue);
+}
+
+.task::before {
+	border: 1.5px dashed var(--purple_bright);
+	border-radius: 0.2em;
+}

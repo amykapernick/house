@@ -7,6 +7,7 @@
 	import TaskEventModal from '$partials/calendar/TaskEventModal/index.svelte';
 	import EventDetailModal from '$partials/calendar/EventDetailModal/index.svelte';
 	import FamilyFilter from '$parts/FamilyFilter/index.svelte';
+	import EventLegend from '$partials/calendar/EventLegend/index.svelte';
 	import Skeleton from '$parts/Skeleton/index.svelte';
 	import parseTasks from '$utils/calendar/parseTasks';
 	import parseEvents from '$utils/calendar/parseEvents';
@@ -362,6 +363,7 @@
 		pageKey="calendar"
 		class={styles.filter}
 	/>
+	<EventLegend class={styles.legend} />
 
 	{#if activeCustomView === 'year'}
 		<YearView

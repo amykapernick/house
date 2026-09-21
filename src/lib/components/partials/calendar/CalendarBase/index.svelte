@@ -126,8 +126,10 @@
 	// same defensive intent as the old eventDidMount merge.
 	function eventCss(ctx: { event: any }): string {
 		const base = eventColourClass(ctx.event.backgroundColor, ctx.event.textColor);
+		const type = ctx.event.extendedProps?.type;
+		const typeClass = type ? styles[`event-type-${type}`] : '';
 		const extra = optionsOverride.eventCss?.(ctx) ?? '';
-		return [base, extra].filter(Boolean).join(' ');
+		return [base, typeClass, extra].filter(Boolean).join(' ');
 	}
 </script>
 

@@ -3,6 +3,7 @@
 	import type { Task } from '$types/tasks';
 	import NotionIcon from '$img/icons/notion.svg?component';
 	import TodoistIcon from '$img/icons/todoist.svg?component';
+	import styles from './EventContent.module.css';
 
 	// eventContent is a component reference SVAR mounts itself (passing only
 	// {event, mode}) - it can't be handed extra props per-caller the way
@@ -22,14 +23,14 @@
 	let PlatformIcon = $derived(extendedProps.platform ? platformIcons[extendedProps.platform] : undefined);
 </script>
 
-<span class="event_content {extendedProps.type ?? ''}">
-	{#if timeLabel}<span class="event_time">{timeLabel}</span>{/if}
-	{#if extendedProps.type === 'meal'}🍽{/if}
+<span class={styles.event_content}>
+	{#if timeLabel}<span class={styles.event_time}>{timeLabel}</span>{/if}
+	{#if extendedProps.type === 'task'}☐{:else if extendedProps.type === 'meal'}🍽{/if}
 	{event.text}
 	{#if extendedProps.type === 'task' && extendedProps.link && PlatformIcon}
 		<!-- eslint-disable svelte/no-navigation-without-resolve -- link is the external Notion/Todoist task page, not an internal route -->
 		<a
-			class="platform"
+			class={styles.platform}
 			href={extendedProps.link}
 			target="_blank"
 			rel="noreferrer"

@@ -134,7 +134,22 @@
 		--wx-calendar-controls-font-color: var(--text_primary);
 		--wx-calendar-grid-color: var(--border);
 		--wx-calendar-weekend-background: var(--card_bottom);
-
-		
 	}
+
+	& :global(.wx-x-header-cell) {
+		background: var(--purple_solid_flat);
+		color: var(--white);
+		font-weight: 700;
+		letter-spacing: 0.05em;
+		text-transform: uppercase;
+	}
+}
+
+/* Applied via CalendarBase's eventCss (see index.svelte) alongside the
+   colour class from eventColourClass.ts - task events keep their assigned
+   colour fill but get a dashed border so they read as "not yet done"
+   distinct from plain calendar events. */
+
+.event-type-task {
+	border: 2px dashed currentColor;
 }

@@ -21,22 +21,40 @@
 
 		& .wx-toolbar {
 			display: grid;
-			grid-column: span 2;
+			grid-column: span 3;
 			grid-template-columns: subgrid;
+			grid-template-rows: 1fr;
+		}
+
+		/* Only nav/today/modes render a real control - the date label is
+		   redundant with the page's own <h1> (hidden below) and the two
+		   spacer items exist for the library's default flex toolbar, not
+		   this grid. All three are pulled out of grid flow entirely so
+		   they can't wrap the real controls onto implicit extra rows. */
+
+		& .wx-spacer,
+		& *[data-id=":title"] {
+			display: none;
 		}
 
 		& *[data-id=":modes"] {
+			grid-column: 1;
+			grid-row: 1;
+		}
+
+		& *[data-id=":nav"] {
 			grid-column: 2;
+			grid-row: 1;
+		}
+
+		& *[data-id=":today"] {
+			grid-column: 3;
+			grid-row: 1;
 		}
 	}
 
 	& .wx-calendar-main {
 		grid-column: 1 / -1;
 		grid-row: 3 / 4;
-	}
-
-	& .wx-date-label {
-
-		@include sr_only;
 	}
 }
