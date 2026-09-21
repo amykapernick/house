@@ -547,12 +547,22 @@
 			justify-self: end;
 		}
 
-		/* TODO: Style all select fields */
+		/* Matches the scale-multiplier pill controls above (border/radius/colour) so
+		   both rows read as one family of compact controls, not a styled row next
+		   to a bare native dropdown. */
+
 		& select {
 			grid-column: unset;
 			grid-row: 2;
 			width: max-content;
 			margin: 0;
+			padding: 0.3em 1.6em 0.3em 0.6em;
+			border: 1px solid var(--purple_bright);
+			border-radius: 0.7em;
+			background: var(--transparent);
+			color: var(--purple_bright);
+			font-size: inherit;
+			font-weight: 700;
 		}
 	}
 

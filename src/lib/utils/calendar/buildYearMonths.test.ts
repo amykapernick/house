@@ -89,9 +89,16 @@ describe(`buildYearMonths`, () => {
 		const [, , , , , june, july] = buildYearMonths(2026, events);
 
 		expect(june.events).toHaveLength(1);
-		expect(june.events[0]).toMatchObject({ id: `1`, offset: 27, span: 3 });
+		expect(june.events[0]).toMatchObject({ id: `1`, offset: 27, span: 3, continuing: false, continues: true });
 
 		expect(july.events).toHaveLength(1);
-		expect(july.events[0]).toMatchObject({ id: `1`, offset: 0, span: 2 });
+		expect(july.events[0]).toMatchObject({ id: `1`, offset: 0, span: 2, continuing: true, continues: false });
+	});
+
+	it(`flags a same-month event as neither continuing nor continuing further`, () => {
+		const events: YearViewEventInput[] = [{ id: `1`, title: `Birthday`, start: new Date(2026, 6, 10), end: new Date(2026, 6, 10), allDay: true }];
+		const [, , , , , , july] = buildYearMonths(2026, events);
+
+		expect(july.events[0]).toMatchObject({ continuing: false, continues: false });
 	});
 });

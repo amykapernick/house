@@ -142,10 +142,9 @@
 				{#each month.events as event (event.id + month.index)}
 					<button
 						type="button"
-						class={styles.event}
+						class={[styles.event, event.continues && styles.continues, event.continuing && styles.continuing]}
 						style={`--col-start: ${event.offset + 1}; --col-end: span ${event.span}; --event_background: ${event.backgroundColor}; --event_colour: ${event.textColor}`}
 						onclick={() => onEventClick?.(event)}
-						// TODO: add class of continues if the event continues into the next month, and continuing if it started in the previous month
 					>
 						{event.title}
 					</button>

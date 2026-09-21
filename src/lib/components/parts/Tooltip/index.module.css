@@ -13,10 +13,11 @@
 	bottom: 100%;
 	left: 50%;
 
-	/* TODO: Fix overflowing tooltip */
-
-	/* width: 40vw; */
-	max-width: 300px;
+	/* Clamped against the viewport rather than a flat max-width so the tooltip
+	   can't overflow off-screen for a trigger sitting near the left/right edge -
+	   translateX(-50%) centres it on the trigger, so the available room on
+	   either side is only ever half the viewport width. */
+	max-width: min(300px, calc(50vw - 1em));
 	margin-bottom: 0.3em;
 	padding: 0.2em 0.6em;
 	transform: translateX(-50%);
@@ -27,8 +28,6 @@
 	color: var(--white);
 	font-size: 0.75em;
 	font-weight: 400;
-
-	/* white-space: nowrap; */
 	pointer-events: none;
 }
 

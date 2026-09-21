@@ -18,6 +18,8 @@ export type YearViewEventInput = {
 export type YearViewEvent = YearViewEventInput & {
 	offset: number; // Offset from the start of the month in days (0 = the 1st)
 	span: number; // Number of days this event covers within the month
+	continuing: boolean; // Started in a previous month - this segment is clipped at its start
+	continues: boolean; // Continues into the next month - this segment is clipped at its end
 };
 
 export type YearDayCell = {
@@ -77,6 +79,8 @@ export function buildYearMonths(year: number, events: YearViewEventInput[], toda
 					...event,
 					offset: differenceInCalendarDays(segmentStart, monthStart),
 					span: differenceInCalendarDays(segmentEnd, segmentStart),
+					continuing: isBefore(event.start, monthStart),
+					continues: isBefore(monthEndExclusive, effectiveEnd(event)),
 				},
 			];
 		});
