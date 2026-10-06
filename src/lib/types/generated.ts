@@ -778,6 +778,7 @@ export type Mutation = {
 	updateMilestoneStatus: Maybe<Milestone>;
 	updateSwimSkillStatus: Maybe<SwimSkill>;
 	updateTaskStatus: Maybe<CompleteTaskResult>;
+	updateVaccinationStatus: Maybe<VaccinationItem>;
 };
 
 
@@ -1041,6 +1042,12 @@ export type MutationUpdateSwimSkillStatusArgs = {
 export type MutationUpdateTaskStatusArgs = {
 	status: Scalars[`String`][`input`];
 	taskId: Scalars[`String`][`input`];
+};
+
+
+export type MutationUpdateVaccinationStatusArgs = {
+	id: Scalars[`ID`][`input`];
+	status: VaccinationStatus;
 };
 
 export type NightForecast = {
@@ -1621,6 +1628,7 @@ export type Task = {
 	status: Maybe<Scalars[`String`][`output`]>;
 	subtasks: Maybe<Array<Maybe<Task>>>;
 	tags: Maybe<Array<Maybe<Scalars[`String`][`output`]>>>;
+	updatedAt: Maybe<Scalars[`String`][`output`]>;
 	uuid: Maybe<Scalars[`String`][`output`]>;
 };
 
