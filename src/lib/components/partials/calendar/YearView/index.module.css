@@ -64,6 +64,10 @@
 .day {
 	grid-row: 1;
 	text-align: right;
+
+	&.weekend {
+		background: var(--card_bottom);
+	}
 }
 
 .event {

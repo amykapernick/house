@@ -25,6 +25,7 @@ export type YearViewEvent = YearViewEventInput & {
 export type YearDayCell = {
 	date: Date;
 	isToday: boolean;
+	isWeekend: boolean;
 };
 
 export type YearMonth = {
@@ -63,6 +64,7 @@ export function buildYearMonths(year: number, events: YearViewEventInput[], toda
 		const days: YearDayCell[] = eachDayOfInterval({ start: monthStart, end: monthEnd }).map((date) => ({
 			date,
 			isToday: isSameDay(date, today),
+			isWeekend: getDay(date) === 0 || getDay(date) === 6,
 		}));
 
 		// Events only render at month level (one bar per month, spanning the days

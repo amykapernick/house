@@ -1,60 +1,51 @@
+/* Every level from .container (CalendarBase/index.module.css) down to the
+   actual Sections/ScrollableSection renderer needs an unbroken chain of
+   definite heights for percentage-height children (.wx-sections: height:
+   100%, etc) to resolve to anything but 0 - Month and Resources rendering
+   0px-tall content traced back to .wx-calendar-main still being SVAR's own
+   flex:1 (meaningless once its parent, .wx-calendar, was made a grid
+   container below) with no definite height of its own. Explicit 1fr row
+   tracks (not just relying on implicit-row stretch, which is what this
+   used to lean on) plus height: 100% at every level closes that gap, and
+   converting .wx-calendar-main's own layout from flex to grid keeps the
+   whole chain in one sizing model instead of flex fighting grid. */
+
 .wx-theme {
 	display: grid;
 	grid-column: 1 / -1;
-	grid-row: 1 / 4;
 	grid-template-columns: subgrid;
-	grid-template-rows: subgrid;
+	grid-template-rows: 1fr;
+	height: 100%;
 
 	& .wx-calendar.wx-calendar {
 		display: grid;
 		grid-column: 1 / -1;
-		grid-row: 1 / 4;
 		grid-template-columns: subgrid;
-		grid-template-rows: subgrid;
-	}
+		grid-template-rows: 1fr;
+		height: 100%;
 
-	& .wx-navigation {
-		display: grid;
-		grid-column: 2 / -1;
-		grid-row: 1;
-		grid-template-columns: subgrid;
+		/* toolbar is disabled (see optionsOverride.toolbar) everywhere this
+		   app uses CalendarBase - the page/dashboard widget around it owns
+		   nav controls instead - so this is always .wx-calendar's only
+		   child and just needs to span the full subgrid width rather than
+		   sitting in the single first column auto-placement would
+		   otherwise give it. */
 
-		& .wx-toolbar {
+		& .wx-calendar-main.wx-calendar-main {
 			display: grid;
-			grid-column: span 3;
-			grid-template-columns: subgrid;
+			grid-column: 1 / -1;
 			grid-template-rows: 1fr;
+			height: 100%;
+
+			/* Month specifically (ScrollableSection, not Sections - week/day/
+			   resources) sizes itself with flex: 1 rather than a percentage
+			   height, which is exactly what's meaningless once its parent
+			   above stopped being a flex container. */
+
+			& .wx-scrollable-section {
+				height: 100%;
+				min-height: 0;
+			}
 		}
-
-		/* Only nav/today/modes render a real control - the date label is
-		   redundant with the page's own <h1> (hidden below) and the two
-		   spacer items exist for the library's default flex toolbar, not
-		   this grid. All three are pulled out of grid flow entirely so
-		   they can't wrap the real controls onto implicit extra rows. */
-
-		& .wx-spacer,
-		& *[data-id=":title"] {
-			display: none;
-		}
-
-		& *[data-id=":modes"] {
-			grid-column: 1;
-			grid-row: 1;
-		}
-
-		& *[data-id=":nav"] {
-			grid-column: 2;
-			grid-row: 1;
-		}
-
-		& *[data-id=":today"] {
-			grid-column: 3;
-			grid-row: 1;
-		}
-	}
-
-	& .wx-calendar-main {
-		grid-column: 1 / -1;
-		grid-row: 3 / 4;
 	}
 }

@@ -10,6 +10,13 @@
 	font-weight: 700;
 }
 
+.swatch {
+	flex-shrink: 0;
+	width: 0.8em;
+	height: 0.8em;
+	border-radius: 100%;
+}
+
 .platform {
 	display: inline-flex;
 	align-items: center;

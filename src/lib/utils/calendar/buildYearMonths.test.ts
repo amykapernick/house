@@ -37,6 +37,14 @@ describe(`buildYearMonths`, () => {
 		expect(july.days.filter((day) => day.isToday)).toHaveLength(1);
 	});
 
+	it(`flags Saturday and Sunday cells as weekends, no others`, () => {
+		const [, , , , , , july] = buildYearMonths(2026, []);
+
+		// 4 July 2026 is a Saturday, 5th a Sunday.
+		const weekendDates = july.days.filter((day) => day.isWeekend).map((day) => day.date.getDate());
+		expect(weekendDates).toEqual([4, 5, 11, 12, 18, 19, 25, 26]);
+	});
+
 	it(`only places all-day events, not timed ones`, () => {
 		const events: YearViewEventInput[] = [
 			{ id: `1`, title: `All day`, start: new Date(2026, 6, 10), end: new Date(2026, 6, 10), allDay: true },

@@ -1,11 +1,12 @@
 .layout {
 	display: grid;
 	grid-template-areas:
-		'title views nav controls'
-		'filter legend legend legend'
-		'cal cal cal cal';
-	grid-template-columns: 1fr auto auto auto;
+		'title views controls'
+		'filter legend legend'
+		'cal cal cal';
+	grid-template-columns: 1fr auto auto;
 	grid-template-rows: auto auto 1fr;
+	align-items: center;
 }
 
 .filter {
@@ -17,8 +18,63 @@
 	justify-self: end;
 }
 
+.viewToggle {
+	grid-area: views;
+}
+
+.controls {
+	display: flex;
+	grid-area: controls;
+	gap: 0.5em;
+}
+
 .calendar {
 	grid-area: cal;
+	align-self: stretch;
+}
+
+/* Caps the week/day time grid to an 18-hour (5am-11pm) window instead of
+   stretching to fill the page's full 1fr height - the rest of the day is
+   still reachable by scrolling (see HOUR_PX/timedSectionOverrides in
+   +page.svelte, which the 54em below must stay in sync with: 18 * 3em). */
+
+.timedView :global(.wx-sections) {
+	max-height: 54em;
+}
+
+.calendar :global(.wx-sections) {
+	border: 1px solid var(--border);
+	border-radius: 0.7em;
+	box-shadow: var(--shadow_card);
+}
+
+/* .wx-section-sticky.wx-section-sticky (repeated): outranks SVAR's own
+   equal-specificity rule for the same property without !important (see the
+   header-cell override in CalendarBase/index.module.css for the same
+   trick) - matched to the page background rather than wx-theme's own
+   --wx-background (transparent) so the sticky all-day/header row doesn't
+   show a mismatched fill while the grid scrolls behind it. */
+
+.calendar :global(.wx-section-sticky.wx-section-sticky) {
+	background: var(--page_bg);
+}
+
+/* Highlights today's column in the week view's day header. SVAR doesn't mark
+   today's header cell itself (only month view's grid cells get a `today`
+   flag/class - see GridSection.svelte) so this is driven from the JS side:
+   +page.svelte computes which of the 7 columns is today (todayHeaderCol) and
+   applies one of these 7 static classes - nth-child can't take a variable,
+   so a dynamic index can't be expressed as a single rule. */
+
+.calendar.today-col-1 :global(.wx-x-header-cell:nth-child(1)),
+.calendar.today-col-2 :global(.wx-x-header-cell:nth-child(2)),
+.calendar.today-col-3 :global(.wx-x-header-cell:nth-child(3)),
+.calendar.today-col-4 :global(.wx-x-header-cell:nth-child(4)),
+.calendar.today-col-5 :global(.wx-x-header-cell:nth-child(5)),
+.calendar.today-col-6 :global(.wx-x-header-cell:nth-child(6)),
+.calendar.today-col-7 :global(.wx-x-header-cell:nth-child(7)) {
+	background: color-mix(in oklch, var(--page_bg) 82%, var(--black) 18%);
+	color: var(--navy);
 }
 
 .loading {

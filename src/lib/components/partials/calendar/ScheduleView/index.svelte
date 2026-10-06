@@ -118,6 +118,14 @@
 		return days;
 	}
 
+	// Routine/schedule blocks render slightly transparent so they read as a
+	// backdrop behind the day rather than competing with actual events for
+	// attention - events (tasks, calendar items) stay at full opacity.
+	function blockBackgroundColour(colour: string | null): string {
+		const solid = colour ? (colour.startsWith('#') ? colour : `var(--${colour})`) : 'var(--purple_bright)';
+		return `color-mix(in srgb, ${solid} 70%, transparent)`;
+	}
+
 	let calendarEvents = $derived.by(() => {
 		const blockEvents = editableBlocks.map((block) => ({
 			id: block.id,
@@ -126,7 +134,7 @@
 			end: new Date(block.end),
 			allDay: false,
 			editable: true,
-			backgroundColor: block.colour ? (block.colour.startsWith('#') ? block.colour : `var(--${block.colour})`) : 'var(--purple_bright)',
+			backgroundColor: blockBackgroundColour(block.colour),
 			textColor: textColourFor(block.colour),
 			classNames: block.isOverride ? ['schedule-override'] : [],
 			extendedProps: { type: 'block', link: undefined, status: undefined, platform: undefined },

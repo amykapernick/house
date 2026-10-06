@@ -14,7 +14,6 @@
 		title = $bindable(''),
 		onRangeChange,
 		onEventClick,
-		onBack,
 		class: className = '',
 	}: {
 		tasks: Task[];
@@ -23,7 +22,6 @@
 		title?: string;
 		onRangeChange?: (start: Date, end: Date) => void;
 		onEventClick?: (event: YearViewEvent) => void;
-		onBack?: () => void;
 		class?: string;
 	} = $props();
 
@@ -71,41 +69,9 @@
 		const yearStart = startOfYear(new Date(year, 0, 1));
 		onRangeChange?.(yearStart, endOfYear(yearStart));
 	});
-
-	function prevYear() {
-		year -= 1;
-	}
-
-	function nextYear() {
-		year += 1;
-	}
-
-	function goToday() {
-		year = new Date().getFullYear();
-	}
 </script>
 
 <div class="{styles.year_view} {className}">
-	<div class="year-toolbar">
-		<button
-			type="button"
-			onclick={prevYear}
-			aria-label="Previous year">Previous</button
-		>
-		<button
-			type="button"
-			onclick={goToday}>Today</button
-		>
-		<button
-			type="button"
-			onclick={nextYear}
-			aria-label="Next year">Next</button
-		>
-		<button
-			type="button"
-			onclick={onBack}>Back to Calendar</button
-		>
-	</div>
 	<div
 		class={styles.year}
 		style={`--cols: ${headerDayColumns}`}
@@ -132,7 +98,7 @@
 			>
 				{#each month.days as day (day.date.getTime())}
 					<div
-						class={[styles.day, day.isToday && 'today']}
+						class={[styles.day, day.isToday && 'today', day.isWeekend && styles.weekend]}
 						style={`--col-start: ${day.date.getDate()}`}
 					>
 						<span>{format(day.date, DATE_FORMATS.dayNumber)}</span>

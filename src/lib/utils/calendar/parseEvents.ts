@@ -4,8 +4,20 @@ import type { Event } from '$types/calendar';
 type ParsedEvent = Extract<Event, { type: `event` }>;
 
 const parseEvents = (events: any[]): ParsedEvent[] => {
+	// Recurring ICS events have occasionally come through with the same id
+	// twice for one occurrence (seen with an overridden instance also
+	// matching its recurrence rule) - Svelte's keyed each block throws hard
+	// on a duplicate key, which was taking down the whole calendar's event
+	// rendering, so duplicates are dropped defensively here rather than
+	// trusting the source data to be unique.
+	const seenIds = new Set<string>();
 	const formattedEvents: ParsedEvent[] = events
 		.filter((event) => event.dates)
+		.filter((event) => {
+			if (seenIds.has(event.id)) return false;
+			seenIds.add(event.id);
+			return true;
+		})
 		.map((event) => ({
 			id: event.id,
 			title: event.name,

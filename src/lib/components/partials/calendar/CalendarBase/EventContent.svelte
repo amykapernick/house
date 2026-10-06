@@ -14,8 +14,17 @@
 
 	let {
 		event,
+		mode,
 	}: {
-		event: { start: Date; end: Date; allDay?: boolean; text?: string; extendedProps?: Record<string, unknown> };
+		event: { start: Date; end: Date; allDay?: boolean; text?: string; backgroundColor?: string; extendedProps?: Record<string, unknown> };
+		// SVAR passes this so the same eventContent component can adapt to
+		// each render mode. Only checked here for "list" (Agenda) - list is
+		// the one mode CalendarBase's own eventCss (see index.svelte) never
+		// reaches, since ListSection.svelte wraps this component directly
+		// without ever attaching that class to a wx-box/bar-event ancestor -
+		// a plain swatch here is the only way Agenda rows get any colour at
+		// all.
+		mode?: string;
 	} = $props();
 
 	let extendedProps = $derived((event.extendedProps ?? {}) as { type?: string; link?: string; platform?: Task['platform'] });
@@ -24,6 +33,10 @@
 </script>
 
 <span class={styles.event_content}>
+	{#if mode === 'list'}<span
+			class={styles.swatch}
+			style="background:{event.backgroundColor}"
+		></span>{/if}
 	{#if timeLabel}<span class={styles.event_time}>{timeLabel}</span>{/if}
 	{#if extendedProps.type === 'task'}☐{:else if extendedProps.type === 'meal'}🍽{/if}
 	{event.text}

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { addDays, endOfWeek, format, startOfWeek } from 'date-fns';
+	import { addHours, startOfDay, format } from 'date-fns';
 	import parseTasks from '$utils/calendar/parseTasks';
 	import parseEvents from '$utils/calendar/parseEvents';
 	import formatCalendarTitle from '$utils/calendar/formatCalendarTitle';
@@ -7,15 +7,13 @@
 	import type { Task } from '$types/tasks';
 	import styles from './index.module.css';
 
-	// One row per family member, time running horizontally across a week -
-	// day-granularity bars (not an hour-level Gantt), the same simplification
-	// tradeoff @svar-ui/svelte-calendar's free tier's scale primitives forced
-	// (see CalendarBase/resourcesView.ts's comment) but chosen deliberately
-	// here too since it reuses YearView's proven CSS-grid bar layout instead
-	// of a bespoke pixel-based one. Referenced @event-calendar/core's
-	// resource-timeline plugin (node_modules) for the overall row/bar shape,
-	// not its layout code, which solves a harder (hour-level, overlap-stacking)
-	// problem than this needs.
+	// One row per family member, a single day's 24 hours running horizontally -
+	// events snap to whole-hour columns (Math.floor/ceil below), not true
+	// minute-level positioning, the same discrete-grid-column simplification
+	// YearView's day bars use, just at hour rather than day granularity.
+	// Referenced @event-calendar/core's resource-timeline plugin (node_modules)
+	// for the overall row/bar shape, not its layout code, which solves a
+	// harder (overlap-stacking) problem than this needs.
 	type Resource = { id: string; title: string; colour?: string; textColour?: string };
 	type TimelineEvent = {
 		id: string;
@@ -32,27 +30,25 @@
 		tasks = [],
 		events = [],
 		resources = [],
-		weekStart = $bindable(startOfWeek(new Date(), { weekStartsOn: 1 })),
+		date = $bindable(startOfDay(new Date())),
 		title = $bindable(''),
 		onRangeChange,
 		onEventClick,
-		onBack,
 		class: className = '',
 	}: {
 		tasks: Task[];
 		events: any[];
 		resources: Resource[];
-		weekStart?: Date;
+		date?: Date;
 		title?: string;
 		onRangeChange?: (start: Date, end: Date) => void;
 		onEventClick?: (event: { id: string; title: string; start: Date; end: Date; extendedProps?: Record<string, unknown> }) => void;
-		onBack?: () => void;
 		class?: string;
 	} = $props();
 
-	let weekEnd = $derived(endOfWeek(weekStart, { weekStartsOn: 1 }));
-	let weekEndExclusive = $derived(addDays(weekEnd, 1));
-	let days = $derived(Array.from({ length: 7 }, (_, i) => addDays(weekStart, i)));
+	let dayStart = $derived(startOfDay(date));
+	let dayEnd = $derived(addHours(dayStart, 24));
+	let hours = $derived(Array.from({ length: 24 }, (_, i) => addHours(dayStart, i)));
 
 	let timelineEvents = $derived.by((): TimelineEvent[] => {
 		const mapped = [...parseTasks(tasks), ...parseEvents(events)]
@@ -80,66 +76,34 @@
 
 	function rowEvents(resourceId: string) {
 		return timelineEvents
-			.filter((event) => event.resourceIds.includes(resourceId) && event.end > weekStart && event.start < weekEndExclusive)
+			.filter((event) => event.resourceIds.includes(resourceId) && event.end > dayStart && event.start < dayEnd)
 			.map((event) => {
-				const clampedStart = event.start < weekStart ? weekStart : event.start;
-				const clampedEnd = event.end > weekEndExclusive ? weekEndExclusive : event.end;
-				const offset = Math.floor((clampedStart.getTime() - weekStart.getTime()) / 86_400_000);
-				const span = Math.max(1, Math.ceil((clampedEnd.getTime() - clampedStart.getTime()) / 86_400_000));
+				const clampedStart = event.start < dayStart ? dayStart : event.start;
+				const clampedEnd = event.end > dayEnd ? dayEnd : event.end;
+				const offset = Math.floor((clampedStart.getTime() - dayStart.getTime()) / 3_600_000);
+				const span = Math.max(1, Math.ceil((clampedEnd.getTime() - clampedStart.getTime()) / 3_600_000));
 				return { ...event, offset, span };
 			});
 	}
 
 	$effect(() => {
-		title = formatCalendarTitle(weekStart, weekEnd);
-		onRangeChange?.(weekStart, weekEnd);
+		title = formatCalendarTitle(date, date);
+		onRangeChange?.(dayStart, dayEnd);
 	});
-
-	function prevWeek() {
-		weekStart = addDays(weekStart, -7);
-	}
-
-	function nextWeek() {
-		weekStart = addDays(weekStart, 7);
-	}
-
-	function goToday() {
-		weekStart = startOfWeek(new Date(), { weekStartsOn: 1 });
-	}
 </script>
 
 <div class="{styles.timeline_view} {className}">
-	<div class="timeline-toolbar">
-		<button
-			type="button"
-			onclick={prevWeek}
-			aria-label="Previous week">Previous</button
-		>
-		<button
-			type="button"
-			onclick={goToday}>Today</button
-		>
-		<button
-			type="button"
-			onclick={nextWeek}
-			aria-label="Next week">Next</button
-		>
-		<button
-			type="button"
-			onclick={onBack}>Back to Calendar</button
-		>
-	</div>
 	<div
 		class={styles.timeline}
-		style={`--cols: ${days.length}`}
+		style={`--cols: ${hours.length}`}
 	>
 		<span class={styles.corner}></span>
-		{#each days as day, columnIndex (day.getTime())}
+		{#each hours as hour, columnIndex (hour.getTime())}
 			<span
 				class={styles.day_header}
 				style={`--col-start: ${columnIndex + 2}`}
 			>
-				{format(day, DATE_FORMATS.weekdayShort)} {format(day, DATE_FORMATS.dayNumber)}
+				{format(hour, DATE_FORMATS.hour)}
 			</span>
 		{/each}
 

@@ -3,9 +3,9 @@
 .container {
 	display: grid;
 	grid-column: 1 / -1;
-	grid-row: 1 / 4;
+	grid-row: 3 / 4;
 	grid-template-columns: subgrid;
-	grid-template-rows: subgrid;
+	grid-template-rows: 1fr;
 
 	& :global(.wx-theme) {
 		--wx-background: var(--transparent);
@@ -69,21 +69,25 @@
 		/* label */
 		--wx-label-font-color: var(--text_primary);
 
-		/* button */
+		/* button - secondary/outline treatment (matches @mixins' button_secondary)
+		   since these are dashboard-adjacent controls (nav/today/view toggle),
+		   not primary calls to action */
 		--wx-button-font-family: $font_heading;
-		--wx-button-font-color: var(--text_primary);
+		--wx-button-font-color: var(--purple_bright);
 		--wx-button-danger-font-color: var(--error_text);
-		--wx-button-background: var(--card_bottom);
-		--wx-button-border: 1px solid var(--transparent);
+		--wx-button-background: var(--transparent);
+		--wx-button-border: 1px solid var(--purple_bright);
 		--wx-button-border-radius: 0.7em;
-		--wx-button-pressed: var(--row_hover);
+		--wx-button-pressed: color-mix(in oklch, var(--purple_bright) 16%, var(--transparent));
 		--wx-button-danger-pressed: var(--error);
 		--wx-button-primary-pressed: color-mix(in oklch, var(--purple_bright) 80%, var(--black));
 
 		/* segmented */
 		--wx-segmented-background: var(--card_bottom);
 		--wx-segmented-background-hover: var(--row_hover);
+		--wx-segmented-border: 1px solid var(--border);
 		--wx-segmented-border-radius: 0.7em;
+		--wx-segmented-padding: 0.25em;
 
 		/* tabs */
 		--wx-tabs-hover-border: var(--text_secondary);
@@ -136,12 +140,52 @@
 		--wx-calendar-weekend-background: var(--card_bottom);
 	}
 
-	& :global(.wx-x-header-cell) {
-		background: var(--purple_solid_flat);
-		color: var(--white);
+	/* .wx-x-header-cell.wx-x-header-cell (repeated): SVAR's own component
+	   styles carry an equal-specificity Svelte scoping class on this
+	   selector, so a single-class override here is a coin-flip on cascade
+	   order - the doubled class outranks it without needing !important
+	   (blocked by declaration-no-important). Week view's label is two lines
+	   (day name, then bare day-of-month number - see the '%D\n%j' xScale
+	   format override in +page.svelte's sectionOverrides); month view's is
+	   just the day name. white-space: pre-line renders that \n as a real
+	   line break, and ::first-line - which, for a single-line month-view
+	   label, is the *whole* label - gets the subtitle eyebrow treatment,
+	   leaving any second (week-view) line at the cell's own h2-equivalent
+	   size/weight for the date number.
+	   display: block (not flex/table-cell): SVAR's own .wx-x-header-cell is
+	   position: absolute, and an absolutely-positioned element is always
+	   blockified - flex/grid survive that as block-level flex/grid
+	   containers, but table-cell has no such equivalent and collapses to
+	   plain block anyway, so table-cell's vertical-align never actually
+	   applied. flex would have kept working for centring, but ::first-line
+	   is spec'd to not apply to flex/grid containers at all (that's why the
+	   subtitle styling below wasn't rendering) - block is the only display
+	   value here where both text-align centring and ::first-line work
+	   together, so vertical centring falls to generous symmetric padding
+	   instead of vertical-align. The taller row height below is needed
+	   because .wx-x-header-cell is height: 100% of .wx-x-header-row, which
+	   SVAR hardcodes to a single-line 32px otherwise - too short for two
+	   lines plus this padding. */
+
+	& :global(.wx-x-header-row.wx-x-header-row) {
+		height: 4.5em;
+	}
+
+	& :global(.wx-x-header-cell.wx-x-header-cell) {
+		display: block;
+		padding: 1em 0.5em;
+		background: var(--page_bg);
+		color: var(--text_primary);
+		font-family: $font_heading;
+		font-size: 1.3em;
 		font-weight: 700;
-		letter-spacing: 0.05em;
-		text-transform: uppercase;
+		text-align: center;
+		white-space: pre-line;
+
+		&::first-line {
+
+			@include subtitle;
+		}
 	}
 }
 

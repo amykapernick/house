@@ -71,6 +71,17 @@ describe(`parseEvents`, () => {
 		}
 	});
 
+	it(`drops later events sharing an id with one already seen (recurring ICS events have come through duplicated)`, () => {
+		const events = [
+			{ id: `amy_makerx:2026-09-22T08:00:00+08:00:Team Standup`, name: `Team Standup`, dates: { start: `2026-09-22T08:00:00` } },
+			{ id: `amy_makerx:2026-09-22T08:00:00+08:00:Team Standup`, name: `Team Standup`, dates: { start: `2026-09-22T08:00:00` } },
+			{ id: `2`, name: `Dentist`, dates: { start: `2026-07-09` } },
+		];
+
+		expect(parseEvents(events)).toHaveLength(2);
+		expect(parseEvents(events).map((event) => event.id)).toEqual([`amy_makerx:2026-09-22T08:00:00+08:00:Team Standup`, `2`]);
+	});
+
 	it(`carries platform through so Notion-sourced events can be told apart from calendar-sourced ones`, () => {
 		const [notionEvent, calendarEvent] = parseEvents([
 			{ id: `1`, name: `Conference`, dates: { start: `2026-07-09` }, platform: `notion` },

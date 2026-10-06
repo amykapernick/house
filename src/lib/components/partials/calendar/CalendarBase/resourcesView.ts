@@ -1,4 +1,4 @@
-import { ViewModel, registerCalendarView, type Section } from '@svar-ui/calendar-store';
+import { ViewModel, registerCalendarView, isMultiDay, type Section } from '@svar-ui/calendar-store';
 
 // One column per family member, time running vertically - same axis as the
 // built-in Day view, just with the day's single implicit column split into
@@ -22,6 +22,29 @@ import { ViewModel, registerCalendarView, type Section } from '@svar-ui/calendar
 export class ResourcesViewModel extends ViewModel {
 	getSections(): Section[] {
 		return [
+			// Mirrors WeekViewModel/DayViewModel's own multiday+timeGrid split
+			// (see @svar-ui/calendar-store) - all-day events get their own bar
+			// row above the hourly grid instead of being squeezed into a sliver
+			// of an hour, still organised into the same per-resource columns
+			// (xScale.items, injected the same way as the timeGrid section
+			// below - see CalendarBase's svarViews).
+			{
+				name: `multiday`,
+				mode: `bars`,
+				xScale: {
+					type: `unit`,
+					items: [{ id: `_none`, label: `` }],
+					accessor: `resourceId`,
+				},
+				yScale: {
+					type: `unit`,
+					items: [{ id: `all`, label: `` }],
+					accessor: `_`,
+					visible: false,
+				},
+				filter: (event) => isMultiDay(event),
+				size: `content-optional`,
+			},
 			{
 				name: `resources`,
 				mode: `boxes`,
@@ -38,6 +61,7 @@ export class ResourcesViewModel extends ViewModel {
 					snapStep: 15,
 					format: `timeScaleFormat`,
 				},
+				filter: (event) => !isMultiDay(event),
 				size: 1,
 			},
 		];
