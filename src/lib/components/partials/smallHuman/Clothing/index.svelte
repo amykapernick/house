@@ -2,7 +2,7 @@
 	import { format, parseISO } from 'date-fns';
 	import { DATE_FORMATS } from '$lib/utils/dateFormats';
 	import type { ClothingSeasonal, ClothingDaytime, ClothingSet } from '$types/smallHuman';
-	import type { Weather as WeatherData, SunTimes } from '$types/generated';
+	import type { House } from '$types/generated';
 	import DebugJson from '$parts/DebugJson/index.svelte';
 	import Card from '$components/parts/Card/index.svelte';
 	import Cards from '$components/parts/Cards/index.svelte';
@@ -18,14 +18,17 @@
 		class: className = '',
 	}: {
 		clothing: { seasonal: ClothingSeasonal; daytime: ClothingDaytime };
-		weather?: WeatherData | null;
-		sun?: SunTimes | null;
+		weather?: House | null;
 		class?: string;
 	} = $props();
 
 	const { seasonal, daytime } = $derived(clothing);
 
-	const { weather, sun } = $derived(weatherData);
+	// weatherData (the `house` query field) null-propagates to null whenever any
+	// of its resolvers errors (e.g. a Home Assistant/weather API hiccup) - falling
+	// back to {} here keeps weather/sun undefined rather than throwing, since the
+	// rest of this component already reads both with optional chaining.
+	const { weather, sun } = $derived(weatherData ?? ({} as Partial<House>));
 
 	const formatWeeksCountdown = (weeks) => {
 		const suffix = weeks > 1 ? 'weeks' : 'week';

@@ -15,6 +15,9 @@
 
 	const sortedMilestones = $derived(
 		[...milestones.items].sort((a, b) => {
+			if (a.status === 'done' && b.status !== 'done') return 1;
+			if (a.status !== 'done' && b.status === 'done') return -1;
+
 			const aWeek = a.expected_weeks?.[0] ?? Infinity;
 			const bWeek = b.expected_weeks?.[0] ?? Infinity;
 			return aWeek - bWeek;

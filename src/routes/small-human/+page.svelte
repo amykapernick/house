@@ -27,7 +27,7 @@
 	import Tabs from '$parts/Tabs/index.svelte';
 	import Modal from '$parts/Modal/index.svelte';
 	import type { ModalAction } from '$parts/Modal/index.svelte';
-	import type { Alert, AlertType, MilestoneStatus, SignStatus } from '$types/generated';
+	import type { Alert, AlertType, MilestoneStatus, SignStatus, VaccinationStatus } from '$types/generated';
 	import UrgentAlerts from '$parts/smallHuman/UrgentAlerts/index.svelte';
 	import Skeleton from '$parts/Skeleton/index.svelte';
 	import EmptyState from '$parts/EmptyState/index.svelte';
@@ -303,6 +303,8 @@
 
 	const updateAuslanSignStatus = (id: string, status: SignStatus) => updateStatus({ mutation: 'updateAuslanSignStatus', fields: 'id status', id, status, sectionKey: 'auslan', itemsKey: 'signs' });
 
+	const updateVaccinationStatus = (id: string, status: VaccinationStatus) => updateStatus({ mutation: 'updateVaccinationStatus', fields: 'id status', id, status, sectionKey: 'vaccinations', itemsKey: 'items' });
+
 	async function markToothErupted(fdi: number) {
 		const token = await getToken();
 
@@ -544,7 +546,10 @@
 			tabindex="0"
 		>
 			<h2>Vaccinations</h2>
-			<Vaccinations {vaccinations} />
+			<Vaccinations
+				{vaccinations}
+				onStatusChange={updateVaccinationStatus}
+			/>
 		</div>
 	{/if}
 	{#if activeTab === 'parenting-approach'}

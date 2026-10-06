@@ -12,12 +12,20 @@
 		onStatusChange?: (id: string, status: MilestoneStatus) => void;
 		class?: string;
 	} = $props();
+
+	const sortedSkills = $derived(
+		[...swimming.skills].sort((a, b) => {
+			if (a.status === 'done' && b.status !== 'done') return 1;
+			if (a.status !== 'done' && b.status === 'done') return -1;
+			return 0;
+		}),
+	);
 </script>
 
 <div class={className}>
 	<p>{swimming.note}</p>
 	<Cards>
-		{#each swimming.skills as m (m.id)}
+		{#each sortedSkills as m (m.id)}
 			<Milestone
 				{...m}
 				{onStatusChange}

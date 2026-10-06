@@ -31,7 +31,12 @@
 	}
 
 	& a {
+		opacity: 0.7;
 		color: inherit;
+	}
+
+	& li:has(.read-mark) a {
+		opacity: 1;
 	}
 }
 

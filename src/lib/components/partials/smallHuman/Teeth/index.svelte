@@ -150,6 +150,8 @@
 			</p>
 		{/each}
 	</div>
+	<!-- TODO: Hide section if nothign is upcoming in the next 1-2 months -->
+	<!-- TODO: Update upcoming to be in the next 1-2 months, in case early -->
 	<h3>Upcoming Teeth</h3>
 	<dl class={styles.upcoming}>
 		{#each upcoming as tooth (tooth.fdi)}
