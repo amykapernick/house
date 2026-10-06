@@ -38,3 +38,56 @@
 		padding: 40px;
 	}
 }
+
+/* Section heading for a grouped task list (List's Overdue/Today/This week,
+	 TaskCalendar's per-day columns) - a title plus a smaller task count. */
+
+@mixin task_section_heading {
+	display: flex;
+	align-items: baseline;
+	margin: 0 0 0.5em;
+	gap: 0.6em;
+	font-size: 1.1em;
+}
+
+@mixin task_section_count {
+	color: var(--text_secondary);
+	font-family: var(--font_main);
+	font-size: 0.75em;
+	font-weight: 500;
+	text-transform: none;
+}
+
+/* A <ul> of Task rows that reads as one seamless block rather than separate
+	 cards - no gaps, a hairline divider between rows, and only the first/last
+	 row's outer corners rounded. Relies on Task's own --task_radius/--task_shadow
+	 custom property hooks (Task/index.module.css). */
+
+@mixin merged_task_list {
+	display: flex;
+	flex-direction: column;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+
+	& li {
+		--task_radius: 0;
+		--task_shadow: none;
+
+		border-top: 1px solid var(--border);
+
+		&:first-child {
+			--task_radius: 0.6em 0.6em 0 0;
+
+			border-top: none;
+		}
+
+		&:last-child {
+			--task_radius: 0 0 0.6em 0.6em;
+		}
+
+		&:first-child:last-child {
+			--task_radius: 0.6em;
+		}
+	}
+}

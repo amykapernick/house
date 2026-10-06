@@ -1,6 +1,7 @@
 import { format } from 'date-fns';
 import fetchClientData from './fetchClientData';
 import { DATE_FORMATS } from './dateFormats';
+import isStaleCompletedTask from './isStaleCompletedTask';
 import type { Task } from '$types/tasks';
 
 type FetchTasksDataProps = {
@@ -16,7 +17,7 @@ export default async function fetchTasksData(props: FetchTasksDataProps = {}): P
 
 	const res = await fetchClientData({
 		cacheKey: `tasks-${today}`,
-		onStale: (data) => onStale?.(data.tasks ?? []),
+		onStale: (data) => onStale?.((data.tasks ?? []).filter((task: Task) => !isStaleCompletedTask(task))),
 		gqlQuery: `
 			query {
 				tasks {
@@ -33,10 +34,14 @@ export default async function fetchTasksData(props: FetchTasksDataProps = {}): P
 					platform
 					link
 					dueLabel(today: "${today}")
+					project {
+						name
+					}
+					updatedAt
 				}
 			}
 		`,
 	});
 
-	return res.tasks ?? [];
+	return (res.tasks ?? []).filter((task: Task) => !isStaleCompletedTask(task));
 }

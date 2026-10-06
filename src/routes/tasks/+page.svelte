@@ -44,6 +44,12 @@
 		tasks = tasks.map((task) => (task.id === id ? { ...task, status } : task));
 		setCache(`tasks-${format(new Date(), DATE_FORMATS.iso)}`, { tasks });
 	}
+
+	// List's quick-add already refetched (and cached) the full task list - just
+	// adopt it here rather than merging piecemeal.
+	function handleTasksChanged(freshTasks: Task[]) {
+		tasks = freshTasks;
+	}
 </script>
 
 <svelte:head>
@@ -59,7 +65,7 @@
 	<Skeleton rows={3} />
 {:else}
 	<FamilyFilter bind:selectedUserSlug pageKey="tasks" />
-	<TaskView tasks={visibleTasks} onUpdate={handleTaskUpdate} />
+	<TaskView tasks={visibleTasks} onUpdate={handleTaskUpdate} onTasksChanged={handleTasksChanged} />
 {/if}
 
 <!-- TODO: migrate to CSS Modules (see #641) -->

@@ -18,7 +18,8 @@ export type Task = {
 	estimate: number,
 	project: Project[],
 	platform: Platform,
-	link: string
+	link: string,
+	updatedAt: string | null
 }
 
 export type ProjectStatus = `Backlog` | `Planning` | `In progress` | `Paused` | `Done` | `Cancelled` | `Archived`

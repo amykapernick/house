@@ -1,0 +1,36 @@
+@import '@mixins';
+
+.input {
+
+	@include sr_only;
+
+	&:checked + .pill {
+		border-color: var(--pill_colour, var(--purple_bright));
+		background: var(--pill_colour, var(--purple_bright));
+		color: var(--pill_text, var(--purple_bright_text));
+	}
+
+	&:focus-visible + .pill {
+		outline: 2px solid var(--pill_colour, var(--purple_bright));
+		outline-offset: 2px;
+	}
+}
+
+.pill {
+	display: inline-flex;
+	align-items: center;
+	padding: 0.2em 0.8em;
+	transition: background-color 0.15s, color 0.15s;
+	border: 1px solid var(--pill_colour, var(--purple_bright));
+	border-radius: 1em;
+	color: var(--pill_colour, var(--purple_bright));
+	font-size: 0.85em;
+	cursor: pointer;
+	gap: 0.4em;
+}
+
+.count {
+	opacity: 0.7;
+	color: inherit;
+	font-size: 0.85em;
+}

@@ -17,5 +17,7 @@ export const DATE_FORMATS = {
 	/** e.g. "November" - full month name, no day or year */
 	monthName: `MMMM`,
 	/** e.g. "24 November" - day and full month name, no year */
-	dayMonth: `d MMMM`
+	dayMonth: `d MMMM`,
+	/** e.g. "3PM", "12AM" - hour only, for the Timeline view's hourly columns */
+	hour: `ha`
 } as const;

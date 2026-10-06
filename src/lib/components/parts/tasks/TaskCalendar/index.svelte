@@ -31,15 +31,18 @@
 
 --columns: {columnCount}">
 	{#each Object.entries(parsedTasks) as [due, dueTasks] (due)}
-		<div class="column">
-			<h2>{due}</h2>
+		<section>
+			<h2 class={styles.heading}>
+				{due}
+				<span class={styles.count}>{dueTasks.length} task{dueTasks.length === 1 ? '' : 's'}</span>
+			</h2>
 			<ul class={styles.list}>
 				{#each dueTasks as task (task.id)}
-					<li class={styles.item}>
+					<li>
 						<TaskCard {...task} {onUpdate} />
 					</li>
 				{/each}
 			</ul>
-		</div>
+		</section>
 	{/each}
 </div>

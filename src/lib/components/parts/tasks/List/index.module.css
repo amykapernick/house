@@ -1,9 +1,48 @@
-.list {
-	margin: 0;
-	padding: 0;
-	list-style: none;
+@import '@mixins';
+
+.add_task {
+	display: flex;
+	margin-bottom: 1em;
+	gap: 0.6em;
+
+	& input {
+		flex: 1 1 auto;
+		padding: 0.6em 0.9em;
+		border: 1px solid var(--input_border);
+		border-radius: 0.7em;
+		background: var(--input_bg);
+		color: var(--text_primary);
+		font: inherit;
+	}
 }
 
-.item {
-	margin: 0.3em 0;
+.error {
+	margin: -0.5em 0 1em;
+	color: var(--red);
+	font-size: 0.85em;
+}
+
+.groups {
+	display: flex;
+	flex-direction: column;
+	gap: 1.5em;
+}
+
+.heading {
+
+	@include task_section_heading;
+
+	&[data-bucket='overdue'] {
+		color: var(--red);
+	}
+}
+
+.count {
+
+	@include task_section_count;
+}
+
+.list {
+
+	@include merged_task_list;
 }

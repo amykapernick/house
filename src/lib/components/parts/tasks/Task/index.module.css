@@ -1,84 +1,136 @@
 .task {
-	display: grid;
+	display: flex;
 	position: relative;
-	grid-template-areas: 'checkbox status status' 'checkbox name name' '. due assigned' '. link link' 'error error error';
-	grid-template-columns: auto 1fr auto;
-	grid-template-rows: auto auto auto auto 1fr;
-	align-items: start;
-	padding: 0.3em 0.5em;
-	border-radius: 0.2em;
-	background: var(--feature_colour);
-	color: var(--neutral);
-	gap: 0.2em 1ch;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.5em 0.8em;
+	padding: 0.7em 0.9em;
+	border-radius: var(--task_radius, 0.6em);
+	background: var(--task_background, var(--surface_bg));
+	box-shadow: var(--task_shadow, var(--shadow_card));
+	color: var(--text_primary);
 }
 
 .checkbox {
-	grid-area: checkbox;
-	align-self: center;
+	flex-shrink: 0;
 }
 
 .name {
-	grid-area: name;
-	margin: 0;
-	font-size: 1.2em;
+	flex: 1 1 auto;
+	min-width: 8em;
+	font-size: 1.1em;
 	font-weight: 600;
 	word-wrap: break-word;
 	word-break: break-word;
 	white-space: wrap;
 }
 
-.status {
-	display: block;
-	grid-area: status;
-	padding: 0.1em 0.2em;
-	border: none;
-	border-radius: 0.1em;
-	font: inherit;
-	font-size: 0.6em;
-	line-height: 1;
-	justify-self: end;
+.meta {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.5em;
+	margin-left: auto;
+}
 
-	&[data-status='not-started'] {
-		background: var(--grey);
-		color: var(--grey_text);
+.category {
+	padding: 0.2em 0.7em;
+	border: 1px solid var(--border);
+	border-radius: 1em;
+	color: var(--text_secondary);
+	font-size: 0.75em;
+	white-space: nowrap;
+}
+
+.due_badge {
+	padding: 0.2em 0.6em;
+	border: none;
+	border-radius: 1em;
+	font-size: 0.7em;
+	font-weight: 700;
+	letter-spacing: 0.02em;
+	text-transform: uppercase;
+	white-space: nowrap;
+
+	&[data-due='overdue'] {
+		background: var(--red);
+		color: var(--red_text);
 	}
 
-	&[data-status='in-progress'],
-	&[data-status='ongoing'] {
+	&[data-due='today'] {
 		background: var(--blue);
 		color: var(--blue_text);
 	}
 
-	&[data-status='paused'] {
-		background: var(--orange);
-		color: var(--orange_text);
+	&[data-due='this-week'] {
+		background: var(--grey);
+		color: var(--grey_text);
 	}
+}
 
-	&[data-status='done'] {
-		background: var(--green);
-		color: var(--green_text);
-	}
+.status {
+	display: block;
+	padding: 0.1em 0.2em;
+	border: none;
+	border-radius: 0.1em;
+	font: inherit;
+	font-size: 0.7em;
+	line-height: 1;
+}
+
+/* Select renders its own control chrome (border/shadow/padding) - this only
+	 layers the status colour on top rather than fighting that layout. */
+
+.statusSelect {
+	font-size: 0.7em;
+}
+
+.status[data-status='not-started'],
+.statusSelect[data-status='not-started'] {
+	background: var(--grey);
+	color: var(--grey_text);
+}
+
+.status[data-status='in-progress'],
+.statusSelect[data-status='in-progress'],
+.status[data-status='ongoing'],
+.statusSelect[data-status='ongoing'] {
+	background: var(--blue);
+	color: var(--blue_text);
+}
+
+.status[data-status='paused'],
+.statusSelect[data-status='paused'] {
+	background: var(--orange);
+	color: var(--orange_text);
+}
+
+.status[data-status='done'],
+.statusSelect[data-status='done'] {
+	background: var(--green);
+	color: var(--green_text);
 }
 
 .due {
 	display: block;
-	grid-area: due;
-	width: 100%;
-}
-
-.assigned {
-	grid-area: assigned;
+	color: var(--text_secondary);
+	font-size: 0.8em;
+	white-space: nowrap;
 }
 
 .link {
-	grid-area: link;
-	justify-self: start;
+	display: flex;
 	color: var(--purple_bright);
 	font-size: 0.9em;
+
+	& :global(svg) {
+		width: 1em;
+		height: 1em;
+	}
 }
 
 .error {
-	grid-area: error;
+	flex: 1 0 100%;
 	margin: 0;
 	color: var(--red);
 	font-size: 0.8em;
