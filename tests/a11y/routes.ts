@@ -37,6 +37,7 @@ export const routes: A11yRoute[] = [
 	{ name: `calendar`, path: `/calendar`, auth: true },
 	{ name: `schedule`, path: `/schedule`, auth: true },
 	{ name: `budget`, path: `/budget`, auth: true },
+	{ name: `budget-import`, path: `/budget/import`, auth: true },
 	{ name: `recipes`, path: `/recipes`, auth: false },
 	{ name: `recipe-tags`, path: `/recipes/tags`, auth: false },
 	{ name: `meal-plan`, path: `/meal-plan`, auth: true },

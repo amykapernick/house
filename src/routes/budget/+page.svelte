@@ -2,6 +2,7 @@
 	import { format, startOfWeek, subWeeks, endOfWeek } from 'date-fns';
 	import { DATE_FORMATS } from '$utils/dateFormats';
 	import { beforeNavigate } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import Budget from '$partials/finance/Budget/index.svelte';
 	import BudgetBuckets from '$partials/finance/BudgetBuckets/index.svelte';
 	import BudgetCharts from '$partials/finance/BudgetCharts/index.svelte';
@@ -239,6 +240,7 @@
 			<button type="button" onclick={startEditing}>Edit</button>
 		{/if}
 		<button type="button" onclick={() => (checkInOpen = true)}>Log last week's spend</button>
+		<a href={resolve('/budget/import')}>Import transactions</a>
 	</div>
 
 	<h2>Overview</h2>

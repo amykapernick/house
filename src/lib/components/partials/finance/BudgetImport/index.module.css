@@ -1,0 +1,49 @@
+@import '@mixins';
+
+/* TODO: design pass - layout of the import page, narrow-screen handling of the transactions table */
+
+.week {
+	margin-top: 2em;
+
+	& small {
+		display: block;
+		color: var(--grey);
+	}
+
+	& tr[data-ignored='true'] {
+		opacity: 0.5;
+	}
+}
+
+.rules {
+	margin-top: 1em;
+
+	& button {
+
+		@include button_text;
+	}
+}
+
+.save {
+	display: flex;
+	align-items: center;
+	gap: 1em;
+	margin-top: 1em;
+
+	& button {
+
+		@include button;
+	}
+}
+
+.warning {
+	color: var(--orange);
+}
+
+.saved {
+	color: var(--green);
+}
+
+.error {
+	color: var(--red);
+}
