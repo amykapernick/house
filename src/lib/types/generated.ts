@@ -192,6 +192,20 @@ export type BudgetMutationResult = {
 	success: Scalars[`Boolean`][`output`];
 };
 
+/**
+ * Saved preference for categorising imported bank transactions: any transaction
+ * whose payee/category/tag equals `value` goes to `budgetItem`, or is skipped
+ * entirely when `ignore` is set.
+ */
+export type BudgetRule = {
+	budgetItem: Maybe<Scalars[`String`][`output`]>;
+	/** payee, category or tag */
+	field: Maybe<Scalars[`String`][`output`]>;
+	id: Maybe<Scalars[`String`][`output`]>;
+	ignore: Maybe<Scalars[`Boolean`][`output`]>;
+	value: Maybe<Scalars[`String`][`output`]>;
+};
+
 export type BudgetSpendEntry = {
 	amount: Maybe<Scalars[`Float`][`output`]>;
 	budgetItem: Maybe<Scalars[`String`][`output`]>;
@@ -753,6 +767,7 @@ export type Mutation = {
 	createShoppingItem: Maybe<CreateShoppingItemResult>;
 	createTask: Maybe<CreateTaskResult>;
 	deleteBudgetItem: Maybe<BudgetMutationResult>;
+	deleteBudgetRule: Maybe<BudgetMutationResult>;
 	deleteColour: Maybe<ColourMutationResult>;
 	deleteHouseArea: Maybe<HouseMutationResult>;
 	deleteHouseItem: Maybe<HouseMutationResult>;
@@ -762,6 +777,8 @@ export type Mutation = {
 	markToothErupted: Maybe<Tooth>;
 	saveArticle: Maybe<Scalars[`String`][`output`]>;
 	savePushSubscription: Maybe<PushSubscriptionResult>;
+	/** Creates the rule for field+value, or replaces it if one already exists. */
+	setBudgetRule: Maybe<BudgetMutationResult>;
 	setBudgetSpend: Maybe<BudgetMutationResult>;
 	updateAuslanSignStatus: Maybe<AuslanSign>;
 	updateBudgetBucketPercentage: Maybe<BudgetMutationResult>;
@@ -890,6 +907,11 @@ export type MutationDeleteBudgetItemArgs = {
 };
 
 
+export type MutationDeleteBudgetRuleArgs = {
+	id: Scalars[`String`][`input`];
+};
+
+
 export type MutationDeleteColourArgs = {
 	id: Scalars[`String`][`input`];
 };
@@ -936,6 +958,14 @@ export type MutationSavePushSubscriptionArgs = {
 	auth: Scalars[`String`][`input`];
 	endpoint: Scalars[`String`][`input`];
 	p256dh: Scalars[`String`][`input`];
+};
+
+
+export type MutationSetBudgetRuleArgs = {
+	budgetItem?: InputMaybe<Scalars[`String`][`input`]>;
+	field: Scalars[`String`][`input`];
+	ignore?: InputMaybe<Scalars[`Boolean`][`input`]>;
+	value: Scalars[`String`][`input`];
 };
 
 
@@ -1129,6 +1159,7 @@ export type Query = {
 	books: Maybe<Array<Maybe<Book>>>;
 	budget: Maybe<Array<Maybe<BudgetItem>>>;
 	budgetBuckets: Maybe<Array<Maybe<BudgetBucket>>>;
+	budgetRules: Maybe<Array<Maybe<BudgetRule>>>;
 	budgetSpend: Maybe<Array<Maybe<BudgetSpendEntry>>>;
 	calendars: Maybe<Array<Maybe<Calendar>>>;
 	chores: Maybe<Array<Maybe<Chore>>>;
