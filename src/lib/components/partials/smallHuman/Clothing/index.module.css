@@ -60,3 +60,26 @@
 		font-size: 3em;
 	}
 }
+
+.sizesForm {
+	display: grid;
+	gap: 0.4em;
+	max-width: 30em;
+
+	& label em {
+		font-size: 0.85em;
+		font-style: normal;
+		color: var(--text_secondary);
+	}
+
+	& footer {
+		display: flex;
+		gap: 0.5em;
+		margin-top: 0.5em;
+	}
+}
+
+.error {
+	margin: 0;
+	color: var(--error_text);
+}

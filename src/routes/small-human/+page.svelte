@@ -305,6 +305,33 @@
 
 	const updateVaccinationStatus = (id: string, status: VaccinationStatus) => updateStatus({ mutation: 'updateVaccinationStatus', fields: 'id status', id, status, sectionKey: 'vaccinations', itemsKey: 'items' });
 
+	async function updateClothingSizes(sizes: string[], note: string): Promise<boolean> {
+		const token = await getToken();
+
+		const res = await fetch(getGraphqlUrl(), {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				...(token ? { Authorization: `Bearer ${token}` } : {}),
+			},
+			body: JSON.stringify({
+				query: `mutation UpdateClothingSizes($sizes: [String!]!, $note: String) { updateClothingSizes(sizes: $sizes, note: $note) { current_sizes current_sizes_note } }`,
+				variables: { sizes, note },
+			}),
+		}).then((r) => r.json()).catch(() => null);
+
+		const updated = res?.data?.updateClothingSizes;
+		if (!updated) return false;
+
+		data = {
+			...data,
+			clothing: { ...data.clothing, seasonal: { ...data.clothing.seasonal, ...updated } },
+			sleep: { ...data.sleep, environment: { ...data.sleep.environment, current_sizes: updated.current_sizes } },
+		};
+		setCache('small-human', { smallHuman: data });
+		return true;
+	}
+
 	async function markToothErupted(fdi: number) {
 		const token = await getToken();
 
@@ -535,6 +562,7 @@
 			<ClothingSeasonal
 				{clothing}
 				{weather}
+				onSizesChange={updateClothingSizes}
 			/>
 		</div>
 	{/if}

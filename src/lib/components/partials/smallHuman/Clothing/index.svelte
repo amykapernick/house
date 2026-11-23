@@ -8,6 +8,7 @@
 	import Cards from '$components/parts/Cards/index.svelte';
 	import Weather from '$components/parts/Weather/index.svelte';
 	import IconChip from '$components/parts/IconChip/index.svelte';
+	import Pill from '$components/parts/Pill/index.svelte';
 	import Outfit from '$components/parts/smallHuman/Outfit/index.svelte';
 	import Plus from '$img/icons/f-add-colored.svg?component';
 	import styles from './index.module.css';
@@ -15,12 +16,46 @@
 	const {
 		clothing,
 		weather: weatherData = null,
+		onSizesChange,
 		class: className = '',
 	}: {
 		clothing: { seasonal: ClothingSeasonal; daytime: ClothingDaytime };
 		weather?: House | null;
+		/** Saves parent-supplied sizes; resolves false if the save failed */
+		onSizesChange?: (sizes: string[], note: string) => Promise<boolean>;
 		class?: string;
 	} = $props();
+
+	let editingSizes = $state(false);
+	let sizesInput = $state('');
+	let sizesNoteInput = $state('');
+	let savingSizes = $state(false);
+	let sizesError = $state('');
+
+	const startEditingSizes = () => {
+		sizesInput = (seasonal.current_sizes ?? []).join(', ');
+		sizesNoteInput = seasonal.current_sizes_note ?? '';
+		sizesError = '';
+		editingSizes = true;
+	};
+
+	const saveSizes = async (event: SubmitEvent) => {
+		event.preventDefault();
+		if (!onSizesChange) return;
+
+		const sizes = sizesInput.split(',').map((size) => size.trim()).filter(Boolean);
+		if (sizes.length === 0) {
+			sizesError = 'Add at least one size.';
+			return;
+		}
+
+		savingSizes = true;
+		const saved = await onSizesChange(sizes, sizesNoteInput.trim());
+		savingSizes = false;
+
+		if (saved) editingSizes = false;
+		else sizesError = "Couldn't save the sizes. Try again.";
+	};
 
 	const { seasonal, daytime } = $derived(clothing);
 
@@ -151,4 +186,58 @@
 
 <h3 class="subtitle">Current Sizes</h3>
 
-<!-- TODO: Add current sizes -->
+{#if editingSizes}
+	<form
+		class={styles.sizesForm}
+		onsubmit={saveSizes}
+	>
+		<label for="clothing-sizes">Sizes <em>(comma separated)</em></label>
+		<input
+			id="clothing-sizes"
+			type="text"
+			bind:value={sizesInput}
+			placeholder="Size 1, Size 2"
+			required
+		/>
+
+		<label for="clothing-sizes-note">Note</label>
+		<input
+			id="clothing-sizes-note"
+			type="text"
+			bind:value={sizesNoteInput}
+			placeholder="Mostly Size 1, moving into Size 2"
+		/>
+
+		{#if sizesError}<p
+				class={styles.error}
+				role="alert"
+			>
+				{sizesError}
+			</p>{/if}
+
+		<footer>
+			<button
+				type="button"
+				onclick={() => (editingSizes = false)}
+				disabled={savingSizes}>Cancel</button
+			>
+			<button
+				type="submit"
+				disabled={savingSizes}>{savingSizes ? 'Saving…' : 'Save'}</button
+			>
+		</footer>
+	</form>
+{:else}
+	<div class={styles.chips}>
+		{#each seasonal.current_sizes ?? [] as size (size)}
+			<Pill status="info">{size}</Pill>
+		{/each}
+	</div>
+	{#if seasonal.current_sizes_note}<p>{seasonal.current_sizes_note}</p>{/if}
+	{#if onSizesChange}
+		<button
+			type="button"
+			onclick={startEditingSizes}>Edit sizes</button
+		>
+	{/if}
+{/if}
