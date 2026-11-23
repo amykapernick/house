@@ -783,6 +783,7 @@ export type Mutation = {
 	updateAuslanSignStatus: Maybe<AuslanSign>;
 	updateBudgetBucketPercentage: Maybe<BudgetMutationResult>;
 	updateBudgetItem: Maybe<BudgetMutationResult>;
+	updateClothingSizes: Maybe<ClothingSeasonal>;
 	updateColour: Maybe<ColourMutationResult>;
 	updateDefaultRoutine: Maybe<ScheduleMutationResult>;
 	updateFreezerItemRecipes: Maybe<UpdateFreezerItemRecipesResult>;
@@ -991,6 +992,12 @@ export type MutationUpdateBudgetBucketPercentageArgs = {
 export type MutationUpdateBudgetItemArgs = {
 	id: Scalars[`String`][`input`];
 	input: BudgetItemInput;
+};
+
+
+export type MutationUpdateClothingSizesArgs = {
+	note?: InputMaybe<Scalars[`String`][`input`]>;
+	sizes: Array<Scalars[`String`][`input`]>;
 };
 
 
