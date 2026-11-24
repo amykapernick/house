@@ -1,0 +1,104 @@
+@import '@mixins';
+
+.card {
+	display: grid;
+	gap: 0.5em;
+}
+
+.header {
+	display: flex;
+	align-items: start;
+	justify-content: space-between;
+	gap: 1em;
+
+	& h3 {
+		margin: 0;
+	}
+}
+
+.when,
+.spent {
+	margin: 0.2em 0;
+	color: var(--text_secondary);
+}
+
+.edit {
+	flex-shrink: 0;
+}
+
+.people {
+	display: grid;
+	gap: 0.8em;
+	margin: 0.5em 0 0;
+	padding: 0;
+	list-style: none;
+}
+
+.person {
+	display: grid;
+	gap: 0.4em;
+	padding-top: 0.6em;
+	border-top: 1px solid var(--border);
+}
+
+.personHeader {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.5em;
+}
+
+.add {
+
+	@include button_icon;
+
+	margin-left: auto;
+
+	& svg {
+		width: 100%;
+		height: 100%;
+	}
+}
+
+.items {
+	display: flex;
+	flex-wrap: wrap;
+	margin: 0;
+	padding: 0;
+	gap: 0.5em;
+	list-style: none;
+}
+
+/* Same as the homepage habit pills: the checkbox covers the whole pill as its click target. */
+.item {
+	display: flex;
+	position: relative;
+	align-items: center;
+	gap: 0.4em;
+
+}
+
+/* Same look as CheckboxButton's flat style; covers the whole pill as its click target, like
+   the homepage habit pills. */
+
+.itemButton {
+	display: flex;
+	padding: 0;
+	border: none;
+	background: none;
+	color: inherit;
+	font: inherit;
+	font-size: 1.2em;
+	cursor: pointer;
+
+	&::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+	}
+
+	& svg {
+		width: 1em;
+		height: 1em;
+	}
+}

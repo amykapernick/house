@@ -93,6 +93,17 @@ export function clearAllCache() {
 	catch {}
 }
 
+// For a page that caches several related queries under one prefix (e.g. gifts, gifts-person-…),
+// so one mutation can drop all of them.
+export function clearCachePrefix(prefix: string) {
+	try {
+		Object.keys(localStorage)
+			.filter((key) => key.startsWith(`cache:${prefix}`))
+			.forEach((key) => localStorage.removeItem(key));
+	}
+	catch {}
+}
+
 // adapter-static means /api/* server routes don't exist at runtime in production -
 // mutation call sites doing their own fetch() must resolve the same way, or they
 // silently 405 against the deployed static host instead of reaching the API.

@@ -6,6 +6,7 @@ export type Resource = {
 	image?: string
 	login?: string
 	url?: string
+	localUrl?: string
 	external?: string
 	icon?: string
 	archived?: boolean

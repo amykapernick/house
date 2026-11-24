@@ -12,9 +12,16 @@
 	}
 }
 
+.edit-tags {
+	width: 8em;
+}
+
+/* Amount and frequency stay on one line - .edit-tags is kept narrow to
+   leave room for them. */
+
 .edit-amount {
 	display: flex;
-	flex-wrap: wrap;
+	flex-wrap: nowrap;
 	align-items: center;
 	gap: 0.4em;
 
@@ -23,18 +30,6 @@
 	}
 
 	& select {
-		width: auto;
-	}
-}
-
-.income-toggle {
-	display: flex;
-	align-items: center;
-	gap: 0.3em;
-	font-size: 0.85em;
-	white-space: nowrap;
-
-	& input {
 		width: auto;
 	}
 }

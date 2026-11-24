@@ -1,0 +1,82 @@
+@import '@mixins';
+
+/* Stacked on small screens. On larger ones the overview moves to a sticky
+   right-hand column, and on very wide ones buckets and income join it
+   underneath, leaving expenses capped at a readable width on the left - .side
+   is display: contents until then, so its sections lay out as grid items. */
+
+.view {
+	display: grid;
+	grid-template-areas:
+		'overview'
+		'buckets'
+		'expenses'
+		'income';
+	grid-template-columns: minmax(0, 1fr);
+	gap: 0 2.5em;
+
+	@media (width >= 75em) {
+		grid-template-areas:
+			'buckets overview'
+			'expenses overview'
+			'income overview';
+		grid-template-columns: minmax(0, 1fr) minmax(24em, 34%);
+		grid-template-rows: auto auto 1fr;
+	}
+
+	@media (width >= 120em) {
+		grid-template-areas: 'expenses side';
+		grid-template-columns: minmax(0, 1000px) minmax(32em, 1fr);
+		grid-template-rows: auto;
+	}
+}
+
+.side {
+	display: contents;
+
+	/* Its own column once there's room - overview across the top, with buckets
+	   and income side by side underneath when both tables' content fits.
+	   Flex (not grid) so wrapping is decided by the tables' actual widths,
+	   rather than fixed tracks they can overflow into each other. */
+
+	@media (width >= 120em) {
+		display: flex;
+		position: sticky;
+		top: 1em;
+		grid-area: side;
+		flex-wrap: wrap;
+		align-items: flex-start;
+		align-self: start;
+		gap: 0 2.5em;
+
+		& > * {
+			flex: 1 1 auto;
+		}
+
+		& > .overview {
+			flex-basis: 100%;
+		}
+	}
+}
+
+.overview {
+	grid-area: overview;
+
+	@media (width >= 75em) and (width < 120em) {
+		position: sticky;
+		top: 1em;
+		align-self: start;
+	}
+}
+
+.buckets {
+	grid-area: buckets;
+}
+
+.expenses {
+	grid-area: expenses;
+}
+
+.income {
+	grid-area: income;
+}

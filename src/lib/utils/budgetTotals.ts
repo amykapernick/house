@@ -18,12 +18,15 @@ export const totalMonthlyExpenses = (budget: BudgetItem[]): number =>
 
 // A bucket's income share is derived from its target percentage of total
 // income, not summed from its items - buckets track spending, not earning.
+// Expenses are summed from `budget` by each item's bucket rather than from the
+// server's `bucket.items`, so unsaved edits (and Scratch Pad scenarios) are
+// reflected immediately.
 export const bucketTotals = (buckets: BudgetBucket[], budget: BudgetItem[]): BucketTotal[] => {
 	const income = totalMonthlyIncome(budget);
 
 	return buckets.map((bucket) => {
-		const expenses = (bucket.items ?? [])
-			.filter((item) => !item.income)
+		const expenses = budget
+			.filter((item) => !item.income && item.bucket?.id === bucket.id)
 			.reduce((sum, item) => sum + (item.monthlyAmount ?? 0), 0);
 
 		return {

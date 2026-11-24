@@ -1,0 +1,27 @@
+.table {
+	width: 100%;
+	border-collapse: collapse;
+
+	& th,
+	& td {
+		padding: 0.4em 0.6em;
+		border-bottom: 1px solid var(--border);
+		text-align: left;
+		vertical-align: middle;
+	}
+}
+
+.link {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.5em;
+}
+
+.muted {
+	color: var(--text_secondary);
+}
+
+.error {
+	color: var(--red);
+}

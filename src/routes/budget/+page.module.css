@@ -1,0 +1,7 @@
+/* The layout's overflow-x: hidden makes it a (non-scrolling) scroll container,
+   which traps BudgetView's position: sticky columns - clip hides the same
+   overflow without creating one, so they stick against the scrolling <main>. */
+
+.layout {
+	overflow-x: clip;
+}

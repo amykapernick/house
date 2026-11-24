@@ -3,7 +3,9 @@ import type { RequestHandler } from './$types';
 import { env } from '$env/dynamic/private';
 
 export const POST: RequestHandler = async ({ request }) => {
-	const { query } = await request.json();
+	// Forward variables and operationName as well as the query - mutations that pass user input
+	// as GraphQL variables (gifts, createTask) fail validation without them.
+	const { query, variables, operationName } = await request.json();
 	const token = request.headers.get(`Authorization`);
 
 	const headers: Record<string, string> = {
@@ -21,7 +23,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		const response = await fetch(`${env.API_URL}/graphql`, {
 			method: `POST`,
 			headers,
-			body: JSON.stringify({ query }),
+			body: JSON.stringify({ query, variables, operationName }),
 			signal: controller.signal,
 		});
 

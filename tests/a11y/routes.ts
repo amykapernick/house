@@ -43,6 +43,7 @@ export const routes: A11yRoute[] = [
 	{ name: `meal-plan`, path: `/meal-plan`, auth: true },
 	{ name: `shopping-list`, path: `/shopping-list`, auth: true },
 	{ name: `shopping-list-cart`, path: `/shopping-list/cart`, auth: true },
+	{ name: `gifts`, path: `/gifts`, auth: true },
 	{ name: `reference`, path: `/reference`, auth: true },
 	{ name: `reference-house`, path: `/reference/house`, auth: true },
 	{ name: `reference-books`, path: `/reference/books`, auth: true },

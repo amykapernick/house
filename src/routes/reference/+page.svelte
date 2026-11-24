@@ -11,6 +11,8 @@
 	import { getPageTitle } from '$utils/pageTitle';
 	import Card from '$components/parts/resources/Card/index.svelte';
 	import Title from '$parts/Title/index.svelte';
+	import ResourceModal from '$components/parts/resources/ResourceModal/index.svelte';
+	import { RESOURCE_FIELDS, RESOURCES_CACHE_KEY } from '$utils/resources';
 
 	let resources = $state<Resource[]>([]);
 	let assets = $state<Asset[]>([]);
@@ -21,6 +23,32 @@
 
 	const activeResources = $derived(resources.filter((resource) => !resource.archived));
 	const archivedResources = $derived(resources.filter((resource) => resource.archived));
+	const resourceCategories = $derived(
+		[...new Set(resources.map((resource) => resource.category).filter((c): c is string => typeof c === `string` && Boolean(c)))].sort()
+	);
+
+	function handleResources(res: any) {
+		resources = res.resources ?? [];
+		resourcesLoading = false;
+	}
+
+	function fetchResources() {
+		fetchClientData({
+			cacheKey: RESOURCES_CACHE_KEY,
+			onStale: handleResources,
+			gqlQuery: `query { resources { ${RESOURCE_FIELDS} } }`,
+		}).then(handleResources);
+	}
+
+	// Add/edit resource modal (resources are memos in Memos, written by the API).
+	let resourceModalOpen = $state(false);
+	let editingResource = $state<Resource | null>(null);
+
+	function openResourceModal(resource: Resource | null = null) {
+		editingResource = resource;
+		resourceModalOpen = true;
+	}
+
 	const activeSuppliers = $derived(suppliers.filter((supplier) => !supplier.archived));
 	const archivedSuppliers = $derived(suppliers.filter((supplier) => supplier.archived));
 
@@ -30,29 +58,7 @@
 	// too, even though those had resolved fine.
 	$effect(() => {
 		if ($isAuthenticated) {
-			function handleResources(res: any) {
-				resources = res.resources ?? [];
-				resourcesLoading = false;
-			}
-			fetchClientData({
-				cacheKey: 'resources',
-				onStale: handleResources,
-				gqlQuery: `
-					query {
-						resources {
-							name
-							id
-							category
-							description
-							image
-							login
-							url
-							icon
-							archived
-						}
-					}
-				`,
-			}).then(handleResources);
+			fetchResources();
 
 			function handleAssets(res: any) {
 				assets = res.assets ?? [];
@@ -126,12 +132,28 @@
 </svelte:head>
 
 <Title>Reference</Title>
+<button
+	type="button"
+	class="add"
+	onclick={() => openResourceModal()}>Add resource</button
+>
+
+<ResourceModal
+	bind:open={resourceModalOpen}
+	resource={editingResource}
+	categories={resourceCategories}
+	onSaved={fetchResources}
+/>
+
 {#if resourcesLoading || assetsLoading || suppliersLoading}
 	<Skeleton rows={3} />
 {/if}
 <div class="references">
 	{#if !resourcesLoading}
-		<Resources items={activeResources} />
+		<Resources
+			items={activeResources}
+			onEdit={openResourceModal}
+		/>
 	{/if}
 	{#if !suppliersLoading}
 		<Card
@@ -149,7 +171,10 @@
 		<summary><h2>Archived</h2></summary>
 		<div class="references">
 			{#if archivedResources.length}
-				<Resources items={archivedResources} />
+				<Resources
+					items={archivedResources}
+					onEdit={openResourceModal}
+				/>
 			{/if}
 			{#if archivedSuppliers.length}
 				<Card
@@ -163,6 +188,8 @@
 
 <!-- TODO: migrate to CSS Modules (see #641) -->
 <style>
+	@import '@mixins';
+
 	.references {
 		display: grid;
 		grid-auto-flow: row dense;
@@ -192,6 +219,13 @@
 		&:global(& > *:has(ul li:nth-child(24))) {
 			grid-row-start: span 6;
 		}
+	}
+
+	.add {
+
+		@include button_secondary;
+
+		margin-bottom: 1em;
 	}
 
 	.archived {

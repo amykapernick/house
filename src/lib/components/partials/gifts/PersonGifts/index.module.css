@@ -1,0 +1,71 @@
+.person {
+	display: grid;
+	gap: 1.5em;
+
+	& h3 {
+		margin: 0 0 0.4em;
+	}
+}
+
+.sectionHeader {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 0.4em;
+	gap: 1em;
+
+	& h3 {
+		margin: 0;
+	}
+}
+
+.list {
+	display: grid;
+	gap: 0.4em;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.item {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0.4em 0;
+	border-bottom: 1px solid var(--border);
+	gap: 0.5em 1em;
+
+	& p {
+		margin: 0.2em 0 0;
+	}
+}
+
+.claimed {
+	color: var(--text_secondary);
+}
+
+.actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.4em;
+}
+
+.muted {
+	color: var(--text_secondary);
+}
+
+.sizes {
+	display: grid;
+	grid-template-columns: max-content 1fr;
+	gap: 0.3em 1em;
+	margin: 0;
+
+	& dt {
+		font-weight: 700;
+	}
+
+	& dd {
+		margin: 0;
+	}
+}

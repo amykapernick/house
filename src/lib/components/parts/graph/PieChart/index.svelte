@@ -13,6 +13,8 @@
 		formatValue?: (v: number) => string;
 		centerLabel?: string;
 		centerValue?: string;
+		// Rendered width/height in px - the SVG's own coordinates stay 200x200.
+		size?: number;
 		class?: string;
 	};
 
@@ -21,6 +23,7 @@
 		formatValue = (v) => v.toFixed(1),
 		centerLabel,
 		centerValue,
+		size = 200,
 		class: className = '',
 	}: Props = $props();
 
@@ -75,7 +78,7 @@
 </script>
 
 <div class="{styles['pie-wrap']} {className}">
-	<svg viewBox="0 0 200 200" class={styles.chart} role="img" aria-label="{slices.map((s) => `${s.label}: ${formatValue(s.value)}`).join(', ')}">
+	<svg viewBox="0 0 200 200" class={styles.chart} style:width="{size}px" style:height="{size}px" role="img" aria-label="{slices.map((s) => `${s.label}: ${formatValue(s.value)}`).join(', ')}">
 		{#each arcs as { slice, share, start, end }, i (slice.label)}
 			{@const outerR = hoveredIndex === i ? OUTER_R + HOVER_BUMP : OUTER_R}
 			{@const [labelX, labelY] = polar((outerR + INNER_R) / 2, (start + end) / 2)}

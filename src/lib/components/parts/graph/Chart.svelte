@@ -29,6 +29,7 @@
 		formatValue?: (v: number) => string;
 		centerLabel?: string;
 		centerValue?: string;
+		size?: number;
 	};
 
 	type Props = (BarProps | LineProps | PieProps) & {
@@ -62,6 +63,7 @@
 			formatValue={props.formatValue}
 			centerLabel={props.centerLabel}
 			centerValue={props.centerValue}
+			size={props.size}
 		/>
 	{/if}
 	<figcaption>{caption}</figcaption>

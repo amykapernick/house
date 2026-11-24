@@ -1,13 +1,68 @@
 {
 	"folders": [
 		{
+			"name": "house",
 			"path": ".."
 		},
 		{
+			"name": "kaperscrewe_api",
 			"path": "../../kaperscrewe_api"
 		}
 	],
 	"settings": {
-		"debug.internalConsoleOptions": "neverOpen"
+		"debug.internalConsoleOptions": "neverOpen",
+		"files.watcherExclude": {
+			"**/node_modules/**": true,
+			"**/.svelte-kit/**": true,
+			"**/dist/**": true,
+			"**/build/**": true,
+			"**/.git/objects/**": true
+		}
+	},
+	"extensions": {
+		"recommendations": [
+			"ms-azuretools.vscode-azurefunctions",
+			"svelte.svelte-vscode",
+			"dbaeumer.vscode-eslint",
+			"stylelint.vscode-stylelint",
+			"esbenp.prettier-vscode"
+		]
+	},
+	"tasks": {
+		"version": "2.0.0",
+		"tasks": [
+			{
+				"label": "API: npm run dev",
+				"type": "shell",
+				"command": "npm run dev",
+				"isBackground": true,
+				"problemMatcher": [],
+				"options": {
+					"cwd": "${workspaceFolder:kaperscrewe_api}"
+				},
+				"runOptions": {
+					"runOn": "folderOpen"
+				}
+			},
+			{
+				"label": "Frontend: npm start",
+				"type": "shell",
+				"command": "echo 'Waiting for API on :7074...'; for i in $(seq 1 180); do curl -s -o /dev/null http://localhost:7074/graphql && break; sleep 1; done; curl -s -o /dev/null http://localhost:7074/graphql || { echo 'API not up on :7074 after 180s - not starting frontend'; exit 1; }; npm start",
+				"isBackground": true,
+				"problemMatcher": [],
+				"options": {
+					"cwd": "${workspaceFolder:house}"
+				},
+				"runOptions": {
+					"runOn": "folderOpen"
+				}
+			},
+			{
+				"label": "Dev: API + Frontend",
+				"dependsOn": ["API: npm run dev", "Frontend: npm start"],
+				"dependsOrder": "parallel",
+				"problemMatcher": []
+			}
+		]
 	}
 }

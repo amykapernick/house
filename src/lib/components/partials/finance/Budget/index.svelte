@@ -80,7 +80,7 @@
 		return [...visibleItems].sort((a, b) => compareValues(sortValue(a, sortKey!), sortValue(b, sortKey!), sortDir));
 	});
 
-	function updateField<K extends 'description' | 'tags' | 'note' | 'income'>(id: string, field: K, value: BudgetItem[K]) {
+	function updateField<K extends 'description' | 'tags' | 'note'>(id: string, field: K, value: BudgetItem[K]) {
 		budget = budget.map((item) => (item.id === id ? { ...item, [field]: value } : item));
 		onChange?.();
 	}
@@ -130,18 +130,20 @@
 					direction={sortDir}
 					onclick={() => toggleSort('description')}
 				/>
-				<SortableTh
-					label="Bucket"
-					active={sortKey === 'bucket'}
-					direction={sortDir}
-					onclick={() => toggleSort('bucket')}
-				/>
-				<SortableTh
-					label="Tags"
-					active={sortKey === 'tags'}
-					direction={sortDir}
-					onclick={() => toggleSort('tags')}
-				/>
+				{#if !income}
+					<SortableTh
+						label="Bucket"
+						active={sortKey === 'bucket'}
+						direction={sortDir}
+						onclick={() => toggleSort('bucket')}
+					/>
+					<SortableTh
+						label="Tags"
+						active={sortKey === 'tags'}
+						direction={sortDir}
+						onclick={() => toggleSort('tags')}
+					/>
+				{/if}
 				<SortableTh
 					label="Budgeted"
 					active={sortKey === 'amount'}
@@ -172,22 +174,24 @@
 								oninput={(e) => updateField(id, 'description', e.currentTarget.value)}
 							/>
 						</td>
-						<td>
-							<select
-								value={bucket?.id ?? ''}
-								onchange={(e) => updateBucket(id, e.currentTarget.value)}
-							>
-								<option value="">No bucket</option>
-								{#each buckets as b (b.id)}<option value={b.id}>{b.name}</option>{/each}
-							</select>
-						</td>
-						<td>
-							<input
-								type="text"
-								value={tags ?? ''}
-								oninput={(e) => updateField(id, 'tags', e.currentTarget.value)}
-							/>
-						</td>
+						{#if !income}
+							<td>
+								<select
+									value={bucket?.id ?? ''}
+									onchange={(e) => updateBucket(id, e.currentTarget.value)}
+								>
+									<option value="">No bucket</option>
+									{#each buckets as b (b.id)}<option value={b.id}>{b.name}</option>{/each}
+								</select>
+							</td>
+							<td class={styles['edit-tags']}>
+								<input
+									type="text"
+									value={tags ?? ''}
+									oninput={(e) => updateField(id, 'tags', e.currentTarget.value)}
+								/>
+							</td>
+						{/if}
 						<td class="amount {styles['edit-amount']}">
 							<input
 								type="number"
@@ -201,15 +205,6 @@
 							>
 								{#each PERIODS as p (p)}<option value={p}>{p}ly</option>{/each}
 							</select>
-							<span class={styles['income-toggle']}>
-								<input
-									type="checkbox"
-									id="income-toggle-{id}"
-									checked={itemIncome}
-									onchange={(e) => updateField(id, 'income', e.currentTarget.checked)}
-								/>
-								<label for="income-toggle-{id}">Income</label>
-							</span>
 						</td>
 						{#if !income}<td class="amount">{thisMonthActualById.has(id) ? formatCurrency(thisMonthActualById.get(id) ?? 0) : ''}</td>{/if}
 						<td class={styles.actions}>
@@ -221,8 +216,10 @@
 						</td>
 					{:else}
 						<td>{description}</td>
-						<td>{bucket?.name}</td>
-						<td>{tags}</td>
+						{#if !income}
+							<td>{bucket?.name}</td>
+							<td>{tags}</td>
+						{/if}
 						<td class="amount">
 							{itemIncome ? '+' : ''}{amountPerMonth != null ? formatCurrency(amountPerMonth) : ''}
 						</td>

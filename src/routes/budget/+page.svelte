@@ -1,13 +1,14 @@
 <script lang="ts">
 	import { format, startOfWeek, subWeeks, endOfWeek } from 'date-fns';
 	import { DATE_FORMATS } from '$utils/dateFormats';
-	import { beforeNavigate } from '$app/navigation';
+	import { beforeNavigate, goto } from '$app/navigation';
+	import { page } from '$app/state';
 	import { resolve } from '$app/paths';
-	import Budget from '$partials/finance/Budget/index.svelte';
-	import BudgetBuckets from '$partials/finance/BudgetBuckets/index.svelte';
-	import BudgetCharts from '$partials/finance/BudgetCharts/index.svelte';
+	import BudgetView from '$partials/finance/BudgetView/index.svelte';
 	import BudgetComparison from '$partials/finance/BudgetComparison.svelte';
 	import BudgetCheckIn from '$partials/finance/BudgetCheckIn/index.svelte';
+	import BudgetScratchPad from '$partials/finance/BudgetScratchPad/index.svelte';
+	import Tabs from '$parts/Tabs/index.svelte';
 	import Modal from '$parts/Modal/index.svelte';
 	import Skeleton from '$parts/Skeleton/index.svelte';
 	import { isAuthenticated, getToken } from '$lib/auth';
@@ -17,6 +18,28 @@
 	import type { BudgetSpendEntry } from '$types/budgetSpend';
 	import { getPageTitle } from '$utils/pageTitle';
 	import Title from '$parts/Title/index.svelte';
+	import { cloneBudget, cloneBuckets } from '$utils/budgetScenarios';
+
+	const tabs = [
+		{ id: 'budget', label: 'Budget' },
+		{ id: 'tracking', label: 'Tracking' },
+		{ id: 'scratch-pad', label: 'Scratch Pad' },
+	];
+
+	let activeTab = $state(tabs[0].id);
+
+	$effect(() => {
+		const hash = page.url.hash.slice(1);
+		if (hash && tabs.some((t) => t.id === hash)) {
+			activeTab = hash;
+		}
+	});
+
+	function setActiveTab(id: string) {
+		activeTab = id;
+		// eslint-disable-next-line svelte/no-navigation-without-resolve -- resolve() is used; the rule can't trace it through template-literal concatenation with the hash
+		goto(`${resolve('/budget')}#${id}`, { replaceState: true, noScroll: true, keepFocus: true });
+	}
 
 	let checkInOpen = $state(false);
 	// Check-in logs the previous, already-completed Monday-Sunday week rather than the
@@ -89,12 +112,6 @@
 	// Editing - editableBudget/editableBuckets are the working copy fed to the
 	// tables/charts everywhere; they track budget/buckets (the server truth)
 	// until the user starts changing them.
-	function cloneBudget(items: BudgetItem[]): BudgetItem[] {
-		return items.map((item) => ({ ...item, bucket: item.bucket ? { ...item.bucket } : undefined }));
-	}
-	function cloneBuckets(items: BudgetBucket[]): BudgetBucket[] {
-		return items.map((bucket) => ({ ...bucket }));
-	}
 
 	let editableBudget = $state<BudgetItem[]>([]);
 	let editableBuckets = $state<BudgetBucket[]>([]);
@@ -230,29 +247,61 @@
 {#if loading}
 	<Skeleton rows={3} />
 {:else}
-	<div class="budget-toolbar">
-		{#if editing}
-			{#if dirty}<span class="unsaved">Unsaved changes</span>{/if}
-			<button type="button" onclick={handleSave} disabled={saving}>{saving ? 'Saving…' : 'Save'}</button>
-			<button type="button" onclick={discard} disabled={saving}>Discard</button>
-			{#if saveError}<span class="error">{saveError}</span>{/if}
-		{:else}
-			<button type="button" onclick={startEditing}>Edit</button>
-		{/if}
-		<button type="button" onclick={() => (checkInOpen = true)}>Log last week's spend</button>
-		<a href={resolve('/budget/import')}>Import transactions</a>
-	</div>
+	<Tabs
+		{tabs}
+		active={activeTab}
+		onSelect={setActiveTab}
+	/>
 
-	<h2>Overview</h2>
-	<BudgetCharts budget={editableBudget} buckets={editableBuckets} entries={budgetSpend} />
-	<h2>Actual vs Budget</h2>
-	<BudgetComparison budget={budget} buckets={buckets} entries={budgetSpend} />
-	<h2>Buckets</h2>
-	<BudgetBuckets bind:buckets={editableBuckets} budget={editableBudget} entries={budgetSpend} {editing} onChange={() => (dirty = true)} />
-	<h2>Expenses</h2>
-	<Budget bind:budget={editableBudget} buckets={editableBuckets} entries={budgetSpend} income={false} {editing} onChange={() => (dirty = true)} />
-	<h2>Income</h2>
-	<Budget bind:budget={editableBudget} buckets={editableBuckets} entries={budgetSpend} income={true} {editing} onChange={() => (dirty = true)} />
+	{#if activeTab === 'budget'}
+		<div
+			id="panel-budget"
+			role="tabpanel"
+			aria-labelledby="tab-budget"
+			tabindex="0"
+		>
+			<div class="budget-toolbar">
+				{#if editing}
+					{#if dirty}<span class="unsaved">Unsaved changes</span>{/if}
+					<button type="button" onclick={handleSave} disabled={saving}>{saving ? 'Saving…' : 'Save'}</button>
+					<button type="button" onclick={discard} disabled={saving}>Discard</button>
+					{#if saveError}<span class="error">{saveError}</span>{/if}
+				{:else}
+					<button type="button" onclick={startEditing}>Edit</button>
+				{/if}
+			</div>
+
+			<BudgetView bind:budget={editableBudget} bind:buckets={editableBuckets} entries={budgetSpend} {editing} onChange={() => (dirty = true)} />
+		</div>
+	{/if}
+
+	{#if activeTab === 'tracking'}
+		<div
+			id="panel-tracking"
+			role="tabpanel"
+			aria-labelledby="tab-tracking"
+			tabindex="0"
+		>
+			<div class="budget-toolbar">
+				<button type="button" onclick={() => (checkInOpen = true)}>Log last week's spend</button>
+				<a href={resolve('/budget/import')}>Import transactions</a>
+			</div>
+
+			<h2>Actual vs Budget</h2>
+			<BudgetComparison budget={budget} buckets={buckets} entries={budgetSpend} />
+		</div>
+	{/if}
+
+	{#if activeTab === 'scratch-pad'}
+		<div
+			id="panel-scratch-pad"
+			role="tabpanel"
+			aria-labelledby="tab-scratch-pad"
+			tabindex="0"
+		>
+			<BudgetScratchPad {budget} {buckets} entries={budgetSpend} />
+		</div>
+	{/if}
 
 	<Modal bind:open={checkInOpen} title="Budget Check-in">
 		<p class="week-label">

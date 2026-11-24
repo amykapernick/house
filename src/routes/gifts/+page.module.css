@@ -1,0 +1,117 @@
+@import '@mixins';
+
+.panel {
+	display: grid;
+	gap: 1em;
+	padding-top: 1em;
+}
+
+.toolbar {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5em;
+}
+
+.occasions {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(min(100%, 20em), 1fr));
+	gap: 1em;
+	align-items: start;
+}
+
+.link {
+	display: grid;
+	gap: 0.6em;
+	max-width: 30em;
+
+	& h2,
+	& p {
+		margin: 0;
+	}
+
+	& button {
+		justify-self: start;
+	}
+}
+
+.warning {
+	color: var(--red);
+}
+
+.notice {
+	color: var(--text_secondary);
+}
+
+.muted {
+	color: var(--text_secondary);
+}
+
+.needs {
+	padding: 0.8em 1em;
+	border: 1px solid var(--orange);
+	border-radius: 0.5em;
+
+	& h2 {
+		margin: 0 0 0.5em;
+		font-size: 1.1em;
+	}
+
+	& ul {
+		display: grid;
+		gap: 0.4em;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	& li {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.5em 1em;
+	}
+}
+
+.tableWrap {
+	overflow-x: auto;
+}
+
+.table {
+	width: 100%;
+	border-collapse: collapse;
+
+	& th,
+	& td {
+		padding: 0.4em 0.6em;
+		border-bottom: 1px solid var(--border);
+		text-align: left;
+		vertical-align: middle;
+	}
+}
+
+.status {
+	text-transform: capitalize;
+}
+
+.rowActions {
+	display: flex;
+	gap: 0.4em;
+	white-space: nowrap;
+}
+
+.viewer {
+	margin: 0 0 0.5em;
+	color: var(--text_secondary);
+}
+
+.quick {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.4em;
+}
+
+.secondary {
+
+	@include button_secondary;
+}

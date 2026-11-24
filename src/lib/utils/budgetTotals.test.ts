@@ -46,13 +46,11 @@ describe(`bucketTotals`, () => {
 	});
 
 	it(`derives a bucket's income from its percentage of total income, not from its own items`, () => {
-		const budget: BudgetItem[] = [item({ income: true, monthlyAmount: 1000 })];
-		const bucket: BudgetBucket = {
-			id: `bucket-1`,
-			name: `Essentials`,
-			percentage: 50,
-			items: [item({ income: false, monthlyAmount: 100 })],
-		};
+		const bucket: BudgetBucket = { id: `bucket-1`, name: `Essentials`, percentage: 50 };
+		const budget: BudgetItem[] = [
+			item({ income: true, monthlyAmount: 1000 }),
+			item({ income: false, monthlyAmount: 100, bucket }),
+		];
 
 		const [result] = bucketTotals([bucket], budget);
 
@@ -60,7 +58,7 @@ describe(`bucketTotals`, () => {
 		expect(result.expenses).toBe(100);
 	});
 
-	it(`defaults missing percentage and items to 0/[]`, () => {
+	it(`defaults missing percentage and expenses to 0`, () => {
 		const bucket: BudgetBucket = { id: `bucket-2`, name: `No config` };
 
 		const [result] = bucketTotals([bucket], []);
@@ -71,16 +69,31 @@ describe(`bucketTotals`, () => {
 	});
 
 	it(`excludes income items from a bucket's own expenses total`, () => {
-		const bucket: BudgetBucket = {
-			id: `bucket-3`,
-			name: `Mixed`,
-			percentage: 10,
-			items: [item({ income: true, monthlyAmount: 5000 }), item({ income: false, monthlyAmount: 50 })],
-		};
+		const bucket: BudgetBucket = { id: `bucket-3`, name: `Mixed`, percentage: 10 };
+		const budget: BudgetItem[] = [
+			item({ income: true, monthlyAmount: 5000, bucket }),
+			item({ income: false, monthlyAmount: 50, bucket }),
+		];
 
-		const [result] = bucketTotals([bucket], []);
+		const [result] = bucketTotals([bucket], budget);
 
 		expect(result.expenses).toBe(50);
+	});
+
+	it(`sums expenses from the budget items assigned to each bucket, ignoring the server's bucket.items`, () => {
+		const bills: BudgetBucket = { id: `bills`, name: `Bills`, items: [item({ monthlyAmount: 999 })] };
+		const fun: BudgetBucket = { id: `fun`, name: `Fun` };
+		const budget: BudgetItem[] = [
+			item({ monthlyAmount: 100, bucket: bills }),
+			item({ monthlyAmount: 25, bucket: { id: `bills`, name: `Bills` } }),
+			item({ monthlyAmount: 40, bucket: fun }),
+			item({ monthlyAmount: 10 }),
+		];
+
+		const [billsTotal, funTotal] = bucketTotals([bills, fun], budget);
+
+		expect(billsTotal.expenses).toBe(125);
+		expect(funTotal.expenses).toBe(40);
 	});
 
 	it(`passes percentageGoal through unchanged`, () => {

@@ -1,0 +1,23 @@
+.fields {
+	display: grid;
+	gap: 0.4em;
+}
+
+.people {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.4em;
+	margin: 0;
+	padding: 0;
+	border: none;
+
+	& legend {
+		margin-bottom: 0.3em;
+		padding: 0;
+	}
+}
+
+
+.error {
+	color: var(--red);
+}

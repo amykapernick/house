@@ -2,7 +2,7 @@
 	import type { Resource } from '$types/resources';
 	import Card from '$parts/resources/Card/index.svelte';
 
-	let { items, class: className = '' }: { items: Resource[]; class?: string } = $props();
+	let { items, onEdit, class: className = '' }: { items: Resource[]; onEdit?: (resource: Resource) => void; class?: string } = $props();
 
 	let grouped = $derived.by(() => {
 		const groups: Record<string, Resource[]> = {};
@@ -20,5 +20,9 @@
 </script>
 
 {#each Object.entries(grouped) as [category, categoryResources] (category)}
-	<Card {category} items={categoryResources} />
+	<Card
+		{category}
+		items={categoryResources}
+		{onEdit}
+	/>
 {/each}

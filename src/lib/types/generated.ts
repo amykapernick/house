@@ -468,6 +468,205 @@ export type FreezerRecipeLink = {
 	slug: Maybe<Scalars[`String`][`output`]>;
 };
 
+export type GiftHistoryEntry = {
+	byUs: Scalars[`Boolean`][`output`];
+	canEdit: Scalars[`Boolean`][`output`];
+	date: Maybe<Scalars[`String`][`output`]>;
+	giver: Maybe<Scalars[`String`][`output`]>;
+	id: Scalars[`ID`][`output`];
+	needsDetails: Scalars[`Boolean`][`output`];
+	occasionId: Maybe<Scalars[`ID`][`output`]>;
+	occasionName: Maybe<Scalars[`String`][`output`]>;
+	personId: Scalars[`ID`][`output`];
+	personName: Scalars[`String`][`output`];
+	price: Maybe<Scalars[`Float`][`output`]>;
+	purchase: Maybe<GiftPurchase>;
+	purchaseId: Maybe<Scalars[`ID`][`output`]>;
+	quickOccasions: Array<GiftQuickOccasion>;
+	source: Scalars[`String`][`output`];
+	status: Scalars[`String`][`output`];
+	title: Scalars[`String`][`output`];
+	url: Maybe<Scalars[`String`][`output`]>;
+	wishlistClaimId: Maybe<Scalars[`ID`][`output`]>;
+	wishlistItemId: Maybe<Scalars[`ID`][`output`]>;
+	year: Maybe<Scalars[`Int`][`output`]>;
+};
+
+export type GiftHouseholdMember = {
+	hasLogin: Scalars[`Boolean`][`output`];
+	isViewer: Scalars[`Boolean`][`output`];
+	name: Scalars[`String`][`output`];
+	slug: Scalars[`String`][`output`];
+	wishlistPersonId: Maybe<Scalars[`ID`][`output`]>;
+	wishlistPersonName: Maybe<Scalars[`String`][`output`]>;
+};
+
+export type GiftIdea = {
+	canSuggest: Scalars[`Boolean`][`output`];
+	created: Maybe<Scalars[`String`][`output`]>;
+	id: Scalars[`ID`][`output`];
+	notes: Maybe<Scalars[`String`][`output`]>;
+	occasionId: Maybe<Scalars[`ID`][`output`]>;
+	occasionName: Maybe<Scalars[`String`][`output`]>;
+	personId: Scalars[`ID`][`output`];
+	personName: Scalars[`String`][`output`];
+	price: Maybe<Scalars[`Float`][`output`]>;
+	status: Scalars[`String`][`output`];
+	title: Scalars[`String`][`output`];
+	url: Maybe<Scalars[`String`][`output`]>;
+	wishlistItemId: Maybe<Scalars[`ID`][`output`]>;
+};
+
+export type GiftIdeaInput = {
+	notes?: InputMaybe<Scalars[`String`][`input`]>;
+	occasionId?: InputMaybe<Scalars[`ID`][`input`]>;
+	personId: Scalars[`ID`][`input`];
+	price?: InputMaybe<Scalars[`Float`][`input`]>;
+	status?: InputMaybe<Scalars[`String`][`input`]>;
+	title: Scalars[`String`][`input`];
+	url?: InputMaybe<Scalars[`String`][`input`]>;
+};
+
+export type GiftLinkOption = {
+	id: Scalars[`ID`][`output`];
+	name: Scalars[`String`][`output`];
+};
+
+export type GiftMutationResult = {
+	id: Maybe<Scalars[`ID`][`output`]>;
+	message: Maybe<Scalars[`String`][`output`]>;
+	success: Scalars[`Boolean`][`output`];
+};
+
+export type GiftOccasion = {
+	date: Scalars[`String`][`output`];
+	daysUntil: Scalars[`Int`][`output`];
+	id: Scalars[`ID`][`output`];
+	name: Scalars[`String`][`output`];
+	next: Scalars[`String`][`output`];
+	people: Array<GiftOccasionPerson>;
+	personIds: Array<Scalars[`ID`][`output`]>;
+	spent: Scalars[`Float`][`output`];
+	type: Scalars[`String`][`output`];
+	year: Scalars[`Int`][`output`];
+};
+
+export type GiftOccasionInput = {
+	date?: InputMaybe<Scalars[`String`][`input`]>;
+	month?: InputMaybe<Scalars[`Int`][`input`]>;
+	name: Scalars[`String`][`input`];
+	personIds?: InputMaybe<Array<Scalars[`ID`][`input`]>>;
+	type?: InputMaybe<Scalars[`String`][`input`]>;
+};
+
+export type GiftOccasionPerson = {
+	name: Scalars[`String`][`output`];
+	personId: Scalars[`ID`][`output`];
+	purchases: Array<GiftPurchase>;
+	spent: Scalars[`Float`][`output`];
+};
+
+export type GiftPerson = {
+	history: Array<GiftHistoryEntry>;
+	id: Scalars[`ID`][`output`];
+	ideas: Array<GiftIdea>;
+	isUs: Scalars[`Boolean`][`output`];
+	name: Scalars[`String`][`output`];
+	nextOccasion: Maybe<GiftOccasion>;
+	occasions: Array<GiftOccasion>;
+	purchases: Array<GiftPurchase>;
+	sizes: Array<GiftSize>;
+	wishlist: Array<GiftWishlistItem>;
+};
+
+
+export type GiftPersonIdeasArgs = {
+	includeClosed?: InputMaybe<Scalars[`Boolean`][`input`]>;
+};
+
+export type GiftPurchase = {
+	boughtBy: Maybe<Scalars[`String`][`output`]>;
+	created: Maybe<Scalars[`String`][`output`]>;
+	id: Scalars[`ID`][`output`];
+	ideaId: Maybe<Scalars[`ID`][`output`]>;
+	notes: Maybe<Scalars[`String`][`output`]>;
+	occasionId: Maybe<Scalars[`ID`][`output`]>;
+	occasionName: Maybe<Scalars[`String`][`output`]>;
+	personId: Scalars[`ID`][`output`];
+	personName: Scalars[`String`][`output`];
+	price: Maybe<Scalars[`Float`][`output`]>;
+	status: Scalars[`String`][`output`];
+	title: Scalars[`String`][`output`];
+	url: Maybe<Scalars[`String`][`output`]>;
+	wishlistClaimId: Maybe<Scalars[`ID`][`output`]>;
+	wishlistItemId: Maybe<Scalars[`ID`][`output`]>;
+	year: Maybe<Scalars[`Int`][`output`]>;
+};
+
+export type GiftPurchaseInput = {
+	ideaId?: InputMaybe<Scalars[`ID`][`input`]>;
+	notes?: InputMaybe<Scalars[`String`][`input`]>;
+	occasionId?: InputMaybe<Scalars[`ID`][`input`]>;
+	personId: Scalars[`ID`][`input`];
+	price?: InputMaybe<Scalars[`Float`][`input`]>;
+	status?: InputMaybe<Scalars[`String`][`input`]>;
+	title: Scalars[`String`][`input`];
+	url?: InputMaybe<Scalars[`String`][`input`]>;
+	wishlistClaimId?: InputMaybe<Scalars[`ID`][`input`]>;
+	wishlistItemId?: InputMaybe<Scalars[`ID`][`input`]>;
+};
+
+export type GiftQuickOccasion = {
+	id: Scalars[`ID`][`output`];
+	label: Scalars[`String`][`output`];
+	year: Scalars[`Int`][`output`];
+};
+
+export type GiftSize = {
+	item: Scalars[`String`][`output`];
+	size: Scalars[`String`][`output`];
+	updatedAt: Maybe<Scalars[`String`][`output`]>;
+};
+
+export type GiftWishlistItem = {
+	canClaim: Scalars[`Boolean`][`output`];
+	claimed: Scalars[`Boolean`][`output`];
+	claimedAt: Maybe<Scalars[`String`][`output`]>;
+	claimedBy: Maybe<Scalars[`String`][`output`]>;
+	claimedByUs: Scalars[`Boolean`][`output`];
+	evergreen: Scalars[`Boolean`][`output`];
+	id: Scalars[`ID`][`output`];
+	notes: Maybe<Scalars[`String`][`output`]>;
+	personId: Scalars[`ID`][`output`];
+	personName: Scalars[`String`][`output`];
+	suggestedBy: Maybe<Scalars[`String`][`output`]>;
+	title: Scalars[`String`][`output`];
+	url: Maybe<Scalars[`String`][`output`]>;
+};
+
+export type Gifts = {
+	history: Array<GiftHistoryEntry>;
+	household: Array<GiftHouseholdMember>;
+	linkOptions: Array<GiftLinkOption>;
+	linked: Scalars[`Boolean`][`output`];
+	needsDetails: Array<GiftHistoryEntry>;
+	occasions: Array<GiftOccasion>;
+	people: Array<GiftPerson>;
+	person: Maybe<GiftPerson>;
+	viewer: Maybe<GiftHouseholdMember>;
+	wishlistAvailable: Scalars[`Boolean`][`output`];
+};
+
+
+export type GiftsHistoryArgs = {
+	personId?: InputMaybe<Scalars[`ID`][`input`]>;
+};
+
+
+export type GiftsPersonArgs = {
+	id: Scalars[`ID`][`input`];
+};
+
 export type Growth = {
 	check_frequency: Scalars[`Int`][`output`];
 	last_updated: Scalars[`String`][`output`];
@@ -753,6 +952,7 @@ export type Mutation = {
 	addBook: Maybe<Book>;
 	addRecipesToShoppingList: Maybe<AddRecipesToShoppingListResult>;
 	checkShoppingItem: Maybe<CheckShoppingItemResult>;
+	claimGiftWishlistItem: Maybe<GiftMutationResult>;
 	completeHabit: Maybe<CompleteTaskResult>;
 	completeTask: Maybe<CompleteTaskResult>;
 	createBudgetItem: Maybe<BudgetMutationResult>;
@@ -763,23 +963,33 @@ export type Mutation = {
 	createHouseItem: Maybe<HouseMutationResult>;
 	createMealPlanEntry: Maybe<MealPlanEntry>;
 	createMealPlanMeatReminders: Maybe<MealPlanMeatReminderResult>;
+	createResource: Maybe<Resource>;
 	createRoutineOverride: Maybe<ScheduleMutationResult>;
 	createShoppingItem: Maybe<CreateShoppingItemResult>;
 	createTask: Maybe<CreateTaskResult>;
 	deleteBudgetItem: Maybe<BudgetMutationResult>;
 	deleteBudgetRule: Maybe<BudgetMutationResult>;
 	deleteColour: Maybe<ColourMutationResult>;
+	deleteGiftIdea: Maybe<GiftMutationResult>;
+	deleteGiftOccasion: Maybe<GiftMutationResult>;
+	deleteGiftPurchase: Maybe<GiftMutationResult>;
 	deleteHouseArea: Maybe<HouseMutationResult>;
 	deleteHouseItem: Maybe<HouseMutationResult>;
 	deleteMealPlanEntry: Maybe<MealPlanMutationResult>;
+	deleteResource: Maybe<Scalars[`Boolean`][`output`]>;
 	dismissAlert: Maybe<Scalars[`Boolean`][`output`]>;
 	importRecipe: Maybe<Recipe>;
+	linkGiftsPerson: Maybe<GiftMutationResult>;
 	markToothErupted: Maybe<Tooth>;
 	saveArticle: Maybe<Scalars[`String`][`output`]>;
+	saveGiftIdea: Maybe<GiftMutationResult>;
+	saveGiftOccasion: Maybe<GiftMutationResult>;
+	saveGiftPurchase: Maybe<GiftMutationResult>;
 	savePushSubscription: Maybe<PushSubscriptionResult>;
 	/** Creates the rule for field+value, or replaces it if one already exists. */
 	setBudgetRule: Maybe<BudgetMutationResult>;
 	setBudgetSpend: Maybe<BudgetMutationResult>;
+	suggestGiftIdea: Maybe<GiftMutationResult>;
 	updateAuslanSignStatus: Maybe<AuslanSign>;
 	updateBudgetBucketPercentage: Maybe<BudgetMutationResult>;
 	updateBudgetItem: Maybe<BudgetMutationResult>;
@@ -794,6 +1004,7 @@ export type Mutation = {
 	updateMe: Maybe<User>;
 	updateMealPlanEntry: Maybe<MealPlanEntry>;
 	updateMilestoneStatus: Maybe<Milestone>;
+	updateResource: Maybe<Resource>;
 	updateSwimSkillStatus: Maybe<SwimSkill>;
 	updateTaskStatus: Maybe<CompleteTaskResult>;
 	updateVaccinationStatus: Maybe<VaccinationItem>;
@@ -814,6 +1025,12 @@ export type MutationCheckShoppingItemArgs = {
 	checked: Scalars[`Boolean`][`input`];
 	itemId: Scalars[`String`][`input`];
 	source: Scalars[`String`][`input`];
+};
+
+
+export type MutationClaimGiftWishlistItemArgs = {
+	input?: InputMaybe<GiftPurchaseInput>;
+	itemId: Scalars[`ID`][`input`];
 };
 
 
@@ -876,6 +1093,11 @@ export type MutationCreateMealPlanMeatRemindersArgs = {
 };
 
 
+export type MutationCreateResourceArgs = {
+	input: ResourceInput;
+};
+
+
 export type MutationCreateRoutineOverrideArgs = {
 	end: Scalars[`String`][`input`];
 	friday: Array<RoutineDayBlockInput>;
@@ -918,6 +1140,21 @@ export type MutationDeleteColourArgs = {
 };
 
 
+export type MutationDeleteGiftIdeaArgs = {
+	id: Scalars[`ID`][`input`];
+};
+
+
+export type MutationDeleteGiftOccasionArgs = {
+	id: Scalars[`ID`][`input`];
+};
+
+
+export type MutationDeleteGiftPurchaseArgs = {
+	id: Scalars[`ID`][`input`];
+};
+
+
 export type MutationDeleteHouseAreaArgs = {
 	id: Scalars[`String`][`input`];
 };
@@ -933,6 +1170,11 @@ export type MutationDeleteMealPlanEntryArgs = {
 };
 
 
+export type MutationDeleteResourceArgs = {
+	id: Scalars[`ID`][`input`];
+};
+
+
 export type MutationDismissAlertArgs = {
 	id: Scalars[`ID`][`input`];
 };
@@ -940,6 +1182,12 @@ export type MutationDismissAlertArgs = {
 
 export type MutationImportRecipeArgs = {
 	url: Scalars[`String`][`input`];
+};
+
+
+export type MutationLinkGiftsPersonArgs = {
+	memberSlug?: InputMaybe<Scalars[`String`][`input`]>;
+	personId: Scalars[`ID`][`input`];
 };
 
 
@@ -952,6 +1200,24 @@ export type MutationSaveArticleArgs = {
 	excerpt?: InputMaybe<Scalars[`String`][`input`]>;
 	title: Scalars[`String`][`input`];
 	url: Scalars[`String`][`input`];
+};
+
+
+export type MutationSaveGiftIdeaArgs = {
+	id?: InputMaybe<Scalars[`ID`][`input`]>;
+	input: GiftIdeaInput;
+};
+
+
+export type MutationSaveGiftOccasionArgs = {
+	id?: InputMaybe<Scalars[`ID`][`input`]>;
+	input: GiftOccasionInput;
+};
+
+
+export type MutationSaveGiftPurchaseArgs = {
+	id?: InputMaybe<Scalars[`ID`][`input`]>;
+	input: GiftPurchaseInput;
 };
 
 
@@ -974,6 +1240,11 @@ export type MutationSetBudgetSpendArgs = {
 	amount: Scalars[`Float`][`input`];
 	budgetItem: Scalars[`String`][`input`];
 	weekStart: Scalars[`String`][`input`];
+};
+
+
+export type MutationSuggestGiftIdeaArgs = {
+	id: Scalars[`ID`][`input`];
 };
 
 
@@ -1070,6 +1341,12 @@ export type MutationUpdateMilestoneStatusArgs = {
 };
 
 
+export type MutationUpdateResourceArgs = {
+	id: Scalars[`ID`][`input`];
+	input: ResourceInput;
+};
+
+
 export type MutationUpdateSwimSkillStatusArgs = {
 	id: Scalars[`ID`][`input`];
 	status: MilestoneStatus;
@@ -1103,6 +1380,30 @@ export type NoonarSeason = {
 };
 
 export type Note = CarSeat | ParentingApproachNote | ToddlerSleepPrepNote;
+
+export type NoteEntry = {
+	archived: Scalars[`Boolean`][`output`];
+	content: Scalars[`String`][`output`];
+	createTime: Maybe<Scalars[`DateTime`][`output`]>;
+	creator: Maybe<Scalars[`String`][`output`]>;
+	id: Scalars[`ID`][`output`];
+	pinned: Scalars[`Boolean`][`output`];
+	snippet: Maybe<Scalars[`String`][`output`]>;
+	space: Maybe<NoteSpace>;
+	tags: Array<Scalars[`String`][`output`]>;
+	title: Maybe<Scalars[`String`][`output`]>;
+	updateTime: Maybe<Scalars[`DateTime`][`output`]>;
+	url: Maybe<Scalars[`String`][`output`]>;
+	visibility: Maybe<Scalars[`String`][`output`]>;
+};
+
+export type NoteSpace = {
+	description: Maybe<Scalars[`String`][`output`]>;
+	icon: Maybe<Scalars[`String`][`output`]>;
+	id: Scalars[`ID`][`output`];
+	name: Scalars[`String`][`output`];
+	title: Scalars[`String`][`output`];
+};
 
 export type Overview = {
 	age_months: Scalars[`Float`][`output`];
@@ -1180,11 +1481,14 @@ export type Query = {
 	contentPage: Maybe<ContentPage>;
 	events: Maybe<Array<Maybe<Event>>>;
 	freezerItems: Maybe<Array<FreezerItem>>;
+	gifts: Maybe<Gifts>;
 	habits: Maybe<Array<Maybe<Habit>>>;
 	house: Maybe<House>;
 	me: Maybe<User>;
 	mealPlanByDay: Array<MealPlanDay>;
 	mealPlans: Maybe<MealPlanList>;
+	noteSpaces: Array<NoteSpace>;
+	notes: Array<NoteEntry>;
 	projects: Maybe<Array<Maybe<Project>>>;
 	pushPublicKey: Maybe<Scalars[`String`][`output`]>;
 	recipe: Maybe<Recipe>;
@@ -1267,6 +1571,15 @@ export type QueryMealPlansArgs = {
 	page?: InputMaybe<Scalars[`Int`][`input`]>;
 	perPage?: InputMaybe<Scalars[`Int`][`input`]>;
 	startDate?: InputMaybe<Scalars[`String`][`input`]>;
+};
+
+
+export type QueryNotesArgs = {
+	archived?: InputMaybe<Scalars[`Boolean`][`input`]>;
+	pinned?: InputMaybe<Scalars[`Boolean`][`input`]>;
+	search?: InputMaybe<Scalars[`String`][`input`]>;
+	spaces?: InputMaybe<Array<Scalars[`String`][`input`]>>;
+	tags?: InputMaybe<Array<Scalars[`String`][`input`]>>;
 };
 
 
@@ -1443,9 +1756,28 @@ export type Resource = {
 	icon: Maybe<Scalars[`String`][`output`]>;
 	id: Maybe<Scalars[`String`][`output`]>;
 	image: Maybe<Scalars[`String`][`output`]>;
+	localUrl: Maybe<Scalars[`String`][`output`]>;
 	login: Maybe<Scalars[`String`][`output`]>;
 	name: Maybe<Scalars[`String`][`output`]>;
 	url: Maybe<Scalars[`String`][`output`]>;
+};
+
+export type ResourceIconUpload = {
+	content: Scalars[`String`][`input`];
+	filename: Scalars[`String`][`input`];
+	type: Scalars[`String`][`input`];
+};
+
+export type ResourceInput = {
+	archived?: InputMaybe<Scalars[`Boolean`][`input`]>;
+	category?: InputMaybe<Scalars[`String`][`input`]>;
+	description?: InputMaybe<Scalars[`String`][`input`]>;
+	icon?: InputMaybe<Scalars[`String`][`input`]>;
+	iconUpload?: InputMaybe<ResourceIconUpload>;
+	localUrl?: InputMaybe<Scalars[`String`][`input`]>;
+	login?: InputMaybe<Scalars[`String`][`input`]>;
+	name?: InputMaybe<Scalars[`String`][`input`]>;
+	url?: InputMaybe<Scalars[`String`][`input`]>;
 };
 
 export type RoutineDayBlockInput = {

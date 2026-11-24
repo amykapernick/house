@@ -1,0 +1,13 @@
+.fields {
+	display: grid;
+	gap: 0.4em;
+}
+
+.hint {
+	margin-top: 0;
+	color: var(--text_secondary);
+}
+
+.error {
+	color: var(--red);
+}

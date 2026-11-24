@@ -29,6 +29,7 @@ import ScheduleColour from '$img/icons/gantt-2.svg?component'
 import BudgetColour from '$img/icons/analytics-2.svg?component'
 import HealthColour from '$img/icons/phone-heartbeat-2.svg?component'
 import DashboardIconColour from '$img/icons/layout-11-3.svg?component'
+import GiftsColour from '$img/icons/save-the-date-2.svg?component'
 
 // TODO: Render both versions of icons so can show/hide different versions as needed
 export const menuItems: MenuItem[] = [
@@ -89,6 +90,12 @@ export const menuItems: MenuItem[] = [
 		link: resolve(`/shopping-list`),
 		auth: true,
 		Icon: ShopListColour
+	},
+	{
+		label: `Gifts`,
+		link: resolve(`/gifts`),
+		auth: true,
+		Icon: GiftsColour
 	},
 	{
 		label: `Reference`,

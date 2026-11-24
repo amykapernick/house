@@ -5,7 +5,7 @@
 	import OP from '$img/icons/1password.svg?component';
 	import styles from './index.module.css';
 
-	let { id, name, url, icon, login, description, archived, image, brand, model, external, ipAddress, ramStorage, content, email, phone, lastUsed }: Omit<Resource, 'category'> = $props();
+	let { id, name, url, localUrl, icon, login, description, archived, image, brand, model, external, ipAddress, ramStorage, content, email, phone, lastUsed, onEdit }: Omit<Resource, 'category'> & { onEdit?: () => void } = $props();
 
 	function formatDate(date?: string) {
 		if (!date) return null;
@@ -13,7 +13,14 @@
 	}
 </script>
 
-<li class={styles.root} data-archived={archived}>
+<li class={styles.root} data-archived={archived} data-editable={Boolean(onEdit)}>
+	{#if onEdit}
+		<button
+			type="button"
+			class={styles.edit}
+			onclick={onEdit}
+		>Edit<span class="sr-only"> {name}</span></button>
+	{/if}
 	<h3 {id}>
 		{#if url}
 			<!-- url is an external resource link, not an internal route -->
@@ -30,7 +37,7 @@
 			{name}
 		{/if}
 	</h3>
-	{#if icon && icon.startsWith('http')}
+	{#if icon && /^(https?:|data:image\/)/.test(icon)}
 		<img
 			class={styles.icon}
 			src={icon}
@@ -65,6 +72,21 @@
 		>
 			<span class="sr-only">External listing for {name} </span>
 			Link
+		</a>
+		<!-- eslint-enable svelte/no-navigation-without-resolve -->
+	{/if}
+
+	{#if localUrl}
+		<!-- localUrl is a link on the home network, not an internal route -->
+		<!-- eslint-disable svelte/no-navigation-without-resolve -->
+		<a
+			href={localUrl}
+			target="_blank"
+			rel="noreferrer"
+			class={styles.ext}
+		>
+			<span class="sr-only">{name} on the home network: </span>
+			Local
 		</a>
 		<!-- eslint-enable svelte/no-navigation-without-resolve -->
 	{/if}

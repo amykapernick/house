@@ -126,6 +126,7 @@
 				formatValue={formatPercent}
 				centerValue="{totalAllocated.toFixed(0)}%"
 				centerLabel="Allocated"
+				size={280}
 				caption="Bucket split (% of income)"
 				class="chart-card"
 			/>

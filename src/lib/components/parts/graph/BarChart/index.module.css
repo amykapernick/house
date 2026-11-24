@@ -10,17 +10,20 @@
 
 .axis {
 	stroke-width: 1.5;
-	stroke: var(--grey);
+	stroke: var(--text_muted);
 }
 
 .gridline {
 	stroke-width: 1;
 	stroke-dasharray: 4 4;
-	stroke: var(--grey_light);
+	stroke: var(--border);
 }
 
+/* --grey isn't themed, so it's too dark against the dark-mode background -
+   --text_secondary switches to grey_light there. */
+
 .tick-label {
-	fill: var(--grey);
+	fill: var(--text_secondary);
 	font-size: 11px;
 }
 
