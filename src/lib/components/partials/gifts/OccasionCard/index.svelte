@@ -76,6 +76,41 @@
 							>
 						</div>
 
+						{#if entry.themed || entry.santa}
+							<ul
+								class={styles.themes}
+								aria-label="Gift theme for {entry.name}"
+							>
+								{#if entry.themed}
+									{#each entry.themes as theme (theme.tag)}
+										<li>
+											<Pill
+												class={styles.theme}
+												status={theme.count ? `success` : undefined}
+												outline={!theme.count}
+											>
+												<span class="sr-only">{themeName(theme.tag)}: {theme.count ? `got ${theme.count}` : `still to get`}</span>
+												<span aria-hidden="true"
+													>{tagLabel(theme.tag)}{#if theme.count > 1}&nbsp;×{theme.count}{/if}</span
+												>
+											</Pill>
+										</li>
+									{/each}
+								{/if}
+								{#if entry.santa}
+									<li>
+										<Pill
+											class={styles.theme}
+											status="info"
+										>
+											<span class="sr-only">From Santa: {entry.santa}</span>
+											<span aria-hidden="true">Santa&nbsp;×{entry.santa}</span>
+										</Pill>
+									</li>
+								{/if}
+							</ul>
+						{/if}
+
 						{#if entry.purchases.length}
 							<ul class={styles.items}>
 								{#each entry.purchases as purchase (purchase.id)}
@@ -110,41 +145,6 @@
 									outline>Nothing yet</Pill
 								>
 							</div>
-						{/if}
-
-						{#if entry.themed || entry.santa}
-							<ul
-								class={styles.themes}
-								aria-label="Gift theme for {entry.name}"
-							>
-								{#if entry.themed}
-									{#each entry.themes as theme (theme.tag)}
-										<li>
-											<Pill
-												class={styles.theme}
-												status={theme.count ? `success` : undefined}
-												outline={!theme.count}
-											>
-												<span class="sr-only">{themeName(theme.tag)}: {theme.count ? `got ${theme.count}` : `still to get`}</span>
-												<span aria-hidden="true"
-													>{tagLabel(theme.tag)}{#if theme.count > 1}&nbsp;×{theme.count}{/if}</span
-												>
-											</Pill>
-										</li>
-									{/each}
-								{/if}
-								{#if entry.santa}
-									<li>
-										<Pill
-											class={styles.theme}
-											status="info"
-										>
-											<span class="sr-only">From Santa: {entry.santa}</span>
-											<span aria-hidden="true">Santa&nbsp;×{entry.santa}</span>
-										</Pill>
-									</li>
-								{/if}
-							</ul>
 						{/if}
 					</li>
 				{/each}
