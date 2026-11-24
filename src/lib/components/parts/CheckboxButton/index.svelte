@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Component } from 'svelte';
-	import Check from '$img/icons/check (2).svg?component';
+	import Check from '$img/icons/check-2.svg?component';
 	import PartialCheck from '$img/icons/progress-2.svg?component';
 	import Incomplete from '$img/icons/circle-outline.svg?component';
 	import styles from './index.module.css';

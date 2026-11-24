@@ -5,7 +5,7 @@
 	import Card from '$parts/Card/index.svelte';
 	import Pill from '$parts/Pill/index.svelte';
 	import Plus from '$img/icons/plus.svg?component';
-	import Bought from '$img/icons/check-all-1.svg?component';
+	import Bought from '$img/icons/check-2.svg?component';
 	import Wrapped from '$img/icons/gift.svg?component';
 	import type { GiftOccasion, GiftPurchase } from '$types/generated';
 	import styles from './index.module.css';

@@ -100,7 +100,7 @@
 
 }
 
-/* A rounded checkbox square: empty when claimed, check-all-1 when bought. */
+/* A rounded checkbox square: empty when claimed, check-2 when bought. */
 .box {
 	display: flex;
 	box-sizing: border-box;
