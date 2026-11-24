@@ -566,6 +566,7 @@ export type GiftOccasionPerson = {
 	personId: Scalars[`ID`][`output`];
 	purchases: Array<GiftPurchase>;
 	santa: Scalars[`Int`][`output`];
+	sections: Array<GiftTagSection>;
 	spent: Scalars[`Float`][`output`];
 	themed: Scalars[`Boolean`][`output`];
 	themes: Array<GiftThemeCount>;
@@ -633,6 +634,11 @@ export type GiftSize = {
 	item: Scalars[`String`][`output`];
 	size: Scalars[`String`][`output`];
 	updatedAt: Maybe<Scalars[`String`][`output`]>;
+};
+
+export type GiftTagSection = {
+	purchases: Array<GiftPurchase>;
+	tag: Maybe<Scalars[`String`][`output`]>;
 };
 
 export type GiftThemeCount = {
