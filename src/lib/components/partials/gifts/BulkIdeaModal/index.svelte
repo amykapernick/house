@@ -2,14 +2,13 @@
 	import Modal from '$parts/Modal/index.svelte';
 	import type { ModalAction } from '$parts/Modal/index.svelte';
 	import Select from '$parts/Select/index.svelte';
-	import GiftTag from '$partials/gifts/GiftTag/index.svelte';
-	import { giftMutation } from '$utils/gifts';
+	import { giftMutation, GIFT_TAGS } from '$utils/gifts';
 	import type { GiftPerson } from '$types/generated';
 	import styles from './index.module.css';
 
 	// Several ideas for one person at once, one per line - the same format as the family
-	// wishlist's "Bulk add items". The API parses the lines (addGiftIdeas); the occasion and tag
-	// picked here apply to all of them.
+	// wishlist's "Bulk add items", plus a #tag per line. The API parses the lines (addGiftIdeas);
+	// the occasion picked here applies to all of them.
 	let {
 		open = $bindable(false),
 		personId,
@@ -24,7 +23,6 @@
 
 	let text = $state(``);
 	let occasionId = $state(``);
-	let tag = $state(``);
 	let saving = $state(false);
 	let error = $state(``);
 
@@ -32,9 +30,12 @@
 		if (!open) return;
 		text = ``;
 		occasionId = ``;
-		tag = ``;
 		error = ``;
 	});
+
+	// "#want, #need, … or #santa" - from_us is written #fromus.
+	const hashtags = GIFT_TAGS.map((entry) => `#${entry.value.replace(/_/g, ``)}`);
+	const tagHint = `${hashtags.slice(0, -1).join(`, `)} or ${hashtags.at(-1)}`;
 
 	let personName = $derived(people.find((person) => person.id === personId)?.name ?? `them`);
 	let occasionOptions = $derived([
@@ -45,11 +46,10 @@
 	async function save() {
 		saving = true;
 		error = ``;
-		const result = await giftMutation(`addGiftIdeas`, `$personId: ID!, $text: String!, $occasionId: ID, $tag: String`, `personId: $personId, text: $text, occasionId: $occasionId, tag: $tag`, {
+		const result = await giftMutation(`addGiftIdeas`, `$personId: ID!, $text: String!, $occasionId: ID`, `personId: $personId, text: $text, occasionId: $occasionId`, {
 			personId,
 			text,
 			occasionId: occasionId || null,
-			tag: tag || null,
 		});
 		saving = false;
 
@@ -81,9 +81,9 @@
 			id="bulk-ideas-hint"
 			class={styles.example}
 		>
-			<p>For example:</p>
-			<pre>{`Dinosaur puzzle - the 100 piece one
-Rain jacket $45 - size 6, any colour
+			<p>Tag one with {tagHint}. For example:</p>
+			<pre>{`Dinosaur puzzle #do - the 100 piece one
+Rain jacket $45 #wear - size 6, any colour
 Paint set https://example.com/paints`}</pre>
 		</div>
 		<textarea
@@ -98,11 +98,6 @@ Paint set https://example.com/paints`}</pre>
 			label="For when"
 			bind:value={occasionId}
 			options={occasionOptions}
-		/>
-
-		<GiftTag
-			id="bulk-ideas-tag"
-			bind:tag
 		/>
 	</div>
 
