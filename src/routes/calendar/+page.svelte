@@ -551,8 +551,7 @@
 		<button
 			type="button"
 			class="secondary"
-			onclick={goPrev}
-			aria-label="Previous">‹</button
+			onclick={goPrev}><span class="sr-only">Previous</span><span aria-hidden="true">‹</span></button
 		>
 		<button
 			type="button"
@@ -562,8 +561,7 @@
 		<button
 			type="button"
 			class="secondary"
-			onclick={goNext}
-			aria-label="Next">›</button
+			onclick={goNext}><span class="sr-only">Next</span><span aria-hidden="true">›</span></button
 		>
 	</div>
 

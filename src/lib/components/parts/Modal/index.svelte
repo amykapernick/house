@@ -48,8 +48,7 @@
 >
 	<button
 		class={styles.close}
-		onclick={() => (open = false)}
-		aria-label="Close">×</button
+		onclick={() => (open = false)}><span class="sr-only">Close</span><span aria-hidden="true">×</span></button
 	>
 	{#if title}<h2>{title}</h2>{/if}
 	{#if children}

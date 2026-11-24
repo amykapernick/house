@@ -222,8 +222,7 @@
 				<button
 					type="button"
 					class="remove-btn"
-					onclick={() => removeFromCart(item.id)}
-					aria-label={`Remove ${item.name} from cart`}>×</button
+					onclick={() => removeFromCart(item.id)}><span class="sr-only">Remove {item.name} from cart</span><span aria-hidden="true">×</span></button
 				>
 			</li>
 		{/each}

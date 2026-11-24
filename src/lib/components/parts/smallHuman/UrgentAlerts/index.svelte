@@ -24,8 +24,7 @@
 				<button
 					type="button"
 					class={styles['urgent-dismiss']}
-					onclick={() => onDismiss(alert)}
-					aria-label="Dismiss {alert.title}">&times;</button
+					onclick={() => onDismiss(alert)}><span class="sr-only">Dismiss {alert.title}</span><span aria-hidden="true">&times;</span></button
 				>
 			</div>
 		{/each}

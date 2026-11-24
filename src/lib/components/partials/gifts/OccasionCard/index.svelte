@@ -1,14 +1,12 @@
 <script lang="ts">
 	import type { Component } from 'svelte';
 	import { formatCurrency } from '$utils/currency';
-	import { describeDaysUntil, formatOccasionDate } from '$utils/gifts';
+	import { describeDaysUntil, formatOccasionDate, withoutYear } from '$utils/gifts';
 	import Card from '$parts/Card/index.svelte';
 	import Pill from '$parts/Pill/index.svelte';
-	import Plus from '$img/icons/f-add-outline.svg?component';
-	import Claimed from '$img/icons/circle-outline.svg?component';
-	import Bought from '$img/icons/check (2).svg?component';
-	// TODO: swap for a gift icon once one's added to src/lib/img/icons.
-	import Wrapped from '$img/icons/check-double.svg?component';
+	import Plus from '$img/icons/plus.svg?component';
+	import Bought from '$img/icons/check-all-1.svg?component';
+	import Wrapped from '$img/icons/gift.svg?component';
 	import type { GiftOccasion, GiftPurchase } from '$types/generated';
 	import styles from './index.module.css';
 
@@ -17,21 +15,25 @@
 		onEdit,
 		onAddPurchase,
 		onEditPurchase,
+		hideYear = false,
 	}: {
 		occasion: GiftOccasion;
+		/** "Christmas" rather than "Christmas 2026" - upcoming ones don't need the year. */
+		hideYear?: boolean;
 		onEdit: () => void;
 		onAddPurchase: (personId: string) => void;
 		onEditPurchase: (purchase: GiftPurchase) => void;
 	} = $props();
 
-	// Claimed: empty box, bought: ticked, wrapped: gift.
-	const STATUS: Record<string, { Icon: Component; pill: 'warning' | 'info' | 'success'; outline: boolean; label: string }> = {
-		claimed: { Icon: Claimed, pill: `warning`, outline: true, label: `Claimed` },
+	// Shown as a checkbox: claimed is an empty box, bought is ticked, wrapped is just the gift (no box).
+	const STATUS: Record<string, { Icon: Component | null; pill: 'warning' | 'info' | 'success'; outline: boolean; label: string }> = {
+		claimed: { Icon: null, pill: `warning`, outline: true, label: `Claimed` },
 		bought: { Icon: Bought, pill: `info`, outline: false, label: `Bought` },
 		wrapped: { Icon: Wrapped, pill: `success`, outline: false, label: `Wrapped` },
 	};
 
 	let headingId = $derived(`occasion-${occasion.id}`);
+	let title = $derived(hideYear ? withoutYear(occasion.name) : occasion.name);
 	// A birthday is for one person, named in the occasion itself, so their row heading is only
 	// kept for screen readers.
 	let hidePersonName = $derived(occasion.type === `birthday` && occasion.people.length === 1);
@@ -41,7 +43,7 @@
 	<section aria-labelledby={headingId}>
 		<header class={styles.header}>
 			<div>
-				<h3 id={headingId}>{occasion.name}</h3>
+				<h3 id={headingId}>{title}</h3>
 				<p class={styles.when}>
 					{formatOccasionDate(occasion)}{#if occasion.type !== `birthday`}&nbsp;· {describeDaysUntil(occasion.daysUntil)}{/if}
 				</p>
@@ -50,7 +52,7 @@
 				type="button"
 				class={styles.edit}
 				onclick={onEdit}
-				aria-label="Edit {occasion.name}">Edit</button
+				aria-label="Edit {title}">Edit</button
 			>
 		</header>
 
@@ -68,8 +70,7 @@
 								type="button"
 								class={styles.add}
 								onclick={() => onAddPurchase(entry.personId)}
-								aria-label="Log a purchase for {entry.name}"
-								title="Log a purchase for {entry.name}"><Plus aria-hidden="true" /></button
+								><span class="sr-only">Add a gift for {entry.name}</span><Plus aria-hidden="true" /></button
 							>
 						</div>
 
@@ -87,8 +88,10 @@
 												type="button"
 												class={styles.itemButton}
 												onclick={() => onEditPurchase(purchase)}
-												aria-label="{purchase.title}, {status.label.toLowerCase()}. Edit"
-												><status.Icon aria-hidden="true" /></button
+												><span class="sr-only">{purchase.title}, {status.label.toLowerCase()}. Edit</span><span
+													class={[styles.box, purchase.status === `wrapped` && styles.unboxed]}
+													aria-hidden="true">{#if status.Icon}<status.Icon />{/if}</span
+												></button
 											>
 											<span>{purchase.title}</span>
 										</Pill>

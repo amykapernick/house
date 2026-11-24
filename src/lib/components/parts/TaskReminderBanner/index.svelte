@@ -12,7 +12,7 @@
 			<div class={styles.task_reminder}>
 				<a href={resolve(`/tasks`)}>{task.name}</a>
 				<span class={styles.due_label}>{task.dueLabel ?? `Due now`}</span>
-				<button type="button" onclick={() => dismissReminder(task.id)} aria-label="Dismiss reminder">✕</button>
+				<button type="button" onclick={() => dismissReminder(task.id)}><span class="sr-only">Dismiss reminder</span><span aria-hidden="true">✕</span></button>
 			</div>
 		{/each}
 	</div>

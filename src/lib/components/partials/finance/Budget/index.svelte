@@ -210,8 +210,7 @@
 						<td class={styles.actions}>
 							<button
 								type="button"
-								onclick={() => removeItem(id)}
-								aria-label="Remove {description || 'item'}">✕</button
+								onclick={() => removeItem(id)}><span class="sr-only">Remove {description || 'item'}</span><span aria-hidden="true">✕</span></button
 							>
 						</td>
 					{:else}

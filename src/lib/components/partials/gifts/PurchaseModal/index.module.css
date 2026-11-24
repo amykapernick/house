@@ -1,3 +1,5 @@
+@import '@mixins';
+
 .fields {
 	display: grid;
 	gap: 0.4em;
@@ -10,4 +12,37 @@
 
 .error {
 	color: var(--red);
+}
+
+/* Adding from an occasion: a steady size, so switching between the wishlist pills and the
+   "something else" fields doesn't make the window jump around. */
+
+.sized {
+	width: min(34em, 90vw);
+	min-height: min(30em, 90vh);
+}
+
+.gifts {
+	margin: 0 0 1em;
+	padding: 0;
+	border: none;
+
+	& legend {
+		margin-bottom: 0.5em;
+		font-weight: 700;
+	}
+}
+
+.pills {
+	display: flex;
+	flex-wrap: wrap;
+	max-height: 16em;
+	overflow-y: auto;
+	gap: 0.5em;
+}
+
+.back {
+	margin-bottom: 1em;
+
+	@include button_secondary;
 }

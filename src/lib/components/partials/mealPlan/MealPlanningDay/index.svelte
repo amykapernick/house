@@ -69,17 +69,12 @@
 						<button
 							type="button"
 							class={styles['remove-btn']}
-							onclick={() => removeDraft(item.id)}
-							aria-label="Remove {item.recipe.name}"
-						>
-							×
-						</button>
+							onclick={() => removeDraft(item.id)}><span class="sr-only">Remove {item.recipe.name}</span><span aria-hidden="true">×</span></button>
 					{:else}
 						<button
 							type="button"
 							class={styles['edit-btn']}
-							onclick={() => onEditItem?.(item)}
-							aria-label="Edit meal">✎</button
+							onclick={() => onEditItem?.(item)}><span class="sr-only">Edit meal</span><span aria-hidden="true">✎</span></button
 						>
 					{/if}
 				</div>

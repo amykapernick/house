@@ -79,8 +79,7 @@
 					<button
 						type="button"
 						class={styles.remove}
-						onclick={() => removeRecipe(recipe)}
-						aria-label={`Remove ${recipe.name}`}>×</button
+						onclick={() => removeRecipe(recipe)}><span class="sr-only">Remove {recipe.name}</span><span aria-hidden="true">×</span></button
 					>
 				</li>
 			{/each}

@@ -17,6 +17,6 @@
 <div class={[styles.toast, styles[variant], className]} role="status" aria-live="polite">
 	<span class={styles.message}>{message}</span>
 	{#if onDismiss}
-		<button type="button" class={styles.dismiss} onclick={onDismiss} aria-label="Dismiss">&times;</button>
+		<button type="button" class={styles.dismiss} onclick={onDismiss}><span class="sr-only">Dismiss</span><span aria-hidden="true">&times;</span></button>
 	{/if}
 </div>

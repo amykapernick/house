@@ -26,6 +26,7 @@ SvelteKit 5 frontend (Svelte 5 runes, Vite 8) for household management — tasks
 - PostCSS plugins: postcss-advanced-variables, postcss-nesting, postcss-mixins, postcss-hexrgba
 - Colour variables defined in `src/lib/styles/config/colours.js`, used as CSS custom properties (`var(--purple_bright)`)
 - Mixins imported with `@import '@mixins'` in component styles
+- **Icon-only buttons** get their name from visually hidden text inside the button (`<span class="sr-only">Remove {item.name}</span>`), with the icon or glyph `aria-hidden="true"` - never `aria-label` or `title`
 
 ## Page Data Pattern
 

@@ -651,6 +651,7 @@ export type Gifts = {
 	linked: Scalars[`Boolean`][`output`];
 	needsDetails: Array<GiftHistoryEntry>;
 	occasions: Array<GiftOccasion>;
+	pastOccasions: Array<GiftOccasion>;
 	people: Array<GiftPerson>;
 	person: Maybe<GiftPerson>;
 	viewer: Maybe<GiftHouseholdMember>;

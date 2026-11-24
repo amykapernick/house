@@ -478,16 +478,14 @@
 				type="button"
 				class="serves-btn"
 				disabled={updatingServes.has(item.id) || !item.serves}
-				onclick={() => adjustFreezerServes(item, -1)}
-				aria-label={`Decrease serves of ${item.name}`}>−</button
+				onclick={() => adjustFreezerServes(item, -1)}><span class="sr-only">Decrease serves of {item.name}</span><span aria-hidden="true">−</span></button
 			>
 			<span class="serves-value">{item.serves ?? 0}</span>
 			<button
 				type="button"
 				class="serves-btn"
 				disabled={updatingServes.has(item.id)}
-				onclick={() => adjustFreezerServes(item, 1)}
-				aria-label={`Increase serves of ${item.name}`}>+</button
+				onclick={() => adjustFreezerServes(item, 1)}><span class="sr-only">Increase serves of {item.name}</span><span aria-hidden="true">+</span></button
 			>
 		</span>
 	</li>

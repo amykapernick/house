@@ -33,13 +33,13 @@
 	class={[styles.checkbox, styles[variant], styles[state], className].filter(Boolean).join(' ')}
 	disabled={disabled || loading}
 	{onclick}
-	aria-label={label}
 >
+	<span class="sr-only">{label}</span>
 	{#if loading}
-		…
+		<span aria-hidden="true">…</span>
 	{:else if variant === 'boxed'}
-		{#if state === 'complete'}<Check />{/if}
+		{#if state === 'complete'}<Check aria-hidden="true" />{/if}
 	{:else}
-		<IconComponent />
+		<IconComponent aria-hidden="true" />
 	{/if}
 </button>

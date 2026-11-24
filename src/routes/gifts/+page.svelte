@@ -1,20 +1,18 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import { format, parseISO } from 'date-fns';
+	import { addMonths, format, parseISO, subMonths } from 'date-fns';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { DATE_FORMATS } from '$utils/dateFormats';
-	import { formatCurrency } from '$utils/currency';
 	import { isAuthenticated } from '$lib/auth';
-	import { fetchGiftsOverview, fetchGiftPerson, fetchGiftHistory, giftMutation } from '$utils/gifts';
+	import { fetchGiftsOverview, fetchGiftPerson, fetchPastOccasions, giftMutation } from '$utils/gifts';
 	import { getPageTitle } from '$utils/pageTitle';
 	import Title from '$parts/Title/index.svelte';
 	import Tabs from '$parts/Tabs/index.svelte';
-	import Select from '$parts/Select/index.svelte';
+	import PillRadio from '$parts/PillRadio/index.svelte';
 	import Skeleton from '$parts/Skeleton/index.svelte';
 	import EmptyState from '$parts/EmptyState/index.svelte';
-	import Pill from '$parts/Pill/index.svelte';
 	import OccasionCard from '$partials/gifts/OccasionCard/index.svelte';
 	import PersonGifts from '$partials/gifts/PersonGifts/index.svelte';
 	import Household from '$partials/gifts/Household/index.svelte';
@@ -93,37 +91,48 @@
 		if (activeTab === `people` && linked && selectedPersonId) untrack(() => loadPerson());
 	});
 
-	// Past gifts tab: gifts.history(personId).
-	let historyPersonId = $state(``);
-	let history = $state<GiftHistoryEntry[]>([]);
-	let historyLoading = $state(false);
+	// Past gifts tab: gifts.pastOccasions, fetched the first time the tab opens.
+	let past = $state<GiftOccasion[]>([]);
+	let pastLoading = $state(true);
 
-	function loadHistory(skipCache = false, filter = historyPersonId) {
-		const id = filter || null;
-		historyLoading = true;
-		const handle = (data: GiftHistoryEntry[]) => {
-			if ((historyPersonId || null) !== id) return;
-			history = data;
-			historyLoading = false;
+	function loadPast(skipCache = false) {
+		const handle = (data: GiftOccasion[]) => {
+			past = data;
+			pastLoading = false;
 		};
-		fetchGiftHistory(id, { onStale: skipCache ? undefined : handle, skipCache }).then(handle);
+		fetchPastOccasions({ onStale: skipCache ? undefined : handle, skipCache }).then(handle);
 	}
 
 	$effect(() => {
-		// Refetch when the person filter changes.
-		const filter = historyPersonId;
-		if (activeTab === `history` && linked) untrack(() => loadHistory(false, filter));
+		if (activeTab === `history` && linked) untrack(() => loadPast());
 	});
 
 	function afterSave(message?: string | null) {
 		notice = message ?? ``;
 		loadOverview(true);
 		if (activeTab === `people`) loadPerson(true);
-		if (activeTab === `history`) loadHistory(true);
+		if (activeTab === `history`) loadPast(true);
 	}
 
+	// Upcoming shows the next 4 months, and each "Load more events" adds another 4. Anything
+	// with gifts already logged shows straight away, however far off it is.
+	const UPCOMING_STEP = 4;
+	// Past gifts shows the last 12 months, and each "Load more occasions" adds another 12.
+	const PAST_STEP = 12;
+	let upcomingMonths = $state(UPCOMING_STEP);
+	let pastMonths = $state(PAST_STEP);
+	const isoDate = (date: Date) => format(date, `yyyy-MM-dd`);
+	const hasGifts = (occasion: GiftOccasion) => occasion.people.some((entry) => entry.purchases.length > 0);
+
+	let upcomingUntil = $derived(isoDate(addMonths(new Date(), upcomingMonths)));
+	let upcoming = $derived((overview?.occasions ?? []).filter((occasion) => occasion.next <= upcomingUntil || hasGifts(occasion)));
+	let moreUpcoming = $derived(upcoming.length < (overview?.occasions.length ?? 0));
+
+	let pastFrom = $derived(isoDate(subMonths(new Date(), pastMonths)));
+	let pastShown = $derived(past.filter((occasion) => occasion.next >= pastFrom));
+	let morePast = $derived(pastShown.length < past.length);
+
 	let people = $derived(overview?.people ?? []);
-	let personOptions = $derived(people.map((entry) => ({ value: entry.id, label: entry.name })));
 	const show = (date: string | null | undefined) => (date ? format(parseISO(date), DATE_FORMATS.full) : ``);
 
 	// Occasion modal
@@ -163,11 +172,19 @@
 	let purchaseOpen = $state(false);
 	let purchaseDraft = $state<PurchaseDraft>({ personId: ``, title: `` });
 	let claimItemId = $state<string | null>(null);
+	let purchaseFromWishlist = $state(false);
 
-	function openPurchase(draft: PurchaseDraft, claimId: string | null = null) {
+	function openPurchase(draft: PurchaseDraft, claimId: string | null = null, fromWishlist = false) {
 		purchaseDraft = draft;
 		claimItemId = claimId;
+		purchaseFromWishlist = fromWishlist;
 		purchaseOpen = true;
+	}
+
+	// The add button on an occasion: pick from their wishlist (claims it) or add something new
+	// (goes on their wishlist, claimed by us). Without the wishlist it's a plain purchase.
+	function addGift(occasion: GiftOccasion, personId: string) {
+		openPurchase({ personId, title: ``, status: `bought`, occasionId: occasion.id, occasionName: occasion.name }, null, overview?.wishlistAvailable ?? false);
 	}
 
 	// New purchases default to the person's next occasion, as worked out by the API.
@@ -236,13 +253,25 @@
 		quickSaving = ``;
 		afterSave(result.success ? `Added ${entry.title} to ${occasion.label}` : result.message);
 	}
-
-	async function deletePurchase(purchase: GiftPurchase) {
-		if (!confirm(`Delete "${purchase.title}"? Anything claimed on the family wishlist stays claimed.`)) return;
-		const result = await giftMutation(`deleteGiftPurchase`, `$id: ID!`, `id: $id`, { id: purchase.id });
-		afterSave(result.success ? null : result.message);
-	}
 </script>
+
+{#snippet occasionGrid(list: GiftOccasion[], empty: string, hideYear: boolean)}
+	{#if list.length}
+		<div class={styles.occasions}>
+			{#each list as occasion (occasion.id)}
+				<OccasionCard
+					{occasion}
+					{hideYear}
+					onEdit={() => openOccasion(occasion)}
+					onAddPurchase={(personId) => addGift(occasion, personId)}
+					onEditPurchase={editPurchase}
+				/>
+			{/each}
+		</div>
+	{:else}
+		<p class={styles.muted}>{empty}</p>
+	{/if}
+{/snippet}
 
 <svelte:head>
 	<title>{getPageTitle(`Gifts`)}</title>
@@ -262,16 +291,6 @@
 		message="Try again in a moment."
 	/>
 {:else}
-	{#if overview.viewer}
-		<p class={styles.viewer}>
-			Signed in as <strong>{overview.viewer.name}</strong>
-			{#if overview.viewer.wishlistPersonId}
-				- {overview.viewer.wishlistPersonName ?? `someone`} on the family wishlist, so gifts for them are hidden from you.
-			{:else}
-				- not linked to the family wishlist yet.
-			{/if}
-		</p>
-	{/if}
 
 	{#if !overview.linked}
 		<section
@@ -369,16 +388,14 @@
 				{/if}
 
 				{#if overview.occasions.length}
-					<div class={styles.occasions}>
-						{#each overview.occasions as occasion (occasion.id)}
-							<OccasionCard
-								{occasion}
-								onEdit={() => openOccasion(occasion)}
-								onAddPurchase={(personId) => openPurchase({ personId, title: ``, status: `bought`, occasionId: occasion.id })}
-								onEditPurchase={editPurchase}
-							/>
-						{/each}
-					</div>
+					{@render occasionGrid(upcoming, `Nothing in the next ${upcomingMonths} months.`, true)}
+					{#if moreUpcoming}
+						<button
+							type="button"
+							class={styles.more}
+							onclick={() => (upcomingMonths += UPCOMING_STEP)}>Load more events</button
+						>
+					{/if}
 				{:else}
 					<EmptyState
 						title="No occasions yet"
@@ -397,12 +414,18 @@
 				class={styles.panel}
 			>
 				{#if people.length}
-					<Select
-						id="gifts-person"
-						label="Person"
-						bind:value={selectedPersonId}
-						options={personOptions}
-					/>
+					<fieldset class={styles.peoplePicker}>
+						<legend class="sr-only">Person</legend>
+						{#each people as entry (entry.id)}
+							<PillRadio
+								id="gifts-person-{entry.id}"
+								name="gifts-person"
+								label={entry.name}
+								value={entry.id}
+								bind:group={selectedPersonId}
+							/>
+						{/each}
+					</fieldset>
 					{#if personLoading}
 						<Skeleton rows={3} />
 					{:else if person}
@@ -436,73 +459,22 @@
 				tabindex="0"
 				class={styles.panel}
 			>
-				<Select
-					id="history-person"
-					label="Person"
-					bind:value={historyPersonId}
-					options={[{ value: ``, label: `Everyone` }, ...personOptions]}
-				/>
-				{#if historyLoading && !history.length}
+				{#if pastLoading}
 					<Skeleton rows={3} />
-				{:else if history.length}
-					<div class={styles.tableWrap}>
-						<table class={styles.table}>
-							<thead>
-								<tr>
-									<th scope="col">Date</th>
-									<th scope="col">For</th>
-									<th scope="col">Gift</th>
-									<th scope="col">From</th>
-									<th scope="col">Price</th>
-									<th scope="col">Status</th>
-									<th scope="col"><span class="sr-only">Actions</span></th>
-								</tr>
-							</thead>
-							<tbody>
-								{#each history as entry (entry.id)}
-									<tr>
-										<td>{show(entry.date)}</td>
-										<td>{entry.personName}</td>
-										<td>
-											<!-- eslint-disable svelte/no-navigation-without-resolve -- external shop link (wishlist item or our idea), not an internal route -->
-											{#if entry.url}<a
-													href={entry.url}
-													target="_blank"
-													rel="noopener noreferrer">{entry.title}</a
-												>{:else}{entry.title}{/if}
-											<!-- eslint-enable svelte/no-navigation-without-resolve -->
-											{#if entry.occasionName}<span class={styles.muted}>({entry.occasionName})</span>{/if}
-											{#if entry.needsDetails}<Pill
-													status="warning"
-													outline>Needs details</Pill
-												>{/if}
-										</td>
-										<td>{entry.giver ?? `-`}</td>
-										<td>{entry.price ? formatCurrency(entry.price) : `-`}</td>
-										<td class={styles.status}>{entry.status}</td>
-										<td class={styles.rowActions}>
-											{#if entry.canEdit}
-												<button
-													type="button"
-													onclick={() => openHistoryEntry(entry)}
-													aria-label="{entry.purchase ? `Edit` : `Add details for`} {entry.title}">{entry.purchase ? `Edit` : `Add details`}</button
-												>
-											{/if}
-											{#if entry.purchase}
-												<button
-													type="button"
-													onclick={() => entry.purchase && deletePurchase(entry.purchase)}
-													aria-label="Delete {entry.title}">Delete</button
-												>
-											{/if}
-										</td>
-									</tr>
-								{/each}
-							</tbody>
-						</table>
-					</div>
+				{:else if past.length}
+					{@render occasionGrid(pastShown, `Nothing in the last ${pastMonths} months.`, false)}
+					{#if morePast}
+						<button
+							type="button"
+							class={styles.more}
+							onclick={() => (pastMonths += PAST_STEP)}>Load more occasions</button
+						>
+					{/if}
 				{:else}
-					<EmptyState title="No past gifts yet" />
+					<EmptyState
+						title="No past occasions yet"
+						message="Occasions move here a week after they pass."
+					/>
 				{/if}
 			</div>
 		{/if}
@@ -525,6 +497,7 @@
 			draft={purchaseDraft}
 			{people}
 			{claimItemId}
+			fromWishlist={purchaseFromWishlist}
 			onSaved={afterSave}
 		/>
 	{/if}

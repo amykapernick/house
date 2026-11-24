@@ -73,37 +73,10 @@
 	}
 }
 
-.tableWrap {
-	overflow-x: auto;
-}
 
-.table {
-	width: 100%;
-	border-collapse: collapse;
 
-	& th,
-	& td {
-		padding: 0.4em 0.6em;
-		border-bottom: 1px solid var(--border);
-		text-align: left;
-		vertical-align: middle;
-	}
-}
 
-.status {
-	text-transform: capitalize;
-}
 
-.rowActions {
-	display: flex;
-	gap: 0.4em;
-	white-space: nowrap;
-}
-
-.viewer {
-	margin: 0 0 0.5em;
-	color: var(--text_secondary);
-}
 
 .quick {
 	display: flex;
@@ -114,4 +87,19 @@
 .secondary {
 
 	@include button_secondary;
+}
+
+.more {
+	justify-self: center;
+
+	@include button_secondary;
+}
+
+.peoplePicker {
+	display: flex;
+	flex-wrap: wrap;
+	margin: 0;
+	padding: 0;
+	border: none;
+	gap: 0.5em;
 }

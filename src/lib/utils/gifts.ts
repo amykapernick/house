@@ -1,5 +1,5 @@
 import { format, parseISO } from 'date-fns';
-import type { Gifts, GiftPerson, GiftHistoryEntry, GiftMutationResult } from '$types/generated';
+import type { Gifts, GiftPerson, GiftOccasion, GiftMutationResult } from '$types/generated';
 import { DATE_FORMATS } from '$utils/dateFormats';
 import { getToken } from '$lib/auth';
 import fetchClientData, { clearCachePrefix, getGraphqlUrl } from '$utils/fetchClientData';
@@ -29,6 +29,8 @@ const MEMBER = `slug name hasLogin isViewer wishlistPersonId wishlistPersonName`
 const PURCHASE = `id personId personName title url notes price occasionId occasionName year status boughtBy wishlistItemId wishlistClaimId ideaId`;
 const HISTORY = `id personId personName title url date giver byUs source price status occasionName needsDetails canEdit wishlistItemId wishlistClaimId purchase { ${PURCHASE} } quickOccasions { id year label }`;
 
+const OCCASION = `id name type date personIds next year daysUntil spent people { personId name spent purchases { ${PURCHASE} } }`;
+
 const OVERVIEW_QUERY = `
 	query {
 		gifts {
@@ -42,10 +44,7 @@ const OVERVIEW_QUERY = `
 				occasions { id name year }
 				nextOccasion { id year }
 			}
-			occasions {
-				id name type date personIds next year daysUntil spent
-				people { personId name spent purchases { ${PURCHASE} } }
-			}
+			occasions { ${OCCASION} }
 			needsDetails { ${HISTORY} }
 		}
 	}
@@ -88,15 +87,9 @@ export function fetchGiftPerson(id: string, options: FetchOptions<GiftPerson | n
 	);
 }
 
-/** Past gifts for one person, or everyone. */
-export function fetchGiftHistory(personId: string | null, options: FetchOptions<GiftHistoryEntry[]> = {}) {
-	const args = personId ? `(personId: ${JSON.stringify(personId)})` : ``;
-	return query(
-		`${CACHE_PREFIX}-history-${personId ?? `all`}`,
-		`query { gifts { history${args} { ${HISTORY} } } }`,
-		(gifts) => gifts?.history ?? [],
-		options
-	);
+/** Occasions older than a week, most recent first, with what was logged against them. */
+export function fetchPastOccasions(options: FetchOptions<GiftOccasion[]> = {}) {
+	return query(`${CACHE_PREFIX}-past`, `query { gifts { pastOccasions { ${OCCASION} } } }`, (gifts) => gifts?.pastOccasions ?? [], options);
 }
 
 /**
@@ -146,3 +139,6 @@ export function describeDaysUntil(days: number): string {
 	if (days === -1) return `Yesterday`;
 	return `${Math.abs(days)} days ago`;
 }
+
+/** "Christmas 2026" -> "Christmas", for upcoming occasions where the year goes without saying. */
+export const withoutYear = (name: string) => name.replace(/\s+\d{4}$/, ``);

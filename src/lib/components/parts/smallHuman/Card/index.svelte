@@ -32,8 +32,7 @@
 		<button
 			type="button"
 			class={styles.dismiss}
-			onclick={onDismiss}
-			aria-label="Dismiss {title}">&times;</button
+			onclick={onDismiss}><span class="sr-only">Dismiss {title}</span><span aria-hidden="true">&times;</span></button
 		>
 	{/if}
 	<svelte:element
