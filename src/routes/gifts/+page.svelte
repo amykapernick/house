@@ -395,6 +395,8 @@
 							class={styles.more}
 							onclick={() => (upcomingMonths += UPCOMING_STEP)}>Load more events</button
 						>
+					{:else}
+						<p class={styles.noMore}>No more events to load</p>
 					{/if}
 				{:else}
 					<EmptyState
@@ -469,6 +471,8 @@
 							class={styles.more}
 							onclick={() => (pastMonths += PAST_STEP)}>Load more occasions</button
 						>
+					{:else}
+						<p class={styles.noMore}>No more occasions to load</p>
 					{/if}
 				{:else}
 					<EmptyState

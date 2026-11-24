@@ -95,6 +95,12 @@
 	@include button_secondary;
 }
 
+.noMore {
+	margin: 0;
+	color: var(--text_secondary);
+	text-align: center;
+}
+
 .peoplePicker {
 	display: flex;
 	flex-wrap: wrap;
