@@ -46,6 +46,11 @@
 	align-items: center;
 	justify-content: space-between;
 	gap: 0.5em;
+
+	& h4 {
+		margin: 0;
+		font-size: 1em;
+	}
 }
 
 .add {
@@ -100,6 +105,22 @@
 
 }
 
+/* "Nothing yet": the whole pill adds a gift, like the add button. */
+.nothingButton {
+	padding: 0;
+	border: none;
+	background: none;
+	color: inherit;
+	font: inherit;
+	cursor: pointer;
+
+	&::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+	}
+}
+
 /* A rounded checkbox square: empty when claimed, check-2 when bought. */
 .box {
 	display: flex;
@@ -135,16 +156,21 @@
 	font-size: 0.8em;
 }
 
-/* The kids' seven-gift theme: filled once something's tagged with it, outlined until then. */
-.themes {
-	display: flex;
-	flex-wrap: wrap;
-	margin: 0;
-	padding: 0;
+/* The kids' seven-gift theme: one small heading per theme, with its gifts under it. */
+.section {
+	display: grid;
 	gap: 0.3em;
-	list-style: none;
+
+	& h5 {
+		margin: 0;
+		color: var(--text_secondary);
+		font-size: 0.85em;
+	}
 }
 
-.theme {
-	font-size: 0.8em;
+.still {
+	margin: 0;
+	color: var(--text_secondary);
+	font-size: 0.85em;
+	font-style: italic;
 }

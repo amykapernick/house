@@ -45,7 +45,7 @@ const MEMBER = `slug name hasLogin isViewer wishlistPersonId wishlistPersonName`
 const PURCHASE = `id personId personName title url notes price occasionId occasionName year status boughtBy wishlistItemId wishlistClaimId ideaId tag`;
 const HISTORY = `id personId personName title url date giver byUs source price status occasionName needsDetails canEdit wishlistItemId wishlistClaimId purchase { ${PURCHASE} } quickOccasions { id year label }`;
 
-const OCCASION = `id name type date personIds next year daysUntil spent people { personId name spent themed themes { tag count } santa purchases { ${PURCHASE} } }`;
+const OCCASION = `id name type date personIds next year daysUntil spent people { personId name spent sections { tag purchases { ${PURCHASE} } } purchases { ${PURCHASE} } }`;
 
 const OVERVIEW_QUERY = `
 	query {
@@ -148,12 +148,22 @@ export function formatOccasionDate(occasion: { type: string; next: string }): st
 	return format(parseISO(occasion.next), occasion.type === `birthday` ? DATE_FORMATS.monthName : DATE_FORMATS.full);
 }
 
+/** Roughly how far off a date is: "Tomorrow", "In 5 days", "2 weeks ago", "In 3 months", "1 year ago". */
 export function describeDaysUntil(days: number): string {
 	if (days === 0) return `Today`;
 	if (days === 1) return `Tomorrow`;
-	if (days > 1) return `In ${days} days`;
 	if (days === -1) return `Yesterday`;
-	return `${Math.abs(days)} days ago`;
+
+	const abs = Math.abs(days);
+	const [count, unit] = abs < 7
+		? [abs, `day`]
+		: abs < 28
+			? [Math.round(abs / 7), `week`]
+			: abs < 365
+				? [Math.max(1, Math.round(abs / 30.44)), `month`]
+				: [Math.round(abs / 365.25), `year`];
+	const span = `${count} ${unit}${count === 1 ? `` : `s`}`;
+	return days > 0 ? `In ${span}` : `${span} ago`;
 }
 
 /** "Christmas 2026" -> "Christmas", for upcoming occasions where the year goes without saying. */

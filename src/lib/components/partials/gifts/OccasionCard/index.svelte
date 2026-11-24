@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Component } from 'svelte';
 	import { formatCurrency } from '$utils/currency';
-	import { describeDaysUntil, formatOccasionDate, tagLabel, THEME_TAGS, withoutYear } from '$utils/gifts';
+	import { describeDaysUntil, formatOccasionDate, GIFT_TAGS, tagLabel, withoutYear } from '$utils/gifts';
 	import Card from '$parts/Card/index.svelte';
 	import Pill from '$parts/Pill/index.svelte';
 	import Plus from '$img/icons/plus.svg?component';
@@ -38,8 +38,37 @@
 	// kept for screen readers.
 	let hidePersonName = $derived(occasion.type === `birthday` && occasion.people.length === 1);
 
-	const themeName = (tag: string) => THEME_TAGS.find((entry) => entry.value === tag)?.long ?? tag;
+	const sectionTitle = (tag: string | null | undefined) => (tag ? GIFT_TAGS.find((entry) => entry.value === tag)?.long ?? tag : `Other`);
 </script>
+
+{#snippet purchaseList(purchases: GiftPurchase[], showTag: boolean)}
+	<ul class={styles.items}>
+		{#each purchases as purchase (purchase.id)}
+			{@const status = STATUS[purchase.status] ?? STATUS.claimed}
+			<li>
+				<Pill
+					class={styles.item}
+					status={status.pill}
+					outline={status.outline}
+				>
+					<button
+						type="button"
+						class={styles.itemButton}
+						onclick={() => onEditPurchase(purchase)}
+						><span class="sr-only">{purchase.title}, {status.label.toLowerCase()}. Edit</span><span
+							class={[styles.box, purchase.status === `wrapped` && styles.unboxed]}
+							aria-hidden="true">{#if status.Icon}<status.Icon />{/if}</span
+						></button
+					>
+					<span>{purchase.title}</span>
+					{#if showTag && purchase.tag}<span class={styles.tag}
+							><span class="sr-only">Tagged </span>{tagLabel(purchase.tag)}</span
+						>{/if}
+				</Pill>
+			</li>
+		{/each}
+	</ul>
+{/snippet}
 
 <Card class={styles.card}>
 	<section aria-labelledby={headingId}>
@@ -67,7 +96,7 @@
 				{#each occasion.people as entry (entry.personId)}
 					<li class={styles.person}>
 						<div class={styles.personHeader}>
-							<strong class={hidePersonName ? `sr-only` : ``}>{entry.name}</strong>
+							<h4 class={hidePersonName ? `sr-only` : ``}>{entry.name}</h4>
 							<button
 								type="button"
 								class={styles.add}
@@ -76,74 +105,34 @@
 							>
 						</div>
 
-						{#if entry.themed || entry.santa}
-							<ul
-								class={styles.themes}
-								aria-label="Gift theme for {entry.name}"
-							>
-								{#if entry.themed}
-									{#each entry.themes as theme (theme.tag)}
-										<li>
-											<Pill
-												class={styles.theme}
-												status={theme.count ? `success` : undefined}
-												outline={!theme.count}
-											>
-												<span class="sr-only">{themeName(theme.tag)}: {theme.count ? `got ${theme.count}` : `still to get`}</span>
-												<span aria-hidden="true"
-													>{tagLabel(theme.tag)}{#if theme.count > 1}&nbsp;×{theme.count}{/if}</span
-												>
-											</Pill>
-										</li>
-									{/each}
-								{/if}
-								{#if entry.santa}
-									<li>
-										<Pill
-											class={styles.theme}
-											status="info"
-										>
-											<span class="sr-only">From Santa: {entry.santa}</span>
-											<span aria-hidden="true">Santa&nbsp;×{entry.santa}</span>
-										</Pill>
-									</li>
-								{/if}
-							</ul>
-						{/if}
-
-						{#if entry.purchases.length}
-							<ul class={styles.items}>
-								{#each entry.purchases as purchase (purchase.id)}
-									{@const status = STATUS[purchase.status] ?? STATUS.claimed}
-									<li>
-										<Pill
-											class={styles.item}
-											status={status.pill}
-											outline={status.outline}
-										>
-											<button
-												type="button"
-												class={styles.itemButton}
-												onclick={() => onEditPurchase(purchase)}
-												><span class="sr-only">{purchase.title}, {status.label.toLowerCase()}. Edit</span><span
-													class={[styles.box, purchase.status === `wrapped` && styles.unboxed]}
-													aria-hidden="true">{#if status.Icon}<status.Icon />{/if}</span
-												></button
-											>
-											<span>{purchase.title}</span>
-											{#if purchase.tag}<span class={styles.tag}
-													><span class="sr-only">Tagged </span>{tagLabel(purchase.tag)}</span
-												>{/if}
-										</Pill>
-									</li>
-								{/each}
-							</ul>
+						{#if entry.sections.length}
+							<!-- The kids' seven-gift theme: each theme as a heading, still-to-get ones included. -->
+							{#each entry.sections as section (section.tag ?? `other`)}
+								<div class={styles.section}>
+									<h5>{sectionTitle(section.tag)}</h5>
+									{#if section.purchases.length}
+										{@render purchaseList(section.purchases, false)}
+									{:else}
+										<p class={styles.still}>Still to get</p>
+									{/if}
+								</div>
+							{/each}
+						{:else if entry.purchases.length}
+							{@render purchaseList(entry.purchases, true)}
 						{:else}
 							<div>
 								<Pill
+									class={styles.item}
 									status="warning"
-									outline>Nothing yet</Pill
+									outline
 								>
+									<button
+										type="button"
+										class={styles.nothingButton}
+										onclick={() => onAddPurchase(entry.personId)}
+										><span class="sr-only">Nothing yet for {entry.name}. Add a gift</span><span aria-hidden="true">Nothing yet</span></button
+									>
+								</Pill>
 							</div>
 						{/if}
 					</li>
