@@ -19,6 +19,7 @@
 	import OccasionModal from '$partials/gifts/OccasionModal/index.svelte';
 	import IdeaModal from '$partials/gifts/IdeaModal/index.svelte';
 	import type { IdeaDraft } from '$partials/gifts/IdeaModal/index.svelte';
+	import BulkIdeaModal from '$partials/gifts/BulkIdeaModal/index.svelte';
 	import PurchaseModal from '$partials/gifts/PurchaseModal/index.svelte';
 	import type { PurchaseDraft } from '$partials/gifts/PurchaseModal/index.svelte';
 	import type { Gifts, GiftPerson, GiftOccasion, GiftPurchase, GiftIdea, GiftHistoryEntry, GiftWishlistItem, GiftQuickOccasion } from '$types/generated';
@@ -146,7 +147,8 @@
 		occasionOpen = true;
 	}
 
-	// Idea modal
+	// Idea modal, and bulk adding several for the selected person
+	let bulkIdeasOpen = $state(false);
 	let ideaOpen = $state(false);
 	let ideaDraft = $state<IdeaDraft>({ personId: `` });
 
@@ -208,6 +210,7 @@
 				notes: idea.notes,
 				price: idea.price,
 				ideaId: idea.id,
+				tag: idea.tag,
 				status: `bought`,
 				...(occasion ? { occasionId: occasion.id } : defaultsFor(idea.personId)),
 			},
@@ -436,6 +439,7 @@
 							wishlistAvailable={overview.wishlistAvailable}
 							onClaim={claimItem}
 							onAddIdea={() => openIdea({ personId: selectedPersonId })}
+							onBulkAddIdeas={() => (bulkIdeasOpen = true)}
 							onEditIdea={(idea) => openIdea({ ...idea })}
 							onDeleteIdea={deleteIdea}
 							onSuggestIdea={suggestIdea}
@@ -495,6 +499,12 @@
 			draft={ideaDraft}
 			{people}
 			onSaved={() => afterSave()}
+		/>
+		<BulkIdeaModal
+			bind:open={bulkIdeasOpen}
+			personId={selectedPersonId}
+			{people}
+			onSaved={afterSave}
 		/>
 		<PurchaseModal
 			bind:open={purchaseOpen}

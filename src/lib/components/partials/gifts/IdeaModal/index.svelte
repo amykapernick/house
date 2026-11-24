@@ -11,6 +11,7 @@
 		price?: number | null;
 		occasionId?: string | null;
 		status?: string;
+		tag?: string | null;
 	};
 </script>
 
@@ -18,6 +19,7 @@
 	import Modal from '$parts/Modal/index.svelte';
 	import type { ModalAction } from '$parts/Modal/index.svelte';
 	import Select from '$parts/Select/index.svelte';
+	import GiftTag from '$partials/gifts/GiftTag/index.svelte';
 	import { giftMutation } from '$utils/gifts';
 	import type { GiftPerson } from '$types/generated';
 	import styles from './index.module.css';
@@ -40,6 +42,7 @@
 	let notes = $state(``);
 	let price = $state<string | number | null>(``);
 	let occasionId = $state(``);
+	let tag = $state(``);
 	let saving = $state(false);
 	let error = $state(``);
 
@@ -51,6 +54,7 @@
 		notes = draft.notes ?? ``;
 		price = draft.price != null ? String(draft.price) : ``;
 		occasionId = draft.occasionId ?? ``;
+		tag = draft.tag ?? ``;
 		error = ``;
 	});
 
@@ -84,6 +88,7 @@
 				price: parsedPrice,
 				occasionId: occasionId || null,
 				status: draft.status ?? `open`,
+				tag: tag || null,
 			},
 		});
 
@@ -149,6 +154,11 @@
 			id="idea-url"
 			type="url"
 			bind:value={url}
+		/>
+
+		<GiftTag
+			id="idea-tag"
+			bind:tag
 		/>
 
 		<label for="idea-notes">Notes</label>

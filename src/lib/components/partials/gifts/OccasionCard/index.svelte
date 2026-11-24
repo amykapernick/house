@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Component } from 'svelte';
 	import { formatCurrency } from '$utils/currency';
-	import { describeDaysUntil, formatOccasionDate, withoutYear } from '$utils/gifts';
+	import { describeDaysUntil, formatOccasionDate, tagLabel, THEME_TAGS, withoutYear } from '$utils/gifts';
 	import Card from '$parts/Card/index.svelte';
 	import Pill from '$parts/Pill/index.svelte';
 	import Plus from '$img/icons/plus.svg?component';
@@ -37,6 +37,8 @@
 	// A birthday is for one person, named in the occasion itself, so their row heading is only
 	// kept for screen readers.
 	let hidePersonName = $derived(occasion.type === `birthday` && occasion.people.length === 1);
+
+	const themeName = (tag: string) => THEME_TAGS.find((entry) => entry.value === tag)?.long ?? tag;
 </script>
 
 <Card class={styles.card}>
@@ -94,6 +96,9 @@
 												></button
 											>
 											<span>{purchase.title}</span>
+											{#if purchase.tag}<span class={styles.tag}
+													><span class="sr-only">Tagged </span>{tagLabel(purchase.tag)}</span
+												>{/if}
 										</Pill>
 									</li>
 								{/each}
@@ -105,6 +110,41 @@
 									outline>Nothing yet</Pill
 								>
 							</div>
+						{/if}
+
+						{#if entry.themed || entry.santa}
+							<ul
+								class={styles.themes}
+								aria-label="Gift theme for {entry.name}"
+							>
+								{#if entry.themed}
+									{#each entry.themes as theme (theme.tag)}
+										<li>
+											<Pill
+												class={styles.theme}
+												status={theme.count ? `success` : undefined}
+												outline={!theme.count}
+											>
+												<span class="sr-only">{themeName(theme.tag)}: {theme.count ? `got ${theme.count}` : `still to get`}</span>
+												<span aria-hidden="true"
+													>{tagLabel(theme.tag)}{#if theme.count > 1}&nbsp;×{theme.count}{/if}</span
+												>
+											</Pill>
+										</li>
+									{/each}
+								{/if}
+								{#if entry.santa}
+									<li>
+										<Pill
+											class={styles.theme}
+											status="info"
+										>
+											<span class="sr-only">From Santa: {entry.santa}</span>
+											<span aria-hidden="true">Santa&nbsp;×{entry.santa}</span>
+										</Pill>
+									</li>
+								{/if}
+							</ul>
 						{/if}
 					</li>
 				{/each}

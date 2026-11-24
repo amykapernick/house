@@ -1,0 +1,27 @@
+.fields {
+	display: grid;
+	gap: 0.4em;
+}
+
+.hint {
+	margin-top: 0;
+	color: var(--text_secondary);
+	font-weight: normal;
+}
+
+.example {
+	color: var(--text_secondary);
+
+	& p {
+		margin: 0;
+	}
+
+	& pre {
+		margin: 0.2em 0 0.4em;
+		white-space: pre-wrap;
+	}
+}
+
+.error {
+	color: var(--red);
+}

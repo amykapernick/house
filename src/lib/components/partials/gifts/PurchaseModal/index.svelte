@@ -16,6 +16,7 @@
 		wishlistItemId?: string | null;
 		wishlistClaimId?: string | null;
 		ideaId?: string | null;
+		tag?: string | null;
 	};
 </script>
 
@@ -24,6 +25,7 @@
 	import type { ModalAction } from '$parts/Modal/index.svelte';
 	import Select from '$parts/Select/index.svelte';
 	import PillRadio from '$parts/PillRadio/index.svelte';
+	import GiftTag from '$partials/gifts/GiftTag/index.svelte';
 	import { fetchGiftPerson, giftMutation, PURCHASE_STATUSES } from '$utils/gifts';
 	import type { GiftPerson, GiftWishlistItem } from '$types/generated';
 	import styles from './index.module.css';
@@ -56,6 +58,7 @@
 	let price = $state<string | number | null>(``);
 	let occasionId = $state(``);
 	let status = $state(`claimed`);
+	let tag = $state(``);
 	let saving = $state(false);
 	let deleting = $state(false);
 	let error = $state(``);
@@ -75,6 +78,7 @@
 		price = draft.price != null ? String(draft.price) : ``;
 		occasionId = draft.occasionId ?? ``;
 		status = draft.status ?? `claimed`;
+		tag = draft.tag ?? ``;
 		error = ``;
 		choice = ``;
 		wishlist = [];
@@ -142,6 +146,7 @@
 			wishlistItemId: draft.wishlistItemId ?? null,
 			wishlistClaimId: draft.wishlistClaimId ?? null,
 			ideaId: draft.ideaId ?? null,
+			tag: tag || null,
 		};
 
 		const result = isClaim
@@ -232,6 +237,13 @@
 		<p class={styles.hint}>This claims it on the family wishlist as you, so nobody else buys it. The details below stay between us.</p>
 	{:else if draft.wishlistItemId}
 		<p class={styles.hint}>Linked to their wishlist.</p>
+	{/if}
+
+	{#if showFields || isClaim}
+		<GiftTag
+			id="purchase-tag"
+			bind:tag
+		/>
 	{/if}
 
 	{#if showFields}

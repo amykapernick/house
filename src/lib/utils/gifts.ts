@@ -25,11 +25,27 @@ export const PURCHASE_STATUSES = [
 	{ value: `wrapped`, label: `Wrapped` },
 ] as const;
 
+// Gift tags (at most one per idea or purchase) - see GIFT_TAGS in household_api's gifts domain.
+// The first seven are the kids' theme, tracked per occasion; Santa is counted on its own.
+export const THEME_TAGS = [
+	{ value: `want`, label: `Want`, long: `Something they want` },
+	{ value: `need`, label: `Need`, long: `Something they need` },
+	{ value: `do`, label: `Do`, long: `Something to do` },
+	{ value: `read`, label: `Read`, long: `Something to read` },
+	{ value: `wear`, label: `Wear`, long: `Something to wear` },
+	{ value: `share`, label: `Share`, long: `Something to share` },
+	{ value: `from_us`, label: `From us`, long: `Something from us` },
+] as const;
+
+export const GIFT_TAGS = [...THEME_TAGS, { value: `santa`, label: `Santa`, long: `From Santa` }] as const;
+
+export const tagLabel = (tag: string) => GIFT_TAGS.find((entry) => entry.value === tag)?.label ?? tag;
+
 const MEMBER = `slug name hasLogin isViewer wishlistPersonId wishlistPersonName`;
-const PURCHASE = `id personId personName title url notes price occasionId occasionName year status boughtBy wishlistItemId wishlistClaimId ideaId`;
+const PURCHASE = `id personId personName title url notes price occasionId occasionName year status boughtBy wishlistItemId wishlistClaimId ideaId tag`;
 const HISTORY = `id personId personName title url date giver byUs source price status occasionName needsDetails canEdit wishlistItemId wishlistClaimId purchase { ${PURCHASE} } quickOccasions { id year label }`;
 
-const OCCASION = `id name type date personIds next year daysUntil spent people { personId name spent purchases { ${PURCHASE} } }`;
+const OCCASION = `id name type date personIds next year daysUntil spent people { personId name spent themed themes { tag count } santa purchases { ${PURCHASE} } }`;
 
 const OVERVIEW_QUERY = `
 	query {
@@ -76,7 +92,7 @@ export function fetchGiftPerson(id: string, options: FetchOptions<GiftPerson | n
 					id name
 					sizes { item size updatedAt }
 					wishlist { id personId title url notes evergreen claimed claimedBy claimedByUs claimedAt suggestedBy canClaim }
-					ideas { id personId title url notes price occasionId status wishlistItemId canSuggest }
+					ideas { id personId title url notes price occasionId status wishlistItemId canSuggest tag }
 					history { ${HISTORY} }
 					occasions { id name type next }
 				}

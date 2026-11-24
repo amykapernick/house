@@ -128,3 +128,23 @@
 	padding: 0;
 	border: none;
 }
+
+/* The tag a gift fills, after its title. */
+.tag {
+	opacity: 0.8;
+	font-size: 0.8em;
+}
+
+/* The kids' seven-gift theme: filled once something's tagged with it, outlined until then. */
+.themes {
+	display: flex;
+	flex-wrap: wrap;
+	margin: 0;
+	padding: 0;
+	gap: 0.3em;
+	list-style: none;
+}
+
+.theme {
+	font-size: 0.8em;
+}

@@ -15,6 +15,7 @@
 		wishlistAvailable,
 		onClaim,
 		onAddIdea,
+		onBulkAddIdeas,
 		onEditIdea,
 		onDeleteIdea,
 		onSuggestIdea,
@@ -26,6 +27,7 @@
 		wishlistAvailable: boolean;
 		onClaim: (item: GiftWishlistItem) => void;
 		onAddIdea: () => void;
+		onBulkAddIdeas: () => void;
 		onEditIdea: (idea: GiftIdea) => void;
 		onDeleteIdea: (idea: GiftIdea) => void;
 		onSuggestIdea: (idea: GiftIdea) => void;
@@ -97,10 +99,17 @@
 	<section aria-labelledby="person-ideas">
 		<div class={styles.sectionHeader}>
 			<h3 id="person-ideas">Our ideas</h3>
-			<button
-				type="button"
-				onclick={onAddIdea}>Add idea</button
-			>
+			<div class={styles.sectionActions}>
+				<button
+					type="button"
+					class={styles.secondary}
+					onclick={onBulkAddIdeas}>Bulk add</button
+				>
+				<button
+					type="button"
+					onclick={onAddIdea}>Add idea</button
+				>
+			</div>
 		</div>
 		{#if person.ideas.length}
 			<ul class={styles.list}>

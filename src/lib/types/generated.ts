@@ -512,6 +512,7 @@ export type GiftIdea = {
 	personName: Scalars[`String`][`output`];
 	price: Maybe<Scalars[`Float`][`output`]>;
 	status: Scalars[`String`][`output`];
+	tag: Maybe<Scalars[`String`][`output`]>;
 	title: Scalars[`String`][`output`];
 	url: Maybe<Scalars[`String`][`output`]>;
 	wishlistItemId: Maybe<Scalars[`ID`][`output`]>;
@@ -523,6 +524,7 @@ export type GiftIdeaInput = {
 	personId: Scalars[`ID`][`input`];
 	price?: InputMaybe<Scalars[`Float`][`input`]>;
 	status?: InputMaybe<Scalars[`String`][`input`]>;
+	tag?: InputMaybe<Scalars[`String`][`input`]>;
 	title: Scalars[`String`][`input`];
 	url?: InputMaybe<Scalars[`String`][`input`]>;
 };
@@ -563,7 +565,10 @@ export type GiftOccasionPerson = {
 	name: Scalars[`String`][`output`];
 	personId: Scalars[`ID`][`output`];
 	purchases: Array<GiftPurchase>;
+	santa: Scalars[`Int`][`output`];
 	spent: Scalars[`Float`][`output`];
+	themed: Scalars[`Boolean`][`output`];
+	themes: Array<GiftThemeCount>;
 };
 
 export type GiftPerson = {
@@ -596,6 +601,7 @@ export type GiftPurchase = {
 	personName: Scalars[`String`][`output`];
 	price: Maybe<Scalars[`Float`][`output`]>;
 	status: Scalars[`String`][`output`];
+	tag: Maybe<Scalars[`String`][`output`]>;
 	title: Scalars[`String`][`output`];
 	url: Maybe<Scalars[`String`][`output`]>;
 	wishlistClaimId: Maybe<Scalars[`ID`][`output`]>;
@@ -610,6 +616,7 @@ export type GiftPurchaseInput = {
 	personId: Scalars[`ID`][`input`];
 	price?: InputMaybe<Scalars[`Float`][`input`]>;
 	status?: InputMaybe<Scalars[`String`][`input`]>;
+	tag?: InputMaybe<Scalars[`String`][`input`]>;
 	title: Scalars[`String`][`input`];
 	url?: InputMaybe<Scalars[`String`][`input`]>;
 	wishlistClaimId?: InputMaybe<Scalars[`ID`][`input`]>;
@@ -626,6 +633,11 @@ export type GiftSize = {
 	item: Scalars[`String`][`output`];
 	size: Scalars[`String`][`output`];
 	updatedAt: Maybe<Scalars[`String`][`output`]>;
+};
+
+export type GiftThemeCount = {
+	count: Scalars[`Int`][`output`];
+	tag: Scalars[`String`][`output`];
 };
 
 export type GiftWishlistItem = {
@@ -951,6 +963,7 @@ export type Milestones = {
 
 export type Mutation = {
 	addBook: Maybe<Book>;
+	addGiftIdeas: Maybe<GiftMutationResult>;
 	addRecipesToShoppingList: Maybe<AddRecipesToShoppingListResult>;
 	checkShoppingItem: Maybe<CheckShoppingItemResult>;
 	claimGiftWishlistItem: Maybe<GiftMutationResult>;
@@ -1014,6 +1027,14 @@ export type Mutation = {
 
 export type MutationAddBookArgs = {
 	input: AddBookInput;
+};
+
+
+export type MutationAddGiftIdeasArgs = {
+	occasionId?: InputMaybe<Scalars[`ID`][`input`]>;
+	personId: Scalars[`ID`][`input`];
+	tag?: InputMaybe<Scalars[`String`][`input`]>;
+	text: Scalars[`String`][`input`];
 };
 
 
